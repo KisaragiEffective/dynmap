@@ -15,8 +15,8 @@ public class SkullRenderer extends CustomRenderer {
     private static final int NUM_DIRECTIONS = 16;
     private static final String[] tileFields = { "SkullType", "Rot" };
     
-    private RenderPatch basemesh[];
-    private RenderPatch meshes[][] = new RenderPatch[NUM_FACES * NUM_DIRECTIONS][];
+    private RenderPatch[] basemesh;
+    private RenderPatch[][] meshes = new RenderPatch[NUM_FACES * NUM_DIRECTIONS][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
@@ -43,7 +43,7 @@ public class SkullRenderer extends CustomRenderer {
         return 6 * NUM_FACES;
     }
 
-    private static final int faces[] = { 0, 1, 2, 3, 4, 5 };
+    private static final int[] faces = { 0, 1, 2, 3, 4, 5 };
     
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {

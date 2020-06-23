@@ -42,8 +42,8 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     private static class BoundingBox {
         double xmin, xmax;
         double ymin, ymax;
-        double xp[];
-        double yp[];
+        double[] xp;
+        double[] yp;
     }
     private Map<String, BoundingBox> bb_cache = null;
 

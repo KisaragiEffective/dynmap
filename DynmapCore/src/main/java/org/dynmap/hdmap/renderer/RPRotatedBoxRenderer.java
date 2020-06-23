@@ -35,7 +35,7 @@ public class RPRotatedBoxRenderer extends CustomRenderer {
         { 3, 2, 4, 5, 1, 0, 187739, 27, 112320 }, 
         { 5, 4, 3, 2, 1, 0, 114011, 110619, 1728 }, 
         { 2, 3, 5, 4, 1, 0, 224603, 27, 112320 } };
-    private int rotalg[] = new int[16]; // Rotaton algorithm (0=orientTextures,1=orientTexturesNew,2=fixed-at-0, 3=rotateTextures)
+    private int[] rotalg = new int[16]; // Rotaton algorithm (0=orientTextures,1=orientTexturesNew,2=fixed-at-0, 3=rotateTextures)
     // Models for rotation values
     private RenderPatch[][] models;
 
@@ -68,7 +68,7 @@ public class RPRotatedBoxRenderer extends CustomRenderer {
         return tileEntityAttribs;
     }
     
-    private static final int rotgrid[][] = { 
+    private static final int[][] rotgrid = {
         { 270, 180, 0, 90 }, // Bottom
         { 270, 180, 0, 90 }, // Top
         { 0, 270, 90, 180 }, // Z-

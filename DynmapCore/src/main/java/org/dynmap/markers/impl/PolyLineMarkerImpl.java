@@ -46,7 +46,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
      * @param persistent - true if persistent
      * @param set - marker set
      */
-    PolyLineMarkerImpl(String id, String lbl, boolean markup, String world, double x[], double[] y, double z[], boolean persistent, MarkerSetImpl set) {
+    PolyLineMarkerImpl(String id, String lbl, boolean markup, String world, double[] x, double[] y, double[] z, boolean persistent, MarkerSetImpl set) {
         markerid = id;
         if(lbl != null)
             label = lbl;

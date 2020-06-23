@@ -89,7 +89,7 @@ public class ForgeMapChunkCache extends MapChunkCache
     private boolean[][] isSectionNotEmpty; /* Indexed by snapshot index, then by section index */
     private Set<?> queue = null;
 
-    private static final BlockStep unstep[] = { BlockStep.X_MINUS, BlockStep.Y_MINUS, BlockStep.Z_MINUS,
+    private static final BlockStep[] unstep = { BlockStep.X_MINUS, BlockStep.Y_MINUS, BlockStep.Z_MINUS,
             BlockStep.X_PLUS, BlockStep.Y_PLUS, BlockStep.Z_PLUS
                                               };
 
@@ -1554,7 +1554,7 @@ public class ForgeMapChunkCache extends MapChunkCache
 
     static
     {
-        Biome b[] = DynmapPlugin.getBiomeList();
+        Biome[] b = DynmapPlugin.getBiomeList();
         BiomeMap[] bm = BiomeMap.values();
         biome_to_bmap = new BiomeMap[256];
 

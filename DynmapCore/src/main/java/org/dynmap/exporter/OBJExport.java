@@ -504,14 +504,14 @@ public class OBJExport {
         }
         // If needed, rotate the UV sequence
         if (rot == HFLIP) { // Flip horizonntal
-            int newuv[] = new int[uv.length];
+            int[] newuv = new int[uv.length];
             for (int i = 0; i < uv.length; i++) {
                 newuv[i] = uv[i ^ 1];
             }
             uv = newuv;
         }
         else if (rot != ROT0) {
-            int newuv[] = new int[uv.length];
+            int[] newuv = new int[uv.length];
             for (int i = 0; i < uv.length; i++) {
                 newuv[i] = uv[(i+4-rot) % uv.length];
             }

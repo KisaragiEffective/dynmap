@@ -16,7 +16,7 @@ public class HDBlockStateTextureMap {
 
     private static HDBlockStateTextureMap[] texmaps = new HDBlockStateTextureMap[DynmapBlockState.getGlobalIndexMax()];   // List of texture maps, indexed by global state index
 
-    int faces[];  /* texture index of image for each face (indexed by BlockStep.ordinal() OR patch index) */
+    int[] faces;  /* texture index of image for each face (indexed by BlockStep.ordinal() OR patch index) */
     final byte[] layers;  /* If layered, each index corresponds to faces index, and value is index of next layer */
     final private String blockset;
     final int colorMult;

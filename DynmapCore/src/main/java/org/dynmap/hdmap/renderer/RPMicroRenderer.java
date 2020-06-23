@@ -87,7 +87,7 @@ public class RPMicroRenderer extends CustomRenderer {
     private static final int NUM_TEXTURES = 70;
 
     /* Texture index = material index in RP */
-    private static final int materialTextureMap[][] = {
+    private static final int[][] materialTextureMap = {
         { 0 }, // 0 = Cobblestone (cobblestone:0)
         { 1 }, // 1 = Stone (stone:0)
         { 2 }, // 2 = Wood planks (Oak) (planks:0)

@@ -22,7 +22,7 @@ import org.json.simple.JSONObject;
 public class TopoHDShader implements HDShader {
     private final String name;
     private final Color linecolor;  /* Color for topo lines */
-    private final Color fillcolor[];  /* Color for nontopo surfaces */
+    private final Color[] fillcolor;  /* Color for nontopo surfaces */
     private final Color watercolor;
     private BitSet hiddenids;
     private final int linespacing;
@@ -118,8 +118,8 @@ public class TopoHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color[];
-        private Color tmpcolor[];
+        private Color[] color;
+        private Color[] tmpcolor;
         private Color c;
         protected MapIterator mapiter;
         protected HDMap map;

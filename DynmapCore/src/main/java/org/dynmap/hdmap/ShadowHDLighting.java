@@ -11,8 +11,8 @@ import org.dynmap.utils.BlockStep;
 
 public class ShadowHDLighting extends DefaultHDLighting {
 
-    protected final int   defLightingTable[];  /* index=skylight level, value = 256 * scaling value */
-    protected final int   lightscale[];   /* scale skylight level (light = lightscale[skylight] */
+    protected final int[] defLightingTable;  /* index=skylight level, value = 256 * scaling value */
+    protected final int[] lightscale;   /* scale skylight level (light = lightscale[skylight] */
     protected final boolean night_and_day;    /* If true, render both day (prefix+'-day') and night (prefix) tiles */
     protected final boolean smooth;
     protected final boolean useWorldBrightnessTable;

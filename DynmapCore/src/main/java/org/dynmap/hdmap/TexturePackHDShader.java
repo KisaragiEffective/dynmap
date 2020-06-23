@@ -100,8 +100,8 @@ public class TexturePackHDShader implements HDShader {
     }
     
     class ShaderState implements HDShaderState {
-        final private Color color[];
-        final private Color tmpcolor[];
+        final private Color[] color;
+        final private Color[] tmpcolor;
         final private Color c;
         final protected MapIterator mapiter;
         final protected HDMap map;

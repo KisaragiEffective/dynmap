@@ -84,10 +84,10 @@ public class DefaultHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color[];
+        private Color[] color;
         protected MapIterator mapiter;
         protected HDMap map;
-        private Color tmpcolor[];
+        private Color[] tmpcolor;
         private int pixelodd;
         private HDLighting lighting;
         final int[] lightingTable;

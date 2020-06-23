@@ -69,8 +69,8 @@ public class RedstoneWireRenderer extends CustomRenderer {
         return 2;
     }
 
-    private static final int x_off[] = { -1, 1, 0, 0 };
-    private static final int z_off[] = { 0, 0, -1, 1 };
+    private static final int[] x_off = { -1, 1, 0, 0 };
+    private static final int[] z_off = { 0, 0, -1, 1 };
     
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext mapDataCtx) {

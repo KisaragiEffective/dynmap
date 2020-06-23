@@ -129,8 +129,8 @@ public class StairStateRenderer extends CustomRenderer {
     }
 
     // Outer and inner left equivalent to outer and innter right minus 90 degrees
-    private static final int midx_by_facing[] = { 3, 2, 1, 0 };
-    private static final int midx_by_facing_left[] = { 1, 0, 2, 3 };
+    private static final int[] midx_by_facing = { 3, 2, 1, 0 };
+    private static final int[] midx_by_facing_left = { 1, 0, 2, 3 };
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
     	int idx = ctx.getBlockType().stateIndex;

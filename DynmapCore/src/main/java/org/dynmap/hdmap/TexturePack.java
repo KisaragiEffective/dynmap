@@ -335,7 +335,7 @@ public class TexturePack {
         String filename;
         String modname;             /* Modname associated with file, if any */
         int tilecnt_x, tilecnt_y;   /* Number of tiles horizontally and vertically */
-        int tile_to_dyntile[];      /* Mapping from tile index in tile file to dynamic ID in global tile table (terrain_argb): 0=unassigned */
+        int[] tile_to_dyntile;      /* Mapping from tile index in tile file to dynamic ID in global tile table (terrain_argb): 0=unassigned */
         TileFileFormat format;
         List<CustomTileRec> cust;
         String[] tilenames;         /* For TILESET, array of tilenames, indexed by tile index */
@@ -869,7 +869,7 @@ public class TexturePack {
             copySubimageFromImage(img_id, 1 * mult, 1 * mult, 15 * mult, 4 * mult, 1 * mult, 4 * mult, tile, 16 * mult);
         }
         /* Put scaled result into tile buffer */
-        int new_argb[] = new int[native_scale*native_scale];
+        int[] new_argb = new int[native_scale*native_scale];
         scaleTerrainPNGSubImage(16*mult, native_scale, tile, new_argb);
         setTileARGB(dest_idx, new_argb);
     }
@@ -900,7 +900,7 @@ public class TexturePack {
             copySubimageFromImage(img_id, 1 * mult, 0, 15 * mult, 15 * mult, 1 * mult, 1 * mult, tile, 16 * mult);
         }
         /* Put scaled result into tile buffer */
-        int new_argb[] = new int[native_scale*native_scale];
+        int[] new_argb = new int[native_scale*native_scale];
         scaleTerrainPNGSubImage(16*mult, native_scale, tile, new_argb);
         setTileARGB(dest_idx, new_argb);
     }
@@ -945,7 +945,7 @@ public class TexturePack {
         int[] tile = new int[24 * 24 * mult * mult];    /* Make image (all are 24x24) */
         copySubimageFromImage(img_id, src_x * mult, src_y * mult, 0, (24-height)*mult, width * mult, height * mult, tile, 24 * mult);
         /* Put scaled result into tile buffer */
-        int new_argb[] = new int[native_scale*native_scale];
+        int[] new_argb = new int[native_scale*native_scale];
         scaleTerrainPNGSubImage(24*mult, native_scale, tile, new_argb);
         setTileARGB(dest_idx, new_argb);
     }
@@ -977,7 +977,7 @@ public class TexturePack {
         int[] tile = new int[8 * 8 * mult * mult];    /* Make image (all are 8x8) */
         copySubimageFromImage(img_id, src_x * mult, src_y * mult, 0, 0, 8 * mult, 8 * mult, tile, 8 * mult);
         /* Put scaled result into tile buffer */
-        int new_argb[] = new int[native_scale*native_scale];
+        int[] new_argb = new int[native_scale*native_scale];
         scaleTerrainPNGSubImage(8 * mult, native_scale, tile, new_argb);
         setTileARGB(dest_idx, new_argb);
     }
@@ -1008,7 +1008,7 @@ public class TexturePack {
         /* Bottom half of the shulker */
         combineSubimageFromImage(img_id, src_x * mult, src_y_btm * mult, 0, 8 * mult, 16 * mult, 8 * mult, tile, 16 * mult);
         /* Put scaled result into tile buffer */
-        int new_argb[] = new int[native_scale*native_scale];
+        int[] new_argb = new int[native_scale*native_scale];
         scaleTerrainPNGSubImage(16 * mult, native_scale, tile, new_argb);
         setTileARGB(dest_idx, new_argb);
     }
@@ -1025,7 +1025,7 @@ public class TexturePack {
         int[] tile = new int[16 * 16 * mult * mult];    /* Make image (all are 16x16) */
         copySubimageFromImage(img_id, src_x * mult, src_y * mult, 0, 0, 16 * mult, 16 * mult, tile, 16 * mult);
         /* Put scaled result into tile buffer */
-        int new_argb[] = new int[native_scale*native_scale];
+        int[] new_argb = new int[native_scale*native_scale];
         scaleTerrainPNGSubImage(16 * mult, native_scale, tile, new_argb);
         setTileARGB(dest_idx, new_argb);
     }
@@ -1053,7 +1053,7 @@ public class TexturePack {
             copySubimageFromImage(img_id, ctr.srcx * mult, ctr.srcy * mult, ctr.targetx * mult, ctr.targety * mult, 
                     ctr.width * mult, ctr.height * mult, tile, 16 * mult);
             /* Put scaled result into tile buffer */
-            int new_argb[] = new int[native_scale*native_scale];
+            int[] new_argb = new int[native_scale*native_scale];
             scaleTerrainPNGSubImage(16*mult, native_scale, tile, new_argb);
             setTileARGB(imgids[i], new_argb);
         }
@@ -1288,7 +1288,7 @@ public class TexturePack {
                 int dim = li.width / dtf.tilecnt_x; /* Dimension of each tile */
                 int dim2 = li.height / dtf.tilecnt_y;
                 if (dim2 < dim) dim = dim2;
-                int old_argb[] = new int[dim*dim];
+                int[] old_argb = new int[dim*dim];
                 for(int x = 0; x < dtf.tilecnt_x; x++) {
                     for(int y = 0; y < dtf.tilecnt_y; y++) {
                         int tileidx = dtf.tile_to_dyntile[y*dtf.tilecnt_x + x];
@@ -1299,7 +1299,7 @@ public class TexturePack {
                                 System.arraycopy(li.argb, (y*dim+j)*li.width + (x*dim), old_argb, j*dim, dim); 
                             }
                             /* Rescale to match rest of terrain PNG */
-                            int new_argb[] = new int[native_scale*native_scale];
+                            int[] new_argb = new int[native_scale*native_scale];
                             scaleTerrainPNGSubImage(dim, native_scale, old_argb, new_argb);
                             setTileARGB(tileidx, new_argb);
                         }
@@ -1381,7 +1381,7 @@ public class TexturePack {
     /* Patch image into texture table */
     private void patchTextureWithImage(int image_idx, int block_idx) {
         /* Now, patch in to block table */
-        int new_argb[] = new int[native_scale*native_scale];
+        int[] new_argb = new int[native_scale*native_scale];
         scaleTerrainPNGSubImage(imgs[image_idx].width, native_scale, imgs[image_idx].argb, new_argb);
         setTileARGB(block_idx, new_argb);
         
@@ -1440,8 +1440,8 @@ public class TexturePack {
          * receives input from 1 or 2 source pixels on each axis
          */
         else if(res > nativeres) {
-            int weights[] = new int[res];
-            int offsets[] = new int[res];
+            int[] weights = new int[res];
+            int[] offsets = new int[res];
             /* LCM of resolutions is used as length of line (res * nativeres)
              * Each native block is (res) long, each scaled block is (nativeres) long
              * Each scaled block overlaps 1 or 2 native blocks: starting with native block 'offsets[]' with
@@ -1493,8 +1493,8 @@ public class TexturePack {
             }
         }
         else {  /* nativeres > res */
-            int weights[] = new int[nativeres];
-            int offsets[] = new int[nativeres];
+            int[] weights = new int[nativeres];
+            int[] offsets = new int[nativeres];
             /* LCM of resolutions is used as length of line (res * nativeres)
              * Each native block is (res) long, each scaled block is (nativeres) long
              * Each native block overlaps 1 or 2 scaled blocks: starting with scaled block 'offsets[]' with
@@ -1509,10 +1509,10 @@ public class TexturePack {
                     weights[idx] = (offsets[idx]*nativeres + nativeres) - v;
                 }
             }
-            double accum_red[] = new double[res*res];
-            double accum_green[] = new double[res*res];
-            double accum_blue[] = new double[res*res];
-            double accum_alpha[] = new double[res*res];
+            double[] accum_red = new double[res*res];
+            double[] accum_green = new double[res*res];
+            double[] accum_blue = new double[res*res];
+            double[] accum_alpha = new double[res*res];
             
             /* Now, use weights and indices to fill in scaled map */
             for(int y = 0; y < nativeres; y++) {
@@ -1940,9 +1940,9 @@ public class TexturePack {
                     int srctxtid = TXTID_TERRAINPNG;
                     if (!terrain_ok)
                         srctxtid = TXTID_INVALID;  // Mark as not usable
-                    int faces[] = new int[] { TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK };
-                    int txtidx[] = new int[] { -1, -1, -1, -1, -1, -1 };
-                    byte layers[] = null;
+                    int[] faces = new int[] { TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK, TILEINDEX_BLANK };
+                    int[] txtidx = new int[] { -1, -1, -1, -1, -1, -1 };
+                    byte[] layers = null;
                     line = line.substring(6);
                     BlockTransparency trans = BlockTransparency.OPAQUE;
                     int colorMult = 0;
@@ -2028,7 +2028,7 @@ public class TexturePack {
                                     Log.severe("Texture mapping has invalid face index - " + av[1] + " - line " + rdr.getLineNumber() + " of " + txtname);
                                     return;
                                 }
-                                int faceToOrd[] = { BlockStep.Y_PLUS.ordinal(), BlockStep.Y_MINUS.ordinal(),
+                                int[] faceToOrd = { BlockStep.Y_PLUS.ordinal(), BlockStep.Y_MINUS.ordinal(),
                                         BlockStep.Z_PLUS.ordinal(), BlockStep.Z_MINUS.ordinal(),
                                         BlockStep.X_PLUS.ordinal(), BlockStep.X_MINUS.ordinal()
                                 };
@@ -2127,7 +2127,7 @@ public class TexturePack {
                                     layers = new byte[faces.length];
                                     Arrays.fill(layers, (byte)-1);
                                 }
-                                String v[] = av[0].substring(5).split("-");
+                                String[] v = av[0].substring(5).split("-");
                                 int id1, id2;
                                 id1 = id2 = Integer.parseInt(v[0]);
                                 if(v.length > 1) {
@@ -2430,7 +2430,7 @@ public class TexturePack {
                 }
                 else if(line.startsWith("var:")) {  /* Test if variable declaration */
                     line = line.substring(4).trim();
-                    String args[] = line.split(",");
+                    String[] args = line.split(",");
                     for (String arg : args) {
                         String[] v = arg.split("=");
                         if (v.length < 2) {
@@ -2500,7 +2500,7 @@ public class TexturePack {
                 }
                 else if(line.startsWith("biome:")) {
                     line = line.substring(6).trim();
-                    String args[] = line.split(",");
+                    String[] args = line.split(",");
                     int id = 0;
                     int grasscolormult = -1;
                     int foliagecolormult = -1;

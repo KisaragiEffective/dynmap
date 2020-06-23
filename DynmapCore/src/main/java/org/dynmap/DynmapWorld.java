@@ -105,7 +105,7 @@ public abstract class DynmapWorld {
         for (MapTypeState mts : mapstate) {
             if (cancelled) return;
             MapType mt = mts.type;
-            MapType.ImageVariant var[] = mt.getVariants();
+            MapType.ImageVariant[] var = mt.getVariants();
             mts.startZoomOutIter(); // Start iterator
             while (mts.nextZoomOutInv(c)) {
                 if(cancelled) return;

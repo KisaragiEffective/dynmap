@@ -609,7 +609,7 @@ public class DynmapCore implements DynmapCommonAPI {
                 for (int i = 0; (!done) && (i < sides.length); i++) {
                     int idx = map.getIndexForFace(sides[i]);
                     if (idx < 0) continue;
-                    int rgb[] = tp.getTileARGB(idx % 1000000);
+                    int[] rgb = tp.getTileARGB(idx % 1000000);
                     if (rgb == null) continue;
                     if (rgb[0] == 0) continue;
                     c.setARGB(rgb[0]);

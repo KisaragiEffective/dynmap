@@ -16,7 +16,7 @@ public class BoxRenderer extends CustomRenderer {
     // Models for rotation values
     private RenderPatch[] model;
     // Patch index ordering, corresponding to BlockStep ordinal order
-    private static final int patchlist[] = { 1, 4, 2, 5, 0, 3 };
+    private static final int[] patchlist = { 1, 4, 2, 5, 0, 3 };
 
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

@@ -107,7 +107,7 @@ public class ImmibisMicroRenderer extends CustomRenderer {
     private static final int NUM_TEXTURES = 102;
 
     /* Texture index = material index in RP */
-    private static final int materialTextureMap[][] = {
+    private static final int[][] materialTextureMap = {
         { 0 }, // 0 = ?
         { 0 }, // 1 = Stone (stone:0)
         { 0 }, // 2 = N/A
@@ -255,7 +255,7 @@ public class ImmibisMicroRenderer extends CustomRenderer {
         SPAN
     }
 
-    private static final AxisPos axes_by_pos[][] = {
+    private static final AxisPos[][] axes_by_pos = {
         { AxisPos.CENTER, AxisPos.CENTER, AxisPos.CENTER }, // Centre
         { AxisPos.NEGATIVE, AxisPos.SPAN, AxisPos.SPAN }, // FaceNX
         { AxisPos.POSITIVE, AxisPos.SPAN, AxisPos.SPAN }, // FacePX

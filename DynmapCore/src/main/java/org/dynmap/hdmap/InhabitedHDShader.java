@@ -22,8 +22,8 @@ import org.json.simple.JSONObject;
 
 public class InhabitedHDShader implements HDShader {
     private final String name;
-    private final long filllevel[]; /* Values for colors */
-    private final Color fillcolor[];
+    private final long[] filllevel; /* Values for colors */
+    private final Color[] fillcolor;
     
     private Color readColor(String id, ConfigurationNode cfg) {
         String lclr = cfg.getString(id, null);
@@ -97,7 +97,7 @@ public class InhabitedHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color[];
+        private Color[] color;
         private Color c;
         protected HDMap map;
         private HDLighting lighting;

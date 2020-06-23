@@ -313,7 +313,7 @@ public class HDBlockModels {
     }
 
     // Patch index ordering, corresponding to BlockStep ordinal order
-    public static final int boxPatchList[] = { 1, 4, 0, 3, 2, 5 };
+    public static final int[] boxPatchList = { 1, 4, 0, 3, 2, 5 };
 
     private static class BoxLimits {
         double xmin = 0.0, xmax = 1.0, ymin = 0.0, ymax = 1.0, zmin = 0.0, zmax = 1.0;
@@ -418,7 +418,7 @@ public class HDBlockModels {
                 }
                 else if(line.startsWith("layer:")) {
                     line = line.substring(6);
-                    String args[] = line.split(",");
+                    String[] args = line.split(",");
                     layerbits = 0;
                     rownum = 0;
                     for(String a: args) {
@@ -427,7 +427,7 @@ public class HDBlockModels {
                 }
                 else if(line.startsWith("rotate:")) {
                     line = line.substring(7);
-                    String args[] = line.split(",");
+                    String[] args = line.split(",");
                     String id = null;
                     int data = -1;
                     int rot = -1;
@@ -488,7 +488,7 @@ public class HDBlockModels {
                 }
                 else if(line.startsWith("patchrotate:")) {
                     line = line.substring(12);
-                    String args[] = line.split(",");
+                    String[] args = line.split(",");
                     String id = null;
                     int data = -1;
                     int rotx = 0;
@@ -517,8 +517,8 @@ public class HDBlockModels {
                     }
                     else if((mod != null) && (mod instanceof HDBlockPatchModel)) {
                         HDBlockPatchModel pmod = (HDBlockPatchModel)mod;
-                        PatchDefinition patches[] = pmod.getPatches();
-                        PatchDefinition newpatches[] = new PatchDefinition[patches.length];
+                        PatchDefinition[] patches = pmod.getPatches();
+                        PatchDefinition[] newpatches = new PatchDefinition[patches.length];
                         for(int i = 0; i < patches.length; i++) {
                             newpatches[i] = (PatchDefinition)pdf.getRotatedPatch(patches[i], rotx, roty, rotz, patches[i].textureindex);
                         }
@@ -595,7 +595,7 @@ public class HDBlockModels {
                 }
                 else if(line.startsWith("var:")) {  /* Test if variable declaration */
                     line = line.substring(4).trim();
-                    String args[] = line.split(",");
+                    String[] args = line.split(",");
                     for (String arg : args) {
                         String[] v = arg.split("=");
                         if (v.length < 2) {
@@ -1104,7 +1104,7 @@ public class HDBlockModels {
             pdf.setPatchNameMape(null);
         }
     }
-    private static long vscale[] = { 10000000000L, 100000000, 1000000, 10000, 100, 1 };
+    private static long[] vscale = { 10000000000L, 100000000, 1000000, 10000, 100, 1 };
 
     private static String normalizeVersion(String v) {
         StringBuilder v2 = new StringBuilder();

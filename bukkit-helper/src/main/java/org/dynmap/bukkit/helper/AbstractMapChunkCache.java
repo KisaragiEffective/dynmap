@@ -78,7 +78,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
     protected long[] inhabitedTicks;  /* Index = (x-x_min) + ((z-z_min)*x_dim) */
     private static final BiomeMap[] nullBiomeMap = { BiomeMap.NULL };
         
-    private static final BlockStep unstep[] = { BlockStep.X_MINUS, BlockStep.Y_MINUS, BlockStep.Z_MINUS,
+    private static final BlockStep[] unstep = { BlockStep.X_MINUS, BlockStep.Y_MINUS, BlockStep.Z_MINUS,
         BlockStep.X_PLUS, BlockStep.Y_PLUS, BlockStep.Z_PLUS };
 
     private static BiomeMap[] biome_to_bmap;

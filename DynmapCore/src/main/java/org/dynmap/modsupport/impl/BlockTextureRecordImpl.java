@@ -71,7 +71,7 @@ public class BlockTextureRecordImpl implements BlockTextureRecord {
     public static final int COLORMOD_MULTTONED_CLEARINSIDE = 21; // MULTTONED + CLEARINSIDE
     public static final int COLORMOD_FOLIAGEMULTTONED = 22; // FOLIAGETONED + colorMult or custColorMult
 
-    private static final int modValueByModifierOrd[] = {
+    private static final int[] modValueByModifierOrd = {
         0,                                  // NONE
         TexturePack.COLORMOD_GRASSTONED,    // GRASSTONED
         TexturePack.COLORMOD_FOLIAGETONED,  // FOLIAGETONED

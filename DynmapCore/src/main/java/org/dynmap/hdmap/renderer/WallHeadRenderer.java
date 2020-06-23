@@ -13,8 +13,8 @@ import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 public class WallHeadRenderer extends CustomRenderer {
     private static final int NUM_DIRECTIONS = 16;
     
-    private RenderPatch basemesh[];
-    private RenderPatch meshes[][] = new RenderPatch[NUM_DIRECTIONS][];
+    private RenderPatch[] basemesh;
+    private RenderPatch[][] meshes = new RenderPatch[NUM_DIRECTIONS][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
@@ -41,7 +41,7 @@ public class WallHeadRenderer extends CustomRenderer {
         return 6;
     }
 
-    private static final int faces[] = { 0, 1, 2, 3, 4, 5 };
+    private static final int[] faces = { 0, 1, 2, 3, 4, 5 };
     
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {

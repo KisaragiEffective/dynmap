@@ -75,7 +75,7 @@ public class BukkitVersionHelperGlowstone extends BukkitVersionHelper {
 
     @Override
     public Object[] getBiomeBaseFromSnapshot(ChunkSnapshot css) {
-        Integer b[] = new Integer[256];
+        Integer[] b = new Integer[256];
         byte[] rb = null;
         try {
             rb = (byte[]) rawbiome.invoke(css, new Object[0]);

@@ -10,7 +10,7 @@ public class Armor {
      * We rely on getArmorContents() to return 4 armor pieces in the order
      * of: boots, pants, chest, helmet
      */
-    private static final int armorPoints[] = {3, 6, 8, 3};
+    private static final int[] armorPoints = {3, 6, 8, 3};
 
     public static final int getArmorPoints(Player player) {
         int currentDurability = 0;

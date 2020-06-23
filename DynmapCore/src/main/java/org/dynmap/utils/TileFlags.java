@@ -46,7 +46,7 @@ public class TileFlags {
 	        String[] tok = v.split(":");
 	        long[] row = new long[64];
 	        try {
-	            String ss[] = tok[0].split("/");
+	            String[] ss = tok[0].split("/");
 	            long rowaddr = (Long.parseLong(ss[0], 16)<<32) | Long.parseLong(ss[1],16);
 	            for(int i = 0; (i < 64) && (i < (tok.length-1)); i++) {
 	                ss = tok[i+1].split("/");

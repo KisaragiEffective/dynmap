@@ -56,7 +56,7 @@ public class RotatedBoxRenderer extends CustomRenderer {
                 }
             }
             else {
-                String sv[] = v.split("/");
+                String[] sv = v.split("/");
                 int x = 0, y = 0, z = 0;
                 if(sv.length == 1) {    /* Only 1 = Y axis */
                     try {

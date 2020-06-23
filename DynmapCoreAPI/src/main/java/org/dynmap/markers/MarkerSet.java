@@ -81,7 +81,7 @@ public interface MarkerSet {
      * @param z - z coord list
      * @param persistent - true if persistent
      */
-    AreaMarker createAreaMarker(String id, String lbl, boolean markup, String world, double x[], double z[], boolean persistent);
+    AreaMarker createAreaMarker(String id, String lbl, boolean markup, String world, double[] x, double[] z, boolean persistent);
     /**
      * Get area marker by ID
      * @param id - ID of the area marker
@@ -106,7 +106,7 @@ public interface MarkerSet {
      * @param z - z coord list
      * @param persistent - true if persistent
      */
-    PolyLineMarker createPolyLineMarker(String id, String lbl, boolean markup, String world, double x[], double[] y, double z[], boolean persistent);
+    PolyLineMarker createPolyLineMarker(String id, String lbl, boolean markup, String world, double[] x, double[] y, double[] z, boolean persistent);
     /**
      * Get poly-line marker by ID
      * @param id - ID of the poly-line marker

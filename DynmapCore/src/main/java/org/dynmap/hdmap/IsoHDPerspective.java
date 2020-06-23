@@ -121,11 +121,11 @@ public class IsoHDPerspective implements HDPerspective {
         Vector3D vS = new Vector3D();
         Vector3D d_cross_uv = new Vector3D();
         // Double max patch count to be safe for patches + water patches
-        double patch_t[] = new double[2*HDBlockModels.getMaxPatchCount()];
-        double patch_u[] = new double[2*HDBlockModels.getMaxPatchCount()];
-        double patch_v[] = new double[2*HDBlockModels.getMaxPatchCount()];
-        BlockStep patch_step[] = new BlockStep[2*HDBlockModels.getMaxPatchCount()];
-        int patch_id[] = new int[2*HDBlockModels.getMaxPatchCount()];
+        double[] patch_t = new double[2*HDBlockModels.getMaxPatchCount()];
+        double[] patch_u = new double[2*HDBlockModels.getMaxPatchCount()];
+        double[] patch_v = new double[2*HDBlockModels.getMaxPatchCount()];
+        BlockStep[] patch_step = new BlockStep[2*HDBlockModels.getMaxPatchCount()];
+        int[] patch_id = new int[2*HDBlockModels.getMaxPatchCount()];
         int cur_patch = -1;
         double cur_patch_u;
         double cur_patch_v;
@@ -137,7 +137,7 @@ public class IsoHDPerspective implements HDPerspective {
         boolean skiptoair;
         final int worldheight;
         final int heightmask;
-        final LightLevels llcache[];
+        final LightLevels[] llcache;
         
         /* Cache for custom model patch lists */
         private final DynLongHashMap custom_meshes;
@@ -1035,7 +1035,7 @@ public class IsoHDPerspective implements HDPerspective {
     @Override
     public List<TileFlags.TileCoord> getTileCoords(DynmapWorld world, int minx, int miny, int minz, int maxx, int maxy, int maxz) {
         ArrayList<TileFlags.TileCoord> tiles = new ArrayList<TileFlags.TileCoord>();
-        Vector3D blocks[] = new Vector3D[] { new Vector3D(), new Vector3D() };
+        Vector3D[] blocks = new Vector3D[] { new Vector3D(), new Vector3D() };
         blocks[0].x = minx - 1;
         blocks[0].y = miny - 1;
         blocks[0].z = minz - 1;
@@ -1092,7 +1092,7 @@ public class IsoHDPerspective implements HDPerspective {
             new HDMapTile(w, this, x - 1, y, t.boostzoom) };
     }
 
-    private static final int corners_by_side[][] = {
+    private static final int[][] corners_by_side = {
         { 1, 3, 7, 5 }, // Top
         { 0, 2, 6, 4 }, // Bottom
         { 0, 1, 3, 2 }, // Left
@@ -1121,7 +1121,7 @@ public class IsoHDPerspective implements HDPerspective {
          * 5 = top-lower-right (XyZ), 
          * 6 = bottom-upper-right (XYz), 
          * 7 = top-upper-right (XYZ) */  
-        Vector3D corners[] = new Vector3D[8];
+        Vector3D[] corners = new Vector3D[8];
         double dx = -basemodscale, dy = -basemodscale;    /* Add 1 block on each axis */
         for(int x = t.tx, idx = 0; x <= (t.tx+1); x++) {
             dy = -basemodscale;
@@ -1194,13 +1194,13 @@ public class IsoHDPerspective implements HDPerspective {
         /* Check if nether world */
         boolean isnether = world.isNether();
         /* Create buffered image for each */
-        DynmapBufferedImage im[] = new DynmapBufferedImage[numshaders];
-        DynmapBufferedImage dayim[] = new DynmapBufferedImage[numshaders];
+        DynmapBufferedImage[] im = new DynmapBufferedImage[numshaders];
+        DynmapBufferedImage[] dayim = new DynmapBufferedImage[numshaders];
         int[][] argb_buf = new int[numshaders][];
         int[][] day_argb_buf = new int[numshaders][];
-        boolean isjpg[] = new boolean[numshaders];
-        int bgday[] = new int[numshaders];
-        int bgnight[] = new int[numshaders];
+        boolean[] isjpg = new boolean[numshaders];
+        int[] bgday = new int[numshaders];
+        int[] bgnight = new int[numshaders];
         
         for(int i = 0; i < numshaders; i++) {
             HDLighting lighting = shaderstate[i].getLighting();
@@ -1229,8 +1229,8 @@ public class IsoHDPerspective implements HDPerspective {
         ps.direction = new Vector3D();
         double xbase = tile.tx * tileWidth;
         double ybase = tile.ty * tileHeight;
-        boolean shaderdone[] = new boolean[numshaders];
-        boolean rendered[] = new boolean[numshaders];
+        boolean[] shaderdone = new boolean[numshaders];
+        boolean[] rendered = new boolean[numshaders];
         double height = maxheight;
         if(height < 0) {    /* Not set - assume world height - 1 */
             if (isnether)

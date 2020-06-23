@@ -183,14 +183,14 @@ public class StairBlockRenderer extends CustomRenderer {
     // 1 = open to NW
     // 2 = open to SE
     // 3 = open to NE
-    private static final int off_x[] = { 1, -1, 0, 0, 1, -1, 0, 0 };
-    private static final int off_z[] = { 0, 0, 1, -1, 0, 0, 1, -1 };
-    private static final int match1[] = { 2, 3, 0, 1, 6, 7, 4, 5 };
-    private static final int corner1[] = { 3, 1, 3, 1, 7, 5, 7, 5 };
-    private static final int icorner1[] = { 1, 2, 1, 2, 5, 6, 5, 6 };
-    private static final int match2[] = { 3, 2, 1, 0, 7, 6, 5, 4 };
-    private static final int corner2[] = { 0, 2, 2, 0, 4, 6, 6, 4 };
-    private static final int icorner2[] = { 0, 3, 3, 0, 4, 7, 7, 4 };
+    private static final int[] off_x = { 1, -1, 0, 0, 1, -1, 0, 0 };
+    private static final int[] off_z = { 0, 0, 1, -1, 0, 0, 1, -1 };
+    private static final int[] match1 = { 2, 3, 0, 1, 6, 7, 4, 5 };
+    private static final int[] corner1 = { 3, 1, 3, 1, 7, 5, 7, 5 };
+    private static final int[] icorner1 = { 1, 2, 1, 2, 5, 6, 5, 6 };
+    private static final int[] match2 = { 3, 2, 1, 0, 7, 6, 5, 4 };
+    private static final int[] corner2 = { 0, 2, 2, 0, 4, 6, 6, 4 };
+    private static final int[] icorner2 = { 0, 3, 3, 0, 4, 7, 7, 4 };
     
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {

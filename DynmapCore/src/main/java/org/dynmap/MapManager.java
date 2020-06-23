@@ -113,8 +113,8 @@ public class MapManager {
 
     /* Chunk load performance numbers */
     AtomicInteger chunk_caches_created = new AtomicInteger(0);
-    AtomicInteger chunks_read[];
-    AtomicLong chunks_read_times[];
+    AtomicInteger[] chunks_read;
+    AtomicLong[] chunks_read_times;
     
     /* lock for our data structures */
     public static final Object lock = new Object();

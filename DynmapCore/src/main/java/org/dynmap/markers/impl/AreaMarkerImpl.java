@@ -53,8 +53,8 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
     private static class BoundingBox {
         double xmin, xmax;
         double ymin, ymax;
-        double xp[];
-        double yp[];
+        double[] xp;
+        double[] yp;
     }
     private Map<String, BoundingBox> bb_cache = null;
     
@@ -69,7 +69,7 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
      * @param persistent - true if persistent
      * @param set - marker set
      */
-    AreaMarkerImpl(String id, String lbl, boolean markup, String world, double x[], double z[], boolean persistent, MarkerSetImpl set) {
+    AreaMarkerImpl(String id, String lbl, boolean markup, String world, double[] x, double[] z, boolean persistent, MarkerSetImpl set) {
         markerid = id;
         if(lbl != null)
             label = lbl;
