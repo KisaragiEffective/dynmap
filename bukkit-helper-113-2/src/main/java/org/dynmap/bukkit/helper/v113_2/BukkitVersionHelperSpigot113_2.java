@@ -2,42 +2,30 @@ package org.dynmap.bukkit.helper.v113_2;
 
 import java.lang.reflect.Field;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.entity.Player;
 import org.dynmap.DynmapChunk;
 import org.dynmap.Log;
-import org.dynmap.bukkit.helper.BukkitVersionHelper;
 import org.dynmap.bukkit.helper.BukkitVersionHelperCB;
 import org.dynmap.bukkit.helper.BukkitWorld;
 import org.dynmap.bukkit.helper.v113_2.MapChunkCache113_2;
-import org.dynmap.hdmap.HDBlockModels;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.Polygon;
-import org.dynmap.common.BiomeMap;
 
 import net.minecraft.server.v1_13_R2.BiomeBase;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockFluids;
 import net.minecraft.server.v1_13_R2.BlockLogAbstract;
 import net.minecraft.server.v1_13_R2.IBlockData;
-import net.minecraft.server.v1_13_R2.IBlockState;
 import net.minecraft.server.v1_13_R2.IRegistry;
 import net.minecraft.server.v1_13_R2.Material;
 

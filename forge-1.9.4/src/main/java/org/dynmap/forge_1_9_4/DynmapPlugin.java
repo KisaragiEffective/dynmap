@@ -96,7 +96,6 @@ import org.dynmap.forge_1_9_4.permissions.OpPermissions;
 import org.dynmap.forge_1_9_4.permissions.PermissionProvider;
 import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
-import org.dynmap.utils.DynIntHashMap;
 import org.dynmap.utils.DynmapLogger;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.VisibilityLimit;

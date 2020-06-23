@@ -101,7 +101,6 @@ import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.hdmap.HDMap;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.modsupport.ModSupportImpl;
-import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.Polygon;
 import org.dynmap.utils.VisibilityLimit;

@@ -8,10 +8,8 @@ import java.util.concurrent.Future;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.user.User;
-import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.cacheddata.CachedPermissionData;
 import net.luckperms.api.cacheddata.CachedDataManager;
-import net.luckperms.api.query.QueryOptions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

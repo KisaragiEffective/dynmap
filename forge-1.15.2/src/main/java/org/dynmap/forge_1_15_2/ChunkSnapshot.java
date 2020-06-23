@@ -2,7 +2,6 @@ package org.dynmap.forge_1_15_2;
 
 import java.util.Arrays;
 
-import org.dynmap.Log;
 import org.dynmap.renderer.DynmapBlockState;
 
 import net.minecraft.nbt.CompoundNBT;

@@ -9,7 +9,6 @@ import org.dynmap.bukkit.helper.BukkitVersionHelper;
 import org.dynmap.renderer.DynmapBlockState;
 
 import net.minecraft.server.v1_13_R2.DataPaletteBlock;
-import net.minecraft.server.v1_13_R2.Chunk;
 
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread

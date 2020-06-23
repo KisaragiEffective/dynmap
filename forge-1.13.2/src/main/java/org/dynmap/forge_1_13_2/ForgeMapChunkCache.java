@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.INBTBase;
@@ -23,7 +22,6 @@ import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.nbt.NBTTagShort;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;

@@ -103,7 +103,6 @@ import org.dynmap.forge_1_10_2.ForgeWorld;
 import org.dynmap.forge_1_10_2.DynmapPlugin.WorldUpdateTracker;
 import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
-import org.dynmap.utils.DynIntHashMap;
 import org.dynmap.utils.DynmapLogger;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.VisibilityLimit;

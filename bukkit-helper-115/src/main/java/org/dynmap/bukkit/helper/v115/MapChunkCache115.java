@@ -1,8 +1,6 @@
 package org.dynmap.bukkit.helper.v115;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 
 import java.io.IOException;

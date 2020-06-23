@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Map;
 
-import org.dynmap.Log;
 import org.dynmap.renderer.CustomRenderer;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.renderer.MapDataContext;

@@ -8,7 +8,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.EndDimension;
-import net.minecraft.world.dimension.NetherDimension;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.LightType;
