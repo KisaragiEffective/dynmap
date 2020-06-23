@@ -75,7 +75,7 @@ class MarkerIconImpl implements MarkerIcon {
         if(is_builtin)
             return null;
         
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
 
         return node;

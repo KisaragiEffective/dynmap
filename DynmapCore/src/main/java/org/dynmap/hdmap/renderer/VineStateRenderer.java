@@ -32,7 +32,7 @@ public class VineStateRenderer extends CustomRenderer {
         RenderPatch East = rpf.getPatch(0.95, 0.0, 0.0, 0.95, 0.0, 1.0, 0.95, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, SideVisible.BOTH, 0);
         RenderPatch North = rpf.getPatch(0.0, 0.0, 0.05, 1.0, 0.0, 0.05, 0.0, 1.0, 0.05, 0.0, 1.0, 0.0, 1.0, SideVisible.BOTH, 0);
         RenderPatch South = rpf.getPatch(0.0, 0.0, 0.95, 1.0, 0.0, 0.95, 0.0, 1.0, 0.95, 0.0, 1.0, 0.0, 1.0, SideVisible.BOTH, 0);
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for (int i = 0; i < 32; i++) {
             list.clear();
             if ((i & 0x10) == 0) list.add(East);

@@ -22,7 +22,7 @@ public class BlockTextureRecordImpl implements BlockTextureRecord {
         private TextureModifier txtMod;
     }
     
-    private ArrayList<TexturePatch> txtPatches = new ArrayList<TexturePatch>();
+    private ArrayList<TexturePatch> txtPatches = new ArrayList<>();
     private TexturePatch blockColor = null;
     
     private static final int[] patchBySideOrdinal = {

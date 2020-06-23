@@ -12,7 +12,7 @@ import org.dynmap.modsupport.impl.ModTextureDefinitionImpl;
  * Implementation of ModSupportAPI
  */
 public class ModSupportImpl extends ModSupportAPI {
-    private HashMap<String, ModTextureDefinitionImpl> txtDefsByModID = new HashMap<String, ModTextureDefinitionImpl>();
+    private HashMap<String, ModTextureDefinitionImpl> txtDefsByModID = new HashMap<>();
     
     /**
      * Initialize mod support API

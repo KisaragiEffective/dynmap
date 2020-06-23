@@ -931,7 +931,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         	}
         }
         else {
-        	chunks = new ArrayList<DynmapChunk>();
+        	chunks = new ArrayList<>();
         }
         nsect = dw.worldheight >> 4;
         this.chunks = chunks;
@@ -1039,7 +1039,7 @@ public class ForgeMapChunkCache extends MapChunkCache
                 break;
             case 9: // List
                 ListNBT tl = (ListNBT) v;
-                ArrayList<Object> vlist = new ArrayList<Object>();
+                ArrayList<Object> vlist = new ArrayList<>();
                 int type = tl.getTagType();
                 for (int i = 0; i < tl.size(); i++) {
                     switch (type) {
@@ -1069,7 +1069,7 @@ public class ForgeMapChunkCache extends MapChunkCache
                 break;
             case 10: // Map
                 CompoundNBT tc = (CompoundNBT) v;
-                HashMap<String, Object> vmap = new HashMap<String, Object>();
+                HashMap<String, Object> vmap = new HashMap<>();
                 for (Object t : tc.keySet()) {
                     String st = (String) t;
                     INBT tg = tc.get(st);
@@ -1142,7 +1142,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         ListNBT tiles = nbt.getList("TileEntities", 10);
         if(tiles == null) tiles = new ListNBT();
         /* Get tile entity data */
-        List<Object> vals = new ArrayList<Object>();
+        List<Object> vals = new ArrayList<>();
         for(int tid = 0; tid < tiles.size(); tid++) {
             CompoundNBT tc = tiles.getCompound(tid);
             int tx = tc.getInt("x");
@@ -1419,7 +1419,7 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     public void setVisibleRange(VisibilityLimit lim) {
         if(visible_limits == null)
-            visible_limits = new ArrayList<VisibilityLimit>();
+            visible_limits = new ArrayList<>();
         visible_limits.add(lim);
     }
     /**
@@ -1429,7 +1429,7 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     public void setHiddenRange(VisibilityLimit lim) {
         if(hidden_limits == null)
-            hidden_limits = new ArrayList<VisibilityLimit>();
+            hidden_limits = new ArrayList<>();
         hidden_limits.add(lim);
     }
     @Override

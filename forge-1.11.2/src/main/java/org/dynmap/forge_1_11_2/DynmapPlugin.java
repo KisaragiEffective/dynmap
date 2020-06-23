@@ -125,15 +125,15 @@ public class DynmapPlugin
     private net.minecraft.server.MinecraftServer server;
     public static DynmapPlugin plugin;
     private ChatHandler chathandler;
-    private HashMap<String, Integer> sortWeights = new HashMap<String, Integer>(); 
+    private HashMap<String, Integer> sortWeights = new HashMap<>();
     // Drop world load ticket after 30 seconds
     private long worldIdleTimeoutNS = 30 * 1000000000L;
-    private HashMap<String, ForgeWorld> worlds = new HashMap<String, ForgeWorld>();
+    private HashMap<String, ForgeWorld> worlds = new HashMap<>();
     private World last_world;
     private ForgeWorld last_fworld;
-    private Map<String, ForgePlayer> players = new HashMap<String, ForgePlayer>();
+    private Map<String, ForgePlayer> players = new HashMap<>();
     //TODO private ForgeMetrics metrics;
-    private HashSet<String> modsused = new HashSet<String>();
+    private HashSet<String> modsused = new HashSet<>();
     private ForgeServer fserver = new ForgeServer();
     private boolean tickregistered = false;
     // TPS calculator
@@ -158,7 +158,7 @@ public class DynmapPlugin
     	String wid;
     	int x, y, z;
     }
-    ConcurrentLinkedQueue<BlockUpdateRec> blockupdatequeue = new ConcurrentLinkedQueue<BlockUpdateRec>();
+    ConcurrentLinkedQueue<BlockUpdateRec> blockupdatequeue = new ConcurrentLinkedQueue<>();
 
     public static DynmapBlockState[] stateByID;
     
@@ -322,7 +322,7 @@ public class DynmapPlugin
     	String message;
     	EntityPlayer sender;
     }
-    private ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<ChatMessage>();
+    private ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<>();
     
     public class ChatHandler {
 		@SubscribeEvent
@@ -341,7 +341,7 @@ public class DynmapPlugin
         long last_ts;
         Ticket ticket;
     }
-    private static HashMap<Integer, WorldBusyRecord> busy_worlds = new HashMap<Integer, WorldBusyRecord>();
+    private static HashMap<Integer, WorldBusyRecord> busy_worlds = new HashMap<>();
     
     private void setBusy(World w) {
         setBusy(w, null);
@@ -471,7 +471,7 @@ public class DynmapPlugin
         }
         Set<String> rslt2 = hasOfflinePermissions(player, perms);
         if((rslt != null) && (rslt2 != null)) {
-            Set<String> newrslt = new HashSet<String>(rslt);
+            Set<String> newrslt = new HashSet<>(rslt);
             newrslt.addAll(rslt2);
             rslt = newrslt;
         }
@@ -500,7 +500,7 @@ public class DynmapPlugin
         private long cur_tick;
         private long next_id;
         private long cur_tick_starttime;
-        private PriorityQueue<TaskRecord> runqueue = new PriorityQueue<TaskRecord>();
+        private PriorityQueue<TaskRecord> runqueue = new PriorityQueue<>();
 
         public ForgeServer() {
         }
@@ -535,7 +535,7 @@ public class DynmapPlugin
         public void scheduleServerTask(Runnable run, long delay)
         {
             TaskRecord tr = new TaskRecord();
-            tr.future = new FutureTask<Object>(run, null);
+            tr.future = new FutureTask<>(run, null);
 
             /* Add task record to queue */
             synchronized (schedlock)
@@ -590,7 +590,7 @@ public class DynmapPlugin
         public Set<String> getIPBans()
         {
             UserListIPBans bl = server.getPlayerList().getBannedIPs();
-            Set<String> ips = new HashSet<String>();
+            Set<String> ips = new HashSet<>();
 
             for (String s : bl.getKeys()) {
                 ips.add(s);
@@ -605,7 +605,7 @@ public class DynmapPlugin
         public <T> Future<T> callSyncMethod(Callable<T> task, long delay)
         {
             TaskRecord tr = new TaskRecord();
-            FutureTask<T> ft = new FutureTask<T>(task);
+            FutureTask<T> ft = new FutureTask<>(task);
             tr.future = ft;
 
             /* Add task record to queue */
@@ -641,7 +641,7 @@ public class DynmapPlugin
         {
             return patternControlCode.matcher(s).replaceAll("");
         }
-        private Set<EventType> registered = new HashSet<EventType>();
+        private Set<EventType> registered = new HashSet<>();
         @Override
         public boolean requestEventNotification(EventType type)
         {
@@ -802,7 +802,7 @@ public class DynmapPlugin
             }
             Set<String> rslt = hasOfflinePermissions(player, perms);
             if (rslt == null) {
-                rslt = new HashSet<String>();
+                rslt = new HashSet<>();
                 if(plugin.isOp(player)) {
                     rslt.addAll(perms);
                 }
@@ -1030,12 +1030,12 @@ public class DynmapPlugin
         }
         @Override
         public List<String> getModList() {
-            return new ArrayList<String>(Loader.instance().getIndexedModList().keySet());
+            return new ArrayList<>(Loader.instance().getIndexedModList().keySet());
         }
 
         @Override
         public Map<Integer, String> getBlockIDMap() {
-            Map<Integer, String> map = new HashMap<Integer, String>();
+            Map<Integer, String> map = new HashMap<>();
             for (Block b : Block.REGISTRY) {
                 int i = Block.getIdFromBlock(b);
                 ResourceLocation ui = Block.REGISTRY.getNameForObject(b);
@@ -1074,7 +1074,7 @@ public class DynmapPlugin
          */
         @Override
         public Map<String, Integer> getBlockUniqueIDMap() {
-            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            HashMap<String, Integer> map = new HashMap<>();
             for (Block b : Block.REGISTRY) {
                 int i = Block.getIdFromBlock(b);
                 ResourceLocation ui = null;
@@ -1094,7 +1094,7 @@ public class DynmapPlugin
          */
         @Override
         public Map<String, Integer> getItemUniqueIDMap() {
-            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            HashMap<String, Integer> map = new HashMap<>();
             for (int i = 0; i < 32000; i++) {
                 Item itm = getItemByID(i);
                 if (itm == null) continue;
@@ -1818,7 +1818,7 @@ public class DynmapPlugin
     }
     
     private WorldTracker worldTracker = null;
-    private HashMap<String, WorldUpdateTracker> updateTrackers = new HashMap<String, WorldUpdateTracker>();
+    private HashMap<String, WorldUpdateTracker> updateTrackers = new HashMap<>();
     
     private void registerEvents()
     {
@@ -1986,9 +1986,9 @@ public class DynmapPlugin
     private void saveWorlds() {
         File f = new File(core.getDataFolder(), "forgeworlds.yml");
         ConfigurationNode cn = new ConfigurationNode(f);
-        ArrayList<HashMap<String,Object>> lst = new ArrayList<HashMap<String,Object>>();
+        ArrayList<HashMap<String,Object>> lst = new ArrayList<>();
         for(DynmapWorld fw : core.mapManager.getWorlds()) {
-            HashMap<String, Object> vals = new HashMap<String, Object>();
+            HashMap<String, Object> vals = new HashMap<>();
             vals.put("name", fw.getRawName());
             vals.put("height",  fw.worldheight);
             vals.put("sealevel", fw.sealevel);

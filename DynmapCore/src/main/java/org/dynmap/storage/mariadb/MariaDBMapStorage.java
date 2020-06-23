@@ -366,7 +366,7 @@ public class MariaDBMapStorage extends MapStorage {
         stmt.close();
     }
     
-    private HashMap<String, Integer> mapKey = new HashMap<String, Integer>();
+    private HashMap<String, Integer> mapKey = new HashMap<>();
     
     private void doLoadMaps() {
         Connection c = null;
@@ -614,7 +614,7 @@ public class MariaDBMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
@@ -631,7 +631,7 @@ public class MariaDBMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
@@ -683,7 +683,7 @@ public class MariaDBMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();

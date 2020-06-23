@@ -966,7 +966,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         	}
         }
         else {
-        	chunks = new ArrayList<DynmapChunk>();
+        	chunks = new ArrayList<>();
         }
         nsect = dw.worldheight >> 4;
         this.chunks = chunks;
@@ -1128,7 +1128,7 @@ public class ForgeMapChunkCache extends MapChunkCache
                 break;
             case 9: // List
                 NBTTagList tl = (NBTTagList) v;
-                ArrayList<Object> vlist = new ArrayList<Object>();
+                ArrayList<Object> vlist = new ArrayList<>();
                 int type = tl.getTagType();
                 for (int i = 0; i < tl.tagCount(); i++) {
                     switch (type) {
@@ -1158,7 +1158,7 @@ public class ForgeMapChunkCache extends MapChunkCache
                 break;
             case 10: // Map
                 NBTTagCompound tc = (NBTTagCompound) v;
-                HashMap<String, Object> vmap = new HashMap<String, Object>();
+                HashMap<String, Object> vmap = new HashMap<>();
                 for (Object t : tc.getKeySet()) {
                     String st = (String) t;
                     NBTBase tg = tc.getTag(st);
@@ -1242,7 +1242,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         NBTTagList tiles = nbt.getTagList("TileEntities", 10);
         if(tiles == null) tiles = new NBTTagList();
         /* Get tile entity data */
-        List<Object> vals = new ArrayList<Object>();
+        List<Object> vals = new ArrayList<>();
         for(int tid = 0; tid < tiles.tagCount(); tid++) {
             NBTTagCompound tc = tiles.getCompoundTagAt(tid);
             int tx = tc.getInteger("x");
@@ -1524,7 +1524,7 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     public void setVisibleRange(VisibilityLimit lim) {
         if(visible_limits == null)
-            visible_limits = new ArrayList<VisibilityLimit>();
+            visible_limits = new ArrayList<>();
         visible_limits.add(lim);
     }
     /**
@@ -1534,7 +1534,7 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     public void setHiddenRange(VisibilityLimit lim) {
         if(hidden_limits == null)
-            hidden_limits = new ArrayList<VisibilityLimit>();
+            hidden_limits = new ArrayList<>();
         hidden_limits.add(lim);
     }
     @Override

@@ -76,7 +76,7 @@ public class RailCraftSlabBlockRenderer extends CustomRenderer {
     }
     
     private RenderPatch[] buildStepMeshes(RenderPatchFactory rpf, int dat) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         switch (dat) {
             case 0:
                 addBox(rpf, list, 0, 1, 0.0, 0.5, 0, 1);

@@ -14,7 +14,7 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
     protected long lastTimestamp = 0;
     protected long lastChatTimestamp = 0;
     private long last_confighash;
-    private ConcurrentHashMap<String, JSONObject> updates = new ConcurrentHashMap<String, JSONObject>();
+    private ConcurrentHashMap<String, JSONObject> updates = new ConcurrentHashMap<>();
     private JSONObject clientConfiguration = null;
     private static InternalClientUpdateComponent singleton;
     

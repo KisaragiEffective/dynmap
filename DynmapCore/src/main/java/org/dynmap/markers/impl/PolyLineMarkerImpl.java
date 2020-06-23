@@ -53,7 +53,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
         else
             label = id;
         this.markup = markup;
-        this.corners = new ArrayList<Coord>();
+        this.corners = new ArrayList<>();
         for(int i = 0; i < x.length; i++) {
             this.corners.add(new Coord(x[i], y[i], z[i]));
         }
@@ -76,7 +76,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
         label = id;
         markup = false;
         desc = null;
-        corners = new ArrayList<Coord>();
+        corners = new ArrayList<>();
         this.minzoom = -1;
         this.maxzoom = -1;
         world = normalized_world = "world";
@@ -177,12 +177,12 @@ class PolyLineMarkerImpl implements PolyLineMarker {
     Map<String, Object> getPersistentData() {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
         node.put("markup", markup);
-        List<Double> xx = new ArrayList<Double>();
-        List<Double> yy = new ArrayList<Double>();
-        List<Double> zz = new ArrayList<Double>();
+        List<Double> xx = new ArrayList<>();
+        List<Double> yy = new ArrayList<>();
+        List<Double> zz = new ArrayList<>();
         for (Coord c : corners) {
             xx.add(c.x);
             yy.add(c.y);

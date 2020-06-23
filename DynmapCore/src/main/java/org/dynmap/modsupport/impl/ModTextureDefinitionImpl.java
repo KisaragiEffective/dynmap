@@ -27,9 +27,9 @@ public class ModTextureDefinitionImpl implements ModTextureDefinition {
     private final String modver;
     private ModModelDefinitionImpl modDef = null;
     private String texturePath;
-    private HashMap<String, TextureFileImpl> txtFileByID = new HashMap<String, TextureFileImpl>();
-    private ArrayList<BlockTextureRecordImpl> blkTextureRec = new ArrayList<BlockTextureRecordImpl>();
-    private ArrayList<CopyBlockTextureRecordImpl> blkCopyTextureRec = new ArrayList<CopyBlockTextureRecordImpl>();
+    private HashMap<String, TextureFileImpl> txtFileByID = new HashMap<>();
+    private ArrayList<BlockTextureRecordImpl> blkTextureRec = new ArrayList<>();
+    private ArrayList<CopyBlockTextureRecordImpl> blkCopyTextureRec = new ArrayList<>();
     private boolean published = false;
     
     public ModTextureDefinitionImpl(String modid, String modver) {

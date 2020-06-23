@@ -79,7 +79,7 @@ public class ImageIOManager {
     
     private static final int MAX_WRITE_RETRIES = 6;
     
-    private static LinkedList<BufferOutputStream> baoslist = new LinkedList<BufferOutputStream>();
+    private static LinkedList<BufferOutputStream> baoslist = new LinkedList<>();
     private static Object baos_lock = new Object();
     /**
      * Wrapper for IOImage.write - implements retries for busy files

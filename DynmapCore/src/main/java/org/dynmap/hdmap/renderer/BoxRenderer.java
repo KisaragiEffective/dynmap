@@ -57,7 +57,7 @@ public class BoxRenderer extends CustomRenderer {
             if (zmax > 1.0) zmax = 1.0;
         }
         /* Now, build box model */
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         CustomRenderer.addBox(rpf, list, xmin, xmax, ymin, ymax, zmin, zmax, patchlist);
         model = list.toArray(new RenderPatch[patchlist.length]);
         

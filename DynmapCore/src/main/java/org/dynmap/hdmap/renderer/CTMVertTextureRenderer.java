@@ -29,7 +29,7 @@ public class CTMVertTextureRenderer extends CustomRenderer {
         if(!super.initializeRenderer(rpf, blkname, blockdatamask, custparm))
             return false;
         blk = DynmapBlockState.getBaseStateByName(blkname);
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         /* Build no neighbors patches */
         addBox(rpf, list, 0, 1, 0, 1, 0, 1, new int[] { TEXTURE_BOTTOM, TEXTURE_TOP, TEXTURE_SIDE_NO_NEIGHBOR, TEXTURE_SIDE_NO_NEIGHBOR, TEXTURE_SIDE_NO_NEIGHBOR, TEXTURE_SIDE_NO_NEIGHBOR });
         mesh_no_neighbor = list.toArray(new RenderPatch[6]);

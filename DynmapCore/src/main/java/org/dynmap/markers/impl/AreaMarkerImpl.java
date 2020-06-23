@@ -75,7 +75,7 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
         else
             label = id;
         this.markup = markup;
-        this.corners = new ArrayList<Coord>();
+        this.corners = new ArrayList<>();
         for(int i = 0; i < x.length; i++) {
             this.corners.add(new Coord(x[i], z[i]));
         }
@@ -106,7 +106,7 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
         label = id;
         markup = false;
         desc = null;
-        corners = new ArrayList<Coord>();
+        corners = new ArrayList<>();
         world = normalized_world = "world";
         this.minzoom = -1;
         this.maxzoom = -1;
@@ -228,11 +228,11 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
     Map<String, Object> getPersistentData() {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
         node.put("markup", markup);
-        List<Double> xx = new ArrayList<Double>();
-        List<Double> zz = new ArrayList<Double>();
+        List<Double> xx = new ArrayList<>();
+        List<Double> zz = new ArrayList<>();
         for (Coord corner : corners) {
             xx.add(corner.x);
             zz.add(corner.z);
@@ -469,7 +469,7 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
     final boolean testTileForBoostMarkers(DynmapWorld w, HDPerspective perspective, final double tile_x, final double tile_y, final double tile_dim) {
         Map<String, BoundingBox> bbc = bb_cache;
         if(bbc == null) {
-            bbc = new ConcurrentHashMap<String, BoundingBox>();
+            bbc = new ConcurrentHashMap<>();
         }
         BoundingBox bb = bbc.get(perspective.getName());
         if (bb == null) { // No cached bounding box, so generate it
@@ -485,7 +485,7 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
                 int cnt = crn.size();
                 if (cnt == 2) { // Special case
                     cnt = 4;
-                    crn = new ArrayList<Coord>();
+                    crn = new ArrayList<>();
                     Coord c0 = corners.get(0);
                     Coord c1 = corners.get(1);
                     crn.add(c0);

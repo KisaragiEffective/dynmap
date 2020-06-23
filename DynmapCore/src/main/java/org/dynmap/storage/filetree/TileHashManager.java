@@ -116,7 +116,7 @@ public class TileHashManager {
     
     private static final int MAX_CACHED_TILEHASHFILES = 25;
     private Object lock = new Object();
-    private LRULinkedHashMap<TileHashFile, byte[]> tilehash = new LRULinkedHashMap<TileHashFile, byte[]>(MAX_CACHED_TILEHASHFILES);
+    private LRULinkedHashMap<TileHashFile, byte[]> tilehash = new LRULinkedHashMap<>(MAX_CACHED_TILEHASHFILES);
     
     public TileHashManager(File tileroot, boolean enabled) {
         tiledir = tileroot;

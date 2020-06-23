@@ -87,7 +87,7 @@ public class StairBlockRenderer extends CustomRenderer {
     }
     
     private RenderPatch[] buildStepMeshes(RenderPatchFactory rpf, int dat) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         /* If inverted, add half top */
         if((dat & 0x4) != 0) {
             addBox(rpf, list, 0, 1, 0.5, 1, 0, 1);
@@ -113,7 +113,7 @@ public class StairBlockRenderer extends CustomRenderer {
     }
 
     private RenderPatch[] buildCornerStepMeshes(RenderPatchFactory rpf, int dat) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         /* If inverted, add half top */
         if((dat & 0x4) != 0) {
             addBox(rpf, list, 0, 1, 0.5, 1, 0, 1);
@@ -139,7 +139,7 @@ public class StairBlockRenderer extends CustomRenderer {
     }
 
     private RenderPatch[] buildIntCornerStepMeshes(RenderPatchFactory rpf, int dat) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         /* If inverted, add half top */
         if((dat & 0x4) != 0) {
             addBox(rpf, list, 0, 1, 0.5, 1, 0, 1);

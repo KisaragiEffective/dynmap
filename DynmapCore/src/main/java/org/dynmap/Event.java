@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class Event<T> {
-    private List<Listener<T>> listeners = new LinkedList<Listener<T>>();
+    private List<Listener<T>> listeners = new LinkedList<>();
     private Object lock = new Object();
 
     public void addListener(Listener<T> l) {
@@ -27,7 +27,7 @@ public class Event<T> {
     public void trigger(T t) {
         ArrayList<Listener<T>> iterlist;
         synchronized(lock) {
-            iterlist = new ArrayList<Listener<T>>(listeners);
+            iterlist = new ArrayList<>(listeners);
         }
         for (Listener<T> l : iterlist) {
             l.triggered(t);

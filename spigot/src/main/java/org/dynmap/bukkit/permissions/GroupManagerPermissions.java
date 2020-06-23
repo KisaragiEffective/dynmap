@@ -43,7 +43,7 @@ public class GroupManagerPermissions implements PermissionProvider {
     
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> hasperms = new HashSet<String>();
+        HashSet<String> hasperms = new HashSet<>();
         AnjoPermissionsHandler apm = gm.getWorldsHolder().getDefaultWorld().getPermissionsHandler();
         if (apm != null) {
             for (String pp : perms) {

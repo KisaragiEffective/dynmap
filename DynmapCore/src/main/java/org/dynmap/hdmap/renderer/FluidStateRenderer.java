@@ -31,7 +31,7 @@ public class FluidStateRenderer extends CustomRenderer {
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
         if(!super.initializeRenderer(rpf, blkname, blockdatamask, custparm))
             return false;
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         // Create meshes for flat topped blocks
         for (int i = 0; i < 10; i++) {
             list.clear();
@@ -188,7 +188,7 @@ public class FluidStateRenderer extends CustomRenderer {
     	// If not found, create model
     	if (mod == null) {
         	RenderPatchFactory rpf = ctx.getPatchFactory();
-			ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+			ArrayList<RenderPatch> list = new ArrayList<>();
 			list.add(bottom);	// All models have bottom patch
 			// Add side for each face
 			addSide(list, rpf, 0, 0, 0, 1, bh_n1_n1, bh_n1_1); // Xminus

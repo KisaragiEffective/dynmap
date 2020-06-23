@@ -34,7 +34,7 @@ public class MarkersComponent extends ClientComponent {
     private long maxofflineage;
     private boolean showSpawn;
     private boolean showBorder;
-    private HashMap<String, Long> offline_times = new HashMap<String, Long>();
+    private HashMap<String, Long> offline_times = new HashMap<>();
     private static final String OFFLINE_PLAYERS_SETID = "offline_players";
     private static final String PLAYER_SPAWN_BED_SETID = "spawn_beds";
     
@@ -116,7 +116,7 @@ public class MarkersComponent extends ClientComponent {
                 core.getServer().scheduleServerTask(new Runnable() {
                     public void run() {
                         long ts = System.currentTimeMillis();
-                        ArrayList<String> deleted = new ArrayList<String>();
+                        ArrayList<String> deleted = new ArrayList<>();
                         for(Map.Entry<String,Long> me : offline_times.entrySet()) {
                             if(ts > me.getValue()) {
                                 deleted.add(me.getKey());

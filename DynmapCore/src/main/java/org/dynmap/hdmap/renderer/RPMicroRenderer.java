@@ -196,7 +196,7 @@ public class RPMicroRenderer extends CustomRenderer {
 //        }
 //        Log.info(s);
         /* Build patch list */
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for(int i = 0, off = 0; i < 29; i++) {
             if ((covermask & (1 << i)) != 0) {
                 addPatchesFor(ctx.getPatchFactory(), list, i, covervals[off], covervals[off+1]);

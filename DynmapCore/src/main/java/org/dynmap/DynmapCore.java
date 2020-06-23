@@ -113,7 +113,7 @@ public class DynmapCore implements DynmapCommonAPI {
     private boolean ctmsupport = false;
     private boolean customcolorssupport = false;
     private String def_image_format = "png";
-    private HashSet<String> enabledTriggers = new HashSet<String>();
+    private HashSet<String> enabledTriggers = new HashSet<>();
     public boolean disable_chat_to_web = false;
     private WebAuthManager authmgr;
     public boolean player_info_protected;
@@ -128,7 +128,7 @@ public class DynmapCore implements DynmapCommonAPI {
     private int updateplayerlimit;  /* Number of online players that will cause update processing to pause */
     private boolean didfullpause;
     private boolean didupdatepause;
-    private Map<String, LinkedList<String>> ids_by_ip = new HashMap<String, LinkedList<String>>();
+    private Map<String, LinkedList<String>> ids_by_ip = new HashMap<>();
     private boolean persist_ids_by_ip = false;
     private int snapshotcachesize;
     private boolean snapshotsoftref;
@@ -521,7 +521,7 @@ public class DynmapCore implements DynmapCommonAPI {
         loadWebserver();
 
         enabledTriggers.clear();
-        List<String> triggers = configuration.getStrings("render-triggers", new ArrayList<String>());
+        List<String> triggers = configuration.getStrings("render-triggers", new ArrayList<>());
         if ((triggers != null) && (triggers.size() > 0)) 
         {
             for (Object trigger : triggers) {
@@ -711,7 +711,7 @@ public class DynmapCore implements DynmapCommonAPI {
             String ip = addr.getAddress().getHostAddress();
             LinkedList<String> ids = ids_by_ip.get(ip);
             if(ids == null) {
-                ids = new LinkedList<String>();
+                ids = new LinkedList<>();
                 ids_by_ip.put(ip, ids);
             }
             String pid = p.getName();
@@ -792,7 +792,7 @@ public class DynmapCore implements DynmapCommonAPI {
 
         int maxconnections = configuration.getInteger("max-sessions", 30);
         if(maxconnections < 2) maxconnections = 2;
-        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(maxconnections);
+        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(maxconnections);
         ExecutorThreadPool pool = new ExecutorThreadPool(maxconnections, 2, queue);
 
         webServer = new Server(pool);
@@ -849,7 +849,7 @@ public class DynmapCore implements DynmapCommonAPI {
         else
             Log.verboseinfo("Web server is not permitting symbolic links");
 
-        List<Filter> filters = new LinkedList<Filter>();
+        List<Filter> filters = new LinkedList<>();
         
         /* Check for banned IPs */
         boolean checkbannedips = configuration.getBoolean("check-banned-ips", true);
@@ -993,7 +993,7 @@ public class DynmapCore implements DynmapCommonAPI {
 
     /* Parse argument strings : handle quoted strings */
     public static String[] parseArgs(String[] args, DynmapCommandSender snd) {
-        ArrayList<String> rslt = new ArrayList<String>();
+        ArrayList<String> rslt = new ArrayList<>();
         /* Build command line, so we can parse our way - make sure there is trailing space */
         String cmdline = String.join(" ", args);
         boolean inquote = false;
@@ -1026,31 +1026,31 @@ public class DynmapCore implements DynmapCommonAPI {
         return rslt.toArray(new String[rslt.size()]);
     }
 
-    private static final Set<String> commands = new HashSet<String>(Arrays.asList(new String[] {
-        "render",
-        "hide",
-        "show",
-        "version",
-        "fullrender",
-        "cancelrender",
-        "radiusrender",
-        "updaterender",
-        "reload",
-        "stats",
-        "triggerstats",
-        "resetstats",
-        "sendtoweb",
-        "pause",
-        "purgequeue",
-        "purgemap",
-        "purgeworld",
-        "quiet",
-        "ids-for-ip",
-        "ips-for-id",
-        "add-id-for-ip",
-        "del-id-for-ip",
-        "webregister",
-        "help"}));
+    private static final Set<String> commands = new HashSet<>(Arrays.asList(new String[]{
+            "render",
+            "hide",
+            "show",
+            "version",
+            "fullrender",
+            "cancelrender",
+            "radiusrender",
+            "updaterender",
+            "reload",
+            "stats",
+            "triggerstats",
+            "resetstats",
+            "sendtoweb",
+            "pause",
+            "purgequeue",
+            "purgemap",
+            "purgeworld",
+            "quiet",
+            "ids-for-ip",
+            "ips-for-id",
+            "add-id-for-ip",
+            "del-id-for-ip",
+            "webregister",
+            "help"}));
 
     private static class CommandInfo {
         final String cmd;
@@ -1206,7 +1206,7 @@ public class DynmapCore implements DynmapCommonAPI {
             }
         }
         String subcmdlist = " Valid subcommands:";
-        TreeSet<String> treeSet = new TreeSet<String>();
+        TreeSet<String> treeSet = new TreeSet<>();
         for(CommandInfo ci : commandinfo) {
             if(ci.matches(cmd)) {
                 treeSet.add(ci.subcmd);
@@ -1557,7 +1557,7 @@ public class DynmapCore implements DynmapCommonAPI {
                     }
                     LinkedList<String> ids = ids_by_ip.get(ipaddr);
                     if(ids == null) {
-                        ids = new LinkedList<String>();
+                        ids = new LinkedList<>();
                         ids_by_ip.put(ipaddr, ids);
                     }
                     ids.remove(args[1]); /* Remove existing, if any */
@@ -1641,7 +1641,7 @@ public class DynmapCore implements DynmapCommonAPI {
         /* Update world_config with final */
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         if(worlds == null) {
-            worlds = new ArrayList<Map<String,Object>>();
+            worlds = new ArrayList<>();
             world_config.put("worlds", worlds);
         }
         boolean did_upd = false;
@@ -1768,7 +1768,7 @@ public class DynmapCore implements DynmapCommonAPI {
         fc.load();
         /* Now, get the list associated with the base node default */
         List<Map<String,Object>> existing = fc.getMapList(basenode);
-        Set<String> existing_names = new HashSet<String>();
+        Set<String> existing_names = new HashSet<>();
         /* Make map, indexed by 'name' in map */
         if(existing != null) {
             for(Map<String,Object> m : existing) {
@@ -1882,7 +1882,7 @@ public class DynmapCore implements DynmapCommonAPI {
     public List<String> getIDsForIP(String ip) {
         LinkedList<String> ids = ids_by_ip.get(ip);
         if(ids != null)
-            return new ArrayList<String>(ids);
+            return new ArrayList<>(ids);
         return null;
     }
 
@@ -1898,7 +1898,7 @@ public class DynmapCore implements DynmapCommonAPI {
                 List<String> ids = fc.getList(k);
                 if(ids != null) {
                     k = k.replace("_", ".");
-                    ids_by_ip.put(k, new LinkedList<String>(ids));
+                    ids_by_ip.put(k, new LinkedList<>(ids));
                 }
             }
         } catch (Exception iox) {
@@ -2024,7 +2024,7 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         /* If not found, and disable, add disable node */
         if(!isenab) {
-            Map<String,Object> newworld = new LinkedHashMap<String,Object>();
+            Map<String,Object> newworld = new LinkedHashMap<>();
             newworld.put("name", wname);
             newworld.put("enabled", isenab);
         }
@@ -2064,7 +2064,7 @@ public class DynmapCore implements DynmapCommonAPI {
             String wn = (String)m.get("name");
             if((wn != null) && (wn.equals(wname))) {
                 if(loc != null) {
-                    Map<String,Object> c = new LinkedHashMap<String,Object>();
+                    Map<String,Object> c = new LinkedHashMap<>();
                     c.put("x", loc.x);
                     c.put("y", loc.y);
                     c.put("z", loc.z);
@@ -2081,7 +2081,7 @@ public class DynmapCore implements DynmapCommonAPI {
     public boolean setWorldOrder(String wname, int order) {
         wname = DynmapWorld.normalizeWorldName(wname);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
-        ArrayList<Map<String,Object>> newworlds = new ArrayList<Map<String,Object>>(worlds);
+        ArrayList<Map<String,Object>> newworlds = new ArrayList<>(worlds);
 
         Map<String,Object> w = null;
         for(Map<String,Object> m : worlds) {
@@ -2114,7 +2114,7 @@ public class DynmapCore implements DynmapCommonAPI {
         wname = DynmapWorld.normalizeWorldName(wname);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         if(worlds == null) {
-            worlds = new ArrayList<Map<String,Object>>();
+            worlds = new ArrayList<>();
             world_config.put("worlds", worlds);
         }
         for(int i = 0; i < worlds.size(); i++) {

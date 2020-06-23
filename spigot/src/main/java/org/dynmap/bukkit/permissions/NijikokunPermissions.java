@@ -52,7 +52,7 @@ public class NijikokunPermissions implements PermissionProvider {
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
         if(permissions == null)
             permissions = ((Permissions)plugin).getHandler();
-        HashSet<String> hasperms = new HashSet<String>();
+        HashSet<String> hasperms = new HashSet<>();
         for (String pp : perms) {
             if (permissions.has(defworld, player, name + "." + pp)) {
                 hasperms.add(pp);

@@ -703,7 +703,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
         this.dw = dw;
         this.w = dw.getWorld();
         if(this.w == null) {
-            this.chunks = new ArrayList<DynmapChunk>();
+            this.chunks = new ArrayList<>();
         }
         nsect = dw.worldheight >> 4;
         this.chunks = chunks;
@@ -838,7 +838,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
                         css = c.getChunkSnapshot(highesty, biome, biomeraw);
                         ss = wrapChunkSnapshot(css);
                         /* Get tile entity data */
-                        List<Object> vals = new ArrayList<Object>();
+                        List<Object> vals = new ArrayList<>();
                         Map<?,?> tileents = BukkitVersionHelper.helper.getTileEntitiesForChunk(c);
                         for(Object t : tileents.values()) {
                             int te_x = BukkitVersionHelper.helper.getTileEntityX(t);
@@ -1001,7 +1001,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
      */
     public void setVisibleRange(VisibilityLimit lim) {
         if(visible_limits == null)
-            visible_limits = new ArrayList<VisibilityLimit>();
+            visible_limits = new ArrayList<>();
         visible_limits.add(lim);
     }
     /**
@@ -1011,7 +1011,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
      */
     public void setHiddenRange(VisibilityLimit lim) {
         if(hidden_limits == null)
-            hidden_limits = new ArrayList<VisibilityLimit>();
+            hidden_limits = new ArrayList<>();
         hidden_limits.add(lim);
     }
     @Override

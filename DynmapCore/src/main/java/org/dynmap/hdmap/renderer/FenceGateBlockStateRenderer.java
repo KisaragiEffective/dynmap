@@ -52,7 +52,7 @@ public class FenceGateBlockStateRenderer extends CustomRenderer {
         	}
         }
         private void buildMeshes(RenderPatchFactory rpf) {
-            ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+            ArrayList<RenderPatch> list = new ArrayList<>();
             // Build model for closed fence gate facing south (default)
             addBox(rpf, list, 0.0, 0.125, 0.3125, 1.0, 0.4375, 0.5625);
             addBox(rpf, list, 0.875, 1.0, 0.3125, 1.0, 0.4375, 0.5625);

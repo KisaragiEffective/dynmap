@@ -32,7 +32,7 @@ public class CuboidRenderer extends CustomRenderer {
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
         if(!super.initializeRenderer(rpf, blkname, blockdatamask, custparm))
             return false;
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         // Loop through parameters
         for (String key : custparm.keySet()) {
             String v = custparm.get(key);

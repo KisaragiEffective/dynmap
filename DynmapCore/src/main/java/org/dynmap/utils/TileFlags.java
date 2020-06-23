@@ -16,7 +16,7 @@ import org.dynmap.Log;
  * 
  */
 public class TileFlags {
-	private HashMap<Long, long[]> chunkmap = new HashMap<Long, long[]>(); 
+	private HashMap<Long, long[]> chunkmap = new HashMap<>();
 	private long last_key = Long.MAX_VALUE;
 	private long[] last_row;
 	private int count; // Number of 1 values
@@ -25,7 +25,7 @@ public class TileFlags {
 	}
 	
 	public List<String> save() {
-	    ArrayList<String> v = new ArrayList<String>();
+	    ArrayList<String> v = new ArrayList<>();
 	    StringBuilder sb = new StringBuilder();
 	    for(Map.Entry<Long, long[]> ent : chunkmap.entrySet()) {
 	        long v1 = ent.getKey();

@@ -305,7 +305,7 @@ public class FileTreeMapStorage extends MapStorage {
             return;
         }
 
-        LinkedList<File> dirs = new LinkedList<File>(); // List to traverse
+        LinkedList<File> dirs = new LinkedList<>(); // List to traverse
         dirs.add(bdir);   // Directory for map
         // While more paths to handle
         while (!dirs.isEmpty()) {
@@ -374,7 +374,7 @@ public class FileTreeMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
@@ -393,7 +393,7 @@ public class FileTreeMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
@@ -418,8 +418,8 @@ public class FileTreeMapStorage extends MapStorage {
         File bdir = new File(base, mname);
         if (!bdir.isDirectory()) return;
 
-        LinkedList<File> dirs = new LinkedList<File>(); // List to traverse
-        LinkedList<File> dirsdone = new LinkedList<File>();
+        LinkedList<File> dirs = new LinkedList<>(); // List to traverse
+        LinkedList<File> dirsdone = new LinkedList<>();
         dirs.add(bdir);   // Directory for map
         // While more paths to handle
         while (!dirs.isEmpty()) {
@@ -456,7 +456,7 @@ public class FileTreeMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();

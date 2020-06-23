@@ -59,7 +59,7 @@ import org.dynmap.utils.MapIterator;
 
 public class TexturePack {
     /* Loaded texture packs */
-    private static HashMap<String, TexturePack> packs = new HashMap<String, TexturePack>();
+    private static HashMap<String, TexturePack> packs = new HashMap<>();
     private static Object packlock = new Object();
 
     private static final String GRASSCOLOR_PNG = "misc/grasscolor.png";
@@ -342,13 +342,13 @@ public class TexturePack {
         boolean used;               // Set to true if any active references to the file
         MaterialType material;      // Material type, if specified
     }
-    private static ArrayList<DynamicTileFile> addonfiles = new ArrayList<DynamicTileFile>();
-    private static Map<String, DynamicTileFile> addonfilesbyname = new HashMap<String, DynamicTileFile>();
-    private Map<Integer, MaterialType> materialbytileid = new HashMap<Integer, MaterialType>();
-    private Map<Integer, String> matIDByTileID = new HashMap<Integer, String>();
-    private Map<String, Integer> tileIDByMatID = new HashMap<String, Integer>();
+    private static ArrayList<DynamicTileFile> addonfiles = new ArrayList<>();
+    private static Map<String, DynamicTileFile> addonfilesbyname = new HashMap<>();
+    private Map<Integer, MaterialType> materialbytileid = new HashMap<>();
+    private Map<Integer, String> matIDByTileID = new HashMap<>();
+    private Map<String, Integer> tileIDByMatID = new HashMap<>();
     // Mods supplying their own texture files
-    private static HashSet<String> loadedmods = new HashSet<String>();
+    private static HashSet<String> loadedmods = new HashSet<>();
     
     private static String getBlockFileName(int idx) {
         if ((idx >= 0) && (idx < terrain_map.length) && (terrain_map[idx] != null)) {
@@ -478,9 +478,9 @@ public class TexturePack {
      * Texture map - used for accumulation of textures from different sources, keyed by lookup value
      */
     public static class TextureMap {
-        private Map<Integer, Integer> key_to_index = new HashMap<Integer, Integer>();
-        private List<Integer> texture_ids = new ArrayList<Integer>();
-        private List<String> blocknames = new ArrayList<String>();
+        private Map<Integer, Integer> key_to_index = new HashMap<>();
+        private List<Integer> texture_ids = new ArrayList<>();
+        private List<String> blocknames = new ArrayList<>();
         private BitSet stateids = new BitSet();
         private BlockTransparency trans = BlockTransparency.OPAQUE;
         private int colorMult = 0;
@@ -496,7 +496,7 @@ public class TexturePack {
             return off;
         }
     }
-    private static HashMap<String, TextureMap> textmap_by_id = new HashMap<String, TextureMap>();
+    private static HashMap<String, TextureMap> textmap_by_id = new HashMap<>();
     
     /**
      * Set tile ARGB buffer at index
@@ -1398,7 +1398,7 @@ public class TexturePack {
      */
     public TexturePack resampleTexturePack(int scale) {
         synchronized(scaledlock) {
-            if(scaled_textures == null) scaled_textures = new HashMap<Integer, TexturePack>();
+            if(scaled_textures == null) scaled_textures = new HashMap<>();
             TexturePack stp = scaled_textures.get(scale);
             if(stp != null)
                 return stp;
@@ -1625,8 +1625,8 @@ public class TexturePack {
         }
         // Load external tile sets
         File renderdir = new File(datadir, "renderdata");
-        ArrayList<String> tsfiles = new ArrayList<String>();
-        ArrayList<String> txfiles = new ArrayList<String>();
+        ArrayList<String> tsfiles = new ArrayList<>();
+        ArrayList<String> txfiles = new ArrayList<>();
         addFiles(tsfiles, txfiles, renderdir, "");
         for(String fname : tsfiles) {
             File custom = new File(renderdir, fname);
@@ -1894,8 +1894,8 @@ public class TexturePack {
     private static void loadTextureFile(InputStream txtfile, String txtname, ConfigurationNode config, DynmapCore core, String blockset) {
         LineNumberReader rdr = null;
         int cnt = 0;
-        HashMap<String,Integer> filetoidx = new HashMap<String,Integer>();
-        HashMap<String,Integer> varvals = new HashMap<String,Integer>();
+        HashMap<String,Integer> filetoidx = new HashMap<>();
+        HashMap<String,Integer> varvals = new HashMap<>();
         final String mcver = core.getDynmapPluginPlatformVersion();
         boolean mod_cfg_needed = false;
         boolean mod_cfg_loaded = false;
@@ -1930,7 +1930,7 @@ public class TexturePack {
                 if (skip) {
                 }
                 else if(line.startsWith("block:")) {
-                    List<String> blknames = new ArrayList<String>();
+                    List<String> blknames = new ArrayList<>();
                     BitSet stateids = null;
                     int srctxtid = TXTID_TERRAINPNG;
                     if (!terrain_ok)
@@ -2147,7 +2147,7 @@ public class TexturePack {
                     }
                 }
                 else if(line.startsWith("copyblock:")) {
-                    List<String> blknames = new ArrayList<String>();
+                    List<String> blknames = new ArrayList<>();
                     BitSet stateids = null;
                     line = line.substring(line.indexOf(':')+1);
                     String[] args = line.split(",");
@@ -2270,7 +2270,7 @@ public class TexturePack {
                     }
                 }
                 else if(line.startsWith("texturemap:")) {
-                    List<String> blknames = new ArrayList<String>();
+                    List<String> blknames = new ArrayList<>();
                     BitSet stateids = null;
                     String mapid = null;
                     line = line.substring(line.indexOf(':') + 1);
@@ -3069,7 +3069,7 @@ public class TexturePack {
                 break;
             case CUSTOM:
                 {
-                    List<CustomTileRec> recs = new ArrayList<CustomTileRec>();
+                    List<CustomTileRec> recs = new ArrayList<>();
                     for(String a : args) {
                         String[] v = a.split("=");
                         if(v.length != 2) continue;
@@ -3284,7 +3284,7 @@ public class TexturePack {
     }
 
     private static class ExportedTexturePack {
-        Map<String, ExportedTexture> txtids = new HashMap<String, ExportedTexture>();
+        Map<String, ExportedTexture> txtids = new HashMap<>();
         DynmapBufferedImage img;
         OBJExport exp;
         String name;
@@ -3407,7 +3407,7 @@ public class TexturePack {
         }
         // Build MTL file
         exp.startExportedFile(etp.name + ".mtl");
-        TreeSet<String> ids = new TreeSet<String>(etp.txtids.keySet());
+        TreeSet<String> ids = new TreeSet<>(etp.txtids.keySet());
         for (String id : ids) {
             ExportedTexture et = etp.txtids.get(id);
             String lines = "newmtl " + id + "\n";

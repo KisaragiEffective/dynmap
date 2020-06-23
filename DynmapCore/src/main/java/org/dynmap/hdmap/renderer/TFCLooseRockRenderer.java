@@ -28,7 +28,7 @@ public class TFCLooseRockRenderer extends CustomRenderer {
     private int[] patches = { 0, 0, 0, 0, 0, 0 };
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         /* Generate seed from coordinates */
         int seed = (ctx.getX() * ctx.getZ()) + ctx.getY();
         Random R = new Random(seed);

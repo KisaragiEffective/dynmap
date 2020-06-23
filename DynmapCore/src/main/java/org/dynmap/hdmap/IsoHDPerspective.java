@@ -1007,7 +1007,7 @@ public class IsoHDPerspective implements HDPerspective {
 
     @Override
     public List<TileFlags.TileCoord> getTileCoords(DynmapWorld world, int x, int y, int z) {
-        HashSet<TileFlags.TileCoord> tiles = new HashSet<TileFlags.TileCoord>();
+        HashSet<TileFlags.TileCoord> tiles = new HashSet<>();
         Vector3D block = new Vector3D();
         block.x = x;
         block.y = y;
@@ -1029,12 +1029,12 @@ public class IsoHDPerspective implements HDPerspective {
             block.y = inity;
             block.x += 1;
         }
-        return new ArrayList<TileFlags.TileCoord>(tiles);
+        return new ArrayList<>(tiles);
     }
 
     @Override
     public List<TileFlags.TileCoord> getTileCoords(DynmapWorld world, int minx, int miny, int minz, int maxx, int maxy, int maxz) {
-        ArrayList<TileFlags.TileCoord> tiles = new ArrayList<TileFlags.TileCoord>();
+        ArrayList<TileFlags.TileCoord> tiles = new ArrayList<>();
         Vector3D[] blocks = new Vector3D[] { new Vector3D(), new Vector3D() };
         blocks[0].x = minx - 1;
         blocks[0].y = miny - 1;
@@ -1155,7 +1155,7 @@ public class IsoHDPerspective implements HDPerspective {
             }
         }
         /* Now, need to walk through the min/max range to see which chunks are actually needed */
-        ArrayList<DynmapChunk> chunks = new ArrayList<DynmapChunk>();
+        ArrayList<DynmapChunk> chunks = new ArrayList<>();
         
         for(int x = min_chunk_x; x <= max_chunk_x; x++) {
             for(int z = min_chunk_z; z <= max_chunk_z; z++) {

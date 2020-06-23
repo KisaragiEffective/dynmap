@@ -55,7 +55,7 @@ public class FenceWallBlockStateRenderer extends CustomRenderer {
     }
     
     private void buildFenceMeshes(RenderPatchFactory rpf) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for(int dat = 0; dat < 16; dat++) {
             /* Add center post */
             addBox(rpf, list, 0.375, 0.625, 0.0, 1.0, 0.375, 0.625);
@@ -93,7 +93,7 @@ public class FenceWallBlockStateRenderer extends CustomRenderer {
     }
 
     private void buildWallMeshes(RenderPatchFactory rpf) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for(int dat = 0; dat < 32; dat++) {
             boolean need_post = ((dat & 0xF) == 0) || ((dat & 0x10) == 0x10);
             switch(dat & SIDE_X) {

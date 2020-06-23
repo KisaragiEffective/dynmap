@@ -11,7 +11,7 @@ import org.dynmap.common.BiomeMap;
 import org.dynmap.debug.Debug;
 
 public class ColorScheme {
-    private static final HashMap<String, ColorScheme> cache = new HashMap<String, ColorScheme>();
+    private static final HashMap<String, ColorScheme> cache = new HashMap<>();
 
     public String name;
     /* Switch to arrays - faster than map */

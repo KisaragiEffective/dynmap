@@ -32,17 +32,17 @@ public class SendMessageServlet extends HttpServlet {
     protected static final Logger log = Logger.getLogger("Minecraft");
 
     private static final JSONParser parser = new JSONParser();
-    public Event<Message> onMessageReceived = new Event<Message>();
+    public Event<Message> onMessageReceived = new Event<>();
     private Charset cs_utf8 = StandardCharsets.UTF_8;
     public int maximumMessageInterval = 1000;
     public boolean hideip = false;
     public boolean trustclientname = false;
     
     public String spamMessage = "\"You may only chat once every %interval% seconds.\"";
-    private HashMap<String, WebUser> disallowedUsers = new HashMap<String, WebUser>();
-    private LinkedList<WebUser> disallowedUserQueue = new LinkedList<WebUser>();
+    private HashMap<String, WebUser> disallowedUsers = new HashMap<>();
+    private LinkedList<WebUser> disallowedUserQueue = new LinkedList<>();
     private Object disallowedUsersLock = new Object();
-    private HashMap<String,String> useralias = new HashMap<String,String>();
+    private HashMap<String,String> useralias = new HashMap<>();
     private int aliasindex = 1;
     public boolean use_player_login_ip = false;
     public boolean require_player_login_ip = false;
@@ -51,7 +51,7 @@ public class SendMessageServlet extends HttpServlet {
     public boolean chat_perms = false;
     public int lengthlimit = 256;
     public DynmapCore core;
-    public HashSet<String> proxyaddress = new HashSet<String>();
+    public HashSet<String> proxyaddress = new HashSet<>();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

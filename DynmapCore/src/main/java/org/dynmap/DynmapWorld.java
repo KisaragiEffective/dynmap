@@ -23,8 +23,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public abstract class DynmapWorld {
-    public List<MapType> maps = new ArrayList<MapType>();
-    public List<MapTypeState> mapstate = new ArrayList<MapTypeState>();
+    public List<MapType> maps = new ArrayList<>();
+    public List<MapTypeState> mapstate = new ArrayList<>();
     
     public UpdateQueue updates = new UpdateQueue();
     public DynmapLocation center;
@@ -322,8 +322,8 @@ public abstract class DynmapWorld {
         else
             center = null;
         List<ConfigurationNode> loclist = worldconfig.getNodes("fullrenderlocations");
-        seedloc = new ArrayList<DynmapLocation>();
-        seedloccfg = new ArrayList<DynmapLocation>();
+        seedloc = new ArrayList<>();
+        seedloccfg = new ArrayList<>();
         servertime = (int)(getTime() % 24000);
         sendposition = worldconfig.getBoolean("sendposition", true);
         sendhealth = worldconfig.getBoolean("sendhealth", true);
@@ -358,7 +358,7 @@ public abstract class DynmapWorld {
         /* Load visibility limits, if any are defined */
         List<ConfigurationNode> vislimits = worldconfig.getNodes("visibilitylimits");
         if(vislimits != null) {
-            visibility_limits = new ArrayList<VisibilityLimit>();
+            visibility_limits = new ArrayList<>();
             for(ConfigurationNode vis : vislimits) {
                 VisibilityLimit lim;
                 if (vis.containsKey("r")) {  /* It is round visibility limit */
@@ -382,7 +382,7 @@ public abstract class DynmapWorld {
         /* Load hidden limits, if any are defined */
         List<ConfigurationNode> hidelimits = worldconfig.getNodes("hiddenlimits");
         if(hidelimits != null) {
-            hidden_limits = new ArrayList<VisibilityLimit>();
+            hidden_limits = new ArrayList<>();
             for(ConfigurationNode vis : hidelimits) {
                 VisibilityLimit lim;
                 if (vis.containsKey("r")) {  /* It is round visibility limit */
@@ -435,7 +435,7 @@ public abstract class DynmapWorld {
         }
         /* Add seed locations, if any */
         if(seedloccfg.size() > 0) {
-            ArrayList<Map<String,Object>> locs = new ArrayList<Map<String,Object>>();
+            ArrayList<Map<String,Object>> locs = new ArrayList<>();
             for (DynmapLocation dl : seedloccfg) {
                 ConfigurationNode ll = new ConfigurationNode();
                 ll.put("x", dl.x);
@@ -451,9 +451,9 @@ public abstract class DynmapWorld {
         node.put("extrazoomout", extrazoomoutlevels);
         /* Save visibility limits, if defined */
         if(visibility_limits != null) {
-            ArrayList<Map<String,Object>> lims = new ArrayList<Map<String,Object>>();
+            ArrayList<Map<String,Object>> lims = new ArrayList<>();
             for (VisibilityLimit lim : visibility_limits) {
-                LinkedHashMap<String, Object> lv = new LinkedHashMap<String, Object>();
+                LinkedHashMap<String, Object> lv = new LinkedHashMap<>();
                 if (lim instanceof RectangleVisibilityLimit) {
                     RectangleVisibilityLimit rect_lim = (RectangleVisibilityLimit) lim;
                     lv.put("x0", rect_lim.x_min);
@@ -472,10 +472,10 @@ public abstract class DynmapWorld {
         }
         /* Save hidden limits, if defined */
         if(hidden_limits != null) {
-            ArrayList<Map<String,Object>> lims = new ArrayList<Map<String,Object>>();
+            ArrayList<Map<String,Object>> lims = new ArrayList<>();
             for(int i = 0; i < hidden_limits.size(); i++) {
                 VisibilityLimit lim = visibility_limits.get(i);
-                LinkedHashMap<String, Object> lv = new LinkedHashMap<String,Object>();
+                LinkedHashMap<String, Object> lv = new LinkedHashMap<>();
                 if (lim instanceof RectangleVisibilityLimit) {
                     RectangleVisibilityLimit rect_lim = (RectangleVisibilityLimit) lim;
                     lv.put("x0", rect_lim.x_min);
@@ -507,7 +507,7 @@ public abstract class DynmapWorld {
         }
         node.put("hidestyle", hide);
         /* Handle map settings */
-        ArrayList<Map<String,Object>> mapinfo = new ArrayList<Map<String,Object>>();
+        ArrayList<Map<String,Object>> mapinfo = new ArrayList<>();
         for(MapType mt : maps) {
             ConfigurationNode mnode = mt.saveConfiguration();
             mapinfo.add(mnode);

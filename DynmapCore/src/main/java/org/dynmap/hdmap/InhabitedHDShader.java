@@ -39,7 +39,7 @@ public class InhabitedHDShader implements HDShader {
     }
     public InhabitedHDShader(DynmapCore core, ConfigurationNode configuration) {
         name = (String) configuration.get("name");
-        HashMap<Long, Color> map = new HashMap<Long, Color>();
+        HashMap<Long, Color> map = new HashMap<>();
         for (String key : configuration.keySet()) {
             if (key.startsWith("color")) {
                 try {
@@ -50,7 +50,7 @@ public class InhabitedHDShader implements HDShader {
                 }
             }
         }
-        TreeSet<Long> keys = new TreeSet<Long>(map.keySet());
+        TreeSet<Long> keys = new TreeSet<>(map.keySet());
         filllevel = new long[keys.size()];
         fillcolor = new Color[keys.size()];
         int idx = 0;

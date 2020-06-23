@@ -120,8 +120,8 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     private Method instance;
     private Method getindexedmodlist;
     private Method getversion;
-    private HashMap<String, BukkitWorld> world_by_name = new HashMap<String, BukkitWorld>();
-    private HashSet<String> modsused = new HashSet<String>();
+    private HashMap<String, BukkitWorld> world_by_name = new HashMap<>();
+    private HashSet<String> modsused = new HashSet<>();
     // TPS calculator
     private double tps;
     private long lasttick;
@@ -133,7 +133,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     private long cur_tick;
     private long prev_tick;
 
-    private HashMap<String, Integer> sortWeights = new HashMap<String, Integer>();
+    private HashMap<String, Integer> sortWeights = new HashMap<>();
     /* Lookup cache */
     private World last_world;
     private BukkitWorld last_bworld;
@@ -189,7 +189,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     }
 
     private LinkedList<BlockToCheck> blocks_to_check = null;
-    private LinkedList<BlockToCheck> blocks_to_check_accum = new LinkedList<BlockToCheck>();
+    private LinkedList<BlockToCheck> blocks_to_check_accum = new LinkedList<>();
     
     public DynmapPlugin() {
         plugin = this;
@@ -298,7 +298,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         public String stripChatColor(String s) {
             return ChatColor.stripColor(s);
         }
-        private Set<EventType> registered = new HashSet<EventType>();
+        private Set<EventType> registered = new HashSet<>();
         @Override
         public boolean requestEventNotification(EventType type) {
             if(registered.contains(type))
@@ -423,10 +423,10 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         public Set<String> checkPlayerPermissions(String player, Set<String> perms) {
             OfflinePlayer p = getServer().getOfflinePlayer(player);
             if(p.isBanned())
-                return new HashSet<String>();
+                return new HashSet<>();
             Set<String> rslt = permissions.hasOfflinePermissions(player, perms);
             if (rslt == null) {
-                rslt = new HashSet<String>();
+                rslt = new HashSet<>();
                 if(p.isOp()) {
                     rslt.addAll(perms);
                 }
@@ -577,7 +577,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         @Override
         public Map<Integer, String> getBlockIDMap() {
             String[] bsn = helper.getBlockNames();
-            HashMap<Integer, String> map = new HashMap<Integer, String>();
+            HashMap<Integer, String> map = new HashMap<>();
             for (int i = 0; i < bsn.length; i++) {
                 if (bsn[i] != null) {
                 	if (bsn[i].indexOf(':') < 0)
@@ -859,7 +859,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         registerPlayerLoginListener();
 
         /* Build default permissions from our plugin */
-        Map<String, Boolean> perdefs = new HashMap<String, Boolean>();
+        Map<String, Boolean> perdefs = new HashMap<>();
         List<Permission> pd = plugin.getDescription().getPermissions();
         for(Permission p : pd) {
             perdefs.put(p.getName(), p.getDefault() == PermissionDefault.TRUE);
@@ -1198,7 +1198,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         public void startIfNeeded() {
             if((blocks_to_check == null) && (!blocks_to_check_accum.isEmpty())) { /* More pending? */
                 blocks_to_check = blocks_to_check_accum;
-                blocks_to_check_accum = new LinkedList<BlockToCheck>();
+                blocks_to_check_accum = new LinkedList<>();
                 getServer().getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, this, 10);
             }
         }

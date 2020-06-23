@@ -6,7 +6,7 @@ import org.dynmap.modsupport.PatchBlockModel;
 import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 
 public class PatchBlockModelImpl extends BlockModelImpl implements PatchBlockModel {
-    private ArrayList<String> patches = new ArrayList<String>();
+    private ArrayList<String> patches = new ArrayList<>();
     
     public PatchBlockModelImpl(int blkid, ModModelDefinitionImpl mdf) {
         super(blkid, mdf);

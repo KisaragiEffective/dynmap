@@ -19,12 +19,12 @@ import org.dynmap.common.DynmapServerInterface;
 
 public class PlayerList {
     private DynmapServerInterface server;
-    private HashSet<String> hiddenPlayerNames = new HashSet<String>();
+    private HashSet<String> hiddenPlayerNames = new HashSet<>();
     private File hiddenPlayersFile;
     private ConfigurationNode configuration;
     private DynmapPlayer[] online;
-    private HashMap<String, Set<String>> invisibility_asserts = new HashMap<String, Set<String>>();
-    private HashMap<String, Set<String>> visibility_asserts = new HashMap<String, Set<String>>();
+    private HashMap<String, Set<String>> invisibility_asserts = new HashMap<>();
+    private HashMap<String, Set<String>> visibility_asserts = new HashMap<>();
 
     public PlayerList(DynmapServerInterface server, File hiddenPlayersFile, ConfigurationNode configuration) {
         this.server = server;
@@ -84,7 +84,7 @@ public class PlayerList {
         if(visible) {
             Set<String> ids = visibility_asserts.get(playerName);
             if(ids == null) {
-                ids = new HashSet<String>();
+                ids = new HashSet<>();
                 visibility_asserts.put(playerName, ids);
             }
             ids.add(plugin_id);
@@ -105,7 +105,7 @@ public class PlayerList {
         if(invisible) {
             Set<String> ids = invisibility_asserts.get(playerName);
             if(ids == null) {
-                ids = new HashSet<String>();
+                ids = new HashSet<>();
                 invisibility_asserts.put(playerName, ids);
             }
             ids.add(plugin_id);
@@ -126,7 +126,7 @@ public class PlayerList {
     }
 
     public List<DynmapPlayer> getVisiblePlayers(String worldName) {
-        ArrayList<DynmapPlayer> visiblePlayers = new ArrayList<DynmapPlayer>();
+        ArrayList<DynmapPlayer> visiblePlayers = new ArrayList<>();
         DynmapPlayer[] onlinePlayers = online;    /* Use copied list - we don't call from server thread */
         boolean useWhitelist = configuration.getBoolean("display-whitelist", false);
         for (DynmapPlayer p : onlinePlayers) {
@@ -149,7 +149,7 @@ public class PlayerList {
     }
     
     public List<DynmapPlayer> getHiddenPlayers() {
-        ArrayList<DynmapPlayer> hidden = new ArrayList<DynmapPlayer>();
+        ArrayList<DynmapPlayer> hidden = new ArrayList<>();
         DynmapPlayer[] onlinePlayers = online;    /* Use copied list - we don't call from server thread */
         boolean useWhitelist = configuration.getBoolean("display-whitelist", false);
         for (DynmapPlayer p : onlinePlayers) {

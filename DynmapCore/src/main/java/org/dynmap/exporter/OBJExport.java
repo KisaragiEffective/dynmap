@@ -52,14 +52,14 @@ public class OBJExport {
     private double scale = 1.0;         // Scale for exported model
     private boolean centerOrigin = true;    // Center at origin
     private PatchDefinition[] defaultPathces;   // Default patches for solid block, indexed by BlockStep.ordinal()
-    private HashSet<String> matIDs = new HashSet<String>();     // Set of defined material ids for RP
+    private HashSet<String> matIDs = new HashSet<>();     // Set of defined material ids for RP
     
     private static class Face {
         String groupLine;
         String faceLine;
     }
     
-    private HashMap<String, List<Face>> facesByTexture = new HashMap<String, List<Face>>();
+    private HashMap<String, List<Face>> facesByTexture = new HashMap<>();
     private static final int MODELSCALE = 16;
     private static final double BLKSIZE = 1.0 / (double) MODELSCALE;
     
@@ -210,7 +210,7 @@ public class OBJExport {
             // Open ZIP file destination
             zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destZipFile)));
             
-            List<DynmapChunk> requiredChunks = new ArrayList<DynmapChunk>();
+            List<DynmapChunk> requiredChunks = new ArrayList<>();
             int mincx = (minX >> 4);
             int maxcx = (maxX + 15) >> 4;
             int mincz = (minZ >> 4);
@@ -500,7 +500,7 @@ public class OBJExport {
     private void addPatchToFile(int[] v, int[] uv, SideVisible sv, String material, int rot) throws IOException {
         List<Face> faces = facesByTexture.get(material);
         if (faces == null) {
-            faces = new ArrayList<Face>();
+            faces = new ArrayList<>();
             facesByTexture.put(material, faces);
         }
         // If needed, rotate the UV sequence
@@ -594,7 +594,7 @@ public class OBJExport {
         }
     }
     private PatchDefinition[] getScaledModelAsPatches(short[] mod) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         short[] tmod = Arrays.copyOf(mod, mod.length);  // Make copy
         for (int y = 0; y < MODELSCALE; y++) {
             for (int z = 0; z < MODELSCALE; z++) {

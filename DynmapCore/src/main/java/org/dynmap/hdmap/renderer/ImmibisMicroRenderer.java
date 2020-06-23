@@ -224,7 +224,7 @@ public class ImmibisMicroRenderer extends CustomRenderer {
         Object v = ctx.getBlockTileEntityField("ICMP");
 
         /* Build patch list */
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         if ((v != null) && (v instanceof List)) {
             List<?> lv = (List<?>) v;
             for (Object lval : lv) {

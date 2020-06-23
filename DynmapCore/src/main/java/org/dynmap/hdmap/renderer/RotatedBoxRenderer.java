@@ -26,7 +26,7 @@ public class RotatedBoxRenderer extends CustomRenderer {
             return false;
         /* See if index attribute defined */
         idx_attrib = custparm.get("textureIndex");
-        ArrayList<Integer> map = new ArrayList<Integer>();
+        ArrayList<Integer> map = new ArrayList<>();
         for(int id = 0; ; id++) {
             String v = custparm.get("index" + id);
             if(v == null) break;
@@ -35,7 +35,7 @@ public class RotatedBoxRenderer extends CustomRenderer {
         rotValues = map.toArray(new Integer[map.size()]);
         models = new RenderPatch[rotValues.length][];
         /* Build unrotated base model */
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         addBox(rpf, list, 0, 1, 0, 1, 0, 1, null);
         
         for(int id = 0; id < rotValues.length; id++) {

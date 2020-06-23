@@ -453,7 +453,7 @@ public class DynIntHashMap
     // Return keys matching given value
     public List<Integer> keysWithValue(Object value) {
         Entry[] tab = table;
-        ArrayList<Integer> match = new ArrayList<Integer>();
+        ArrayList<Integer> match = new ArrayList<>();
 
         if (value==null) {
             for (int i = tab.length ; i-- > 0 ;) {

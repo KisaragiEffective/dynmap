@@ -15,7 +15,7 @@ import org.dynmap.renderer.RenderPatchFactory;
 
 public class FrameRenderer extends CustomRenderer {
     // Map of block ID sets for linking blocks
-    private static Map<String, BitSet> linked_ids_by_set = new HashMap<String, BitSet>();
+    private static Map<String, BitSet> linked_ids_by_set = new HashMap<>();
     // Set of linked blocks
     private BitSet linked_ids;
     // Diameter of frame/wore (1.0 = full block)
@@ -105,7 +105,7 @@ public class FrameRenderer extends CustomRenderer {
             
             map_id = custparm.get("textureMap");
             if(map_id == null) {    /* If no map, indexes are explicit */
-                ArrayList<Integer> map = new ArrayList<Integer>();
+                ArrayList<Integer> map = new ArrayList<>();
                 for(int id = 0; ; id++) {
                     String v = custparm.get("index" + id);
                     if(v == null) break;
@@ -146,7 +146,7 @@ public class FrameRenderer extends CustomRenderer {
     }
 
     private RenderPatch[] buildModel(RenderPatchFactory rpf, int idx, int txt_idx) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         int[] sides = { txt_idx,txt_idx,txt_idx,txt_idx,txt_idx,txt_idx };
         
         /* If we have an X axis match */

@@ -36,12 +36,12 @@ import org.dynmap.utils.PatchDefinitionFactory;
  */
 public class HDBlockModels {
     private static int max_patches;
-    static HashMap<Integer, HDBlockModel> models_by_id_data = new HashMap<Integer, HDBlockModel>();
+    static HashMap<Integer, HDBlockModel> models_by_id_data = new HashMap<>();
     static PatchDefinitionFactory pdf = new PatchDefinitionFactory();
     static BitSet customModelsRequestingTileData = new BitSet(); // Index by globalStateIndex
     static BitSet changeIgnoredBlocks = new BitSet();   // Index by globalStateIndex
-    private static HashSet<String> loadedmods = new HashSet<String>();
-    private static HashMap<Integer, HDScaledBlockModels> scaled_models_by_scale = new HashMap<Integer, HDScaledBlockModels>();
+    private static HashSet<String> loadedmods = new HashSet<>();
+    private static HashMap<Integer, HDScaledBlockModels> scaled_models_by_scale = new HashMap<>();
 
     public static final int getMaxPatchCount() { return max_patches; }  
     public static final PatchDefinitionFactory getPatchDefinitionFactory() { return pdf; }
@@ -214,7 +214,7 @@ public class HDBlockModels {
             }
         }
         // Load external model files (these go before internal versions, to allow external overrides)
-        ArrayList<String> files = new ArrayList<String>();
+        ArrayList<String> files = new ArrayList<>();
         File customdir = new File(datadir, "renderdata");
         addFiles(files, customdir, "");
         for(String fn : files) {
@@ -331,10 +331,10 @@ public class HDBlockModels {
         final String mcver = core.getDynmapPluginPlatformVersion();
         try {
             String line;
-            ArrayList<HDBlockVolumetricModel> modlist = new ArrayList<HDBlockVolumetricModel>();
-            ArrayList<HDBlockPatchModel> pmodlist = new ArrayList<HDBlockPatchModel>();
-            HashMap<String,Integer> varvals = new HashMap<String,Integer>();
-            HashMap<String, PatchDefinition> patchdefs = new HashMap<String, PatchDefinition>();
+            ArrayList<HDBlockVolumetricModel> modlist = new ArrayList<>();
+            ArrayList<HDBlockPatchModel> pmodlist = new ArrayList<>();
+            HashMap<String,Integer> varvals = new HashMap<>();
+            HashMap<String, PatchDefinition> patchdefs = new HashMap<>();
             pdf.setPatchNameMape(patchdefs);
             int layerbits = 0;
             int rownum = 0;
@@ -364,7 +364,7 @@ public class HDBlockModels {
                     
                 }
                 else if(line.startsWith("block:")) {
-                    ArrayList<String> blknames = new ArrayList<String>();
+                    ArrayList<String> blknames = new ArrayList<>();
                     databits.clear();
                     scale = 0;
                     line = line.substring(6);
@@ -531,7 +531,7 @@ public class HDBlockModels {
                     }
                 }
                 else if(line.startsWith("ignore-updates:")) {
-                    ArrayList<String> blknames = new ArrayList<String>();
+                    ArrayList<String> blknames = new ArrayList<>();
                     databits.clear();
                     line = line.substring(line.indexOf(':')+1);
                     String[] args = line.split(",");
@@ -724,11 +724,11 @@ public class HDBlockModels {
                     }
                 }
                 else if(line.startsWith("patchblock:")) {
-                    ArrayList<String> blknames = new ArrayList<String>();
+                    ArrayList<String> blknames = new ArrayList<>();
                     databits.clear();
                     line = line.substring(11);
                     String[] args = line.split(",");
-                    ArrayList<PatchDefinition> patches = new ArrayList<PatchDefinition>();
+                    ArrayList<PatchDefinition> patches = new ArrayList<>();
                     for(String a : args) {
                         String[] av = a.split("=");
                         if(av.length < 2) continue;
@@ -805,7 +805,7 @@ public class HDBlockModels {
                 }
                 // Shortcut for defining a patchblock that is a simple rectangular prism, with sidex corresponding to full block sides
                 else if(line.startsWith("boxblock:")) {
-                    ArrayList<String> blknames = new ArrayList<String>();
+                    ArrayList<String> blknames = new ArrayList<>();
                     databits.clear();
                     line = line.substring(9);
                     String[] args = line.split(",");
@@ -853,7 +853,7 @@ public class HDBlockModels {
                     /* If we have everything, build block */
                     pmodlist.clear();
                     if (blknames.size() > 0) {
-                        ArrayList<RenderPatch> pd = new ArrayList<RenderPatch>();
+                        ArrayList<RenderPatch> pd = new ArrayList<>();
                         CustomRenderer.addBox(pdf, pd, xmin, xmax, ymin, ymax, zmin, zmax, boxPatchList);
                         PatchDefinition[] patcharray = new PatchDefinition[pd.size()];
                         for (int i = 0; i < patcharray.length; i++) {
@@ -878,11 +878,11 @@ public class HDBlockModels {
                 }
                 // Shortcut for defining a patchblock that is a simple rectangular prism, with sidex corresponding to full block sides
                 else if(line.startsWith("boxlist:")) {
-                    ArrayList<String> blknames = new ArrayList<String>();
+                    ArrayList<String> blknames = new ArrayList<>();
                     databits.clear();
                     line = line.substring(8);
                     String[] args = line.split(",");
-                    ArrayList<BoxLimits> boxes = new ArrayList<BoxLimits>();
+                    ArrayList<BoxLimits> boxes = new ArrayList<>();
                     for(String a : args) {
                         String[] av = a.split("=");
                         if(av.length < 2) continue;
@@ -931,7 +931,7 @@ public class HDBlockModels {
                     /* If we have everything, build block */
                     pmodlist.clear();
                     if (blknames.size() > 0) {
-                        ArrayList<RenderPatch> pd = new ArrayList<RenderPatch>();
+                        ArrayList<RenderPatch> pd = new ArrayList<>();
                         
                         for (BoxLimits bl : boxes) {
                             CustomRenderer.addBox(pdf, pd, bl.xmin, bl.xmax, bl.ymin, bl.ymax, bl.zmin, bl.zmax, bl.patches);
@@ -958,8 +958,8 @@ public class HDBlockModels {
                     }
                 }
                 else if(line.startsWith("customblock:")) {
-                    ArrayList<String> blknames = new ArrayList<String>();
-                    HashMap<String,String> custargs = new HashMap<String,String>();
+                    ArrayList<String> blknames = new ArrayList<>();
+                    HashMap<String,String> custargs = new HashMap<>();
                     databits.clear();
                     line = line.substring(12);
                     String[] args = line.split(",");

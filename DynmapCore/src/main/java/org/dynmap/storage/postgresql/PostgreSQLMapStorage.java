@@ -53,7 +53,7 @@ public class PostgreSQLMapStorage extends MapStorage {
     private int cpoolCount = 0;
     private static final Charset UTF8 = StandardCharsets.UTF_8;
 
-    private HashMap<String, Integer> mapKey = new HashMap<String, Integer>();
+    private HashMap<String, Integer> mapKey = new HashMap<>();
 
     public class StorageTile extends MapStorageTile {
         private Integer mapkey;
@@ -615,7 +615,7 @@ public class PostgreSQLMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
@@ -666,7 +666,7 @@ public class PostgreSQLMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
@@ -684,7 +684,7 @@ public class PostgreSQLMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();

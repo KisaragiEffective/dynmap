@@ -43,11 +43,11 @@ public class DynmapBlockState {
     private static int MATCH_SOLID = 1 << 7;
     
     // Map of base blocks by name
-    private static HashMap<String, DynmapBlockState> blocksByName = new HashMap<String, DynmapBlockState>();
+    private static HashMap<String, DynmapBlockState> blocksByName = new HashMap<>();
     // Map of states by global state index
-    private static HashMap<Integer, DynmapBlockState> blocksByIndex = new HashMap<Integer, DynmapBlockState>();
+    private static HashMap<Integer, DynmapBlockState> blocksByIndex = new HashMap<>();
     // Map of base states by legacy ID
-    private static HashMap<Integer, DynmapBlockState> blocksByLegacyID = new HashMap<Integer, DynmapBlockState>();
+    private static HashMap<Integer, DynmapBlockState> blocksByLegacyID = new HashMap<>();
         
     // Well known block names (some versions might need to overwrite these)
     public static String AIR_BLOCK = "minecraft:air";
@@ -77,9 +77,9 @@ public class DynmapBlockState {
     public static String FLOWING_WATER_BLOCK = "minecraft:flowing_water";
 
     /** Names of log blocks: mod versions will need to add to this */
-    private static HashSet<String> log_blocks = new HashSet<String>(Arrays.asList(LOG_BLOCK, LOG2_BLOCK));
+    private static HashSet<String> log_blocks = new HashSet<>(Arrays.asList(LOG_BLOCK, LOG2_BLOCK));
     /** Names of water blocks: mod versions will need to add to this */
-    private static HashSet<String> water_blocks = new HashSet<String>(Arrays.asList(WATER_BLOCK, FLOWING_WATER_BLOCK));
+    private static HashSet<String> water_blocks = new HashSet<>(Arrays.asList(WATER_BLOCK, FLOWING_WATER_BLOCK));
 
     // Well known base blocks - air
     public static final DynmapBlockState AIR = new DynmapBlockState(null, 0, AIR_BLOCK, "", "AIR", 0);

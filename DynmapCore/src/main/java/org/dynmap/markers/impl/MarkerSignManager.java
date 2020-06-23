@@ -105,7 +105,7 @@ public class MarkerSignManager {
             if(mgr == null)
                 return;
             if(sign_cache == null) {    /* Initialize sign cache */
-                sign_cache = new HashMap<String, SignRec>();
+                sign_cache = new HashMap<>();
                 Set<MarkerSet> sets = MarkerAPIImpl.api.getMarkerSets();
                 for(MarkerSet ms : sets) {
                     for(Marker m : ms.getMarkers()) {

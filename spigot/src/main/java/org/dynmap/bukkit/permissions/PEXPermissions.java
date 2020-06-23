@@ -52,7 +52,7 @@ public class PEXPermissions implements PermissionProvider {
     
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> hasperms = new HashSet<String>();
+        HashSet<String> hasperms = new HashSet<>();
         PermissionUser pu = pm.getUser(player);
         if(pu != null) {
             for (String pp : perms) {

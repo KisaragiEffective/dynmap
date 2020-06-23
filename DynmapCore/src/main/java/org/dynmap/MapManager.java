@@ -50,9 +50,9 @@ public class MapManager {
 
     private static final int DEFAULT_CHUNKS_PER_TICK = 200;
     private static final int DEFAULT_ZOOMOUT_PERIOD = 60;
-    public List<DynmapWorld> worlds = new CopyOnWriteArrayList<DynmapWorld>();
-    private List<String> disabled_worlds = new ArrayList<String>();
-    public Map<String, DynmapWorld> worldsLookup = new HashMap<String, DynmapWorld>();
+    public List<DynmapWorld> worlds = new CopyOnWriteArrayList<>();
+    private List<String> disabled_worlds = new ArrayList<>();
+    public Map<String, DynmapWorld> worldsLookup = new HashMap<>();
     private DynmapCore core;
     private long timeslice_int; /* In milliseconds */
     private int max_chunk_loads_per_tick;
@@ -91,7 +91,7 @@ public class MapManager {
     private boolean enterexitUseTitle;
     private boolean enterReplacesExits;
     
-    private HashMap<UUID, HashSet<EnterExitMarker>> entersetstate = new HashMap<UUID, HashSet<EnterExitMarker>>();
+    private HashMap<UUID, HashSet<EnterExitMarker>> entersetstate = new HashMap<>();
     
     private static class TextQueueRec {
     	EnterExitText txt;
@@ -99,17 +99,17 @@ public class MapManager {
     }
     private static class SendQueueRec {
     	DynmapPlayer player;
-    	ArrayList<TextQueueRec> queue = new ArrayList<TextQueueRec>();
+    	ArrayList<TextQueueRec> queue = new ArrayList<>();
     	int tickdelay;    	
     }
 
-    private HashMap<UUID, SendQueueRec> entersetsendqueue = new HashMap<UUID, SendQueueRec>();
+    private HashMap<UUID, SendQueueRec> entersetsendqueue = new HashMap<>();
 
     private boolean did_start = false;
     
     private int zoomout_period;	/* Zoom-out tile processing period, in seconds */
     /* Which fullrenders are active */
-    private HashMap<String, FullWorldRenderState> active_renders = new HashMap<String, FullWorldRenderState>();
+    private HashMap<String, FullWorldRenderState> active_renders = new HashMap<>();
 
     /* Chunk load performance numbers */
     AtomicInteger chunk_caches_created = new AtomicInteger(0);
@@ -150,11 +150,11 @@ public class MapManager {
         String world;
         String reason;
     }
-    private ConcurrentHashMap<TouchEvent, Object> touch_events = new ConcurrentHashMap<TouchEvent, Object>();
-    private LinkedList<TouchVolumeEvent> touch_volume_events = new LinkedList<TouchVolumeEvent>();
+    private ConcurrentHashMap<TouchEvent, Object> touch_events = new ConcurrentHashMap<>();
+    private LinkedList<TouchVolumeEvent> touch_volume_events = new LinkedList<>();
     private Object touch_lock = new Object();
     
-    private HashMap<String, MapStats> mapstats = new HashMap<String, MapStats>();
+    private HashMap<String, MapStats> mapstats = new HashMap<>();
     
     private static class MapStats {
         int loggedcnt;
@@ -163,7 +163,7 @@ public class MapManager {
         int transparentcnt;
     }
     /* synchronized using 'lock' */
-    private HashMap<String, TriggerStats> trigstats = new HashMap<String, TriggerStats>();
+    private HashMap<String, TriggerStats> trigstats = new HashMap<>();
     
     
     private static class TriggerStats {
@@ -274,7 +274,7 @@ public class MapManager {
         DynmapCommandSender sender;
         String player;
         long timeaccum;
-        HashSet<MapType> renderedmaps = new HashSet<MapType>();
+        HashSet<MapType> renderedmaps = new HashSet<>();
         String activemaps;
         int activemapcnt;
         /* Min and max limits for chunk coords (for radius limit) */
@@ -337,7 +337,7 @@ public class MapManager {
             loc = l;
             found = new TileFlags();
             rendered = new TileFlags();
-            renderQueue = new LinkedList<MapTile>();
+            renderQueue = new LinkedList<>();
             this.sender = sender;
             if(sender instanceof DynmapPlayer)
                 this.player = ((DynmapPlayer)sender).getName();
@@ -395,7 +395,7 @@ public class MapManager {
             sl = n.getStrings("rendered", null);
             if(sl != null)
                 rendered.load(sl);
-            renderQueue = new LinkedList<MapTile>();
+            renderQueue = new LinkedList<>();
             List<ConfigurationNode> tl = n.getNodes("queue");
             if(tl != null) {
                 for(ConfigurationNode cn : tl) {
@@ -407,7 +407,7 @@ public class MapManager {
             }
             rendercnt = n.getInteger("count", 0);
             timeaccum = n.getInteger("timeaccum", 0);
-            renderedmaps = new HashSet<MapType>();
+            renderedmaps = new HashSet<>();
             sl = n.getStrings("renderedmaps", null);
             if(sl != null) {
                 for(String s : sl) {
@@ -440,7 +440,7 @@ public class MapManager {
         }
         
         public HashMap<String,Object> saveState() {
-            HashMap<String,Object> v = new HashMap<String,Object>();
+            HashMap<String,Object> v = new HashMap<>();
             
             v.put("world", world.getName());
             v.put("locX", loc.x);
@@ -456,7 +456,7 @@ public class MapManager {
             }
             v.put("found", found.save());
             v.put("rendered", rendered.save());
-            LinkedList<ConfigurationNode> queue = new LinkedList<ConfigurationNode>();
+            LinkedList<ConfigurationNode> queue = new LinkedList<>();
             for(MapTile tq : renderQueue) {
                 ConfigurationNode n = tq.saveTile();
                 if(n != null)
@@ -465,7 +465,7 @@ public class MapManager {
             v.put("queue", queue);
             v.put("count", rendercnt);
             v.put("timeaccum", timeaccum);
-            LinkedList<String> rmaps = new LinkedList<String>();
+            LinkedList<String> rmaps = new LinkedList<>();
             for(MapType mt : renderedmaps) {
                 rmaps.add(mt.getName());
             }
@@ -653,7 +653,7 @@ public class MapManager {
                     }
                 }
                 if(parallelrendercnt > 1) { /* Doing parallel renders? */
-                    tileset = new ArrayList<MapTile>();
+                    tileset = new ArrayList<>();
                     for(int i = 0; i < parallelrendercnt; i++) {
                         tile = renderQueue.pollFirst();
                         if(tile != null)
@@ -676,7 +676,7 @@ public class MapManager {
             
             if(tileset != null) {
                 long save_timeaccum = timeaccum;
-                List<Future<Boolean>> rslt = new ArrayList<Future<Boolean>>();
+                List<Future<Boolean>> rslt = new ArrayList<>();
                 final int cnt = tileset.size();
                 for(int i = 1; i < cnt; i++) {   /* Do all but first on other threads */
                     final MapTile mt = tileset.get(i);
@@ -883,7 +883,7 @@ public class MapManager {
     }
     
     private class CheckWorldTimes implements Runnable {
-    	HashMap<String, Polygon> last_worldborder = new HashMap<String, Polygon>();
+    	HashMap<String, Polygon> last_worldborder = new HashMap<>();
         public void run() {
             Future<Integer> f = core.getServer().callSyncMethod(new Callable<Integer>() {
                 public Integer call() throws Exception {
@@ -936,7 +936,7 @@ public class MapManager {
         public void run() {
             if (!tpspausezoomout) {
                 Debug.debug("DoZoomOutProcessing started");
-                ArrayList<DynmapWorld> wl = new ArrayList<DynmapWorld>(worlds);
+                ArrayList<DynmapWorld> wl = new ArrayList<>(worlds);
                 for(DynmapWorld w : wl) {
                     w.freshenZoomOutFiles();
                 }
@@ -991,7 +991,7 @@ public class MapManager {
     	rec.queue.add(txtrec);
     	// If enter replaces exits, and we just added enter, purge exits
     	if (enterReplacesExits && isEnter) {
-    		ArrayList<TextQueueRec> newlst = new ArrayList<TextQueueRec>();
+    		ArrayList<TextQueueRec> newlst = new ArrayList<>();
     		for (TextQueueRec r : rec.queue) {
     			if (r.isEnter) newlst.add(r);	// Keep the enter records
     		}
@@ -1001,12 +1001,12 @@ public class MapManager {
     
     private class DoUserMoveProcessing implements Runnable {
         public void run() {
-            HashMap<UUID, HashSet<EnterExitMarker>> newstate = new HashMap<UUID, HashSet<EnterExitMarker>>();
+            HashMap<UUID, HashSet<EnterExitMarker>> newstate = new HashMap<>();
         	DynmapPlayer[] pl = core.playerList.getOnlinePlayers();
         	for (DynmapPlayer player : pl) {
         		if (player == null) continue;
         		UUID puuid = player.getUUID();
-        		HashSet<EnterExitMarker> newset = new HashSet<EnterExitMarker>();
+        		HashSet<EnterExitMarker> newset = new HashSet<>();
         		DynmapLocation dl = player.getLocation();
         		if (dl != null) {
         			MarkerAPIImpl.getEnteredMarkers(dl.world, dl.x, dl.y, dl.z, newset);
@@ -1033,7 +1033,7 @@ public class MapManager {
         	entersetstate = newstate;	// Replace old with new
         	
         	// Go through queues - send pending messages
-        	List<UUID> keys = new ArrayList<UUID>(entersetsendqueue.keySet());
+        	List<UUID> keys = new ArrayList<>(entersetsendqueue.keySet());
         	for (UUID id : keys) {
         		SendQueueRec rec = entersetsendqueue.get(id);
         		// Check delay - count down if needed
@@ -1059,7 +1059,7 @@ public class MapManager {
     }
 
     private void addNextTilesToUpdate(int cnt) {
-        ArrayList<MapTile> tiles = new ArrayList<MapTile>();
+        ArrayList<MapTile> tiles = new ArrayList<>();
         TileFlags.TileCoord coord = new TileFlags.TileCoord();
         while(cnt > 0) {
             tiles.clear();
@@ -1096,7 +1096,7 @@ public class MapManager {
         hideores = configuration.getBoolean("hideores", false);
         useBrightnessTable = configuration.getBoolean("use-brightness-table", false);
         
-        blockalias = new HashMap<String, String>();
+        blockalias = new HashMap<>();
         if (hideores) {
             setBlockAlias(DynmapBlockState.GOLD_ORE_BLOCK, DynmapBlockState.STONE_BLOCK); // Gold ore
             setBlockAlias(DynmapBlockState.IRON_ORE_BLOCK, DynmapBlockState.STONE_BLOCK);  // Iron ore
@@ -1150,20 +1150,20 @@ public class MapManager {
         savependingperiod = configuration.getInteger("save-pending-period", 900);
         if ((savependingperiod > 0) && (savependingperiod < 60)) savependingperiod = 60;
         
-        this.tileQueue = new AsynchronousQueue<MapTile>(
+        this.tileQueue = new AsynchronousQueue<>(
                 new Handler<MapTile>() {
-                @Override
-                public void handle(MapTile t) {
-                    FullWorldRenderState job = new FullWorldRenderState(t);
-                    if(!scheduleDelayedJob(job, 0))
-                        job.cleanup();
-                }
-            }, 
-            (int) (configuration.getDouble("renderinterval", 0.5) * 1000),
-            configuration.getInteger("renderacceleratethreshold", 30),
-            (int)(configuration.getDouble("renderaccelerateinterval", 0.2) * 1000), 
-            configuration.getInteger("tiles-rendered-at-once", (Runtime.getRuntime().availableProcessors()+1)/2),
-            usenormalpriority);
+                    @Override
+                    public void handle(MapTile t) {
+                        FullWorldRenderState job = new FullWorldRenderState(t);
+                        if (!scheduleDelayedJob(job, 0))
+                            job.cleanup();
+                    }
+                },
+                (int) (configuration.getDouble("renderinterval", 0.5) * 1000),
+                configuration.getInteger("renderacceleratethreshold", 30),
+                (int) (configuration.getDouble("renderaccelerateinterval", 0.2) * 1000),
+                configuration.getInteger("tiles-rendered-at-once", (Runtime.getRuntime().availableProcessors() + 1) / 2),
+                usenormalpriority);
 
         /* On dedicated thread, so default to no delays */
         timeslice_int = (long)(configuration.getDouble("timesliceinterval", 0.0) * 1000);
@@ -1362,7 +1362,7 @@ public class MapManager {
         disabled_worlds.remove(worldname);
         // TODO: Make this less... weird...
         // Insert the world on the same spot as in the configuration.
-        HashMap<String, Integer> indexLookup = new HashMap<String, Integer>();
+        HashMap<String, Integer> indexLookup = new HashMap<>();
         List<Map<String,Object>> nodes = core.world_config.getMapList("worlds");
         for (int i = 0; i < nodes.size(); i++) {
             Map<String,Object> node = nodes.get(i);
@@ -1486,7 +1486,7 @@ public class MapManager {
         List<MapTile> mt = tileQueue.popAll();
         File f = new File(core.getDataFolder(), w.getName() + ".pending");
         ConfigurationNode saved = new ConfigurationNode();
-        ArrayList<ConfigurationNode> savedtiles = new ArrayList<ConfigurationNode>();
+        ArrayList<ConfigurationNode> savedtiles = new ArrayList<>();
         for(MapTile tile : mt) {
             if(tile.getDynmapWorld() != w) {
                 tileQueue.push(tile);
@@ -1505,7 +1505,7 @@ public class MapManager {
             saved.put("tiles", savedtiles);
         }
         /* Save invalidated tiles */
-        HashMap<String, Object> invalid = new HashMap<String,Object>();
+        HashMap<String, Object> invalid = new HashMap<>();
         for(MapTypeState mts : w.mapstate) {
             invalid.put(mts.type.getPrefix(), mts.save());
             cnt += mts.getInvCount();
@@ -1517,7 +1517,7 @@ public class MapManager {
             }
         }
         /* Save invalidated zoom out tiles pending */
-        HashMap<String, List<List<String>>> invzooms = new HashMap<String,List<List<String>>>();
+        HashMap<String, List<List<String>>> invzooms = new HashMap<>();
         for(MapTypeState mts : w.mapstate) {
             List<List<String>> szo = mts.saveZoomOut();
             if (szo != null) {
@@ -1695,7 +1695,7 @@ public class MapManager {
             }
         }
         synchronized(lock) {
-            for(String k: new TreeSet<String>(mapstats.keySet())) {
+            for(String k: new TreeSet<>(mapstats.keySet())) {
                 if((prefix != null) && !k.startsWith(prefix))
                     continue;
                 MapStats ms = mapstats.get(k);
@@ -1731,7 +1731,7 @@ public class MapManager {
     public void printTriggerStats(DynmapCommandSender sender) {
         sender.sendMessage("Render Trigger Statistics:");
         synchronized(lock) {
-            for(String k: new TreeSet<String>(trigstats.keySet())) {
+            for(String k: new TreeSet<>(trigstats.keySet())) {
                 TriggerStats ts = trigstats.get(k);
                 sender.sendMessage("  " + k + ": calls=" + ts.callsmade + ", calls-adding-tiles=" + ts.callswithtiles + ", tiles-added=" + ts.tilesqueued);
             }
@@ -1852,7 +1852,7 @@ public class MapManager {
         ArrayList<TouchVolumeEvent> tve = null;
 
         if(!touch_events.isEmpty()) {
-            te = new ArrayList<TouchEvent>(touch_events.keySet());
+            te = new ArrayList<>(touch_events.keySet());
             for (TouchEvent touchEvent : te) {
                 touch_events.remove(touchEvent);
             }
@@ -1860,7 +1860,7 @@ public class MapManager {
 
         synchronized(touch_lock) {
             if(!touch_volume_events.isEmpty()) {
-                tve = new ArrayList<TouchVolumeEvent>(touch_volume_events);
+                tve = new ArrayList<>(touch_volume_events);
                 touch_volume_events.clear();
             }
         }

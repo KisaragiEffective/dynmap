@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.dynmap.Log;
 
 public class OpPermissions implements PermissionProvider {
-    public HashSet<String> opCommands = new HashSet<String>();
+    public HashSet<String> opCommands = new HashSet<>();
 
     public OpPermissions(String[] opCommands) {
         for (String opCommand : opCommands) {

@@ -196,7 +196,7 @@ public class CTMTexturePack {
         private String[] tokenize(String v, String split)
         {
             StringTokenizer tok = new StringTokenizer(v, split);
-            ArrayList<String> rslt = new ArrayList<String>();
+            ArrayList<String> rslt = new ArrayList<>();
 
             while (tok.hasMoreTokens()) {
                 rslt.add(tok.nextToken());
@@ -253,7 +253,7 @@ public class CTMTexturePack {
             String v = p.getProperty(fld);
             if(v == null) return null;
             String[] tok = tokenize(v, ", ");
-            ArrayList<Integer> rslt = new ArrayList<Integer>();
+            ArrayList<Integer> rslt = new ArrayList<>();
             for(String t : tok) {
                 t = t.trim();
                 String[] vtok = tokenize(t, "-");
@@ -311,7 +311,7 @@ public class CTMTexturePack {
         	}
         }
         private int[] getIDList(Properties properties, String key, String type) {
-            Set<Integer> list = new HashSet<Integer>();
+            Set<Integer> list = new HashSet<>();
             String property = properties.getProperty(key, "");
             for (String token : property.split("\\s+")) {
                 if (token.equals("")) {
@@ -441,7 +441,7 @@ public class CTMTexturePack {
         private void getBiomes(Properties p, CTMTexturePack tp) {
             String v = p.getProperty("biomes", "").trim().toLowerCase();
             if (!v.equals("")) {
-                ArrayList<Integer> ids = new ArrayList<Integer>();
+                ArrayList<Integer> ids = new ArrayList<>();
                 String[] biomenames = tp.biomenames;
                 for(String s : v.split("\\s+")) {
                     for(int i = 0; i < biomenames.length; i++) {
@@ -509,7 +509,7 @@ public class CTMTexturePack {
                 if (v.length() == 0) {
                     return null;
                 }
-                ArrayList<String> lst = new ArrayList<String>();
+                ArrayList<String> lst = new ArrayList<>();
                 String[] tok = tokenize(v, " ,");
                 for (String t : tok) {
                     if (t.indexOf('-') >= 0) {
@@ -901,7 +901,7 @@ public class CTMTexturePack {
      * @param is_rp - if true, resource pack; if false, texture pack
      */
     public CTMTexturePack(TexturePackLoader tpl, TexturePack tp, DynmapCore core, boolean is_rp) {
-        ArrayList<String> files = new ArrayList<String>();
+        ArrayList<String> files = new ArrayList<>();
         this.tpl = tpl;
         biomenames = core.getBiomeNames();
         Set<String> ent = tpl.getEntries();

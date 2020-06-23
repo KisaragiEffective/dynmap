@@ -33,7 +33,7 @@ public class bPermPermissions extends BukkitPermissions {
 
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> hasperms = new HashSet<String>();
+        HashSet<String> hasperms = new HashSet<>();
         User usr = wm.getDefaultWorld().getUser(player);
         if(usr != null) {
             try { usr.calculateEffectivePermissions(); } catch (Exception x) {}

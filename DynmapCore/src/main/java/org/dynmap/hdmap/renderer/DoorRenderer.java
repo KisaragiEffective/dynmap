@@ -26,7 +26,7 @@ public class DoorRenderer extends CustomRenderer {
             return false;
         int[] txt = new int[6];
         for (int combined_meta = 0; combined_meta < 32; combined_meta++) {
-            ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+            ArrayList<RenderPatch> list = new ArrayList<>();
             /* Get textures for each side */
             for (int side = 0; side < 6; side++) {
                 txt[side] = sideAndMetaToTexture(combined_meta, side);

@@ -29,7 +29,7 @@ public class MushroomStateRenderer extends CustomRenderer {
 
     private void buildPatches(RenderPatchFactory rpf) {
         int[] faces = new int[6];
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for (int i = 0; i < 64; i++) {
             list.clear();
             faces[0] = ((i & 0x20) == 0) ? TEXTURE_OUTSIDE : TEXTURE_INSIDE;    // Down

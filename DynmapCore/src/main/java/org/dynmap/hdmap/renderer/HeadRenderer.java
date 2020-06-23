@@ -21,7 +21,7 @@ public class HeadRenderer extends CustomRenderer {
         if(!super.initializeRenderer(rpf, blkname, blockdatamask, custparm))
             return false;
 
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         list.add(rpf.getPatch(0.75, 0.0, 0.25, 0.25, 0.0, 0.25, 0.75, 0.0, 0.75, 0, 1, 0, 1, SideVisible.TOP, 0));
         list.add(rpf.getPatch(0.75, 0.5, 0.25, 0.25, 0.5, 0.25, 0.75, 0.5, 0.75, 0, 1, 0, 1, SideVisible.TOP, 0));
         RenderPatch side = rpf.getPatch(0.75, 0.0, 0.25, 0.25, 0.0, 0.25, 0.75, 0.5, 0.25, 0, 1, 0, 1, SideVisible.TOP, 0);

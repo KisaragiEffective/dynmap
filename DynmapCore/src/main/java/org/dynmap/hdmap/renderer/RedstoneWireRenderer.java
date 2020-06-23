@@ -102,7 +102,7 @@ public class RedstoneWireRenderer extends CustomRenderer {
     }
     
     private RenderPatch[] buildMesh(int idx) {
-        ArrayList<RenderPatch> lst = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> lst = new ArrayList<>();
         lst.add(bottom_patches[idx & 0xF]);
         /* Add any needed sides */
         for(int i = 0; i < 4; i++) {

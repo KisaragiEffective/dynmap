@@ -43,7 +43,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     private boolean req_login;
     private boolean chat_perms;
     private int lengthlimit;
-    private HashMap<String,String> useralias = new HashMap<String,String>();
+    private HashMap<String,String> useralias = new HashMap<>();
     private int aliasindex = 1;
     private long last_confighash;
     private MessageDigest md;
@@ -94,7 +94,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     }
     private Object lock = new Object();
     private FileProcessor pending;
-    private LinkedList<FileToWrite> files_to_write = new LinkedList<FileToWrite>();
+    private LinkedList<FileToWrite> files_to_write = new LinkedList<>();
 
     private void enqueueFileWrite(String filename, byte[] content, boolean phpwrap) {
         FileToWrite ftw = new FileToWrite();
@@ -309,7 +309,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     protected void writeUpdates() {
         if(core.mapManager == null) return;
         //Handles Updates
-        ArrayList<DynmapWorld> wlist = new ArrayList<DynmapWorld>(core.mapManager.getWorlds());	// Grab copy of world list
+        ArrayList<DynmapWorld> wlist = new ArrayList<>(core.mapManager.getWorlds());	// Grab copy of world list
         for (DynmapWorld dynmapWorld : wlist) {
             JSONObject update = new JSONObject();
             update.put("timestamp", currentTimestamp);
@@ -501,7 +501,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         BufferInputStream bis = storage.getStandaloneFile("dynmap_reg.php");
         if (bis != null) {
             BufferedReader br = null;
-            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> lines = new ArrayList<>();
             try {
                 br = new BufferedReader(new InputStreamReader(bis));
                 String line;

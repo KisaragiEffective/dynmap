@@ -296,7 +296,7 @@ public class BukkitVersionHelperCB extends BukkitVersionHelperGeneric {
                 }
             }
             else if (blockbyidfunc != null) {
-                ArrayList<Object> mats = new ArrayList<Object>();
+                ArrayList<Object> mats = new ArrayList<>();
                 for (int i = 0; i < map.length; i++) {
                     Object blk = blockbyidfunc.invoke(nmsblock, i);
                     if (blk != null) {

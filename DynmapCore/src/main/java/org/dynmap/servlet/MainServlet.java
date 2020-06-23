@@ -33,8 +33,8 @@ public class MainServlet extends HttpServlet {
         }
     }
     
-    List<Registration> registrations = new LinkedList<Registration>();
-    public List<Header> customHeaders = new LinkedList<Header>();
+    List<Registration> registrations = new LinkedList<>();
+    public List<Header> customHeaders = new LinkedList<>();
     
     public void addServlet(String pattern, HttpServlet servlet) {
         registrations.add(new Registration(pattern, servlet));
@@ -42,7 +42,7 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HashMap<String, Object> properties = new HashMap<String, Object>();
+        HashMap<String, Object> properties = new HashMap<>();
         String path = req.getPathInfo();
         
         for(Header header : customHeaders) {
@@ -60,7 +60,7 @@ public class MainServlet extends HttpServlet {
                     bestMatch = r;
                     bestMatchPart = matchingPart;
                     bestProperties = properties;
-                    properties = new HashMap<String, Object>();
+                    properties = new HashMap<>();
                 }
             }
         }

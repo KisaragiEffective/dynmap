@@ -36,8 +36,8 @@ public class RotatedPatchRenderer extends CustomRenderer {
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
         if(!super.initializeRenderer(rpf, blkname, blockdatamask, custparm))
             return false;
-        ArrayList<RenderPatch> patches = new ArrayList<RenderPatch>();
-        ArrayList<int[]> rotations = new ArrayList<int[]>();
+        ArrayList<RenderPatch> patches = new ArrayList<>();
+        ArrayList<int[]> rotations = new ArrayList<>();
         /* See if index attribute defined */
         idx_attrib = custparm.get("index");
         /* Now, traverse parameters */

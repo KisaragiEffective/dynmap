@@ -205,7 +205,7 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     Map<String, Object> getPersistentData() {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
         node.put("markup", markup);
         node.put("x", x);
@@ -402,7 +402,7 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     final boolean testTileForBoostMarkers(DynmapWorld w, HDPerspective perspective, double tile_x, double tile_y, double tile_dim) {
         Map<String, BoundingBox> bbc = bb_cache;
         if(bbc == null) {
-            bbc = new ConcurrentHashMap<String, BoundingBox>();
+            bbc = new ConcurrentHashMap<>();
         }
         BoundingBox bb = bbc.get(perspective.getName());
         if (bb == null) { // No cached bounding box, so generate it

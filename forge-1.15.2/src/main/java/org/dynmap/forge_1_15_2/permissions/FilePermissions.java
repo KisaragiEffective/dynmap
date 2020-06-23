@@ -29,12 +29,12 @@ public class FilePermissions implements PermissionProvider {
     }
     
     private FilePermissions(ConfigurationNode cfg) {
-        perms = new HashMap<String,Set<String>>();
+        perms = new HashMap<>();
         for(String k : cfg.keySet()) {
             List<String> p = cfg.getStrings(k, null);
             if(p != null) {
                 k = k.toLowerCase();
-                HashSet<String> pset = new HashSet<String>();
+                HashSet<String> pset = new HashSet<>();
                 for(String perm : p) {
                     pset.add(perm.toLowerCase());
                 }
@@ -59,7 +59,7 @@ public class FilePermissions implements PermissionProvider {
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
         player = player.toLowerCase();
-        HashSet<String> rslt = new HashSet<String>();
+        HashSet<String> rslt = new HashSet<>();
         if(DynmapPlugin.plugin.isOp(player)) {
             rslt.addAll(perms);
         }

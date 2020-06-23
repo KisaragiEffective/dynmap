@@ -65,7 +65,7 @@ public class TFCSupportRenderer extends CustomRenderer {
     }
 
     private void buildMeshes(RenderPatchFactory rpf) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for(int dat = 0; dat < 32; dat++) {
             switch(dat & SIDE_X) {
                 case SIDE_XP: // Just X+

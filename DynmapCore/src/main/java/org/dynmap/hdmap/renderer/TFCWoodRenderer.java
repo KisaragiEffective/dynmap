@@ -48,7 +48,7 @@ public class TFCWoodRenderer extends CustomRenderer {
     }
 
     private void buildMeshes(RenderPatchFactory rpf) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for(int dat = 0; dat < 32; dat++) {
             int dat2 = dat;
             if((dat & SIDE_YN) == 0) {  /* Nothing below, always X-Y */

@@ -9,7 +9,7 @@ import org.dynmap.Log;
 import org.dynmap.forge_1_15_2.DynmapPlugin;
 
 public class OpPermissions implements PermissionProvider {
-    public HashSet<String> usrCommands = new HashSet<String>();
+    public HashSet<String> usrCommands = new HashSet<>();
 
     public OpPermissions(String[] usrCommands) {
         for (String usrCommand : usrCommands) {
@@ -20,7 +20,7 @@ public class OpPermissions implements PermissionProvider {
 
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> rslt = new HashSet<String>();
+        HashSet<String> rslt = new HashSet<>();
         if(DynmapPlugin.plugin.isOp(player)) {
             rslt.addAll(perms);
         }

@@ -36,7 +36,7 @@ public class ConfigurationNode implements Map<String, Object> {
     private Yaml yaml;
     
     public ConfigurationNode() {
-        entries = new LinkedHashMap<String, Object>();
+        entries = new LinkedHashMap<>();
     }
 
     private void initparse() {
@@ -54,7 +54,7 @@ public class ConfigurationNode implements Map<String, Object> {
 
     public ConfigurationNode(File f) {
         this.f = f;
-        entries = new LinkedHashMap<String, Object>();
+        entries = new LinkedHashMap<>();
     }
     
     public ConfigurationNode(Map<String, Object> map) {
@@ -206,7 +206,7 @@ public class ConfigurationNode implements Map<String, Object> {
         if (!(o instanceof List<?>)) {
             return def;
         }
-        ArrayList<String> strings = new ArrayList<String>();
+        ArrayList<String> strings = new ArrayList<>();
         for(Object i : (List<?>)o) {
             strings.add(i.toString());
         }
@@ -242,13 +242,13 @@ public class ConfigurationNode implements Map<String, Object> {
             try {
                 T o = (T)getObject(path, null);
                 if (o == null) {
-                    return new ArrayList<T>();
+                    return new ArrayList<>();
                 }
-                ArrayList<T> al = new ArrayList<T>();
+                ArrayList<T> al = new ArrayList<>();
                 al.add(o);
                 return al;
             } catch (ClassCastException e2) {
-                return new ArrayList<T>();
+                return new ArrayList<>();
             }
         }
     }
@@ -270,9 +270,9 @@ public class ConfigurationNode implements Map<String, Object> {
         List<Object> o = getList(path);
 
         if(o == null)
-            return new ArrayList<ConfigurationNode>();
+            return new ArrayList<>();
         
-        ArrayList<ConfigurationNode> nodes = new ArrayList<ConfigurationNode>();
+        ArrayList<ConfigurationNode> nodes = new ArrayList<>();
         for(Object i : o) {
             if (i instanceof Map<?, ?>) {
                 Map<String, Object> map;
@@ -296,7 +296,7 @@ public class ConfigurationNode implements Map<String, Object> {
         if(v instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, Object> mv = (Map<String, Object>)v;
-            LinkedHashMap<String, Object> newv = new LinkedHashMap<String,Object>();
+            LinkedHashMap<String, Object> newv = new LinkedHashMap<>();
             for(Map.Entry<String, Object> me : mv.entrySet()) {
                 newv.put(me.getKey(), copyValue(me.getValue()));
             }
@@ -305,7 +305,7 @@ public class ConfigurationNode implements Map<String, Object> {
         else if(v instanceof List) {
             @SuppressWarnings("unchecked")
             List<Object> lv = (List<Object>)v;
-            ArrayList<Object> newv = new ArrayList<Object>();
+            ArrayList<Object> newv = new ArrayList<>();
             for (Object o : lv) {
                 newv.add(copyValue(o));
             }
@@ -351,7 +351,7 @@ public class ConfigurationNode implements Map<String, Object> {
     
     public <T> List<T> createInstances(String path, Class<?>[] constructorParameters, Object[] constructorArguments) {
         List<ConfigurationNode> nodes = getNodes(path);
-        List<T> instances = new ArrayList<T>();
+        List<T> instances = new ArrayList<>();
         for(ConfigurationNode node : nodes) {
             T instance = node.<T>createInstance(constructorParameters, constructorArguments);
             if (instance != null) {

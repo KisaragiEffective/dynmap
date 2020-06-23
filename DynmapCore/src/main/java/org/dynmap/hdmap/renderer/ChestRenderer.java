@@ -37,7 +37,7 @@ public class ChestRenderer extends CustomRenderer {
 
         double_chest = !("false".equals(custparm.get("doublechest")));
         		
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         // Build single chest patch model 
         CustomRenderer.addBox(rpf, list, OFF1, OFF15, 0, OFF14, OFF1, OFF15, SINGLE_PATCHES);
         models[ChestData.SINGLE_SOUTH.ordinal()] = list.toArray(new RenderPatch[list.size()]);

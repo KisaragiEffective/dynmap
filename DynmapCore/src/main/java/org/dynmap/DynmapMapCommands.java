@@ -84,7 +84,7 @@ public class DynmapMapCommands {
             return true;
         Set<String> wnames = null;
         if(args.length > 1) {
-            wnames = new HashSet<String>();
+            wnames = new HashSet<>();
             for(int i = 1; i < args.length; i++)
                 wnames.add(DynmapWorld.normalizeWorldName(args[i]));
         }
@@ -335,7 +335,7 @@ public class DynmapMapCommands {
                 sender.sendMessage("Cannot delete maps from disabled or unloaded world: " + wname);
                 return true;
             }
-            List<MapType> maps = new ArrayList<MapType>(w.maps);
+            List<MapType> maps = new ArrayList<>(w.maps);
             boolean done = false;
             for(int idx = 0; (!done) && (idx < maps.size()); idx++) {
                 MapType mt = maps.get(idx);
@@ -636,7 +636,7 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.blklist"))
             return true;
         Map<String, Integer> map = core.getServer().getBlockUniqueIDMap();
-        TreeSet<String> keys = new TreeSet<String>(map.keySet());
+        TreeSet<String> keys = new TreeSet<>(map.keySet());
         for (String k : keys) {
             sender.sendMessage(k + ": " + map.get(k));
         }

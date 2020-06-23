@@ -9,8 +9,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class AsynchronousQueue<T> {
     private Object lock = new Object();
     private Thread thread;
-    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<T>();
-    private Set<T> set = new HashSet<T>();
+    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    private Set<T> set = new HashSet<>();
     private Handler<T> handler;
     private int dequeueTime;
     private int accelDequeueTime;
@@ -68,7 +68,7 @@ public class AsynchronousQueue<T> {
     public List<T> popAll() {
         List<T> s;
         synchronized(lock) {
-            s = new ArrayList<T>(queue);
+            s = new ArrayList<>(queue);
             queue.clear();
             set.clear();
         }

@@ -109,7 +109,7 @@ public abstract class MapType {
 
     public List<MapTile> getTiles(DynmapWorld w, int x, int y, int z) {
         List<TileFlags.TileCoord> coords = this.getTileCoords(w, x, y, z);
-        ArrayList<MapTile> tiles = new ArrayList<MapTile>();
+        ArrayList<MapTile> tiles = new ArrayList<>();
         for(TileFlags.TileCoord c : coords) {
             this.addMapTiles(tiles, w, c.x, c.y);
         }
@@ -146,7 +146,7 @@ public abstract class MapType {
     }
     
     protected void walkMapTree(File root, FileCallback cb, boolean day) {
-        LinkedList<File> dirs = new LinkedList<File>();
+        LinkedList<File> dirs = new LinkedList<>();
         String ext = "." + getImageFormat().getFileExt();
         dirs.add(root);
         while(!dirs.isEmpty()) {

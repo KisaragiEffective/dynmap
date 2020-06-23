@@ -19,8 +19,8 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.servlet.LoginServlet;
 
 public class WebAuthManager {
-    private HashMap<String, String> pwdhash_by_userid = new HashMap<String, String>();
-    private HashMap<String, String> pending_registrations = new HashMap<String, String>();
+    private HashMap<String, String> pwdhash_by_userid = new HashMap<>();
+    private HashMap<String, String> pending_registrations = new HashMap<>();
     private String hashsalt;
     private File pfile;
     public static final String WEBAUTHFILE = "webauth.txt";
@@ -258,7 +258,7 @@ public class WebAuthManager {
         if (wrap) {
             sb.append("<?php\n");
         }
-        ArrayList<String> mid = new ArrayList<String>();
+        ArrayList<String> mid = new ArrayList<>();
         /* Create world access list */
         sb.append("$worldaccess = array(\n");
         for(DynmapWorld w : core.getMapManager().getWorlds()) {
@@ -294,7 +294,7 @@ public class WebAuthManager {
         }
         sb.append(");\n");
 
-        HashSet<String> cantseeall = new HashSet<String>();
+        HashSet<String> cantseeall = new HashSet<>();
         String perm = "playermarkers.seeall";
         sb.append("$seeallmarkers = '");
         for(String uid : pwdhash_by_userid.keySet()) {
@@ -349,7 +349,7 @@ public class WebAuthManager {
         return (pending_registrations.size() > 0);
     }
     Set<String> getUserIDs() {
-        HashSet<String> lst = new HashSet<String>();
+        HashSet<String> lst = new HashSet<>();
         lst.addAll(pwdhash_by_userid.keySet());
         lst.addAll(pending_registrations.keySet());
         return lst;

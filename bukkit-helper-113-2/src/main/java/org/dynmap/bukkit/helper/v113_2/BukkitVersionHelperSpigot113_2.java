@@ -96,8 +96,8 @@ public class BukkitVersionHelperSpigot113_2 extends BukkitVersionHelperCB {
      */
     @Override
     public void initializeBlockStates() {
-    	dataToState = new IdentityHashMap<IBlockData, DynmapBlockState>();
-    	HashMap<String, DynmapBlockState> lastBlockState = new HashMap<String, DynmapBlockState>();
+    	dataToState = new IdentityHashMap<>();
+    	HashMap<String, DynmapBlockState> lastBlockState = new HashMap<>();
     	
     	int cnt = Block.REGISTRY_ID.a();
     	// Loop through block data states

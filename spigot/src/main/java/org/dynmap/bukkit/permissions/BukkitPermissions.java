@@ -42,7 +42,7 @@ public class BukkitPermissions implements PermissionProvider {
         Player p = Bukkit.getPlayerExact(player);
         HashSet<String> hasperms = null;
         if (p != null) {
-            hasperms = new HashSet<String>();
+            hasperms = new HashSet<>();
             for(String perm : perms) {
                 if (p.hasPermission(name + "." + perm)) {
                     hasperms.add(perm);

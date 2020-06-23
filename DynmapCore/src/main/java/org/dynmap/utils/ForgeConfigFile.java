@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class ForgeConfigFile {
     private File cfg;
-    private HashMap<String, String> settings = new HashMap<String, String>();
+    private HashMap<String, String> settings = new HashMap<>();
     public static final String ALLOWED_CHARS = "._-:";
 
     public ForgeConfigFile(File cfgfile) {
@@ -29,7 +29,7 @@ public class ForgeConfigFile {
             fis = new FileInputStream(cfg);
             rdr = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
             String line;
-            ArrayList<String> section = new ArrayList<String>();
+            ArrayList<String> section = new ArrayList<>();
             String tok;
             while((line = rdr.readLine()) != null) {
                 boolean skip = false;

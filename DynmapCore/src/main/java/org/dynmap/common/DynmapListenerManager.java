@@ -46,13 +46,13 @@ public class DynmapListenerManager {
         BLOCK_BREAK,
         SIGN_CHANGE
     }
-    private Map<EventType, ArrayList<EventListener>> listeners = new EnumMap<EventType, ArrayList<EventListener>>(EventType.class);
+    private Map<EventType, ArrayList<EventListener>> listeners = new EnumMap<>(EventType.class);
     
     public void addListener(EventType type, EventListener listener) {
         synchronized(listeners) {
             ArrayList<EventListener> lst = listeners.get(type);
             if(lst == null) {
-                lst = new ArrayList<EventListener>();
+                lst = new ArrayList<>();
                 listeners.put(type, lst);
                 core.getServer().requestEventNotification(type);
             }

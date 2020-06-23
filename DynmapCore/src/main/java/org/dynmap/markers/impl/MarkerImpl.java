@@ -181,7 +181,7 @@ class MarkerImpl implements Marker {
     Map<String, Object> getPersistentData() {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
         node.put("markup", markup);
         node.put("x", x);
