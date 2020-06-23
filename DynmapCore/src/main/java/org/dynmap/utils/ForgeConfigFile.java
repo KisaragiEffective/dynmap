@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ForgeConfigFile {
-    private File cfg;
-    private HashMap<String, String> settings = new HashMap<>();
+    private final File cfg;
+    private final HashMap<String, String> settings = new HashMap<>();
     public static final String ALLOWED_CHARS = "._-:";
 
     public ForgeConfigFile(File cfgfile) {

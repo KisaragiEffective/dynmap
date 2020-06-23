@@ -54,8 +54,8 @@ public class ForgeMapChunkCache extends MapChunkCache
     private static Field chunksToRemove = null; // Map
 
     /* ChunjManager Pending fields */
-    private static Field chunkCoord = null;
-    private static Field nbtTag = null;
+    private static final Field chunkCoord = null;
+    private static final Field nbtTag = null;
     
     private World w;
     private DynmapWorld dw;
@@ -82,9 +82,9 @@ public class ForgeMapChunkCache extends MapChunkCache
             BlockStep.X_PLUS, BlockStep.Y_PLUS, BlockStep.Z_PLUS
                                               };
 
-    private static BiomeMap[] biome_to_bmap;
+    private static final BiomeMap[] biome_to_bmap;
 
-    private static final int getIndexInChunk(int cx, int cy, int cz) {
+    private static int getIndexInChunk(int cx, int cy, int cz) {
         return (cy << 8) | (cz << 4) | cx;
     }
 
@@ -805,7 +805,7 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     private static class PlainChunk extends ChunkSnapshot
     {
-        private DynmapBlockState fill;
+        private final DynmapBlockState fill;
 
         PlainChunk(String fill)
         {
@@ -983,7 +983,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         
     }
 
-    private static boolean didError = false;
+    private static final boolean didError = false;
     
     public CompoundNBT readChunk(int x, int z) {
         try {

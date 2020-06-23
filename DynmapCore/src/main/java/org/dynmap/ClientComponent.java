@@ -37,7 +37,7 @@ public class ClientComponent extends Component {
         return o;
     }
     
-    protected static final JSONObject convertMap(Map<String, ?> m) {
+    protected static JSONObject convertMap(Map<String, ?> m) {
         JSONObject o = new JSONObject();
         for(Map.Entry<String, ?> entry : m.entrySet()) {
             s(o, entry.getKey(), convert(entry.getValue()));
@@ -46,7 +46,7 @@ public class ClientComponent extends Component {
     }
     
     @SuppressWarnings("unchecked")
-    protected static final JSONArray convertList(List<?> l) {
+    protected static JSONArray convertList(List<?> l) {
         JSONArray o = new JSONArray();
         for(Object entry : l) {
             o.add(convert(entry));
@@ -55,7 +55,7 @@ public class ClientComponent extends Component {
     }
     
     @SuppressWarnings("unchecked")
-    protected static final Object convert(Object o) {
+    protected static Object convert(Object o) {
         if (o instanceof Map<?, ?>) {
             return convertMap((Map<String, ?>)o);
         } else if (o instanceof List<?>) {

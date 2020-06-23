@@ -15,7 +15,7 @@ import org.dynmap.hdmap.HDShader;
  * Handler for export commands (/dynmapexp)
  */
 public class DynmapExpCommands {
-    private HashMap<String, ExportContext> sessions = new HashMap<>();
+    private final HashMap<String, ExportContext> sessions = new HashMap<>();
 
     private static class ExportContext {
         public String shader = "stdtexture";

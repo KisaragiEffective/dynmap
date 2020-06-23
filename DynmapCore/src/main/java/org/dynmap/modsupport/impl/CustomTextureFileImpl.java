@@ -16,7 +16,7 @@ public class CustomTextureFileImpl extends TextureFileImpl implements CustomText
         int ydest;
     }
 
-    private ArrayList<CustomPatch> patches = new ArrayList<>();
+    private final ArrayList<CustomPatch> patches = new ArrayList<>();
     
     public CustomTextureFileImpl(String id, String filename, int xcount, int ycount) {
         super(id, filename, TextureFileType.GRID, xcount, ycount);

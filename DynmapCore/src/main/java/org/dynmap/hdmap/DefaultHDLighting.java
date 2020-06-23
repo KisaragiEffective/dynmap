@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 import static org.dynmap.JSONUtils.s;
 
 public class DefaultHDLighting implements HDLighting {
-    private String name;
+    private final String name;
     protected boolean grayscale;
     protected boolean blackandwhite;
     protected int blackthreshold;

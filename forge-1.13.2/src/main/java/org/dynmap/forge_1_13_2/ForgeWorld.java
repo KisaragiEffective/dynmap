@@ -28,7 +28,7 @@ public class ForgeWorld extends DynmapWorld
     private final boolean isnether;
     private final boolean istheend;
     private final String env;
-    private DynmapLocation spawnloc = new DynmapLocation();
+    private final DynmapLocation spawnloc = new DynmapLocation();
     private static boolean doMCPCMapping = false;
     private static boolean doSaveFolderMapping = false;
     private static int maxWorldHeight = 256;    // Maximum allows world height

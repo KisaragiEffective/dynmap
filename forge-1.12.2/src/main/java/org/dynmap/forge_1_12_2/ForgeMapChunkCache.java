@@ -93,9 +93,9 @@ public class ForgeMapChunkCache extends MapChunkCache
             BlockStep.X_PLUS, BlockStep.Y_PLUS, BlockStep.Z_PLUS
                                               };
 
-    private static BiomeMap[] biome_to_bmap;
+    private static final BiomeMap[] biome_to_bmap;
 
-    private static final int getIndexInChunk(int cx, int cy, int cz) {
+    private static int getIndexInChunk(int cx, int cy, int cz) {
         return (cy << 8) | (cz << 4) | cx;
     }
 
@@ -816,7 +816,7 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     private static class PlainChunk extends ChunkSnapshot
     {
-        private DynmapBlockState fill;
+        private final DynmapBlockState fill;
 
         PlainChunk(String fill)
         {

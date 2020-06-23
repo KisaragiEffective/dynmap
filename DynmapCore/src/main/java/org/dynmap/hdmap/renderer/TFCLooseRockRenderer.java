@@ -25,7 +25,7 @@ public class TFCLooseRockRenderer extends CustomRenderer {
         return 1;
     }
     
-    private int[] patches = { 0, 0, 0, 0, 0, 0 };
+    private final int[] patches = { 0, 0, 0, 0, 0, 0 };
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
         ArrayList<RenderPatch> list = new ArrayList<>();

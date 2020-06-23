@@ -19,14 +19,14 @@ public class CopyStairBlockRenderer extends CustomRenderer {
     private static final int TEXTURE_Y_MINUS = 4;
     private static final int TEXTURE_Z_MINUS = 5;
     
-    private static BitSet stair_ids = new BitSet();
+    private static final BitSet stair_ids = new BitSet();
         
     // Array of meshes for normal steps - index = (data value & 7)
-    private RenderPatch[][] stepmeshes = new RenderPatch[8][];
+    private final RenderPatch[][] stepmeshes = new RenderPatch[8][];
     // Array of meshes for 3/4 steps - index = (data value & 7), with extra one clockwise from normal step
-    private RenderPatch[][] step_3_4_meshes = new RenderPatch[8][];
+    private final RenderPatch[][] step_3_4_meshes = new RenderPatch[8][];
     // Array of meshes for 1/4 steps - index = (data value & 7), with clockwise quarter clopped from normal step
-    private RenderPatch[][] step_1_4_meshes = new RenderPatch[8][];
+    private final RenderPatch[][] step_1_4_meshes = new RenderPatch[8][];
     
     private void setID(String bname) {
         DynmapBlockState bbs = DynmapBlockState.getBaseStateByName(bname);

@@ -14,7 +14,7 @@ public class HeadRenderer extends CustomRenderer {
     private static final int NUM_DIRECTIONS = 16;
     
     private RenderPatch[] basemesh;
-    private RenderPatch[][] meshes = new RenderPatch[NUM_DIRECTIONS][];
+    private final RenderPatch[][] meshes = new RenderPatch[NUM_DIRECTIONS][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

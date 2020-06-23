@@ -21,8 +21,8 @@ import static org.dynmap.JSONUtils.g;
 
 public class ClientConfigurationServlet extends HttpServlet {
     private static final long serialVersionUID = 9106801553080522469L;
-    private DynmapCore core;
-    private Charset cs_utf8 = StandardCharsets.UTF_8;
+    private final DynmapCore core;
+    private final Charset cs_utf8 = StandardCharsets.UTF_8;
 
     public ClientConfigurationServlet(DynmapCore plugin) {
         this.core = plugin;

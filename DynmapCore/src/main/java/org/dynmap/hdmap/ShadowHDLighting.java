@@ -200,7 +200,7 @@ public class ShadowHDLighting extends DefaultHDLighting {
         }
     }
     
-    private final int getLightLevel(final LightLevels ll, boolean useambient) {
+    private int getLightLevel(final LightLevels ll, boolean useambient) {
         int lightlevel;
         /* If ambient light, adjust base lighting for it */
         if(useambient)
@@ -265,7 +265,7 @@ public class ShadowHDLighting extends DefaultHDLighting {
         checkGrayscale(outcolor);
     }
 
-    private final void shadowColor(Color c, int lightlevel, int[] shadowscale) {
+    private void shadowColor(Color c, int lightlevel, int[] shadowscale) {
         int scale = shadowscale[lightlevel];
         if(scale < 256)
             c.setRGBA((c.getRed() * scale) >> 8, (c.getGreen() * scale) >> 8, 

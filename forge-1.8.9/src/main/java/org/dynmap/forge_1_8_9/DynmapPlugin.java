@@ -119,16 +119,16 @@ public class DynmapPlugin
     private net.minecraft.server.MinecraftServer server;
     public static DynmapPlugin plugin;
     private ChatHandler chathandler;
-    private HashMap<String, Integer> sortWeights = new HashMap<>();
+    private final HashMap<String, Integer> sortWeights = new HashMap<>();
     // Drop world load ticket after 30 seconds
-    private long worldIdleTimeoutNS = 30 * 1000000000L;
-    private HashMap<String, ForgeWorld> worlds = new HashMap<>();
+    private final long worldIdleTimeoutNS = 30 * 1000000000L;
+    private final HashMap<String, ForgeWorld> worlds = new HashMap<>();
     private World last_world;
     private ForgeWorld last_fworld;
-    private Map<String, ForgePlayer> players = new HashMap<>();
+    private final Map<String, ForgePlayer> players = new HashMap<>();
     //TODO private ForgeMetrics metrics;
-    private HashSet<String> modsused = new HashSet<>();
-    private ForgeServer fserver = new ForgeServer();
+    private final HashSet<String> modsused = new HashSet<>();
+    private final ForgeServer fserver = new ForgeServer();
     private boolean tickregistered = false;
     // TPS calculator
     private double tps;
@@ -223,33 +223,33 @@ public class DynmapPlugin
         //}
     }
 
-    public static final int getBlockID(World w, int x, int y, int z) {
+    public static int getBlockID(World w, int x, int y, int z) {
         // Block.getIdFromBlock(w.getBlockType(x,y,z))
         return Block.getIdFromBlock(w.getBlockState(new BlockPos(x,  y,  z)).getBlock());
     }
-    public static final Block getBlockByID(int id) {
+    public static Block getBlockByID(int id) {
         return Block.getBlockById(id);
     }
-    public static final Item getItemByID(int id) {
+    public static Item getItemByID(int id) {
         return Item.getItemById(id);
     }
-    public static final Material getBlockMaterial(Block b) {
+    public static Material getBlockMaterial(Block b) {
         return b.getMaterial();
     }
-    public static final String getBlockUnlocalizedName(Block b) {
+    public static String getBlockUnlocalizedName(Block b) {
         String s = b.getUnlocalizedName();
         if (s.startsWith("tile.")) {
             s = s.substring(5);
         }
         return s;
     }
-    public static final BiomeGenBase[] getBiomeList() {
+    public static BiomeGenBase[] getBiomeList() {
         return BiomeGenBase.getBiomeGenArray();
     }
-    public static final String getChatMessage(IChatComponent cc) {
+    public static String getChatMessage(IChatComponent cc) {
         return cc.getUnformattedTextForChat();
     }
-    public static final NetworkManager getNetworkManager(NetHandlerPlayServer nh) {
+    public static NetworkManager getNetworkManager(NetHandlerPlayServer nh) {
         return nh.netManager;
     }
     
@@ -303,7 +303,7 @@ public class DynmapPlugin
     	String message;
     	EntityPlayer sender;
     }
-    private ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<>();
     
     public class ChatHandler {
 		@SubscribeEvent
@@ -322,7 +322,7 @@ public class DynmapPlugin
         long last_ts;
         Ticket ticket;
     }
-    private static HashMap<Integer, WorldBusyRecord> busy_worlds = new HashMap<>();
+    private static final HashMap<Integer, WorldBusyRecord> busy_worlds = new HashMap<>();
     
     private void setBusy(World w) {
         setBusy(w, null);
@@ -475,11 +475,11 @@ public class DynmapPlugin
     public class ForgeServer extends DynmapServerInterface
     {
         /* Server thread scheduler */
-        private Object schedlock = new Object();
+        private final Object schedlock = new Object();
         private long cur_tick;
         private long next_id;
         private long cur_tick_starttime;
-        private PriorityQueue<TaskRecord> runqueue = new PriorityQueue<>();
+        private final PriorityQueue<TaskRecord> runqueue = new PriorityQueue<>();
 
         public ForgeServer() {
         }
@@ -620,7 +620,7 @@ public class DynmapPlugin
         {
             return patternControlCode.matcher(s).replaceAll("");
         }
-        private Set<EventType> registered = new HashSet<>();
+        private final Set<EventType> registered = new HashSet<>();
         @Override
         public boolean requestEventNotification(EventType type)
         {
@@ -1356,7 +1356,7 @@ public class DynmapPlugin
     /* Handler for generic console command sender */
     public class ForgeCommandSender implements DynmapCommandSender
     {
-        private ICommandSender sender;
+        private final ICommandSender sender;
 
         protected ForgeCommandSender() {
         	sender = null;
@@ -1843,7 +1843,7 @@ public class DynmapPlugin
     /*NOTYET - need rest of forge
     private WorldTracker worldTracker = null;
     */
-    private HashMap<String, WorldUpdateTracker> updateTrackers = new HashMap<>();
+    private final HashMap<String, WorldUpdateTracker> updateTrackers = new HashMap<>();
     
     private void registerEvents()
     {
@@ -2101,8 +2101,8 @@ public class DynmapPlugin
 
 class DynmapCommandHandler extends CommandBase
 {
-    private String cmd;
-    private DynmapPlugin plugin;
+    private final String cmd;
+    private final DynmapPlugin plugin;
 
     public DynmapCommandHandler(String cmd, DynmapPlugin p)
     {

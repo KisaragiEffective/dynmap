@@ -14,7 +14,7 @@ import org.dynmap.Log;
 import org.dynmap.forge_1_9_4.DynmapPlugin;
 
 public class FilePermissions implements PermissionProvider {
-    private HashMap<String, Set<String>> perms;
+    private final HashMap<String, Set<String>> perms;
     private Set<String> defperms;
     
     public static FilePermissions create() {

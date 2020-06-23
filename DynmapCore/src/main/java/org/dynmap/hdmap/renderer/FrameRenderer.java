@@ -15,13 +15,13 @@ import org.dynmap.renderer.RenderPatchFactory;
 
 public class FrameRenderer extends CustomRenderer {
     // Map of block ID sets for linking blocks
-    private static Map<String, BitSet> linked_ids_by_set = new HashMap<>();
+    private static final Map<String, BitSet> linked_ids_by_set = new HashMap<>();
     // Set of linked blocks
     private BitSet linked_ids;
     // Diameter of frame/wore (1.0 = full block)
     private double diameter;
     // Models for connection graph (bit0=X+,bit1=X-,bit2=Y+,bit3=Y-,bit4=Z+,bit5=Z-), by texture index
-    private RenderPatch[][][] models = new RenderPatch[64][][];
+    private final RenderPatch[][][] models = new RenderPatch[64][][];
     // Base index (based on force parameter)
     private int base_index = 0;
     // Texture index map

@@ -8,9 +8,9 @@ import org.dynmap.renderer.RenderPatch;
 import org.dynmap.renderer.RenderPatchFactory;
 
 public class PatchDefinitionFactory implements RenderPatchFactory {
-    private HashMap<PatchDefinition,PatchDefinition> patches = new HashMap<>();
-    private Object lock = new Object();
-    private PatchDefinition lookup = new PatchDefinition();
+    private final HashMap<PatchDefinition,PatchDefinition> patches = new HashMap<>();
+    private final Object lock = new Object();
+    private final PatchDefinition lookup = new PatchDefinition();
     private Map<String, PatchDefinition> namemap = null;
 
     public PatchDefinitionFactory() {

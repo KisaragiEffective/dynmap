@@ -81,10 +81,10 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
     private static final BlockStep[] unstep = { BlockStep.X_MINUS, BlockStep.Y_MINUS, BlockStep.Z_MINUS,
         BlockStep.X_PLUS, BlockStep.Y_PLUS, BlockStep.Z_PLUS };
 
-    private static BiomeMap[] biome_to_bmap;
-    private static Biome[] biome_by_id;
+    private static final BiomeMap[] biome_to_bmap;
+    private static final Biome[] biome_by_id;
 
-    protected static final int getIndexInChunk(int cx, int cy, int cz) {
+    protected static int getIndexInChunk(int cx, int cy, int cz) {
         return (cy << 8) | (cz << 4) | cx;
     }
 
@@ -652,7 +652,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
      * Chunk cache for representing generic stone chunk
      */
     private static class PlainChunk implements Snapshot {
-        private DynmapBlockState fill;
+        private final DynmapBlockState fill;
         PlainChunk(String blockname) { this.fill = DynmapBlockState.getBaseStateByName(blockname); }
 
 		@Override

@@ -17,9 +17,9 @@ public class RedstoneWireRenderer extends CustomRenderer {
     private DynmapBlockState blkbs;
 
     // Patches for bottom - indexed by connection graph (bit0=N,bit1=S,bit2=E,bit3=W)
-    private RenderPatch[] bottom_patches = new RenderPatch[16];
+    private final RenderPatch[] bottom_patches = new RenderPatch[16];
     // Patches for sides - (N, S, E, W)
-    private RenderPatch[] side_patches = new RenderPatch[4];
+    private final RenderPatch[] side_patches = new RenderPatch[4];
     // Array of lists - index: bit 0-3=bottom index, bit4=N side, 5=southside, 6=E side, 7=W side present
     protected RenderPatch[][] meshes = new RenderPatch[256][];
     

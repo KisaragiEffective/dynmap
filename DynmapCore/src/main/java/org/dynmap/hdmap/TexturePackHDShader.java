@@ -53,7 +53,7 @@ public class TexturePackHDShader implements HDShader {
         }
     }
     
-    private final TexturePack getTexturePack() {
+    private TexturePack getTexturePack() {
         if (!did_tp_load) {
             tp = TexturePack.getTexturePack(this.core, this.tpname);
             if(tp == null) {

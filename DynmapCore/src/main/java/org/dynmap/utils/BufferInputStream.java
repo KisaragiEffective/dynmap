@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class BufferInputStream extends InputStream {
-    private byte[] buf;
-    private int len;
+    private final byte[] buf;
+    private final int len;
     private int off = 0;
     private int mark = 0;
     

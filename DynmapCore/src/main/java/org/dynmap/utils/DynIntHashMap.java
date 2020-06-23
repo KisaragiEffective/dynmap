@@ -16,7 +16,7 @@ import java.util.List;
 public class DynIntHashMap
 {
     static class Entry {
-        private int   key;
+        private final int   key;
         private Object value;
         private Entry  next;
 

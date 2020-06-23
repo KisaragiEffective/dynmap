@@ -46,20 +46,20 @@ public class OBJExport {
     private final String basename;
     private int minX, minY, minZ;       // Minimum world coordinates to be rendered
     private int maxX, maxY, maxZ;       // Maximum world coordinates to be rendered
-    private static Charset UTF8 = StandardCharsets.UTF_8;
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     private ZipOutputStream zos;        // Output stream ZIP for result
     private double originX, originY, originZ;   // Origin for exported model
     private double scale = 1.0;         // Scale for exported model
     private boolean centerOrigin = true;    // Center at origin
-    private PatchDefinition[] defaultPathces;   // Default patches for solid block, indexed by BlockStep.ordinal()
-    private HashSet<String> matIDs = new HashSet<>();     // Set of defined material ids for RP
+    private final PatchDefinition[] defaultPathces;   // Default patches for solid block, indexed by BlockStep.ordinal()
+    private final HashSet<String> matIDs = new HashSet<>();     // Set of defined material ids for RP
     
     private static class Face {
         String groupLine;
         String faceLine;
     }
     
-    private HashMap<String, List<Face>> facesByTexture = new HashMap<>();
+    private final HashMap<String, List<Face>> facesByTexture = new HashMap<>();
     private static final int MODELSCALE = 16;
     private static final double BLKSIZE = 1.0 / (double) MODELSCALE;
     
@@ -69,16 +69,16 @@ public class OBJExport {
     public static final int GROUP_BLOCKID = 2;
     public static final int GROUP_BLOCKIDMETA = 3;
     public static final int GROUP_COUNT = 4;
-    private String[] group = new String[GROUP_COUNT];
-    private boolean[] enabledGroups = new boolean[GROUP_COUNT];
+    private final String[] group = new String[GROUP_COUNT];
+    private final boolean[] enabledGroups = new boolean[GROUP_COUNT];
     private String groupline = null;
     
     // Vertex set
-    private IndexedVector3DList vertices;
+    private final IndexedVector3DList vertices;
     // UV set
-    private IndexedVector3DList uvs;
+    private final IndexedVector3DList uvs;
     // Scaled models
-    private HDScaledBlockModels models;
+    private final HDScaledBlockModels models;
     
     public static final int ROT0 = 0;
     public static final int ROT90 = 1;
@@ -543,7 +543,7 @@ public class OBJExport {
         return matIDs;
     }
     
-    private static final boolean getSubblock(short[] mod, int x, int y, int z) {
+    private static boolean getSubblock(short[] mod, int x, int y, int z) {
         if ((x >= 0) && (x < MODELSCALE) && (y >= 0) && (y < MODELSCALE) && (z >= 0) && (z < MODELSCALE)) {
             return mod[MODELSCALE*MODELSCALE*y + MODELSCALE*z + x] != 0;
         }

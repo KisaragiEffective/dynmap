@@ -21,8 +21,8 @@ public abstract class MapChunkCache {
         public String getLabel() { return label; }
     }
 
-    private long[] timeTotal = new long[ChunkStats.values().length];
-    private int[] cntTotal = new int[ChunkStats.values().length];
+    private final long[] timeTotal = new long[ChunkStats.values().length];
+    private final int[] cntTotal = new int[ChunkStats.values().length];
 
     /**
      * Set chunk data type needed

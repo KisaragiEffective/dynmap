@@ -8,9 +8,9 @@ import org.dynmap.ConfigurationNode;
 import org.dynmap.markers.MarkerIcon;
 
 class MarkerIconImpl implements MarkerIcon {
-    private String iconid;
+    private final String iconid;
     private String label;
-    private boolean is_builtin;
+    private final boolean is_builtin;
     private MarkerSize size = MarkerSize.MARKER_16x16;
     
     MarkerIconImpl(String id) {

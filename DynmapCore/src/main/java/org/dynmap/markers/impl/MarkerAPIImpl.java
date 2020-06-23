@@ -54,14 +54,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * Implementation class for MarkerAPI - should not be called directly
  */
 public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
-    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private File markerpersist;
     private File markerpersist_old;
     private File markerdir; /* Local store for markers (internal) */
-    private HashMap<String, MarkerIconImpl> markericons = new HashMap<>();
-    private ConcurrentHashMap<String, MarkerSetImpl> markersets = new ConcurrentHashMap<>();
-    private HashMap<String, List<DynmapLocation>> pointaccum = new HashMap<>();
-    private HashMap<String, PlayerSetImpl> playersets = new HashMap<>();
+    private final HashMap<String, MarkerIconImpl> markericons = new HashMap<>();
+    private final ConcurrentHashMap<String, MarkerSetImpl> markersets = new ConcurrentHashMap<>();
+    private final HashMap<String, List<DynmapLocation>> pointaccum = new HashMap<>();
+    private final HashMap<String, PlayerSetImpl> playersets = new HashMap<>();
     private DynmapCore core;
     static MarkerAPIImpl api;
 
@@ -333,7 +333,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
     
     private boolean stop = false;
-    private Set<String> dirty_worlds = new HashSet<>();
+    private final Set<String> dirty_worlds = new HashSet<>();
     private boolean dirty_markers = false;
     
     private class DoFileWrites implements Runnable {

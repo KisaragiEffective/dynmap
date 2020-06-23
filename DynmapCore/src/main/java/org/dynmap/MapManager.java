@@ -51,21 +51,21 @@ public class MapManager {
     private static final int DEFAULT_CHUNKS_PER_TICK = 200;
     private static final int DEFAULT_ZOOMOUT_PERIOD = 60;
     public List<DynmapWorld> worlds = new CopyOnWriteArrayList<>();
-    private List<String> disabled_worlds = new ArrayList<>();
+    private final List<String> disabled_worlds = new ArrayList<>();
     public Map<String, DynmapWorld> worldsLookup = new HashMap<>();
-    private DynmapCore core;
-    private long timeslice_int; /* In milliseconds */
+    private final DynmapCore core;
+    private final long timeslice_int; /* In milliseconds */
     private int max_chunk_loads_per_tick;
-    private int parallelrendercnt;
+    private final int parallelrendercnt;
     private int progressinterval;
-    private int tileupdatedelay;
+    private final int tileupdatedelay;
     private int savependingperiod; // every 15 minutes, by default
-    private boolean saverestorepending;
+    private final boolean saverestorepending;
     private boolean pauseupdaterenders = false;
-    private boolean hideores;
-    private boolean useBrightnessTable;
-    private boolean usenormalpriority;
-    private HashMap<String, String> blockalias;
+    private final boolean hideores;
+    private final boolean useBrightnessTable;
+    private final boolean usenormalpriority;
+    private final HashMap<String, String> blockalias;
     
     private boolean pausefullrenders = false;
 
@@ -84,12 +84,12 @@ public class MapManager {
     private static final int DEFAULT_TITLE_FADEOUT = 20;	// 20 ticks = 1 second    
     private static final boolean DEFAULT_ENTEREXIT_USETITLE = true;
     private static final boolean DEFAULT_ENTEREPLACESEXITS = false;
-    private int enterexitperiod;	// Enter/exit processing period
-    private int titleFadeIn;
-    private int titleStay;
-    private int titleFadeOut;
-    private boolean enterexitUseTitle;
-    private boolean enterReplacesExits;
+    private final int enterexitperiod;	// Enter/exit processing period
+    private final int titleFadeIn;
+    private final int titleStay;
+    private final int titleFadeOut;
+    private final boolean enterexitUseTitle;
+    private final boolean enterReplacesExits;
     
     private HashMap<UUID, HashSet<EnterExitMarker>> entersetstate = new HashMap<>();
     
@@ -103,13 +103,13 @@ public class MapManager {
     	int tickdelay;    	
     }
 
-    private HashMap<UUID, SendQueueRec> entersetsendqueue = new HashMap<>();
+    private final HashMap<UUID, SendQueueRec> entersetsendqueue = new HashMap<>();
 
     private boolean did_start = false;
     
     private int zoomout_period;	/* Zoom-out tile processing period, in seconds */
     /* Which fullrenders are active */
-    private HashMap<String, FullWorldRenderState> active_renders = new HashMap<>();
+    private final HashMap<String, FullWorldRenderState> active_renders = new HashMap<>();
 
     /* Chunk load performance numbers */
     AtomicInteger chunk_caches_created = new AtomicInteger(0);
@@ -150,11 +150,11 @@ public class MapManager {
         String world;
         String reason;
     }
-    private ConcurrentHashMap<TouchEvent, Object> touch_events = new ConcurrentHashMap<>();
-    private LinkedList<TouchVolumeEvent> touch_volume_events = new LinkedList<>();
-    private Object touch_lock = new Object();
+    private final ConcurrentHashMap<TouchEvent, Object> touch_events = new ConcurrentHashMap<>();
+    private final LinkedList<TouchVolumeEvent> touch_volume_events = new LinkedList<>();
+    private final Object touch_lock = new Object();
     
-    private HashMap<String, MapStats> mapstats = new HashMap<>();
+    private final HashMap<String, MapStats> mapstats = new HashMap<>();
     
     private static class MapStats {
         int loggedcnt;
@@ -163,7 +163,7 @@ public class MapManager {
         int transparentcnt;
     }
     /* synchronized using 'lock' */
-    private HashMap<String, TriggerStats> trigstats = new HashMap<>();
+    private final HashMap<String, TriggerStats> trigstats = new HashMap<>();
     
     
     private static class TriggerStats {

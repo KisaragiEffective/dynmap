@@ -20,7 +20,7 @@ import org.dynmap.utils.MapIterator;
 import org.json.simple.JSONObject;
 
 public class DefaultHDShader implements HDShader {
-    private String name;
+    private final String name;
     protected ColorScheme colorScheme;
 
     protected boolean transparency; /* Is transparency support active? */
@@ -84,12 +84,12 @@ public class DefaultHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color[] color;
+        private final Color[] color;
         protected MapIterator mapiter;
         protected HDMap map;
-        private Color[] tmpcolor;
+        private final Color[] tmpcolor;
         private int pixelodd;
-        private HDLighting lighting;
+        private final HDLighting lighting;
         final int[] lightingTable;
         
         private OurShaderState(MapIterator mapiter, HDMap map, MapChunkCache cache) {

@@ -12,7 +12,7 @@ import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 
 class MarkerImpl implements Marker {
-    private String markerid;
+    private final String markerid;
     private String label;
     private boolean markup;
     private String desc;

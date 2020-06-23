@@ -7,17 +7,17 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class AsynchronousQueue<T> {
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private Thread thread;
-    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
-    private Set<T> set = new HashSet<>();
-    private Handler<T> handler;
-    private int dequeueTime;
-    private int accelDequeueTime;
+    private final LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    private final Set<T> set = new HashSet<>();
+    private final Handler<T> handler;
+    private final int dequeueTime;
+    private final int accelDequeueTime;
     public int accelDequeueThresh;
     private int pendingcnt;
-    private int pendinglimit;
-    private boolean normalprio;
+    private final int pendinglimit;
+    private final boolean normalprio;
     
     public AsynchronousQueue(Handler<T> handler, int dequeueTime, int accelDequeueThresh, int accelDequeueTime, int pendinglimit, boolean normalprio) {
         this.handler = handler;

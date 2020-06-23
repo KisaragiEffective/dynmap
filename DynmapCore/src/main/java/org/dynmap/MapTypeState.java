@@ -10,11 +10,11 @@ public class MapTypeState {
     public static final long DEF_INV_PERIOD = 30;
     public static final long NANOS_PER_SECOND = 1000000000L;
     public MapType type;
-    private Object invTileLock = new Object();
+    private final Object invTileLock = new Object();
     private TileFlags pendingInvTiles = new TileFlags();
     private TileFlags pendingInvTilesAlt = new TileFlags();
-    private TileFlags invTiles = new TileFlags();
-    private TileFlags.Iterator invTilesIter = invTiles.getIterator();
+    private final TileFlags invTiles = new TileFlags();
+    private final TileFlags.Iterator invTilesIter = invTiles.getIterator();
     private long nextInvTS;
     private long invTSPeriod;
     private ArrayList<TileFlags> zoomOutInvAccum = new ArrayList<>();

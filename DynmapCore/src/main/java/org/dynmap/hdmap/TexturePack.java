@@ -59,8 +59,8 @@ import org.dynmap.utils.MapIterator;
 
 public class TexturePack {
     /* Loaded texture packs */
-    private static HashMap<String, TexturePack> packs = new HashMap<>();
-    private static Object packlock = new Object();
+    private static final HashMap<String, TexturePack> packs = new HashMap<>();
+    private static final Object packlock = new Object();
 
     private static final String GRASSCOLOR_PNG = "misc/grasscolor.png";
     private static final String GRASSCOLOR_RP_PNG = "assets/minecraft/textures/colormap/grass.png";
@@ -342,13 +342,13 @@ public class TexturePack {
         boolean used;               // Set to true if any active references to the file
         MaterialType material;      // Material type, if specified
     }
-    private static ArrayList<DynamicTileFile> addonfiles = new ArrayList<>();
-    private static Map<String, DynamicTileFile> addonfilesbyname = new HashMap<>();
-    private Map<Integer, MaterialType> materialbytileid = new HashMap<>();
-    private Map<Integer, String> matIDByTileID = new HashMap<>();
-    private Map<String, Integer> tileIDByMatID = new HashMap<>();
+    private static final ArrayList<DynamicTileFile> addonfiles = new ArrayList<>();
+    private static final Map<String, DynamicTileFile> addonfilesbyname = new HashMap<>();
+    private final Map<Integer, MaterialType> materialbytileid = new HashMap<>();
+    private final Map<Integer, String> matIDByTileID = new HashMap<>();
+    private final Map<String, Integer> tileIDByMatID = new HashMap<>();
     // Mods supplying their own texture files
-    private static HashSet<String> loadedmods = new HashSet<>();
+    private static final HashSet<String> loadedmods = new HashSet<>();
     
     private static String getBlockFileName(int idx) {
         if ((idx >= 0) && (idx < terrain_map.length) && (terrain_map[idx] != null)) {
@@ -418,9 +418,9 @@ public class TexturePack {
     // Need copy, since RP can change this....
     private ColorizingData blockColoring = HDBlockStateTextureMap.getColorizingData();
 
-    private int colorMultBirch = 0x80a755;  /* From ColorizerFoliage.java in MCP */
-    private int colorMultPine = 0x619961;   /* From ColorizerFoliage.java in MCP */
-    private int colorMultLily = 0x208030;   /* from BlockLilyPad.java in MCP */
+    private final int colorMultBirch = 0x80a755;  /* From ColorizerFoliage.java in MCP */
+    private final int colorMultPine = 0x619961;   /* From ColorizerFoliage.java in MCP */
+    private final int colorMultLily = 0x208030;   /* from BlockLilyPad.java in MCP */
     
     private static final int IMG_GRASSCOLOR = 0;
     private static final int IMG_FOLIAGECOLOR = 1;
@@ -439,7 +439,7 @@ public class TexturePack {
     private LoadedImage[] imgs;
 
     private HashMap<Integer, TexturePack> scaled_textures;
-    private Object scaledlock = new Object();
+    private final Object scaledlock = new Object();
     
     public enum BlockTransparency {
         OPAQUE, /* Block is opaque - blocks light - lit by light from adjacent blocks */
@@ -449,7 +449,7 @@ public class TexturePack {
     }
     
     public static class ColorizingData {
-        private DynIntHashMap map = new DynIntHashMap();
+        private final DynIntHashMap map = new DynIntHashMap();
         
         public void setBlkStateValue(DynmapBlockState blk, Integer mapidx) {
             int idx = blk.globalStateIndex;
@@ -478,8 +478,8 @@ public class TexturePack {
      * Texture map - used for accumulation of textures from different sources, keyed by lookup value
      */
     public static class TextureMap {
-        private Map<Integer, Integer> key_to_index = new HashMap<>();
-        private List<Integer> texture_ids = new ArrayList<>();
+        private final Map<Integer, Integer> key_to_index = new HashMap<>();
+        private final List<Integer> texture_ids = new ArrayList<>();
         private List<String> blocknames = new ArrayList<>();
         private BitSet stateids = new BitSet();
         private BlockTransparency trans = BlockTransparency.OPAQUE;
@@ -496,7 +496,7 @@ public class TexturePack {
             return off;
         }
     }
-    private static HashMap<String, TextureMap> textmap_by_id = new HashMap<>();
+    private static final HashMap<String, TextureMap> textmap_by_id = new HashMap<>();
     
     /**
      * Set tile ARGB buffer at index
@@ -1058,7 +1058,7 @@ public class TexturePack {
         }
     }
 
-    private static List<CustomTileRec> bed_patches = 
+    private static final List<CustomTileRec> bed_patches =
 		Arrays.asList(new CustomTileRec[] {
 			    // TILEINDEX_BED_HEAD_TOP
 				new CustomTileRec(6, 6, 16, 16),
@@ -2633,8 +2633,8 @@ public class TexturePack {
     /**
      * Read color for given subblock coordinate, with given block id and data and face
      */
-    private final void readColor(final HDPerspectiveState ps, final MapIterator mapiter, final Color rslt, final DynmapBlockState blk, final DynmapBlockState lastblocktype,
-                final TexturePackHDShader.ShaderState ss, HDBlockStateTextureMap map, BlockStep laststep, int patchid, int textid, boolean stdrot) {
+    private void readColor(final HDPerspectiveState ps, final MapIterator mapiter, final Color rslt, final DynmapBlockState blk, final DynmapBlockState lastblocktype,
+                           final TexturePackHDShader.ShaderState ss, HDBlockStateTextureMap map, BlockStep laststep, int patchid, int textid, boolean stdrot) {
         if(textid < 0) {
             rslt.setTransparent();
             return;
@@ -2989,14 +2989,14 @@ public class TexturePack {
         }
     }
     
-    private static final void makeAlphaPure(int[] argb) {
+    private static void makeAlphaPure(int[] argb) {
         for(int i = 0; i < argb.length; i++) {
             if((argb[i] & 0xFF000000) != 0)
                 argb[i] |= 0xFF000000;
         }
     }
 
-    private static final int fastFloor(double f) {
+    private static int fastFloor(double f) {
         return ((int)(f + 1000000000.0)) - 1000000000;
     }
 

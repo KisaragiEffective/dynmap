@@ -12,8 +12,8 @@ import org.dynmap.markers.PlayerSet;
 import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 
 class PlayerSetImpl implements PlayerSet {
-    private String setid;
-    private HashSet<String> players;
+    private final String setid;
+    private final HashSet<String> players;
     private boolean symmetric;
     private boolean ispersistent;
     

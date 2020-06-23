@@ -26,8 +26,8 @@ import org.json.simple.JSONObject;
 
 @SuppressWarnings("serial")
 public class ClientUpdateServlet extends HttpServlet {
-    private DynmapCore core;
-    private Charset cs_utf8 = StandardCharsets.UTF_8;
+    private final DynmapCore core;
+    private final Charset cs_utf8 = StandardCharsets.UTF_8;
     
     public ClientUpdateServlet(DynmapCore plugin) {
         this.core = plugin;

@@ -130,19 +130,19 @@ public class DynmapPlugin
     public SnapshotCache sscache;
     public PlayerList playerList;
     private MapManager mapManager;
-    private net.minecraft.server.MinecraftServer server;
+    private final net.minecraft.server.MinecraftServer server;
     public static DynmapPlugin plugin;
     private ChatHandler chathandler;
-    private HashMap<String, Integer> sortWeights = new HashMap<>();
+    private final HashMap<String, Integer> sortWeights = new HashMap<>();
     // Drop world load ticket after 30 seconds
-    private long worldIdleTimeoutNS = 30 * 1000000000L;
-    private HashMap<String, ForgeWorld> worlds = new HashMap<>();
+    private final long worldIdleTimeoutNS = 30 * 1000000000L;
+    private final HashMap<String, ForgeWorld> worlds = new HashMap<>();
     private IWorld last_world;
     private ForgeWorld last_fworld;
-    private Map<String, ForgePlayer> players = new HashMap<>();
+    private final Map<String, ForgePlayer> players = new HashMap<>();
     //TODO private ForgeMetrics metrics;
-    private HashSet<String> modsused = new HashSet<>();
-    private ForgeServer fserver = new ForgeServer();
+    private final HashSet<String> modsused = new HashSet<>();
+    private final ForgeServer fserver = new ForgeServer();
     private boolean tickregistered = false;
     // TPS calculator
     private double tps;
@@ -168,8 +168,8 @@ public class DynmapPlugin
 
     public static DynmapBlockState[] stateByID;
 
-    private Map<String, LongOpenHashSet> knownloadedchunks = new HashMap<>();
-    private boolean didInitialKnownChunks = false;
+    private final Map<String, LongOpenHashSet> knownloadedchunks = new HashMap<>();
+    private final boolean didInitialKnownChunks = false;
     private void addKnownChunk(ForgeWorld fw, ChunkPos pos) {
     	LongOpenHashSet cset = knownloadedchunks.get(fw.getName());
     	if (cset == null) {
@@ -264,17 +264,17 @@ public class DynmapPlugin
         }
     }
 
-    public static final Item getItemByID(int id) {
+    public static Item getItemByID(int id) {
         return Item.getItemById(id);
     }
     
-    public static final String getBlockUnlocalizedName(Block b) {
+    public static String getBlockUnlocalizedName(Block b) {
     	return b.getNameTextComponent().getString();
     }
     
     private static Biome[] biomelist = null;
     
-    public static final Biome[] getBiomeList() {
+    public static Biome[] getBiomeList() {
         if (biomelist == null) {
         	biomelist = new Biome[256];
             for (Biome b : ForgeRegistries.BIOMES) {
@@ -287,7 +287,7 @@ public class DynmapPlugin
         }
         return biomelist;
     }
-    public static final NetworkManager getNetworkManager(ServerPlayNetHandler nh) {
+    public static NetworkManager getNetworkManager(ServerPlayNetHandler nh) {
         return nh.netManager;
     }
     
@@ -341,7 +341,7 @@ public class DynmapPlugin
     	String message;
     	PlayerEntity sender;
     }
-    private ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<>();
     
     public class ChatHandler {
 		@SubscribeEvent
@@ -510,11 +510,11 @@ public class DynmapPlugin
     public class ForgeServer extends DynmapServerInterface
     {
         /* Server thread scheduler */
-        private Object schedlock = new Object();
+        private final Object schedlock = new Object();
         private long cur_tick;
         private long next_id;
         private long cur_tick_starttime;
-        private PriorityQueue<TaskRecord> runqueue = new PriorityQueue<>();
+        private final PriorityQueue<TaskRecord> runqueue = new PriorityQueue<>();
 
         public ForgeServer() {
         }
@@ -644,7 +644,7 @@ public class DynmapPlugin
         {
             return patternControlCode.matcher(s).replaceAll("");
         }
-        private Set<EventType> registered = new HashSet<>();
+        private final Set<EventType> registered = new HashSet<>();
         @Override
         public boolean requestEventNotification(EventType type)
         {
@@ -1336,7 +1336,7 @@ public class DynmapPlugin
     /* Handler for generic console command sender */
     public class ForgeCommandSender implements DynmapCommandSender
     {
-        private CommandSource sender;
+        private final CommandSource sender;
 
         protected ForgeCommandSender() {
         	sender = null;
@@ -1937,8 +1937,8 @@ public class DynmapPlugin
 
 class DynmapCommandHandler
 {
-    private String cmd;
-    private DynmapPlugin plugin;
+    private final String cmd;
+    private final DynmapPlugin plugin;
 
     public DynmapCommandHandler(String cmd, DynmapPlugin p)
     {

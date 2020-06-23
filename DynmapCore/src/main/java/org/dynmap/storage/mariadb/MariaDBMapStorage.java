@@ -48,13 +48,13 @@ public class MariaDBMapStorage extends MapStorage {
 
     private int port;
     private static final int POOLSIZE = 5;
-    private Connection[] cpool = new Connection[POOLSIZE];
+    private final Connection[] cpool = new Connection[POOLSIZE];
     private int cpoolCount = 0;
     private static final Charset UTF8 = StandardCharsets.UTF_8;
         
     public class StorageTile extends MapStorageTile {
-        private Integer mapkey;
-        private String uri;
+        private final Integer mapkey;
+        private final String uri;
         protected StorageTile(DynmapWorld world, MapType map, int x, int y,
                 int zoom, ImageVariant var) {
             super(world, map, x, y, zoom, var);
@@ -366,7 +366,7 @@ public class MariaDBMapStorage extends MapStorage {
         stmt.close();
     }
     
-    private HashMap<String, Integer> mapKey = new HashMap<>();
+    private final HashMap<String, Integer> mapKey = new HashMap<>();
     
     private void doLoadMaps() {
         Connection c = null;

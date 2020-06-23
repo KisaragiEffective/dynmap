@@ -24,7 +24,7 @@ public class TopoHDShader implements HDShader {
     private final Color linecolor;  /* Color for topo lines */
     private final Color[] fillcolor;  /* Color for nontopo surfaces */
     private final Color watercolor;
-    private BitSet hiddenids;
+    private final BitSet hiddenids;
     private final int linespacing;
     
     public TopoHDShader(DynmapCore core, ConfigurationNode configuration) {
@@ -118,13 +118,13 @@ public class TopoHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color[] color;
-        private Color[] tmpcolor;
-        private Color c;
+        private final Color[] color;
+        private final Color[] tmpcolor;
+        private final Color c;
         protected MapIterator mapiter;
         protected HDMap map;
-        private HDLighting lighting;
-        private int scale;
+        private final HDLighting lighting;
+        private final int scale;
         private int heightshift;    /* Divide to keep in 0-127 range of colors */
         private boolean inWater;
         final int[] lightingTable;
@@ -187,7 +187,7 @@ public class TopoHDShader implements HDShader {
             inWater = false;
         }
         
-        private final boolean isHidden(DynmapBlockState blk) {
+        private boolean isHidden(DynmapBlockState blk) {
             return hiddenids.get(blk.globalStateIndex);
         }
         

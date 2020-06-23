@@ -27,10 +27,10 @@ import org.dynmap.utils.PatchDefinitionFactory;
 public class ModModelDefinitionImpl implements ModModelDefinition {
     private final ModTextureDefinitionImpl txtDef;
     private boolean published = false;
-    private ArrayList<BlockModelImpl> blkModel = new ArrayList<>();
-    private ArrayList<PatchDefinition> blkPatch = new ArrayList<>();
-    private HashMap<String, PatchDefinition> blkPatchMap = new HashMap<>();
-    private PatchDefinitionFactory pdf;
+    private final ArrayList<BlockModelImpl> blkModel = new ArrayList<>();
+    private final ArrayList<PatchDefinition> blkPatch = new ArrayList<>();
+    private final HashMap<String, PatchDefinition> blkPatchMap = new HashMap<>();
+    private final PatchDefinitionFactory pdf;
     
     public ModModelDefinitionImpl(ModTextureDefinitionImpl txtDef) {
         this.txtDef = txtDef;

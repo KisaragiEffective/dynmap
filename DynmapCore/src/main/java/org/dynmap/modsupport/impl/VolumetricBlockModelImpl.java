@@ -3,7 +3,7 @@ package org.dynmap.modsupport.impl;
 import org.dynmap.modsupport.VolumetricBlockModel;
 
 public class VolumetricBlockModelImpl extends BlockModelImpl implements VolumetricBlockModel {
-    private boolean[][][] grid;
+    private final boolean[][][] grid;
     
     public VolumetricBlockModelImpl(int blkid, ModModelDefinitionImpl mdf, int scale) {
         super(blkid, mdf);

@@ -97,10 +97,10 @@ public class InhabitedHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color[] color;
-        private Color c;
+        private final Color[] color;
+        private final Color c;
         protected HDMap map;
-        private HDLighting lighting;
+        private final HDLighting lighting;
         final int[] lightingTable;
         
         private OurShaderState(MapIterator mapiter, HDMap map, MapChunkCache cache, int scale) {

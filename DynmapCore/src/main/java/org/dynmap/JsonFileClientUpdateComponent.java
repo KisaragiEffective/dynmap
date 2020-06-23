@@ -35,19 +35,19 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     protected long lastTimestamp = 0;
     protected long lastChatTimestamp = 0;
     protected JSONParser parser = new JSONParser();
-    private boolean hidewebchatip;
-    private boolean useplayerloginip;
-    private boolean requireplayerloginip;
-    private boolean trust_client_name;
-    private boolean checkuserban;
-    private boolean req_login;
-    private boolean chat_perms;
-    private int lengthlimit;
-    private HashMap<String,String> useralias = new HashMap<>();
+    private final boolean hidewebchatip;
+    private final boolean useplayerloginip;
+    private final boolean requireplayerloginip;
+    private final boolean trust_client_name;
+    private final boolean checkuserban;
+    private final boolean req_login;
+    private final boolean chat_perms;
+    private final int lengthlimit;
+    private final HashMap<String,String> useralias = new HashMap<>();
     private int aliasindex = 1;
     private long last_confighash;
     private MessageDigest md;
-    private MapStorage storage;
+    private final MapStorage storage;
     private File baseStandaloneDir;
 
     private static class FileToWrite {
@@ -92,9 +92,9 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
             }
         }
     }
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private FileProcessor pending;
-    private LinkedList<FileToWrite> files_to_write = new LinkedList<>();
+    private final LinkedList<FileToWrite> files_to_write = new LinkedList<>();
 
     private void enqueueFileWrite(String filename, byte[] content, boolean phpwrap) {
         FileToWrite ftw = new FileToWrite();
@@ -115,7 +115,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         }
     }
     
-    private static Charset cs_utf8 = StandardCharsets.UTF_8;
+    private static final Charset cs_utf8 = StandardCharsets.UTF_8;
     public JsonFileClientUpdateComponent(final DynmapCore core, final ConfigurationNode configuration) {
         super(core, configuration);
         final boolean allowwebchat = configuration.getBoolean("allowwebchat", false);

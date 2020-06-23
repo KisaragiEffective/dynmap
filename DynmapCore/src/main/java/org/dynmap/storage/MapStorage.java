@@ -19,8 +19,8 @@ import org.dynmap.utils.BufferOutputStream;
  * Generic interface for map data storage (image tiles, and associated hash codes)
  */
 public abstract class MapStorage {
-    private static Object lock = new Object();
-    private static HashMap<String, Integer> filelocks = new HashMap<>();
+    private static final Object lock = new Object();
+    private static final HashMap<String, Integer> filelocks = new HashMap<>();
     private static final Integer WRITELOCK = -1;
     protected File baseStandaloneDir;
 
@@ -31,7 +31,7 @@ public abstract class MapStorage {
     }
     
     // Proper modulo - versus the bogus Java behavior of negative modulo for negative numerators
-    protected static final int modulo(int x, int y) {
+    protected static int modulo(int x, int y) {
         return ((x % y) + y) % y;
     }
 

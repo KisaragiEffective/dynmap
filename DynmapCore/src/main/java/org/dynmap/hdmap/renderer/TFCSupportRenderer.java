@@ -13,8 +13,8 @@ import org.dynmap.renderer.RenderPatchFactory;
 
 public class TFCSupportRenderer extends CustomRenderer {
     private boolean isVert;
-    private static BitSet vertid = new BitSet();
-    private static BitSet horizid = new BitSet();
+    private static final BitSet vertid = new BitSet();
+    private static final BitSet horizid = new BitSet();
 
     private static final int SIDE_XP = 0x1;
     private static final int SIDE_XN = 0x2;
@@ -25,7 +25,7 @@ public class TFCSupportRenderer extends CustomRenderer {
     private static final int SIDE_YN = 0x10;
 
     // Meshes, indexed by connection combination (bit 0=X+, bit 1=X-, bit 2=Z+, bit 3=Z-, bit 4=Y-)
-    private RenderPatch[][] meshes = new RenderPatch[32][];
+    private final RenderPatch[][] meshes = new RenderPatch[32][];
     
     private void setID(BitSet set, String bname) {
         DynmapBlockState bbs = DynmapBlockState.getBaseStateByName(bname);
@@ -101,7 +101,7 @@ public class TFCSupportRenderer extends CustomRenderer {
         }
     }
 
-    private static int[][] sides = {
+    private static final int[][] sides = {
         { 1, 0, 0, SIDE_XP },
         { -1, 0, 0, SIDE_XN },
         { 0, 0, 1, SIDE_ZP },

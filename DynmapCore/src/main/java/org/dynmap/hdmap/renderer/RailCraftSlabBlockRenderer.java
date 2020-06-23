@@ -15,10 +15,10 @@ public class RailCraftSlabBlockRenderer extends CustomRenderer {
     private static final int TEXTURE_SIDES = 0;
     private static final int TEXTURE_TOP = 1;
     private static final int TEXTURE_BOTTOM = 2;
-    private static BitSet stair_ids = new BitSet();
+    private static final BitSet stair_ids = new BitSet();
         
     // Array of meshes for normal steps - index = (0=bottom, 1=top, 2=double)
-    private RenderPatch[][] stepmeshes = new RenderPatch[3][];
+    private final RenderPatch[][] stepmeshes = new RenderPatch[3][];
     
     private int textsetcnt = 0;
     private String[] tilefields = null;

@@ -13,7 +13,7 @@ import org.dynmap.Log;
  * 
  */
 public class DynmapListenerManager {
-    private DynmapCore core;
+    private final DynmapCore core;
     
     public DynmapListenerManager(DynmapCore core) {
         this.core = core;
@@ -46,7 +46,7 @@ public class DynmapListenerManager {
         BLOCK_BREAK,
         SIGN_CHANGE
     }
-    private Map<EventType, ArrayList<EventListener>> listeners = new EnumMap<>(EventType.class);
+    private final Map<EventType, ArrayList<EventListener>> listeners = new EnumMap<>(EventType.class);
     
     public void addListener(EventType type, EventListener listener) {
         synchronized(listeners) {

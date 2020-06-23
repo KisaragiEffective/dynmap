@@ -28,7 +28,7 @@ public class MapStorageResourceHandler extends AbstractHandler {
 
     private DynmapCore core;
     private byte[] blankpng;
-    private long blankpnghash = 0x12345678;
+    private final long blankpnghash = 0x12345678;
     
     public MapStorageResourceHandler() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

@@ -33,16 +33,16 @@ public class SendMessageServlet extends HttpServlet {
 
     private static final JSONParser parser = new JSONParser();
     public Event<Message> onMessageReceived = new Event<>();
-    private Charset cs_utf8 = StandardCharsets.UTF_8;
+    private final Charset cs_utf8 = StandardCharsets.UTF_8;
     public int maximumMessageInterval = 1000;
     public boolean hideip = false;
     public boolean trustclientname = false;
     
     public String spamMessage = "\"You may only chat once every %interval% seconds.\"";
-    private HashMap<String, WebUser> disallowedUsers = new HashMap<>();
-    private LinkedList<WebUser> disallowedUserQueue = new LinkedList<>();
-    private Object disallowedUsersLock = new Object();
-    private HashMap<String,String> useralias = new HashMap<>();
+    private final HashMap<String, WebUser> disallowedUsers = new HashMap<>();
+    private final LinkedList<WebUser> disallowedUserQueue = new LinkedList<>();
+    private final Object disallowedUsersLock = new Object();
+    private final HashMap<String,String> useralias = new HashMap<>();
     private int aliasindex = 1;
     public boolean use_player_login_ip = false;
     public boolean require_player_login_ip = false;

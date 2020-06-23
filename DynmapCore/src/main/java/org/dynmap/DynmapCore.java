@@ -106,14 +106,14 @@ public class DynmapCore implements DynmapCommonAPI {
     public SkinUrlProvider skinUrlProvider;
     public Events events = new Events();
     public String deftemplatesuffix = "";
-    private DynmapMapCommands dmapcmds = new DynmapMapCommands();
-    private DynmapExpCommands dynmapexpcmds = new DynmapExpCommands();
+    private final DynmapMapCommands dmapcmds = new DynmapMapCommands();
+    private final DynmapExpCommands dynmapexpcmds = new DynmapExpCommands();
     boolean bettergrass = false;
     boolean smoothlighting = false;
     private boolean ctmsupport = false;
     private boolean customcolorssupport = false;
     private String def_image_format = "png";
-    private HashSet<String> enabledTriggers = new HashSet<>();
+    private final HashSet<String> enabledTriggers = new HashSet<>();
     public boolean disable_chat_to_web = false;
     private WebAuthManager authmgr;
     public boolean player_info_protected;
@@ -128,7 +128,7 @@ public class DynmapCore implements DynmapCommonAPI {
     private int updateplayerlimit;  /* Number of online players that will cause update processing to pause */
     private boolean didfullpause;
     private boolean didupdatepause;
-    private Map<String, LinkedList<String>> ids_by_ip = new HashMap<>();
+    private final Map<String, LinkedList<String>> ids_by_ip = new HashMap<>();
     private boolean persist_ids_by_ip = false;
     private int snapshotcachesize;
     private boolean snapshotsoftref;
@@ -210,7 +210,7 @@ public class DynmapCore implements DynmapCommonAPI {
         biomenames = names;
     }
     
-    public static final boolean migrateChunks() {
+    public static boolean migrateChunks() {
         return migrate_chunks;
     }
 

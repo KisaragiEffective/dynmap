@@ -97,7 +97,7 @@ public class Color {
      * @param argb1 second color
      * @return blended color
      */
-    public static final int blendColor(int argb0, int argb1) {
+    public static int blendColor(int argb0, int argb1) {
         int nval = (((((argb0 >> 24) & 0xFF) * ((argb1 >> 24) & 0xFF)) / 255) << 24);
         nval = nval | (((((argb0 >> 16) & 0xFF) * ((argb1 >> 16) & 0xFF)) / 255) << 16);
         nval = nval | (((((argb0 >> 8) & 0xFF) * ((argb1 >> 8) & 0xFF)) / 255) << 8);

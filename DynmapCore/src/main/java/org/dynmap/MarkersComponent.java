@@ -21,7 +21,7 @@ import org.dynmap.utils.Polygon;
  * Markers component - ties in the component system, both on the server and client
  */
 public class MarkersComponent extends ClientComponent {
-    private MarkerAPI api;
+    private final MarkerAPI api;
     private MarkerSignManager signmgr;
     private MarkerIcon spawnicon;
     private String spawnlbl;
@@ -32,9 +32,9 @@ public class MarkersComponent extends ClientComponent {
     private MarkerIcon spawnbedicon;
     private String spawnbedformat;
     private long maxofflineage;
-    private boolean showSpawn;
-    private boolean showBorder;
-    private HashMap<String, Long> offline_times = new HashMap<>();
+    private final boolean showSpawn;
+    private final boolean showBorder;
+    private final HashMap<String, Long> offline_times = new HashMap<>();
     private static final String OFFLINE_PLAYERS_SETID = "offline_players";
     private static final String PLAYER_SPAWN_BED_SETID = "spawn_beds";
     

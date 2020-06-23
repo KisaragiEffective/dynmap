@@ -115,13 +115,13 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     public static DynmapPlugin plugin;
     public PluginManager pm;
     private Metrics metrics;
-    private BukkitEnableCoreCallback enabCoreCB = new BukkitEnableCoreCallback();
+    private final BukkitEnableCoreCallback enabCoreCB = new BukkitEnableCoreCallback();
     private Method ismodloaded;
     private Method instance;
     private Method getindexedmodlist;
     private Method getversion;
-    private HashMap<String, BukkitWorld> world_by_name = new HashMap<>();
-    private HashSet<String> modsused = new HashSet<>();
+    private final HashMap<String, BukkitWorld> world_by_name = new HashMap<>();
+    private final HashSet<String> modsused = new HashSet<>();
     // TPS calculator
     private double tps;
     private long lasttick;
@@ -133,20 +133,20 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     private long cur_tick;
     private long prev_tick;
 
-    private HashMap<String, Integer> sortWeights = new HashMap<>();
+    private final HashMap<String, Integer> sortWeights = new HashMap<>();
     /* Lookup cache */
     private World last_world;
     private BukkitWorld last_bworld;
     
     private BukkitVersionHelper helper;
     
-    private final BukkitWorld getWorldByName(String name) {
+    private BukkitWorld getWorldByName(String name) {
         if((last_world != null) && (last_world.getName().equals(name))) {
             return last_bworld;
         }
         return world_by_name.get(name);
     }
-    private final BukkitWorld getWorld(World w) {
+    private BukkitWorld getWorld(World w) {
         if(last_world == w) {
             return last_bworld;
         }
@@ -298,7 +298,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         public String stripChatColor(String s) {
             return ChatColor.stripColor(s);
         }
-        private Set<EventType> registered = new HashSet<>();
+        private final Set<EventType> registered = new HashSet<>();
         @Override
         public boolean requestEventNotification(EventType type) {
             if(registered.contains(type))
@@ -594,7 +594,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
      */
     public class BukkitPlayer extends BukkitCommandSender implements DynmapPlayer {
         private Player player;
-        private OfflinePlayer offplayer;
+        private final OfflinePlayer offplayer;
         private String skinurl;
         private UUID uuid;
         
@@ -732,7 +732,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     }
     /* Handler for generic console command sender */
     public class BukkitCommandSender implements DynmapCommandSender {
-        private CommandSender sender;
+        private final CommandSender sender;
 
         public BukkitCommandSender(CommandSender send) {
             sender = send;
@@ -1203,7 +1203,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             }
         }
     }
-    private BlockCheckHandler btth = new BlockCheckHandler();
+    private final BlockCheckHandler btth = new BlockCheckHandler();
 
     private void checkBlock(Block b, String trigger) {
         BlockToCheck btt = new BlockToCheck();

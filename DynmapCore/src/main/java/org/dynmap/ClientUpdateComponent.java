@@ -9,11 +9,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 public class ClientUpdateComponent extends Component {
-    private int hideifshadow;
-    private int hideifunder;
-    private boolean hideifsneaking;
-    private boolean hideifinvisiblepotion;
-    private boolean is_protected;
+    private final int hideifshadow;
+    private final int hideifunder;
+    private final boolean hideifsneaking;
+    private final boolean hideifinvisiblepotion;
+    private final boolean is_protected;
     public static boolean usePlayerColors;
     public static boolean hideNames;
     

@@ -15,7 +15,7 @@ import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 import org.dynmap.utils.Vector3D;
 
 class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
-    private String markerid;
+    private final String markerid;
     private String label;
     private boolean markup;
     private String desc;

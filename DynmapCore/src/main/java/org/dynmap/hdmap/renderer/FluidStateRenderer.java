@@ -25,7 +25,7 @@ public class FluidStateRenderer extends CustomRenderer {
     
     private static RenderPatch bottom = null; 	// Common bottom patch
 
-    private static DynIntHashMap meshcache = new DynIntHashMap();
+    private static final DynIntHashMap meshcache = new DynIntHashMap();
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
@@ -67,7 +67,7 @@ public class FluidStateRenderer extends CustomRenderer {
     	return (idx > 7) ? 1 : (idx + 1);
     }
     
-    private static final int getIntKey(int h_1_1, int h_n1_1, int h_1_n1, int h_n1_n1) {
+    private static int getIntKey(int h_1_1, int h_n1_1, int h_1_n1, int h_n1_n1) {
     	return (h_1_1) + (h_n1_1 << 4) + (h_1_n1 << 8) + (h_n1_n1 << 12);
     }
 

@@ -22,10 +22,10 @@ public class SnapshotCache {
     }
 
     private CacheHashMap snapcache;
-    private ReferenceQueue<SnapshotRec> refqueue;
+    private final ReferenceQueue<SnapshotRec> refqueue;
     private long cache_attempts;
     private long cache_success;
-    private boolean softref;
+    private final boolean softref;
     
     private static class CacheRec {
         Reference<SnapshotRec> ref;
@@ -37,7 +37,7 @@ public class SnapshotCache {
     
     @SuppressWarnings("serial")
     public class CacheHashMap extends LinkedHashMap<String, CacheRec> {
-        private int limit;
+        private final int limit;
         private IdentityHashMap<Reference<SnapshotRec>, String> reverselookup;
 
         public CacheHashMap(int lim) {

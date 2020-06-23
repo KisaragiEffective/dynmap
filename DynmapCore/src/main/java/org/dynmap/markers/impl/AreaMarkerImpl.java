@@ -17,7 +17,7 @@ import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 import org.dynmap.utils.Vector3D;
 
 class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
-    private String markerid;
+    private final String markerid;
     private String label;
     private boolean markup;
     private String desc;
@@ -25,7 +25,7 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
     private String world;
     private String normalized_world;
     private boolean ispersistent;
-    private ArrayList<Coord> corners;
+    private final ArrayList<Coord> corners;
     private int lineweight = 3;
     private double lineopacity = 0.8;
     private int linecolor = 0xFF0000;

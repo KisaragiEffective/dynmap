@@ -23,7 +23,7 @@ public class CuboidRenderer extends CustomRenderer {
     private static final int[] crossedPatchDefault = { 0 };
     private static final int[] cuboidPatchDefault = { 0, 1, 2, 3, 4, 5 };
     
-    private static final double clamp(double f) {
+    private static double clamp(double f) {
         if (f < 0.0) { f = 0.0; }
         if (f > 1.0) { f = 1.0; }
         return f;

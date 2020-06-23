@@ -23,7 +23,7 @@ public class TFCWoodRenderer extends CustomRenderer {
     private static final int SIDE_YN = 0x10;
 
     // Meshes, indexed by connection combination (bit 0=X+, bit 1=X-, bit 2=Z+, bit 3=Z-, bit 4=Y-)
-    private RenderPatch[][] meshes = new RenderPatch[32][];
+    private final RenderPatch[][] meshes = new RenderPatch[32][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
@@ -84,7 +84,7 @@ public class TFCWoodRenderer extends CustomRenderer {
         }
     }
 
-    private static int[][] sides = {
+    private static final int[][] sides = {
         { 1, 0, 0, SIDE_XP },
         { -1, 0, 0, SIDE_XN },
         { 0, 0, 1, SIDE_ZP },

@@ -14,7 +14,7 @@ import org.dynmap.DynmapCore;
 
 public class ConfigJSServlet extends HttpServlet {
     private static final long serialVersionUID = 3543457384759837L;
-    private byte[] outputBytes;
+    private final byte[] outputBytes;
 
     public ConfigJSServlet(DynmapCore core) {
         Charset cs_utf8 = StandardCharsets.UTF_8;

@@ -35,7 +35,7 @@ public class BukkitVersionHelperSpigot115 extends BukkitVersionHelperCB {
     
     /** CraftChunkSnapshot */
     protected Class<?> datapalettearray;
-    private Field blockid_field;
+    private final Field blockid_field;
 
     @Override
     protected boolean isBlockIdNeeded() {

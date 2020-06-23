@@ -40,11 +40,11 @@ public class HDBlockModels {
     static PatchDefinitionFactory pdf = new PatchDefinitionFactory();
     static BitSet customModelsRequestingTileData = new BitSet(); // Index by globalStateIndex
     static BitSet changeIgnoredBlocks = new BitSet();   // Index by globalStateIndex
-    private static HashSet<String> loadedmods = new HashSet<>();
-    private static HashMap<Integer, HDScaledBlockModels> scaled_models_by_scale = new HashMap<>();
+    private static final HashSet<String> loadedmods = new HashSet<>();
+    private static final HashMap<Integer, HDScaledBlockModels> scaled_models_by_scale = new HashMap<>();
 
-    public static final int getMaxPatchCount() { return max_patches; }  
-    public static final PatchDefinitionFactory getPatchDefinitionFactory() { return pdf; }
+    public static int getMaxPatchCount() { return max_patches; }
+    public static PatchDefinitionFactory getPatchDefinitionFactory() { return pdf; }
     
     /* Reset model if defined by different block set */
     public static boolean resetIfNotBlockSet(DynmapBlockState blk, String blockset) {
@@ -65,7 +65,7 @@ public class HDBlockModels {
         return 6;
     }
     
-    public static final boolean isChangeIgnoredBlock(DynmapBlockState blk) {
+    public static boolean isChangeIgnoredBlock(DynmapBlockState blk) {
         return changeIgnoredBlocks.get(blk.globalStateIndex);
     }
     
@@ -105,7 +105,7 @@ public class HDBlockModels {
      * @param blk - block state
      * @return null if none needed, else list of fields needed
      */
-    public static final String[] getTileEntityFieldsNeeded(DynmapBlockState blk) {
+    public static String[] getTileEntityFieldsNeeded(DynmapBlockState blk) {
         int idx = blk.globalStateIndex;
         if(customModelsRequestingTileData.get(idx)) {
             HDBlockModel mod = models_by_id_data.get(idx);
@@ -1100,7 +1100,7 @@ public class HDBlockModels {
             pdf.setPatchNameMape(null);
         }
     }
-    private static long[] vscale = { 10000000000L, 100000000, 1000000, 10000, 100, 1 };
+    private static final long[] vscale = { 10000000000L, 100000000, 1000000, 10000, 100, 1 };
 
     private static String normalizeVersion(String v) {
         StringBuilder v2 = new StringBuilder();

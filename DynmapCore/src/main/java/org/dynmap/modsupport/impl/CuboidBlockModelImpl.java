@@ -17,8 +17,8 @@ public class CuboidBlockModelImpl extends BlockModelImpl implements CuboidBlockM
         double xmax, ymax, zmax;
         int textureidx;
     }
-    private ArrayList<Cuboid> cuboids = new ArrayList<>();
-    private ArrayList<Crossed> crosseds = new ArrayList<>();
+    private final ArrayList<Cuboid> cuboids = new ArrayList<>();
+    private final ArrayList<Crossed> crosseds = new ArrayList<>();
     
     public CuboidBlockModelImpl(int blkid, ModModelDefinitionImpl mdf) {
         super(blkid, mdf);

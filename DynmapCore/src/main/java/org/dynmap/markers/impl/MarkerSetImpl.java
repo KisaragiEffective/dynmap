@@ -22,14 +22,14 @@ import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 
 class MarkerSetImpl implements MarkerSet {
-    private ConcurrentHashMap<String, MarkerImpl> markers = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, AreaMarkerImpl> areamarkers = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, PolyLineMarkerImpl> linemarkers = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, CircleMarkerImpl> circlemarkers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, MarkerImpl> markers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, AreaMarkerImpl> areamarkers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, PolyLineMarkerImpl> linemarkers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CircleMarkerImpl> circlemarkers = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, AreaMarkerImpl> boostingareamarkers = null;
     private ConcurrentHashMap<String, CircleMarkerImpl> boostingcirclemarkers = null;
     private ConcurrentHashMap<String, EnterExitMarker> enterexitmarkers = null;
-    private String setid;
+    private final String setid;
     private String label;
     private ConcurrentHashMap<String, MarkerIconImpl> allowedicons = null;
     private boolean hide_by_def;

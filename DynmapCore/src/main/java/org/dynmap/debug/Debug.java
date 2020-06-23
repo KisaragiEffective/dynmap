@@ -3,7 +3,7 @@ package org.dynmap.debug;
 import java.util.ArrayList;
 
 public class Debug {
-    private static ArrayList<Debugger> debuggers = new ArrayList<>();
+    private static final ArrayList<Debugger> debuggers = new ArrayList<>();
 
     public synchronized static void addDebugger(Debugger d) {
         debuggers.add(d);

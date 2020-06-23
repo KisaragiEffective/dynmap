@@ -14,8 +14,8 @@ import java.util.ConcurrentModificationException;
 public class DynLongHashMap
 {
     static class Entry {
-        private int    hash;
-        private long   key;
+        private final int    hash;
+        private final long   key;
         private Object value;
         private Entry  next;
 

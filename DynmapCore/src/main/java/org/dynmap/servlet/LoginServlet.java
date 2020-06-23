@@ -18,12 +18,12 @@ import java.util.Date;
 
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private DynmapCore core;
+    private final DynmapCore core;
     public static final String USERID_GUEST = "_guest_";
     public static final String USERID_ATTRIB = "userid";
     public static final String LOGIN_PAGE = "../login.html";
     public static final String LOGIN_POST = "/up/login";
-    private Charset cs_utf8 = StandardCharsets.UTF_8;
+    private final Charset cs_utf8 = StandardCharsets.UTF_8;
     
     public LoginServlet(DynmapCore core) {
         this.core = core;

@@ -4,7 +4,7 @@ import org.dynmap.modsupport.PlantBlockModel;
 import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 
 public class PlantBlockModelImpl extends BlockModelImpl implements PlantBlockModel {
-    private String patch0;
+    private final String patch0;
     
     public PlantBlockModelImpl(int blkid, ModModelDefinitionImpl mdf) {
         super(blkid, mdf);

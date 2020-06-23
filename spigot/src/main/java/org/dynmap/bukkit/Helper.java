@@ -11,7 +11,7 @@ import org.dynmap.bukkit.helper.v115.BukkitVersionHelperSpigot115;
 
 public class Helper {
     
-    public static final BukkitVersionHelper getHelper() {
+    public static BukkitVersionHelper getHelper() {
         if (BukkitVersionHelper.helper == null) {
         	String v = Bukkit.getServer().getVersion();
             Log.info("version=" + v);

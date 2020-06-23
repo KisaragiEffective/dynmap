@@ -20,9 +20,9 @@ import org.dynmap.utils.MapIterator;
 import org.json.simple.JSONObject;
 
 public class CaveHDShader implements HDShader {
-    private String name;
-    private boolean iflit;
-    private BitSet hiddenids = new BitSet();
+    private final String name;
+    private final boolean iflit;
+    private final BitSet hiddenids = new BitSet();
 
     private void setHidden(DynmapBlockState blk) {
         hiddenids.set(blk.globalStateIndex);
@@ -111,7 +111,7 @@ public class CaveHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color;
+        private final Color color;
         protected MapIterator mapiter;
         protected HDMap map;
         private boolean air;

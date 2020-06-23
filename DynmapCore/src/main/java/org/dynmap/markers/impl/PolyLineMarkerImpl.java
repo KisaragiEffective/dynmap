@@ -12,7 +12,7 @@ import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 
 class PolyLineMarkerImpl implements PolyLineMarker {
-    private String markerid;
+    private final String markerid;
     private String label;
     private boolean markup;
     private String desc;
@@ -20,7 +20,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
     private String world;
     private String normalized_world;
     private boolean ispersistent;
-    private ArrayList<Coord> corners;
+    private final ArrayList<Coord> corners;
     private int lineweight = 3;
     private double lineopacity = 0.8;
     private int linecolor = 0xFF0000;

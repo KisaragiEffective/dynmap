@@ -12,7 +12,7 @@ public class Armor {
      */
     private static final int[] armorPoints = {3, 6, 8, 3};
 
-    public static final int getArmorPoints(Player player) {
+    public static int getArmorPoints(Player player) {
         int currentDurability = 0;
         int baseDurability = 0;
         int baseArmorPoints = 0;

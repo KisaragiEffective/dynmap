@@ -177,7 +177,7 @@ public class Client {
         // Apply sanitize policy before returning
         return sanitizeHTML(s);
     }
-    private static String[][] codes = {
+    private static final String[][] codes = {
         { "0", "<span style='color:#000000'>"},
         { "1", "<span style='color:#0000AA'>"},
         { "2", "<span style='color:#00AA00'>"},
@@ -200,8 +200,8 @@ public class Client {
         { "o", "<span style='font-style:italic'>"},
         { "r", "<span style='font-style:normal,text-decoration:none,font-weight:normal'>"}
     };
-    private static Random rnd = new Random();
-    private static String rndchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final Random rnd = new Random();
+    private static final String rndchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     // Replace color codes with corresponding <span - assume we're returning safe HTML text 
     public static String encodeColorInHTML(String s) {
         StringBuilder sb = new StringBuilder();

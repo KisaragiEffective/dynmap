@@ -28,7 +28,7 @@ import com.google.gson.JsonParseException;
  * Helper for isolation of bukkit version specific issues
  */
 public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
-    private String obc_package; // Package used for org.bukkit.craftbukkit
+    private final String obc_package; // Package used for org.bukkit.craftbukkit
     protected String nms_package; // Package used for net.minecraft.server
     private boolean failed;
     protected static final Object[] nullargs = new Object[0];
@@ -39,11 +39,11 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
     protected Class<?> craftchunksnapshot;
     private Field ccss_biome;
     /** CraftChunk */
-    private Class<?> craftchunk;
-    private Method cc_gethandle;
+    private final Class<?> craftchunk;
+    private final Method cc_gethandle;
     /** CraftWorld */
-    private Class<?> craftworld;
-    private Method cw_gethandle;
+    private final Class<?> craftworld;
+    private final Method cw_gethandle;
 
     /** BiomeBase related helpers */
     protected Class<?> biomestorage;
@@ -108,14 +108,14 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
     /** Player */
     protected Method player_gethealth;
     // CraftPlayer
-    private Class<?> obc_craftplayer;
-    private Method obcplayer_getprofile;
+    private final Class<?> obc_craftplayer;
+    private final Method obcplayer_getprofile;
     // GameProfile
-    private Class<?> cma_gameprofile;
-    private Method cmaprofile_getproperties;
+    private final Class<?> cma_gameprofile;
+    private final Method cmaprofile_getproperties;
     // Property
-    private Class<?> cma_property;
-    private Method cmaproperty_getvalue;
+    private final Class<?> cma_property;
+    private final Method cmaproperty_getvalue;
 
     protected BukkitVersionHelperGeneric() {
         failed = false;

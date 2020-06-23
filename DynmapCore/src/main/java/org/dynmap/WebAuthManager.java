@@ -19,15 +19,15 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.servlet.LoginServlet;
 
 public class WebAuthManager {
-    private HashMap<String, String> pwdhash_by_userid = new HashMap<>();
-    private HashMap<String, String> pending_registrations = new HashMap<>();
+    private final HashMap<String, String> pwdhash_by_userid = new HashMap<>();
+    private final HashMap<String, String> pending_registrations = new HashMap<>();
     private String hashsalt;
-    private File pfile;
+    private final File pfile;
     public static final String WEBAUTHFILE = "webauth.txt";
     private static final String HASHSALT = "$HASH_SALT$";
     private static final String PWDHASH_PREFIX = "hash.";
-    private Random rnd = new Random();
-    private DynmapCore core;
+    private final Random rnd = new Random();
+    private final DynmapCore core;
     
     public WebAuthManager(DynmapCore core) {
         this.core = core;
@@ -163,7 +163,7 @@ public class WebAuthManager {
         pwdhash_by_userid.put(uid, hash);
         return save();
     }
-    public static final boolean checkUserName(String name) {
+    public static boolean checkUserName(String name) {
         int nlen = name.length();
         if ((nlen > 0) && (nlen <= 16)) {
             for (int i = 0; i < nlen; i++) {

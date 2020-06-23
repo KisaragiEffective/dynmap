@@ -40,7 +40,7 @@ public abstract class DynmapCommonAPIListener {
     
     private static DynmapCommonAPI dynmapapi = null;
     
-    private static CopyOnWriteArrayList<DynmapCommonAPIListener> listeners = new CopyOnWriteArrayList<>();
+    private static final CopyOnWriteArrayList<DynmapCommonAPIListener> listeners = new CopyOnWriteArrayList<>();
     /**
      * Register listener instance
      * 

@@ -158,7 +158,7 @@ public class HDMapManager {
         return getCachedFlags(t)[BLOCKTYPEFLAG];
     }
     
-    private HashMap<String, boolean[]> cached_data_flags_by_world_perspective = new HashMap<>();
+    private final HashMap<String, boolean[]> cached_data_flags_by_world_perspective = new HashMap<>();
     
     private boolean[] getCachedFlags(HDMapTile t) {
         String w = t.getDynmapWorld().getName();

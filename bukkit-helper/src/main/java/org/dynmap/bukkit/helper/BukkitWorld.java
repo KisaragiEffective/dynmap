@@ -24,7 +24,7 @@ public class BukkitWorld extends DynmapWorld {
     private World world;
     private World.Environment env;
     private boolean skylight;
-    private DynmapLocation spawnloc = new DynmapLocation();
+    private final DynmapLocation spawnloc = new DynmapLocation();
     
     public BukkitWorld(World w) {
         this(w.getName(), w.getMaxHeight(), w.getSeaLevel(), w.getEnvironment());

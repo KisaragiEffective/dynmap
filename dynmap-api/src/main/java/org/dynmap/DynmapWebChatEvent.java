@@ -11,9 +11,9 @@ import org.bukkit.event.HandlerList;
 public class DynmapWebChatEvent extends Event implements Cancellable {
     public static final String CUSTOM_TYPE = "org.dynmap.DynmapWebChatEvent";
     private static final HandlerList handlers = new HandlerList();
-    private String source;
-    private String name;
-    private String message;
+    private final String source;
+    private final String name;
+    private final String message;
     private boolean cancelled;
     private boolean isprocessed;
     

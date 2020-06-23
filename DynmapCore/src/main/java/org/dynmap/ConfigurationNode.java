@@ -292,7 +292,7 @@ public class ConfigurationNode implements Map<String, Object> {
             extendMap(this, other);
     }
     
-    private final static Object copyValue(Object v) {
+    private static Object copyValue(Object v) {
         if(v instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, Object> mv = (Map<String, Object>)v;
@@ -316,7 +316,7 @@ public class ConfigurationNode implements Map<String, Object> {
         }
     }
 
-    private final static void extendMap(Map<String, Object> left, Map<String, Object> right) {
+    private static void extendMap(Map<String, Object> left, Map<String, Object> right) {
         ConfigurationNode original = new ConfigurationNode(left);
         for(Map.Entry<String, Object> entry : right.entrySet()) {
             String key = entry.getKey();

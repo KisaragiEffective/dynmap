@@ -23,8 +23,8 @@ import java.util.UUID;
  * Listen for player logins, and process player faces by fetching skins *
  */
 public class PlayerFaces {
-    private boolean fetchskins;
-    private boolean refreshskins;
+    private final boolean fetchskins;
+    private final boolean refreshskins;
     private String skinurl;
     public MapStorage storage;
     
@@ -106,7 +106,7 @@ public class PlayerFaces {
     }
     
     private class LoadPlayerImages implements Runnable {
-        private SkinUrlProvider mSkinUrlProvider;
+        private final SkinUrlProvider mSkinUrlProvider;
         public final String playername;
         public final String playerskinurl;
 

@@ -16,7 +16,7 @@ public class SkullRenderer extends CustomRenderer {
     private static final String[] tileFields = { "SkullType", "Rot" };
     
     private RenderPatch[] basemesh;
-    private RenderPatch[][] meshes = new RenderPatch[NUM_FACES * NUM_DIRECTIONS][];
+    private final RenderPatch[][] meshes = new RenderPatch[NUM_FACES * NUM_DIRECTIONS][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

@@ -15,14 +15,14 @@ public class StairBlockRenderer extends CustomRenderer {
     private static final int TEXTURE_SIDES = 0;
     private static final int TEXTURE_TOP = 1;
     private static final int TEXTURE_BOTTOM = 2;
-    private static BitSet stair_ids = new BitSet();
+    private static final BitSet stair_ids = new BitSet();
         
     // Array of meshes for normal steps - index = (data value & 7)
-    private RenderPatch[][] stepmeshes = new RenderPatch[8][];
+    private final RenderPatch[][] stepmeshes = new RenderPatch[8][];
     // Array of meshes for 3/4 steps - index = (data value & 7), with extra one clockwise from normal step
-    private RenderPatch[][] step_3_4_meshes = new RenderPatch[8][];
+    private final RenderPatch[][] step_3_4_meshes = new RenderPatch[8][];
     // Array of meshes for 1/4 steps - index = (data value & 7), with clockwise quarter clopped from normal step
-    private RenderPatch[][] step_1_4_meshes = new RenderPatch[8][];
+    private final RenderPatch[][] step_1_4_meshes = new RenderPatch[8][];
     
     private int textsetcnt = 0;
     private String textindex = null;

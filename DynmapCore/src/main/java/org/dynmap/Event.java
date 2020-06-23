@@ -8,8 +8,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class Event<T> {
-    private List<Listener<T>> listeners = new LinkedList<>();
-    private Object lock = new Object();
+    private final List<Listener<T>> listeners = new LinkedList<>();
+    private final Object lock = new Object();
 
     public void addListener(Listener<T> l) {
         synchronized(lock) {

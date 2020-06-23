@@ -120,7 +120,7 @@ public class HDBlockStateTextureMap {
         }
     }
 
-    private static final void resize(int newend) {
+    private static void resize(int newend) {
         if (newend < texmaps.length) return; 
         HDBlockStateTextureMap[] newm = new HDBlockStateTextureMap[newend+1];
         System.arraycopy(texmaps,  0,  newm,  0,  texmaps.length);
@@ -134,7 +134,7 @@ public class HDBlockStateTextureMap {
     }
     
     // Lookup records by block state
-    public static final HDBlockStateTextureMap getByBlockState(DynmapBlockState blk) {
+    public static HDBlockStateTextureMap getByBlockState(DynmapBlockState blk) {
         HDBlockStateTextureMap m = HDBlockStateTextureMap.BLANK;
         try {
             m = texmaps[blk.globalStateIndex];

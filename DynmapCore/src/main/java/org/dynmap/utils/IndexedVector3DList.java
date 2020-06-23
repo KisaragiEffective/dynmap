@@ -9,12 +9,12 @@ import java.util.Map;
  */
 public class IndexedVector3DList {
     private int nextIndex = 1;      // Next index value for list
-    private HashMap<Vector3D, IndexedVector3D> set = new HashMap<>();  // Set of values
+    private final HashMap<Vector3D, IndexedVector3D> set = new HashMap<>();  // Set of values
 
     public interface ListCallback {
         void elementAdded(IndexedVector3DList list, IndexedVector3D newElement);
     }
-    private ListCallback callback;  // Callback for new elements added to list
+    private final ListCallback callback;  // Callback for new elements added to list
     
     public IndexedVector3DList(ListCallback cb) {
         callback = cb;

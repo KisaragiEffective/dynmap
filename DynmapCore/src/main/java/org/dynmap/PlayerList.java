@@ -18,13 +18,13 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 
 public class PlayerList {
-    private DynmapServerInterface server;
-    private HashSet<String> hiddenPlayerNames = new HashSet<>();
-    private File hiddenPlayersFile;
-    private ConfigurationNode configuration;
+    private final DynmapServerInterface server;
+    private final HashSet<String> hiddenPlayerNames = new HashSet<>();
+    private final File hiddenPlayersFile;
+    private final ConfigurationNode configuration;
     private DynmapPlayer[] online;
-    private HashMap<String, Set<String>> invisibility_asserts = new HashMap<>();
-    private HashMap<String, Set<String>> visibility_asserts = new HashMap<>();
+    private final HashMap<String, Set<String>> invisibility_asserts = new HashMap<>();
+    private final HashMap<String, Set<String>> visibility_asserts = new HashMap<>();
 
     public PlayerList(DynmapServerInterface server, File hiddenPlayersFile, ConfigurationNode configuration) {
         this.server = server;

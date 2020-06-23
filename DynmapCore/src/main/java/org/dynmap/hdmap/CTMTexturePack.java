@@ -26,15 +26,15 @@ import org.dynmap.utils.MapIterator;
  * Connected Texture Mod (CTM) handler
  */
 public class CTMTexturePack {
-    private String[] ctpfiles;
-    private TexturePackLoader tpl;
+    private final String[] ctpfiles;
+    private final TexturePackLoader tpl;
     private CTMProps[][] bytilelist;
     private CTMProps[][] bybaseblockstatelist;
     private BitSet mappedtiles;
     private BitSet mappedblocks;
     private String[] biomenames;
     
-    private String vanillatextures;
+    private final String vanillatextures;
     
     static final int BOTTOM_FACE = 0; // 0, -1, 0
     static final int TOP_FACE = 1; // 0, 1, 0
@@ -1534,7 +1534,7 @@ public class CTMTexturePack {
     private static final long MULTIPLIER = 0x5deece66dL;
     private static final long ADDEND = 0xbL;
 
-    private static final int getRandom(int x, int y, int z, int face, int modulus)
+    private static int getRandom(int x, int y, int z, int face, int modulus)
     {
         long n = P1 * x * (x + ADDEND) + P2 * y * (y + ADDEND) + P3 * z * (z + ADDEND) + P4 * face * (face + ADDEND);
         n = MULTIPLIER * (n + x + y + z + face) + ADDEND;

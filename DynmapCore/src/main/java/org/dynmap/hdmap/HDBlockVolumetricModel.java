@@ -7,8 +7,8 @@ import org.dynmap.renderer.DynmapBlockState;
 
 public class HDBlockVolumetricModel extends HDBlockModel {
     /* Volumetric model specific attributes */
-    private long[] blockflags;
-    private int nativeres;
+    private final long[] blockflags;
+    private final int nativeres;
     private HashMap<Integer, short[]> scaledblocks;
     /**
      * Block definition - positions correspond to Bukkit coordinates (+X is south, +Y is up, +Z is west)
