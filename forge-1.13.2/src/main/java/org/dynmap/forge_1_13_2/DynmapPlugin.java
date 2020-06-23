@@ -1020,7 +1020,7 @@ public class DynmapPlugin
         public InputStream openResource(String modid, String rname) {
             if (modid != null) {
                 Optional<? extends ModContainer> mc = ModList.get().getModContainerById(modid);
-                Object mod = (mc.isPresent()) ? mc.get().getMod() : null;
+                Object mod = mc.map(ModContainer::getMod).orElse(null);
                 if (mod != null) {
                     InputStream is = mod.getClass().getClassLoader().getResourceAsStream(rname);
                     if (is != null) {
@@ -1031,7 +1031,7 @@ public class DynmapPlugin
             List<ModInfo> mcl = ModList.get().getMods();
             for (ModInfo mci : mcl) {
                 Optional<? extends ModContainer> mc = ModList.get().getModContainerById(mci.getModId());
-                Object mod = (mc.isPresent()) ? mc.get().getMod() : null;
+                Object mod = mc.map(ModContainer::getMod).orElse(null);
                 if (mod == null) continue;
                 InputStream is = mod.getClass().getClassLoader().getResourceAsStream(rname);
                 if (is != null) {

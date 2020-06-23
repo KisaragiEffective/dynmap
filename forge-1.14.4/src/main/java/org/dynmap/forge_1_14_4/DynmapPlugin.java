@@ -1044,7 +1044,7 @@ public class DynmapPlugin
         	if (modid == null) modid = "minecraft";
 
         	Optional<? extends ModContainer> mc = ModList.get().getModContainerById(modid);
-            Object mod = (mc.isPresent()) ? mc.get().getMod() : null;
+            Object mod = mc.map(ModContainer::getMod).orElse(null);
             if (mod != null) {
                 ClassLoader cl = mod.getClass().getClassLoader();
                 if (cl == null) cl = ClassLoader.getSystemClassLoader();
@@ -1056,7 +1056,7 @@ public class DynmapPlugin
             List<ModInfo> mcl = ModList.get().getMods();
             for (ModInfo mci : mcl) {
                 mc = ModList.get().getModContainerById(mci.getModId());
-                mod = (mc.isPresent()) ? mc.get().getMod() : null;
+                mod = mc.map(ModContainer::getMod).orElse(null);
                 if (mod == null) continue;
                 ClassLoader cl = mod.getClass().getClassLoader();
                 if (cl == null) cl = ClassLoader.getSystemClassLoader();
