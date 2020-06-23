@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -51,7 +52,7 @@ public class PostgreSQLMapStorage extends MapStorage {
     private static final int POOLSIZE = 5;
     private Connection[] cpool = new Connection[POOLSIZE];
     private int cpoolCount = 0;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
 
     private HashMap<String, Integer> mapKey = new HashMap<String, Integer>();
 

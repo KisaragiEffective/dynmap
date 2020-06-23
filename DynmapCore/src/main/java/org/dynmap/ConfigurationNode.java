@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -120,7 +121,7 @@ public class ConfigurationNode implements Map<String, Object> {
 
         try {
             stream = new FileOutputStream(file);
-            OutputStreamWriter writer = new OutputStreamWriter(stream, "UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
             yaml.dump(entries, writer);
             return true;
         } catch (IOException e) {

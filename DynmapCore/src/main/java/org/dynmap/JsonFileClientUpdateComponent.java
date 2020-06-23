@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -114,7 +115,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         }
     }
     
-    private static Charset cs_utf8 = Charset.forName("UTF-8");
+    private static Charset cs_utf8 = StandardCharsets.UTF_8;
     public JsonFileClientUpdateComponent(final DynmapCore core, final ConfigurationNode configuration) {
         super(core, configuration);
         final boolean allowwebchat = configuration.getBoolean("allowwebchat", false);

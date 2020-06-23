@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class ForgeConfigFile {
         
         try {
             fis = new FileInputStream(cfg);
-            rdr = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+            rdr = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
             String line;
             ArrayList<String> section = new ArrayList<String>();
             String tok = "";

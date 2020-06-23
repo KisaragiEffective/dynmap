@@ -19,6 +19,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class SendMessageServlet extends HttpServlet {
 
     private static final JSONParser parser = new JSONParser();
     public Event<Message> onMessageReceived = new Event<Message>();
-    private Charset cs_utf8 = Charset.forName("UTF-8");
+    private Charset cs_utf8 = StandardCharsets.UTF_8;
     public int maximumMessageInterval = 1000;
     public boolean hideip = false;
     public boolean trustclientname = false;

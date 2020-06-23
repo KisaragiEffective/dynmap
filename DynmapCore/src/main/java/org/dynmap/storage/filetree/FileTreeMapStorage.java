@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -31,7 +32,7 @@ public class FileTreeMapStorage extends MapStorage {
     private File baseTileDir;
     private TileHashManager hashmap;
     private static final int MAX_WRITE_RETRIES = 6;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
 
     public class StorageTile extends MapStorageTile {
         private final String baseFilename;

@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public class WebAuthManager {
     private String makeHash(String pwd) {
         String check = hashsalt + pwd;
         try {
-            byte[] checkbytes = check.getBytes("UTF-8");
+            byte[] checkbytes = check.getBytes(StandardCharsets.UTF_8);
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] rslt = md.digest(checkbytes);
             String rslthash = "";
@@ -91,7 +92,6 @@ public class WebAuthManager {
             }
             return rslthash;
         } catch (NoSuchAlgorithmException nsax) {
-        } catch (UnsupportedEncodingException uex) {
         }
         return null;
     }

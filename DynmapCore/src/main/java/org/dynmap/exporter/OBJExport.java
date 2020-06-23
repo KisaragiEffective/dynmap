@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class OBJExport {
     private final String basename;
     private int minX, minY, minZ;       // Minimum world coordinates to be rendered
     private int maxX, maxY, maxZ;       // Maximum world coordinates to be rendered
-    private static Charset UTF8 = Charset.forName("UTF-8");
+    private static Charset UTF8 = StandardCharsets.UTF_8;
     private ZipOutputStream zos;        // Output stream ZIP for result
     private double originX, originY, originZ;   // Origin for exported model
     private double scale = 1.0;         // Scale for exported model

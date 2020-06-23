@@ -2,6 +2,7 @@ package org.dynmap.storage.sqllte;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -34,7 +35,7 @@ public class SQLiteMapStorage extends MapStorage {
     private static final int POOLSIZE = 5;
     private Connection[] cpool = new Connection[POOLSIZE];
     private int cpoolCount = 0;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
         
     public class StorageTile extends MapStorageTile {
         private Integer mapkey;

@@ -2,6 +2,7 @@ package org.dynmap.servlet;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.ListIterator;
 
@@ -22,7 +23,7 @@ import static org.dynmap.JSONUtils.g;
 public class ClientConfigurationServlet extends HttpServlet {
     private static final long serialVersionUID = 9106801553080522469L;
     private DynmapCore core;
-    private Charset cs_utf8 = Charset.forName("UTF-8");
+    private Charset cs_utf8 = StandardCharsets.UTF_8;
 
     public ClientConfigurationServlet(DynmapCore plugin) {
         this.core = plugin;

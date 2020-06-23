@@ -5,6 +5,7 @@ import static org.dynmap.JSONUtils.g;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.ListIterator;
 import java.util.regex.Matcher;
@@ -27,7 +28,7 @@ import org.json.simple.JSONObject;
 @SuppressWarnings("serial")
 public class ClientUpdateServlet extends HttpServlet {
     private DynmapCore core;
-    private Charset cs_utf8 = Charset.forName("UTF-8");
+    private Charset cs_utf8 = StandardCharsets.UTF_8;
     
     public ClientUpdateServlet(DynmapCore plugin) {
         this.core = plugin;
