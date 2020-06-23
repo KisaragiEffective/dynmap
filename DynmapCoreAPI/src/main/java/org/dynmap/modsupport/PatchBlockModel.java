@@ -33,9 +33,9 @@ public interface PatchBlockModel extends BlockModel {
      * @return patch ID
      */
     @Deprecated
-    public String addPatch(double x0, double y0, double z0, double xu,
-            double yu, double zu, double xv, double yv, double zv, double umin,
-            double umax, double vmin, double vmax, double uplusvmax, SideVisible sidevis);
+    String addPatch(double x0, double y0, double z0, double xu,
+                    double yu, double zu, double xv, double yv, double zv, double umin,
+                    double umax, double vmin, double vmax, double uplusvmax, SideVisible sidevis);
     /**
      * Add patch with given attributes.
      * 
@@ -63,9 +63,9 @@ public interface PatchBlockModel extends BlockModel {
      * @param sidevis - Controls which sides of the surface are visible (U cross V defines normal - TOP is from that side, BOTTOM is opposite side)
      * @return patch ID
      */
-    public String addPatch(double x0, double y0, double z0, double xu,
-            double yu, double zu, double xv, double yv, double zv, double umin,
-            double umax, double vmin, double vminatumax, double vmax, double vmaxatumax, SideVisible sidevis);
+    String addPatch(double x0, double y0, double z0, double xu,
+                    double yu, double zu, double xv, double yv, double zv, double umin,
+                    double umax, double vmin, double vminatumax, double vmax, double vmaxatumax, SideVisible sidevis);
     /**
      * Add patch with given attributes.
      * 
@@ -87,8 +87,8 @@ public interface PatchBlockModel extends BlockModel {
      * @param sidevis - Controls which sides of the surface are visible (U cross V defines normal - TOP is from that side, BOTTOM is opposite side)
      * @return patch ID
      */
-    public String addPatch(double x0, double y0, double z0, double xu,
-            double yu, double zu, double xv, double yv, double zv, SideVisible sidevis);
+    String addPatch(double x0, double y0, double z0, double xu,
+                    double yu, double zu, double xv, double yv, double zv, SideVisible sidevis);
     /**
      * Add patch with given attributes.
      * 
@@ -109,8 +109,8 @@ public interface PatchBlockModel extends BlockModel {
      * @param zv - Z coordinate of end of V vector
      * @return patch ID
      */
-    public String addPatch(double x0, double y0, double z0, double xu,
-            double yu, double zu, double xv, double yv, double zv);
+    String addPatch(double x0, double y0, double z0, double xu,
+                    double yu, double zu, double xv, double yv, double zv);
     /**
      * Add rotated patch
      * @param patchid - existing patch ID
@@ -119,5 +119,5 @@ public interface PatchBlockModel extends BlockModel {
      * @param zrot - z axis rotation (0, 90, 180, 270)
      * @return patch ID
      */
-    public String addRotatedPatch(String patchid, int xrot, int yrot, int zrot);
+    String addRotatedPatch(String patchid, int xrot, int yrot, int zrot);
 }

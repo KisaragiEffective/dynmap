@@ -7,7 +7,7 @@ package org.dynmap.modsupport;
  *    patch1 - Texture used for the edges of the panel model (the "frame")
  */
 public interface PaneBlockModel extends BlockModel {
-    public static final int PATCH_FACE = 0;
-    public static final int PATCH_EDGE = 1;
+    int PATCH_FACE = 0;
+    int PATCH_EDGE = 1;
     
 }

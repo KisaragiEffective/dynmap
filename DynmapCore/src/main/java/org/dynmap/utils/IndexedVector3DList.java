@@ -12,7 +12,7 @@ public class IndexedVector3DList {
     private HashMap<Vector3D, IndexedVector3D> set = new HashMap<Vector3D, IndexedVector3D>();  // Set of values
 
     public interface ListCallback {
-        public void elementAdded(IndexedVector3DList list, IndexedVector3D newElement);
+        void elementAdded(IndexedVector3DList list, IndexedVector3D newElement);
     }
     private ListCallback callback;  // Callback for new elements added to list
     

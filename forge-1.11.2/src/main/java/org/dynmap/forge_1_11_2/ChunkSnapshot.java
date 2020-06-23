@@ -14,11 +14,11 @@ import net.minecraft.nbt.NBTTagList;
  */
 public class ChunkSnapshot
 {
-    private static interface Section {
-        public DynmapBlockState getBlockType(int x, int y, int z);
-        public int getBlockSkyLight(int x, int y, int z);
-        public int getBlockEmittedLight(int x, int y, int z);
-        public boolean isEmpty();
+    private interface Section {
+        DynmapBlockState getBlockType(int x, int y, int z);
+        int getBlockSkyLight(int x, int y, int z);
+        int getBlockEmittedLight(int x, int y, int z);
+        boolean isEmpty();
     }
 
     private final int x, z;

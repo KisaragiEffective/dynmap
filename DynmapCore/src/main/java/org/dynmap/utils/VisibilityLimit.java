@@ -9,11 +9,11 @@ public interface VisibilityLimit {
      * @return true if chunk intersects visibility limit, false if not
      */
     /* Test if chunk is contained in visibility limit */
-    public boolean doIntersectChunk(int chunk_x, int chunk_z);
+    boolean doIntersectChunk(int chunk_x, int chunk_z);
 
     /* Returns x-coordinate of central block of visibility limit */
-    public int xCenter();
+    int xCenter();
 
     /* Returns z-coordinate of central block of visibility limit */
-    public int zCenter();
+    int zCenter();
 }

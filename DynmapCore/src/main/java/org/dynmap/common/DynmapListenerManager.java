@@ -21,19 +21,19 @@ public class DynmapListenerManager {
     public interface EventListener {
     }
     public interface WorldEventListener extends EventListener {
-        public void worldEvent(DynmapWorld w);
+        void worldEvent(DynmapWorld w);
     }
     public interface PlayerEventListener extends EventListener {
-        public void playerEvent(DynmapPlayer p);
+        void playerEvent(DynmapPlayer p);
     }
     public interface ChatEventListener extends EventListener {
-        public void chatEvent(DynmapPlayer p, String msg);
+        void chatEvent(DynmapPlayer p, String msg);
     }
     public interface BlockEventListener extends EventListener {
-        public void blockEvent(String material, String w, int x, int y, int z);
+        void blockEvent(String material, String w, int x, int y, int z);
     }
     public interface SignChangeEventListener extends EventListener {
-        public void signChangeEvent(String material, String w, int x, int y, int z, String[] lines, DynmapPlayer p);
+        void signChangeEvent(String material, String w, int x, int y, int z, String[] lines, DynmapPlayer p);
     }
     public enum EventType {
         WORLD_LOAD,

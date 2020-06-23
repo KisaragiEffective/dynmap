@@ -32,11 +32,11 @@ import net.minecraft.server.v1_14_R1.NBTTagList;
 public class MapChunkCache114_1 extends AbstractMapChunkCache {
 
 	public static class NBTSnapshot implements Snapshot {
-	    private static interface Section {
-	        public DynmapBlockState getBlockType(int x, int y, int z);
-	        public int getBlockSkyLight(int x, int y, int z);
-	        public int getBlockEmittedLight(int x, int y, int z);
-	        public boolean isEmpty();
+	    private interface Section {
+	        DynmapBlockState getBlockType(int x, int y, int z);
+	        int getBlockSkyLight(int x, int y, int z);
+	        int getBlockEmittedLight(int x, int y, int z);
+	        boolean isEmpty();
 	    }
 	    private final int x, z;
 	    private final Section[] section;

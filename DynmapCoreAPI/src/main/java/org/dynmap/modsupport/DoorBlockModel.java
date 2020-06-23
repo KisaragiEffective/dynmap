@@ -7,6 +7,6 @@ package org.dynmap.modsupport;
  * patch1 - the texture to be used for the bottom of the door
  */
 public interface DoorBlockModel extends BlockModel {
-    public static final int PATCH_TOP = 0;
-    public static final int PATCH_BOTTOM = 1;
+    int PATCH_TOP = 0;
+    int PATCH_BOTTOM = 1;
 }

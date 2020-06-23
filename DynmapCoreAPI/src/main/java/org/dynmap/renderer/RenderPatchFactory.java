@@ -1,7 +1,7 @@
 package org.dynmap.renderer;
 
 public interface RenderPatchFactory {
-    public enum SideVisible { TOP, BOTTOM, BOTH, FLIP };
+    enum SideVisible { TOP, BOTTOM, BOTH, FLIP };
     
     /**
      * Get/create patch with given attributes.
@@ -29,7 +29,7 @@ public interface RenderPatchFactory {
      * @param sidevis - Controls which sides of the surface are visible (U cross V defines normal - TOP is from that side, BOTTOM is opposite side)
      * @param textureidx - texture index to be used for patch
      */
-    public RenderPatch getPatch(double x0, double y0, double z0, double xu, double yu, double zu, double xv, double yv, double zv, double umin, double umax, double vmin, double vmax, SideVisible sidevis, int textureidx);
+    RenderPatch getPatch(double x0, double y0, double z0, double xu, double yu, double zu, double xv, double yv, double zv, double umin, double umax, double vmin, double vmax, SideVisible sidevis, int textureidx);
     /**
      * Get/create patch with given attributes.
      * 
@@ -60,7 +60,7 @@ public interface RenderPatchFactory {
      * @param sidevis - Controls which sides of the surface are visible (U cross V defines normal - TOP is from that side, BOTTOM is opposite side)
      * @param textureidx - texture index to be used for patch
      */
-    public RenderPatch getPatch(double x0, double y0, double z0, double xu, double yu, double zu, double xv, double yv, double zv, double umin, double umax, double vmin, double vminatumax, double vmax, double vmaxatumax, SideVisible sidevis, int textureidx);
+    RenderPatch getPatch(double x0, double y0, double z0, double xu, double yu, double zu, double xv, double yv, double zv, double umin, double umax, double vmin, double vminatumax, double vmax, double vmaxatumax, SideVisible sidevis, int textureidx);
     /**
      * Get/create patch with given attributes.
      * 
@@ -84,7 +84,7 @@ public interface RenderPatchFactory {
      * @param textureidx - texture index to be used for patch
      */
     @Deprecated
-    public RenderPatch getPatch(double x0, double y0, double z0, double xu, double yu, double zu, double xv, double yv, double zv, double uplusvmax, SideVisible sidevis, int textureidx);
+    RenderPatch getPatch(double x0, double y0, double z0, double xu, double yu, double zu, double xv, double yv, double zv, double uplusvmax, SideVisible sidevis, int textureidx);
     /**
      * Get/create patch with given attributes.
      * 
@@ -97,7 +97,7 @@ public interface RenderPatchFactory {
      * @param textureidx - texture index to be used for rotated patch
      * @return patch requested
      */
-    public RenderPatch getRotatedPatch(RenderPatch patch, int xrot, int yrot, int zrot, int textureidx);
+    RenderPatch getRotatedPatch(RenderPatch patch, int xrot, int yrot, int zrot, int textureidx);
     /**
      * Get named patch with given attributes.  Name can encode rotation and patch index info
      * "name" - simple name
@@ -109,18 +109,18 @@ public interface RenderPatchFactory {
      * @param textureidx - texture index to be used for patch, if not provided in name encoding (#patchid suffix)
      * @return patch requested
      */
-    public RenderPatch getNamedPatch(final String name, int textureidx);
+    RenderPatch getNamedPatch(final String name, int textureidx);
     /**
      * Get index of texture from texture map, using given key value
      * @param id - texture map ID
      * @param key - key of requested texture
      * @return index of texture, or -1 if not found
      */
-    public int getTextureIndexFromMap(String id, int key);
+    int getTextureIndexFromMap(String id, int key);
     /**
      * Get number of textures defined in given texture map
      * @param id - texture map ID
      * @return number of textures, or -1 if map not found
      */
-    public int getTextureCountFromMap(String id);
+    int getTextureCountFromMap(String id);
 }

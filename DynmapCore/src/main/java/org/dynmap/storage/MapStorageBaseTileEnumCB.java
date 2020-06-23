@@ -8,5 +8,5 @@ public interface MapStorageBaseTileEnumCB {
      * @param tile - tile found
      * @param enc - image encoding
      */
-    public void tileFound(MapStorageTile tile, ImageEncoding enc);
+    void tileFound(MapStorageTile tile, ImageEncoding enc);
 }

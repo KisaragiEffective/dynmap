@@ -142,7 +142,7 @@ public abstract class MapType {
     public void purgeOldTiles(DynmapWorld world, TileFlags rendered) { }
  
     public interface FileCallback {
-        public void fileFound(File f, File parent, boolean day);
+        void fileFound(File f, File parent, boolean day);
     }
     
     protected void walkMapTree(File root, FileCallback cb, boolean day) {
