@@ -1291,13 +1291,12 @@ public class ForgeMapChunkCache extends MapChunkCache
             unloadChunks();
             return 0;
         }
-        ListIterator<DynmapChunk> iter = chunks.listIterator();
-        while (iter.hasNext()) {
+        for (DynmapChunk dynmapChunk : chunks) {
             long startTime = System.nanoTime();
-            DynmapChunk chunk = iter.next();
-            int chunkindex = (chunk.x-x_min) + (chunk.z - z_min)*x_dim;
+            DynmapChunk chunk = dynmapChunk;
+            int chunkindex = (chunk.x - x_min) + (chunk.z - z_min) * x_dim;
             if (snaparray[chunkindex] != null) continue;    // Skip if already processed
-            
+
             boolean vis = isChunkVisible(chunk);
 
             /* Check if cached chunk snapshot found */
@@ -1316,19 +1315,16 @@ public class ForgeMapChunkCache extends MapChunkCache
                     } catch (IllegalAccessException e) {
                     } catch (IllegalArgumentException e) {
                     } catch (InvocationTargetException e) {
-                    }                
+                    }
                     SnapshotRec ssr = prepChunkSnapshot(chunk, nbt);
                     ss = ssr.ss;
                     tileData = ssr.tileData;
-                }
-                else {
+                } else {
                     if (hidestyle == HiddenChunkStyle.FILL_STONE_PLAIN) {
                         ss = STONE;
-                    }
-                    else if (hidestyle == HiddenChunkStyle.FILL_OCEAN) {
+                    } else if (hidestyle == HiddenChunkStyle.FILL_OCEAN) {
                         ss = OCEAN;
-                    }
-                    else {
+                    } else {
                         ss = EMPTY;
                     }
                     tileData = new DynIntHashMap();

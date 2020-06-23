@@ -221,43 +221,43 @@ public class DynmapPlugin
         DynmapBlockState basebs = null;
         Block baseb = null;
         int baseidx = 0;
-    	
-    	Iterator<BlockState> iter = bsids.iterator();
-		while (iter.hasNext()) {
-			BlockState bs = iter.next();
-			int idx = bsids.get(bs);
-    		if (idx >= stateByID.length) {
-    			int plen = stateByID.length;
-    			stateByID = Arrays.copyOf(stateByID, idx+1);
-    			Arrays.fill(stateByID, plen, stateByID.length, DynmapBlockState.AIR);
-    		}
+
+        for (BlockState bs : bsids) {
+            int idx = bsids.get(bs);
+            if (idx >= stateByID.length) {
+                int plen = stateByID.length;
+                stateByID = Arrays.copyOf(stateByID, idx + 1);
+                Arrays.fill(stateByID, plen, stateByID.length, DynmapBlockState.AIR);
+            }
             Block b = bs.getBlock();
-    		// If this is new block vs last, it's the base block state
-    		if (b != baseb) {
-    			basebs = null;
+            // If this is new block vs last, it's the base block state
+            if (b != baseb) {
+                basebs = null;
                 baseidx = idx;
                 baseb = b;
-    		}
-    		
+            }
+
             ResourceLocation ui = b.getRegistryName();
             if (ui == null) {
-            	continue;
+                continue;
             }
             String bn = ui.getNamespace() + ":" + ui.getPath();
             // Only do defined names, and not "air"
             if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                 Material mat = bs.getMaterial();
                 String statename = "";
-                for(IProperty<?> p : bs.getProperties()) {
-                	if (statename.length() > 0) {
-                		statename += ",";
-                	}
-                	statename += p.getName() + "=" + bs.get(p).toString();
+                for (IProperty<?> p : bs.getProperties()) {
+                    if (statename.length() > 0) {
+                        statename += ",";
+                    }
+                    statename += p.getName() + "=" + bs.get(p).toString();
                 }
                 //Log.info("bn=" + bn + ", statenme=" + statename + ",idx=" + idx + ",baseidx=" + baseidx);
                 DynmapBlockState dbs = new DynmapBlockState(basebs, idx - baseidx, bn, statename, mat.toString(), idx);
                 stateByID[idx] = dbs;
-                if (basebs == null) { basebs = dbs; }
+                if (basebs == null) {
+                    basebs = dbs;
+                }
                 if (mat.isSolid()) {
                     dbs.setSolid();
                 }
@@ -274,7 +274,7 @@ public class DynmapPlugin
                     dbs.setWaterlogged();
                 }
             }
-    	}
+        }
         for (int gidx = 0; gidx < DynmapBlockState.getGlobalIndexMax(); gidx++) {
         	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
         	//Log.info(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
@@ -294,15 +294,13 @@ public class DynmapPlugin
     public static final Biome[] getBiomeList() {
         if (biomelist == null) {
         	biomelist = new Biome[256];
-        	Iterator<Biome> iter = ForgeRegistries.BIOMES.iterator();
-        	while (iter.hasNext()) {
-                Biome b = iter.next();
+            for (Biome b : ForgeRegistries.BIOMES) {
                 int bidx = Registry.BIOME.getId(b);
-        		if (bidx >= biomelist.length) {
-        			biomelist = Arrays.copyOf(biomelist, bidx + biomelist.length);
-        		}
-        		biomelist[bidx] = b;
-        	}
+                if (bidx >= biomelist.length) {
+                    biomelist = Arrays.copyOf(biomelist, bidx + biomelist.length);
+                }
+                biomelist[bidx] = b;
+            }
         }
         return biomelist;
     }

@@ -1197,13 +1197,12 @@ public class ForgeMapChunkCache extends MapChunkCache
             unloadChunks();
             return 0;
         }
-        ListIterator<DynmapChunk> iter = chunks.listIterator();
-        while (iter.hasNext()) {
+        for (DynmapChunk dynmapChunk : chunks) {
             long startTime = System.nanoTime();
-            DynmapChunk chunk = iter.next();
-            int chunkindex = (chunk.x-x_min) + (chunk.z - z_min)*x_dim;
+            DynmapChunk chunk = dynmapChunk;
+            int chunkindex = (chunk.x - x_min) + (chunk.z - z_min) * x_dim;
             if (snaparray[chunkindex] != null) continue;    // Skip if already processed
-            
+
             boolean vis = isChunkVisible(chunk);
 
             /* Check if cached chunk snapshot found */
@@ -1216,20 +1215,17 @@ public class ForgeMapChunkCache extends MapChunkCache
                 ChunkSnapshot ss;
                 DynIntHashMap tileData;
                 if (vis) {  // If visible 
-                    CompoundNBT nbt = ChunkSerializer.write((ServerWorld)w, cps.getChunk(chunk.x, chunk.z, false));
+                    CompoundNBT nbt = ChunkSerializer.write((ServerWorld) w, cps.getChunk(chunk.x, chunk.z, false));
                     if (nbt != null) nbt = nbt.getCompound("Level");
                     SnapshotRec ssr = prepChunkSnapshot(chunk, nbt);
                     ss = ssr.ss;
                     tileData = ssr.tileData;
-                }
-                else {
+                } else {
                     if (hidestyle == HiddenChunkStyle.FILL_STONE_PLAIN) {
                         ss = STONE;
-                    }
-                    else if (hidestyle == HiddenChunkStyle.FILL_OCEAN) {
+                    } else if (hidestyle == HiddenChunkStyle.FILL_OCEAN) {
                         ss = OCEAN;
-                    }
-                    else {
+                    } else {
                         ss = EMPTY;
                     }
                     tileData = new DynIntHashMap();
