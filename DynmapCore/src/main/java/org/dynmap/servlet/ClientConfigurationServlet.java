@@ -57,31 +57,28 @@ public class ClientConfigurationServlet extends HttpServlet {
             JSONArray wlist = (JSONArray)g(json, "worlds");
             JSONArray newwlist = new JSONArray();
             json.put("worlds", newwlist);
-            for(ListIterator<JSONObject> iter = wlist.listIterator(); iter.hasNext();) {
-                JSONObject w = iter.next();
-                String n = (String)g(w, "name");
+            for (JSONObject w : (Iterable<JSONObject>) wlist) {
+                String n = (String) g(w, "name");
                 DynmapWorld dw = core.getWorld(n);
                 /* If protected, and we're guest or don't have permission, drop it */
-                if(dw.isProtected() && (guest || (!core.getServer().checkPlayerPermission(user, "world." + n)))) {
+                if (dw.isProtected() && (guest || (!core.getServer().checkPlayerPermission(user, "world." + n)))) {
                     /* Don't add to new list */
-                }
-                else {
+                } else {
                     JSONObject neww = new JSONObject();
                     neww.putAll(w);
                     newwlist.add(neww);
-                    JSONArray mlist = (JSONArray)g(w, "maps");
+                    JSONArray mlist = (JSONArray) g(w, "maps");
                     JSONArray newmlist = new JSONArray();
-                    neww.put("maps",  newmlist);
-                    for(ListIterator<JSONObject> iter2 = mlist.listIterator(); iter2.hasNext();) {
-                        JSONObject m = iter2.next();
+                    neww.put("maps", newmlist);
+                    for (JSONObject m : (Iterable<JSONObject>) mlist) {
                         Boolean prot = (Boolean) g(m, "protected");
                         /* If not protected, leave it in */
-                        if((prot == null) || (!prot.booleanValue())) {
+                        if ((prot == null) || (!prot.booleanValue())) {
                             newmlist.add(m);
                             continue;
                         }
                         /* If not guest and we have permission, keep it */
-                        String mn = (String)g(m, "name");
+                        String mn = (String) g(m, "name");
                         if ((!guest) && core.getServer().checkPlayerPermission(user, "map." + n + "." + mn)) {
                             newmlist.add(m);
                         }

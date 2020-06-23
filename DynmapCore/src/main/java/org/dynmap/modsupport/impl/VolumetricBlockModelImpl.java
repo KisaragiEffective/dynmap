@@ -48,12 +48,11 @@ public class VolumetricBlockModelImpl extends BlockModelImpl implements Volumetr
             String l = "layer: " + y + "\n";
             boolean empty = true;
             for (int z = 0; z < grid.length; z++) {
-                for (int x = 0; x < grid.length; x++) {
-                    if (grid[x][y][z]) {
+                for (boolean[][] booleans : grid) {
+                    if (booleans[y][z]) {
                         empty = false;
                         l += '*';
-                    }
-                    else {
+                    } else {
                         l += '-';
                     }
                 }

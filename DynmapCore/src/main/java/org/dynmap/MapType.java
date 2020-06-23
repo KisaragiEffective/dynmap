@@ -46,9 +46,9 @@ public abstract class MapType {
         }
         public static ImageEncoding fromExt(String x) {
             ImageEncoding[] v = values();
-            for (int i = 0; i < v.length; i++) {
-                if (v[i].ext.equalsIgnoreCase(x)) {
-                    return v[i];
+            for (ImageEncoding imageEncoding : v) {
+                if (imageEncoding.ext.equalsIgnoreCase(x)) {
+                    return imageEncoding;
                 }
             }
             return null;

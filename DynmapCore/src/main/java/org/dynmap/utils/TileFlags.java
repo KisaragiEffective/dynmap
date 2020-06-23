@@ -113,12 +113,12 @@ public class TileFlags {
 	                count--;
 	                if(row[idx] == 0L) { // All zero in element?
 	                    boolean nonzero = false;
-	                    for(int i = 0; i < row.length; i++) {
-	                        if(row[i] != 0L) {
-	                            nonzero = true;
-	                            break;
-	                        }
-	                    }
+                        for (long l : row) {
+                            if (l != 0L) {
+                                nonzero = true;
+                                break;
+                            }
+                        }
 	                    if(!nonzero) {
 	                        chunkmap.remove(k);
 	                        last_row = null;

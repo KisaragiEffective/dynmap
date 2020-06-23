@@ -183,8 +183,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
         List<Double> xx = new ArrayList<Double>();
         List<Double> yy = new ArrayList<Double>();
         List<Double> zz = new ArrayList<Double>();
-        for(int i = 0; i < corners.size(); i++) {
-            Coord c = corners.get(i);
+        for (Coord c : corners) {
             xx.add(c.x);
             yy.add(c.y);
             zz.add(c.z);

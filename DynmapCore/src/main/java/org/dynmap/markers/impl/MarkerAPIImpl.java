@@ -376,8 +376,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
         api.markerpersist = new File(core.getDataFolder(), "markers.yml");
         api.markerpersist_old = new File(core.getDataFolder(), "markers.yml.old");
         /* Fill in default icons and sets, if needed */
-        for(int i = 0; i < builtin_icons.length; i++) {
-            String id = builtin_icons[i];
+        for (String id : builtin_icons) {
             api.createBuiltinMarkerIcon(id, id);
         }
         /* Load persistence */

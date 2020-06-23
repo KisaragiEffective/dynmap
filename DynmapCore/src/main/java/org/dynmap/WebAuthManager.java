@@ -86,8 +86,8 @@ public class WebAuthManager {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] rslt = md.digest(checkbytes);
             String rslthash = "";
-            for(int i = 0; i < rslt.length; i++) {
-                rslthash += String.format("%02X", 0xFF & (int)rslt[i]);
+            for (byte b : rslt) {
+                rslthash += String.format("%02X", 0xFF & (int) b);
             }
             return rslthash;
         } catch (NoSuchAlgorithmException nsax) {

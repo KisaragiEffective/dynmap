@@ -1632,8 +1632,8 @@ public class MapManager {
 
     public void pushUpdate(Client.Update update) {
         int sz = worlds.size();
-        for(int i = 0; i < sz; i++) {
-            worlds.get(i).updates.pushUpdate(update);
+        for (DynmapWorld world : worlds) {
+            world.updates.pushUpdate(update);
         }
     }
 
@@ -1852,8 +1852,8 @@ public class MapManager {
 
         if(!touch_events.isEmpty()) {
             te = new ArrayList<TouchEvent>(touch_events.keySet());
-            for(int i = 0; i < te.size(); i++) {
-                touch_events.remove(te.get(i));
+            for (TouchEvent touchEvent : te) {
+                touch_events.remove(touchEvent);
             }
         }
 

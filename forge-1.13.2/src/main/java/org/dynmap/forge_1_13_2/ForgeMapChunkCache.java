@@ -886,42 +886,41 @@ public class ForgeMapChunkCache extends MapChunkCache
     	if (!init)
     	{
     		Field[] f = ChunkProviderServer.class.getDeclaredFields();
-    		
-    		for(int i = 0; i < f.length; i++) {
-    			if((unloadqueue == null) && f[i].getType().isAssignableFrom(it.unimi.dsi.fastutil.longs.LongSet.class)) {
-    	    		unloadqueue = f[i];
-    				//Log.info("Found unloadqueue - " + f[i].getName());
-    				unloadqueue.setAccessible(true);
-    			}
-    			else if((currentchunkloader == null) && f[i].getType().isAssignableFrom(IChunkLoader.class)) {
-    				currentchunkloader = f[i];
-    				//Log.info("Found currentchunkprovider - " + f[i].getName());
-    				currentchunkloader.setAccessible(true);
-    			}
-    		}
+
+            for (Field item : f) {
+                if ((unloadqueue == null) && item.getType().isAssignableFrom(it.unimi.dsi.fastutil.longs.LongSet.class)) {
+                    unloadqueue = item;
+                    //Log.info("Found unloadqueue - " + f[i].getName());
+                    unloadqueue.setAccessible(true);
+                } else if ((currentchunkloader == null) && item.getType().isAssignableFrom(IChunkLoader.class)) {
+                    currentchunkloader = item;
+                    //Log.info("Found currentchunkprovider - " + f[i].getName());
+                    currentchunkloader.setAccessible(true);
+                }
+            }
     		
     		f = WorldServer.class.getDeclaredFields();
-    		for(int i = 0; i < f.length; i++) {
-    			if((updateEntityTick == null) && f[i].getType().isAssignableFrom(int.class)) {
-    				updateEntityTick = f[i];
-    				//Log.info("Found updateEntityTick - " + f[i].getName());
-    				updateEntityTick.setAccessible(true);
-    			}
-    		}
+            for (Field value : f) {
+                if ((updateEntityTick == null) && value.getType().isAssignableFrom(int.class)) {
+                    updateEntityTick = value;
+                    //Log.info("Found updateEntityTick - " + f[i].getName());
+                    updateEntityTick.setAccessible(true);
+                }
+            }
 
     		f = AnvilChunkLoader.class.getDeclaredFields();
-    		for(int i = 0; i < f.length; i++) {
-    		    if((chunksToRemove == null) && (f[i].getType().equals(Map.class))) {
-                    chunksToRemove = f[i];
+            for (Field field : f) {
+                if ((chunksToRemove == null) && (field.getType().equals(Map.class))) {
+                    chunksToRemove = field;
                     //Log.info("Found chunksToRemove - " + f[i].getName());
-    		        chunksToRemove.setAccessible(true);
-    		    }
+                    chunksToRemove.setAccessible(true);
+                }
 //    		    else if((pendingAnvilChunksCoordinates == null) && (f[i].getType().equals(it.unimi.dsi.fastutil.longs.LongSet.class))) {
 //                    //Log.info("Found pendingAnvilChunksCoordinates - " + f[i].getName());
 //    		        pendingAnvilChunksCoordinates = f[i];
 //    		        pendingAnvilChunksCoordinates.setAccessible(true);
 //    		    }
-    		}
+            }
     		// Get writeChunkToNBT method
     	    Method[] ma = AnvilChunkLoader.class.getDeclaredMethods();
     	    for (Method m : ma) {
@@ -1586,11 +1585,9 @@ public class ForgeMapChunkCache extends MapChunkCache
         	
             String bs = b[i].getTranslationKey();
 
-            for (int j = 0; j < bm.length; j++)
-            {
-                if (bm[j].toString().equals(bs))
-                {
-                    biome_to_bmap[i] = bm[j];
+            for (BiomeMap biomeMap : bm) {
+                if (biomeMap.toString().equals(bs)) {
+                    biome_to_bmap[i] = biomeMap;
                     break;
                 }
             }

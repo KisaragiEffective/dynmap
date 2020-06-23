@@ -996,8 +996,8 @@ public class DynmapCore implements DynmapCommonAPI {
         ArrayList<String> rslt = new ArrayList<String>();
         /* Build command line, so we can parse our way - make sure there is trailing space */
         String cmdline = "";
-        for(int i = 0; i < args.length; i++) {
-            cmdline += args[i] + " ";
+        for (String arg : args) {
+            cmdline += arg + " ";
         }
         boolean inquote = false;
         StringBuilder sb = new StringBuilder();

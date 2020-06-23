@@ -161,15 +161,14 @@ public class IsoHDPerspective implements HDPerspective {
         
         private final void updateSemitransparentLight(LightLevels ll) {
         	int emitted = 0, sky = 0;
-        	for(int i = 0; i < semi_steps.length; i++) {
-        	    BlockStep s = semi_steps[i];
-        		mapiter.stepPosition(s);
-        		int v = mapiter.getBlockEmittedLight();
-        		if(v > emitted) emitted = v;
-        		v = mapiter.getBlockSkyLight();
-        		if(v > sky) sky = v;
-        		mapiter.unstepPosition(s);
-        	}
+            for (BlockStep s : semi_steps) {
+                mapiter.stepPosition(s);
+                int v = mapiter.getBlockEmittedLight();
+                if (v > emitted) emitted = v;
+                v = mapiter.getBlockSkyLight();
+                if (v > sky) sky = v;
+                mapiter.unstepPosition(s);
+            }
         	ll.sky = sky;
         	ll.emitted = emitted;
         }
@@ -479,13 +478,13 @@ public class IsoHDPerspective implements HDPerspective {
             int hitcnt = 0;
             int water_hit = Integer.MAX_VALUE; // hit index of first water hit
             /* Loop through patches : compute intercept values for each */
-            for(int i = 0; i < patches.length; i++) {
-                hitcnt = handlePatch((PatchDefinition)patches[i], hitcnt);
+            for (RenderPatch patch : patches) {
+                hitcnt = handlePatch((PatchDefinition) patch, hitcnt);
             }
             if ((fluidpatches != null) && (fluidpatches.length > 0)) {
                 int prev_hitcnt = hitcnt;
-                for(int i = 0; i < fluidpatches.length; i++) {
-                    hitcnt = handlePatch((PatchDefinition)fluidpatches[i], hitcnt);
+                for (RenderPatch fluidpatch : fluidpatches) {
+                    hitcnt = handlePatch((PatchDefinition) fluidpatch, hitcnt);
                 }
                 if (prev_hitcnt < hitcnt) { // At least one water hit?
                     water_hit = prev_hitcnt;    // Remember index
@@ -1216,8 +1215,8 @@ public class IsoHDPerspective implements HDPerspective {
             bgnight[i] = shaderstate[i].getMap().getBackgroundARGBNight();
         }
         // Mark the tiles we're going to render as validated
-        for (int i = 0; i < numshaders; i++) {
-            MapTypeState mts = world.getMapState(shaderstate[i].getMap());
+        for (HDShaderState shaderState : shaderstate) {
+            MapTypeState mts = world.getMapState(shaderState.getMap());
             if (mts != null) {
                 mts.validateTile(tile.tx, tile.ty);
             }
@@ -1251,8 +1250,8 @@ public class IsoHDPerspective implements HDPerspective {
                 ps.direction.set(ps.bottom);
                 ps.direction.subtract(ps.top);
                 ps.py = y / sizescale;
-                for(int i = 0; i < numshaders; i++) {
-                    shaderstate[i].reset(ps);
+                for (HDShaderState hdShaderState : shaderstate) {
+                    hdShaderState.reset(ps);
                 }
                 try {
                     ps.raytrace(cache, shaderstate, shaderdone);

@@ -436,8 +436,7 @@ public abstract class DynmapWorld {
         /* Add seed locations, if any */
         if(seedloccfg.size() > 0) {
             ArrayList<Map<String,Object>> locs = new ArrayList<Map<String,Object>>();
-            for(int i = 0; i < seedloccfg.size(); i++) {
-                DynmapLocation dl = seedloccfg.get(i);
+            for (DynmapLocation dl : seedloccfg) {
                 ConfigurationNode ll = new ConfigurationNode();
                 ll.put("x", dl.x);
                 ll.put("y", dl.y);
@@ -453,17 +452,15 @@ public abstract class DynmapWorld {
         /* Save visibility limits, if defined */
         if(visibility_limits != null) {
             ArrayList<Map<String,Object>> lims = new ArrayList<Map<String,Object>>();
-            for(int i = 0; i < visibility_limits.size(); i++) {
-                VisibilityLimit lim = visibility_limits.get(i);
-                LinkedHashMap<String, Object> lv = new LinkedHashMap<String,Object>();
+            for (VisibilityLimit lim : visibility_limits) {
+                LinkedHashMap<String, Object> lv = new LinkedHashMap<String, Object>();
                 if (lim instanceof RectangleVisibilityLimit) {
                     RectangleVisibilityLimit rect_lim = (RectangleVisibilityLimit) lim;
                     lv.put("x0", rect_lim.x_min);
                     lv.put("z0", rect_lim.z_min);
                     lv.put("x1", rect_lim.x_max);
                     lv.put("z1", rect_lim.z_max);
-                }
-                else {
+                } else {
                     RoundVisibilityLimit round_lim = (RoundVisibilityLimit) lim;
                     lv.put("x", round_lim.x_center);
                     lv.put("z", round_lim.z_center);

@@ -1047,12 +1047,12 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
         for(int i = 0; i < biome_to_bmap.length; i++) {
             biome_to_bmap[i] = BiomeMap.NULL;
         }
-        for(int i = 0; i < b.length; i++) {
-            String bs = b[i].toString();
-            for(int j = 0; j < bm.length; j++) {
-                if(bm[j].toString().equals(bs)) {
-                    biome_to_bmap[b[i].ordinal()] = bm[j];
-                    biome_by_id[j] = b[i];
+        for (Biome value : b) {
+            String bs = value.toString();
+            for (int j = 0; j < bm.length; j++) {
+                if (bm[j].toString().equals(bs)) {
+                    biome_to_bmap[value.ordinal()] = bm[j];
+                    biome_by_id[j] = value;
                     break;
                 }
             }

@@ -305,8 +305,8 @@ public class ConfigurationNode implements Map<String, Object> {
             @SuppressWarnings("unchecked")
             List<Object> lv = (List<Object>)v;
             ArrayList<Object> newv = new ArrayList<Object>();
-            for(int i = 0; i < lv.size(); i++) {
-                newv.add(copyValue(lv.get(i)));
+            for (Object o : lv) {
+                newv.add(copyValue(o));
             }
             return newv;
         }

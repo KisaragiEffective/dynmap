@@ -129,17 +129,15 @@ public class PlayerList {
         ArrayList<DynmapPlayer> visiblePlayers = new ArrayList<DynmapPlayer>();
         DynmapPlayer[] onlinePlayers = online;    /* Use copied list - we don't call from server thread */
         boolean useWhitelist = configuration.getBoolean("display-whitelist", false);
-        for (int i = 0; i < onlinePlayers.length; i++) {
-            DynmapPlayer p = onlinePlayers[i];
-            if(p == null) continue;
-            if((worldName != null) && (!p.getWorld().equals(worldName))) continue;
+        for (DynmapPlayer p : onlinePlayers) {
+            if (p == null) continue;
+            if ((worldName != null) && (!p.getWorld().equals(worldName))) continue;
             String pname = p.getName().toLowerCase();
             if (!(useWhitelist ^ hiddenPlayerNames.contains(pname))) {
-                if(!invisibility_asserts.containsKey(pname)) {
+                if (!invisibility_asserts.containsKey(pname)) {
                     visiblePlayers.add(p);
                 }
-            }
-            else if(visibility_asserts.containsKey(pname)) {
+            } else if (visibility_asserts.containsKey(pname)) {
                 visiblePlayers.add(p);
             }
         }
@@ -154,16 +152,14 @@ public class PlayerList {
         ArrayList<DynmapPlayer> hidden = new ArrayList<DynmapPlayer>();
         DynmapPlayer[] onlinePlayers = online;    /* Use copied list - we don't call from server thread */
         boolean useWhitelist = configuration.getBoolean("display-whitelist", false);
-        for (int i = 0; i < onlinePlayers.length; i++) {
-            DynmapPlayer p = onlinePlayers[i];
-            if(p == null) continue;
+        for (DynmapPlayer p : onlinePlayers) {
+            if (p == null) continue;
             String pname = p.getName().toLowerCase();
             if (!(useWhitelist ^ hiddenPlayerNames.contains(pname))) {
-                if(invisibility_asserts.containsKey(pname)) {
+                if (invisibility_asserts.containsKey(pname)) {
                     hidden.add(p);
                 }
-            }
-            else if(!visibility_asserts.containsKey(pname)) {
+            } else if (!visibility_asserts.containsKey(pname)) {
                 hidden.add(p);
             }
         }

@@ -235,19 +235,19 @@ public class DynmapBlockState {
         	    String[] statelist = statename.split(",");
         		for (DynmapBlockState bb : blk.states) {
         		    boolean match = true;
-        		    for (int i = 0; i < statelist.length; i++) {
-        		        boolean valmatch = false;
-        		        for (int j = 0; j < bb.stateList.length; j++) {
-        		            if (statelist[i].equals(bb.stateList[j])) {
-        		                valmatch = true;
-        		                break;
-        		            }
-        		        }
-        		        if (!valmatch) {
-        		            match = false;
-        		            break;
-        		        }
-        		    }
+                    for (String s : statelist) {
+                        boolean valmatch = false;
+                        for (int j = 0; j < bb.stateList.length; j++) {
+                            if (s.equals(bb.stateList[j])) {
+                                valmatch = true;
+                                break;
+                            }
+                        }
+                        if (!valmatch) {
+                            match = false;
+                            break;
+                        }
+                    }
         			if (match) {
         				return bb;
         			}

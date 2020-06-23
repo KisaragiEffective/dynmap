@@ -183,8 +183,7 @@ public class TopoHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for(int i = 0; i < color.length; i++)
-                color[i].setTransparent();
+            for (Color value : color) value.setTransparent();
             inWater = false;
         }
         
@@ -273,8 +272,7 @@ public class TopoHDShader implements HDShader {
                               (tmpcolor[i].getGreen()*alpha2 + color[i].getGreen()*alpha) / talpha,
                               (tmpcolor[i].getBlue()*alpha2 + color[i].getBlue()*alpha) / talpha, talpha);
                 else
-                    for(int i = 0; i < color.length; i++)
-                        color[i].setTransparent();
+                    for (Color value : color) value.setTransparent();
                     
                 return (talpha >= 254);   /* If only one short, no meaningful contribution left */
             }

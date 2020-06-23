@@ -93,19 +93,17 @@ public class ClientUpdateServlet extends HttpServlet {
                 JSONArray newplayers = new JSONArray();
                 u.put("players",  newplayers);
                 if(players != null) {
-                    for(ListIterator<JSONObject> iter = players.listIterator(); iter.hasNext();) {
-                        JSONObject p = iter.next();
+                    for (JSONObject p : (Iterable<JSONObject>) players) {
                         JSONObject newp = new JSONObject();
                         newp.putAll(p);
                         newplayers.add(newp);
                         boolean hide;
-                        if(!guest) {
-                            hide = !core.testIfPlayerVisibleToPlayer(user, (String)newp.get("name"));
-                        }
-                        else {
+                        if (!guest) {
+                            hide = !core.testIfPlayerVisibleToPlayer(user, (String) newp.get("name"));
+                        } else {
                             hide = true;
                         }
-                        if(hide) {
+                        if (hide) {
                             s(newp, "world", "-some-other-bogus-world-");
                             s(newp, "x", 0.0);
                             s(newp, "y", 64.0);
@@ -120,9 +118,8 @@ public class ClientUpdateServlet extends HttpServlet {
             JSONArray newupdates = new JSONArray();
             u.put("updates", newupdates);
             if(updates != null) {
-                for(ListIterator<Client.Update> iter = updates.listIterator(); iter.hasNext();) {
-                    Client.Update update = iter.next();
-                    if(update.timestamp >= since) {
+                for (Client.Update update : (Iterable<Client.Update>) updates) {
+                    if (update.timestamp >= since) {
                         newupdates.add(update);
                     }
                 }

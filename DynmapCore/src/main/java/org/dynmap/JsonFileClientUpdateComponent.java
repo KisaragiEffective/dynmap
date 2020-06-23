@@ -310,8 +310,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         if(core.mapManager == null) return;
         //Handles Updates
         ArrayList<DynmapWorld> wlist = new ArrayList<DynmapWorld>(core.mapManager.getWorlds());	// Grab copy of world list
-        for (int windx = 0; windx < wlist.size(); windx++) {
-        	DynmapWorld dynmapWorld = wlist.get(windx);
+        for (DynmapWorld dynmapWorld : wlist) {
             JSONObject update = new JSONObject();
             update.put("timestamp", currentTimestamp);
             ClientUpdateEvent clientUpdate = new ClientUpdateEvent(currentTimestamp - 30000, dynmapWorld, update);
@@ -320,10 +319,9 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
 
             String outputFile;
             boolean dowrap = storage.wrapStandaloneJSON(core.isLoginSupportEnabled());
-            if(dowrap) {
+            if (dowrap) {
                 outputFile = "updates_" + dynmapWorld.getName() + ".php";
-            }
-            else {
+            } else {
                 outputFile = "dynmap_" + dynmapWorld.getName() + ".json";
             }
             byte[] content = Json.stringifyJson(update).getBytes(cs_utf8);
@@ -525,9 +523,9 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
                     br = null;
                 }
             }
-            for(int i = 0; i < lines.size(); i++) {
-                String[] vals = lines.get(i).split("=");
-                if(vals.length == 3) {
+            for (String line : lines) {
+                String[] vals = line.split("=");
+                if (vals.length == 3) {
                     core.processCompletedRegister(vals[0].trim(), vals[1].trim(), vals[2].trim());
                 }
             }

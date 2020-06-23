@@ -95,10 +95,10 @@ public class TFCWoodRenderer extends CustomRenderer {
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
         /* Build connection map - check each axis */
         int connect = 0;
-        for(int i = 0; i < sides.length; i++) {
-            DynmapBlockState blk = ctx.getBlockTypeAt(sides[i][0], sides[i][1], sides[i][2]);
+        for (int[] side : sides) {
+            DynmapBlockState blk = ctx.getBlockTypeAt(side[0], side[1], side[2]);
             if (blkbs.matchingBaseState(blk)) {
-                connect |= sides[i][3];
+                connect |= side[3];
             }
         }
         DynmapBlockState id = ctx.getBlockTypeAt(0, -1, 0);

@@ -87,9 +87,9 @@ public class Json {
             List<?> l = (List<?>) o;
             s.append("[");
             int count = 0;
-            for (int i = 0; i < l.size(); i++) {
+            for (Object value : l) {
                 if (count++ > 0) s.append(",");
-                appendJson(l.get(i), s);
+                appendJson(value, s);
             }
             s.append("]");
         } else if (o.getClass().isArray()) {

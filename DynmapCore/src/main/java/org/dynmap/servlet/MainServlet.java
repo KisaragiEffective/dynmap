@@ -122,8 +122,8 @@ public class MainServlet extends HttpServlet {
     private int indexOfAny(String s, char[] cs, int startIndex) {
         for(int i = startIndex; i < s.length(); i++) {
             char c = s.charAt(i);
-            for(int j = 0; j < cs.length; j++) {
-                if (c == cs[j]) {
+            for (char value : cs) {
+                if (c == value) {
                     return i;
                 }
             }

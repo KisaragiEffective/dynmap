@@ -171,8 +171,7 @@ public class TexturePackHDShader implements HDShader {
          */
         @Override
         public void reset(HDPerspectiveState ps) {
-            for(int i = 0; i < color.length; i++)
-                color[i].setTransparent();
+            for (Color value : color) value.setTransparent();
             setLastBlockState(DynmapBlockState.AIR);
             lastblkhit = DynmapBlockState.AIR;
         }
@@ -253,9 +252,9 @@ public class TexturePackHDShader implements HDShader {
                     int xx = mapiter.getX() % gridscale;
                     int zz = mapiter.getZ() % gridscale;
                     if(((xx == 0) && ((zz & 2) == 0)) || ((zz == 0) && ((xx & 2) == 0))) {
-                        for(int i = 0; i < tmpcolor.length; i++) {
-                            int v = tmpcolor[i].getARGB();
-                            tmpcolor[i].setARGB((v & 0xFF000000) | ((v & 0xFEFEFE) >> 1) | 0x808080);
+                        for (Color value : tmpcolor) {
+                            int v = value.getARGB();
+                            value.setARGB((v & 0xFF000000) | ((v & 0xFEFEFE) >> 1) | 0x808080);
                         }
                     }
                 }
@@ -276,8 +275,7 @@ public class TexturePackHDShader implements HDShader {
                                   (tmpcolor[i].getGreen()*alpha2 + color[i].getGreen()*alpha) / talpha,
                                   (tmpcolor[i].getBlue()*alpha2 + color[i].getBlue()*alpha) / talpha, talpha);
                     else
-                    	for(int i = 0; i < color.length; i++)
-                    		color[i].setTransparent();
+                        for (Color value : color) value.setTransparent();
                     	
                     return (talpha >= 254);   /* If only one short, no meaningful contribution left */
                 }

@@ -145,8 +145,7 @@ public class InhabitedHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for(int i = 0; i < color.length; i++)
-                color[i].setTransparent();
+            for (Color value : color) value.setTransparent();
         }
         /**
          * Process next ray step - called for each block on route

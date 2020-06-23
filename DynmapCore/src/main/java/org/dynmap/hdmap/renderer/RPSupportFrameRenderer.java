@@ -57,8 +57,8 @@ public class RPSupportFrameRenderer extends RPMicroRenderer {
         /* Get patches from any microblocks */
         if((covermask & 0x3FFFFFFF) != 0) {
             RenderPatch[] rp = super.getRenderPatchList(ctx);
-            for(int i = 0; i < rp.length; i++) {
-                list.add(rp[i]);
+            for (RenderPatch renderPatch : rp) {
+                list.add(renderPatch);
             }
         }
         return list.toArray(new RenderPatch[list.size()]);

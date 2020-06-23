@@ -2430,9 +2430,9 @@ public class TexturePack {
                 else if(line.startsWith("var:")) {  /* Test if variable declaration */
                     line = line.substring(4).trim();
                     String args[] = line.split(",");
-                    for(int i = 0; i < args.length; i++) {
-                        String[] v = args[i].split("=");
-                        if(v.length < 2) {
+                    for (String arg : args) {
+                        String[] v = arg.split("=");
+                        if (v.length < 2) {
                             Log.severe("Format error - line " + rdr.getLineNumber() + " of " + txtname);
                             return;
                         }
@@ -2506,28 +2506,23 @@ public class TexturePack {
                     int watercolormult = -1;
                     double rain = -1.0;
                     double tmp = -1.0;
-                    for(int i = 0; i < args.length; i++) {
-                        String[] v = args[i].split("=");
-                        if(v.length < 2) {
+                    for (String arg : args) {
+                        String[] v = arg.split("=");
+                        if (v.length < 2) {
                             Log.severe("Format error - line " + rdr.getLineNumber() + " of " + txtname);
                             return;
                         }
-                        if(v[0].equals("id")) {
-                            id = getIntValue(varvals, v[1]);   
-                        }
-                        else if(v[0].equals("grassColorMult")) {
+                        if (v[0].equals("id")) {
+                            id = getIntValue(varvals, v[1]);
+                        } else if (v[0].equals("grassColorMult")) {
                             grasscolormult = Integer.valueOf(v[1], 16);
-                        }
-                        else if(v[0].equals("foliageColorMult")) {
+                        } else if (v[0].equals("foliageColorMult")) {
                             foliagecolormult = Integer.valueOf(v[1], 16);
-                        }
-                        else if(v[0].equals("waterColorMult")) {
+                        } else if (v[0].equals("waterColorMult")) {
                             watercolormult = Integer.valueOf(v[1], 16);
-                        }
-                        else if(v[0].equals("temp")) {
+                        } else if (v[0].equals("temp")) {
                             tmp = Double.parseDouble(v[1]);
-                        }
-                        else if(v[0].equals("rain")) {
+                        } else if (v[0].equals("rain")) {
                             rain = Double.parseDouble(v[1]);
                         }
                     }

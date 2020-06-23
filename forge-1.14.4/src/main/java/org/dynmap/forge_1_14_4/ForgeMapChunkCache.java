@@ -884,27 +884,27 @@ public class ForgeMapChunkCache extends MapChunkCache
     		Field[] f = ServerChunkProvider.class.getDeclaredFields();
     		    		
     		f = ServerWorld.class.getDeclaredFields();
-    		for(int i = 0; i < f.length; i++) {
-    			if((updateEntityTick == null) && f[i].getType().isAssignableFrom(int.class)) {
-    				updateEntityTick = f[i];
-    				//Log.info("Found updateEntityTick - " + f[i].getName());
-    				updateEntityTick.setAccessible(true);
-    			}
-    		}
+            for (Field value : f) {
+                if ((updateEntityTick == null) && value.getType().isAssignableFrom(int.class)) {
+                    updateEntityTick = value;
+                    //Log.info("Found updateEntityTick - " + f[i].getName());
+                    updateEntityTick.setAccessible(true);
+                }
+            }
 
     		f = ChunkManager.class.getDeclaredFields();
-    		for(int i = 0; i < f.length; i++) {
-    		    if((chunksToRemove == null) && (f[i].getType().equals(Map.class))) {
-                    chunksToRemove = f[i];
+            for (Field field : f) {
+                if ((chunksToRemove == null) && (field.getType().equals(Map.class))) {
+                    chunksToRemove = field;
                     //Log.info("Found chunksToRemove - " + f[i].getName());
-    		        chunksToRemove.setAccessible(true);
-    		    }
+                    chunksToRemove.setAccessible(true);
+                }
 //    		    else if((pendingAnvilChunksCoordinates == null) && (f[i].getType().equals(it.unimi.dsi.fastutil.longs.LongSet.class))) {
 //                    //Log.info("Found pendingAnvilChunksCoordinates - " + f[i].getName());
 //    		        pendingAnvilChunksCoordinates = f[i];
 //    		        pendingAnvilChunksCoordinates.setAccessible(true);
 //    		    }
-    		}
+            }
 			if (updateEntityTick == null) {
 				Log.severe("ERROR: cannot find updateEntityTick - dynmap cannot drive entity cleanup when no players are active");
 			}
@@ -1472,11 +1472,9 @@ public class ForgeMapChunkCache extends MapChunkCache
         	
             String bs = b[i].getTranslationKey();
 
-            for (int j = 0; j < bm.length; j++)
-            {
-                if (bm[j].toString().equals(bs))
-                {
-                    biome_to_bmap[i] = bm[j];
+            for (BiomeMap biomeMap : bm) {
+                if (biomeMap.toString().equals(bs)) {
+                    biome_to_bmap[i] = biomeMap;
                     break;
                 }
             }

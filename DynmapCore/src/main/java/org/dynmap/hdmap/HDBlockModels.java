@@ -596,9 +596,9 @@ public class HDBlockModels {
                 else if(line.startsWith("var:")) {  /* Test if variable declaration */
                     line = line.substring(4).trim();
                     String args[] = line.split(",");
-                    for(int i = 0; i < args.length; i++) {
-                        String[] v = args[i].split("=");
-                        if(v.length < 2) {
+                    for (String arg : args) {
+                        String[] v = arg.split("=");
+                        if (v.length < 2) {
                             Log.severe("Format error - line " + rdr.getLineNumber() + " of " + fname);
                             return;
                         }

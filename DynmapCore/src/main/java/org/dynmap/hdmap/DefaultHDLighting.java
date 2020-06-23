@@ -28,21 +28,20 @@ public class DefaultHDLighting implements HDLighting {
     
     protected void checkGrayscale(Color[] outcolor) {
         if (grayscale) {
-        	for (int i = 0; i < outcolor.length; i++) {
-        		outcolor[i].setGrayscale();
-        		outcolor[i].scaleColor(graytonedark,graytone);
-        	}
+            for (Color color : outcolor) {
+                color.setGrayscale();
+                color.scaleColor(graytonedark, graytone);
+            }
         }
         else if (blackandwhite) {
-        	for (int i = 0; i < outcolor.length; i++) {
-        		outcolor[i].setGrayscale();
-        		if (outcolor[i].getRed() > blackthreshold) {
-        			outcolor[i].setColor(graytone);
-        		}
-        		else {
-        			outcolor[i].setColor(graytonedark);
-        		}
-        	}        	
+            for (Color color : outcolor) {
+                color.setGrayscale();
+                if (color.getRed() > blackthreshold) {
+                    color.setColor(graytone);
+                } else {
+                    color.setColor(graytonedark);
+                }
+            }
         }
     }
 
@@ -51,8 +50,7 @@ public class DefaultHDLighting implements HDLighting {
     
     /* Apply lighting to given pixel colors (1 outcolor if normal, 2 if night/day) */
     public void    applyLighting(HDPerspectiveState ps, HDShaderState ss, Color incolor, Color[] outcolor) {
-        for(int i = 0; i < outcolor.length; i++)
-            outcolor[i].setColor(incolor);
+        for (Color color : outcolor) color.setColor(incolor);
         checkGrayscale(outcolor);
     }
     

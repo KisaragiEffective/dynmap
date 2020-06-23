@@ -219,9 +219,9 @@ public class Client {
                 else if (c == 'r') { // reset
                     magic = false;
                 }
-                for (int j = 0; j < codes.length; j++) {
-                    if (codes[j][0].charAt(0) == c) {   // Matching code?
-                        sb.append(codes[j][1]); // Substitute
+                for (String[] code : codes) {
+                    if (code[0].charAt(0) == c) {   // Matching code?
+                        sb.append(code[1]); // Substitute
                         spancnt++;
                         break;
                     }
@@ -240,9 +240,9 @@ public class Client {
                     else if (c == 'r') { // reset
                         magic = false;
                     }
-                    for (int j = 0; j < codes.length; j++) {
-                        if (codes[j][0].charAt(0) == c) {   // Matching code?
-                            sb.append(codes[j][1]); // Substitute
+                    for (String[] code : codes) {
+                        if (code[0].charAt(0) == c) {   // Matching code?
+                            sb.append(code[1]); // Substitute
                             spancnt++;
                             break;
                         }

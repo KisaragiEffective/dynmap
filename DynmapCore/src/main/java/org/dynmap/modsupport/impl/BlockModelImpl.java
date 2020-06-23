@@ -26,8 +26,8 @@ public abstract class BlockModelImpl implements BlockModel {
     @Override
     public void addBlockID(int blockID) {
         if (blockID > 0) {
-            for (int i = 0; i < ids.length; i++) {
-                if (ids[i] == blockID) {
+            for (int id : ids) {
+                if (id == blockID) {
                     return;
                 }
             }
@@ -42,8 +42,8 @@ public abstract class BlockModelImpl implements BlockModel {
      */
     @Override
     public void addBlockName(String blockname) {
-        for (int i = 0; i < names.length; i++) {
-            if (names[i].equals(blockname)) {
+        for (String name : names) {
+            if (name.equals(blockname)) {
                 return;
             }
         }
@@ -112,11 +112,11 @@ public abstract class BlockModelImpl implements BlockModel {
             }
         }
         // Add names
-        for (int i = 0; i < names.length; i++) {
+        for (String name : names) {
             if (s.length() > 0) {
                 s += ",";
             }
-            s += "id=%" + names[i];
+            s += "id=%" + name;
         }
         // Add meta
         if (this.metaMask == METAMASK_ALL) {

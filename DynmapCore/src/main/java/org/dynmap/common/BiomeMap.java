@@ -121,9 +121,9 @@ public class BiomeMap {
     }
 
     private static boolean isUniqueID(String id) {
-        for(int i = 0; i < biome_by_index.length; i++) {
-            if(biome_by_index[i] == null) continue;
-            if(biome_by_index[i].id.equals(id))
+        for (BiomeMap biomeByIndex : biome_by_index) {
+            if (biomeByIndex == null) continue;
+            if (biomeByIndex.id.equals(id))
                 return false;
         }
         return true;
