@@ -115,7 +115,7 @@ public class FluidStateRenderer extends CustomRenderer {
         		cnt++;
         	}
     	}
-    	else if (b1.isSolid() == false) {
+    	else if (!b1.isSolid()) {
     		accum += 9;
     		cnt += 1;
     	}
@@ -130,7 +130,7 @@ public class FluidStateRenderer extends CustomRenderer {
         		cnt++;
         	}
     	}
-    	else if (b2.isSolid() == false) {
+    	else if (!b2.isSolid()) {
     		accum += 9;
     		cnt += 1;
     	}
@@ -145,7 +145,7 @@ public class FluidStateRenderer extends CustomRenderer {
         		cnt++;
         	}
     	}
-    	else if (b3.isSolid() == false) {
+    	else if (!b3.isSolid()) {
     		accum += 9;
     		cnt += 1;
     	}

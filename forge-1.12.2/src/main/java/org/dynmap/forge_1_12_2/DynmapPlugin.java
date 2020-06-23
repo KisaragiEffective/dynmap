@@ -895,7 +895,7 @@ public class DynmapPlugin
                 Log.severe(ix);
                 return null;
             }
-            if(w.isLoaded() == false) {
+            if(!w.isLoaded()) {
             	return null;
             }
             // Now, do rest of chunk reading from calling thread
@@ -1718,7 +1718,7 @@ public class DynmapPlugin
 				int ymax = 0;
 				ExtendedBlockStorage[] sections = c.getBlockStorageArray();
 				for(int i = 0; i < sections.length; i++) {
-					if((sections[i] != null) && (sections[i].isEmpty() == false)) {
+					if((sections[i] != null) && (!sections[i].isEmpty())) {
 						ymax = 16*(i+1);
 					}
 				}
@@ -1744,7 +1744,7 @@ public class DynmapPlugin
 
                 ExtendedBlockStorage[] sections = c.getBlockStorageArray();
 				for(int i = 0; i < sections.length; i++) {
-					if((sections[i] != null) && (sections[i].isEmpty() == false)) {
+					if((sections[i] != null) && (!sections[i].isEmpty())) {
 						ymax = 16*(i+1);
 					}
 				}

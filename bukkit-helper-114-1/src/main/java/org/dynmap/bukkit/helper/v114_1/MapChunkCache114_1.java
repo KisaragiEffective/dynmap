@@ -347,7 +347,7 @@ public class MapChunkCache114_1 extends AbstractMapChunkCache {
     // Load chunk snapshots
     @Override
     public int loadChunks(int max_to_load) {
-        if(dw.isLoaded() == false)
+        if(!dw.isLoaded())
             return 0;        
         int cnt = 0;
         if(iterator == null)

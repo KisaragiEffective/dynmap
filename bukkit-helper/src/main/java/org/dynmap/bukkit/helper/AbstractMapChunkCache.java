@@ -742,7 +742,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
 
     // Load chunk snapshots
     public int loadChunks(int max_to_load) {
-        if(dw.isLoaded() == false)
+        if(!dw.isLoaded())
             return 0;
         Object queue = BukkitVersionHelper.helper.getUnloadQueue(w);
         
@@ -935,7 +935,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
      * Test if done loading
      */
     public boolean isDoneLoading() {
-        if(dw.isLoaded() == false) {
+        if(!dw.isLoaded()) {
             isempty = true;
             unloadChunks();
             return true;

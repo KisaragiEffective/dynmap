@@ -3062,7 +3062,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
             }
             HashMap<String, Object> markers = new HashMap<String, Object>();
             for(Marker m : ms.getMarkers()) {
-                if(m.getWorld().equals(wname) == false) continue;
+                if(!m.getWorld().equals(wname)) continue;
                 
                 HashMap<String, Object> mdata = new HashMap<String, Object>();
                 mdata.put("x", m.getX());
@@ -3090,7 +3090,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
 
             HashMap<String, Object> areas = new HashMap<String, Object>();
             for(AreaMarker m : ms.getAreaMarkers()) {
-                if(m.getWorld().equals(wname) == false) continue;
+                if(!m.getWorld().equals(wname)) continue;
                 
                 HashMap<String, Object> mdata = new HashMap<String, Object>();
                 int cnt = m.getCornerCount();
@@ -3126,7 +3126,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
 
             HashMap<String, Object> lines = new HashMap<String, Object>();
             for(PolyLineMarker m : ms.getPolyLineMarkers()) {
-                if(m.getWorld().equals(wname) == false) continue;
+                if(!m.getWorld().equals(wname)) continue;
                 
                 HashMap<String, Object> mdata = new HashMap<String, Object>();
                 int cnt = m.getCornerCount();
@@ -3161,7 +3161,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
 
             HashMap<String, Object> circles = new HashMap<String, Object>();
             for(CircleMarker m : ms.getCircleMarkers()) {
-                if(m.getWorld().equals(wname) == false) continue;
+                if(!m.getWorld().equals(wname)) continue;
                 
                 HashMap<String, Object> mdata = new HashMap<String, Object>();
                 mdata.put("x", m.getCenterX());

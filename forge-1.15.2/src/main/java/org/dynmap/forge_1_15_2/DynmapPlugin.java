@@ -909,7 +909,7 @@ public class DynmapPlugin
                 Log.severe(ix);
                 return null;
             }
-            if(w.isLoaded() == false) {
+            if(!w.isLoaded()) {
             	return null;
             }
             // Now, do rest of chunk reading from calling thread
