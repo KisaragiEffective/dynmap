@@ -280,8 +280,8 @@ public class HDBlockModels {
                     throw new NumberFormatException("invalid ID - " + val);
                 }
             }
-            if((offset != 0) && (v.intValue() > 0))
-                v = v.intValue() + offset;
+            if((offset != 0) && (v > 0))
+                v = v + offset;
             return v;
         }
         else {

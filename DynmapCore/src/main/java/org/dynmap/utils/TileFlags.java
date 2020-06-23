@@ -28,7 +28,7 @@ public class TileFlags {
 	    ArrayList<String> v = new ArrayList<String>();
 	    StringBuilder sb = new StringBuilder();
 	    for(Map.Entry<Long, long[]> ent : chunkmap.entrySet()) {
-	        long v1 = ent.getKey().longValue();
+	        long v1 = ent.getKey();
 	        sb.append(String.format("%x/%x", ((v1>>32)&0xFFFFFFFFL), (v1 & 0xFFFFFFFFL) ));
 	        long[] val = ent.getValue();
 	        for(long vv : val) {

@@ -184,7 +184,7 @@ public class RPMicroRenderer extends CustomRenderer {
         byte[] covervals = new byte[2*29];
         Object v = ctx.getBlockTileEntityField("cvm");
         if(v instanceof Integer) {
-            covermask = ((Integer)v).intValue();
+            covermask = (Integer) v;
         }
         v = ctx.getBlockTileEntityField("cvs");
         if(v instanceof byte[]) {

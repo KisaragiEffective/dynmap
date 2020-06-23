@@ -113,7 +113,7 @@ public class FrameRenderer extends CustomRenderer {
                 }
                 txtIndex = new int[map.size()];
                 for(int id = 0; id < txtIndex.length; id++) {
-                    txtIndex[id] = map.get(id).intValue() + txtOffset;
+                    txtIndex[id] = map.get(id) + txtOffset;
                 }
                 txtCount = txtIndex.length;
             }

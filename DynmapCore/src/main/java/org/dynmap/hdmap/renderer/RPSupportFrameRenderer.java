@@ -31,7 +31,7 @@ public class RPSupportFrameRenderer extends RPMicroRenderer {
         int covermask = 0;
         Object v = ctx.getBlockTileEntityField("cvm");
         if(v instanceof Integer) {
-            covermask = ((Integer)v).intValue();
+            covermask = (Integer) v;
         }
         RenderPatchFactory rpf = ctx.getPatchFactory();
         ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();

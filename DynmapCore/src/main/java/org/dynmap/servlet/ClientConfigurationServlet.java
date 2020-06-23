@@ -74,7 +74,7 @@ public class ClientConfigurationServlet extends HttpServlet {
                     for (JSONObject m : (Iterable<JSONObject>) mlist) {
                         Boolean prot = (Boolean) g(m, "protected");
                         /* If not protected, leave it in */
-                        if ((prot == null) || (!prot.booleanValue())) {
+                        if ((prot == null) || (!prot)) {
                             newmlist.add(m);
                             continue;
                         }

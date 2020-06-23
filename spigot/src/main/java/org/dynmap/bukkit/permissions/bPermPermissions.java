@@ -42,12 +42,12 @@ public class bPermPermissions extends BukkitPermissions {
                 String permval = name + "." + pp;
                 Boolean v = p.get(permval);
                 if (v != null) {
-                    if(v.booleanValue())
+                    if(v)
                         hasperms.add(permval);
                 }
                 else {
                     v = pd.get(permval);
-                    if((v != null) && v.booleanValue())
+                    if((v != null) && v)
                         hasperms.add(permval);
                 }
             }

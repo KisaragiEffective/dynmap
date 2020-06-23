@@ -1822,7 +1822,7 @@ public class DynmapPlugin
             	if (fw == null) continue;
             	Long2ObjectLinkedOpenHashMap<ChunkHolder> chunks = world.getChunkProvider().chunkManager.immutableLoadedChunks;
             	for (Entry<Long, ChunkHolder> k : chunks.long2ObjectEntrySet()) {
-            		long key = k.getKey().longValue();
+            		long key = k.getKey();
             		ChunkHolder ch = k.getValue();
             		IChunk c = null;
             		try {

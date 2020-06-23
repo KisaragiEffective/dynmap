@@ -1116,7 +1116,7 @@ public class CTMTexturePack {
             idx = (mapiter.getBlockKey() << 8) | laststep.ordinal();
             Integer val = (Integer) cache.get(idx);
             if (val != null) {
-                return val.intValue();
+                return val;
             }
         }
             

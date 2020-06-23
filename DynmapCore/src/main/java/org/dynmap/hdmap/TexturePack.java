@@ -565,7 +565,7 @@ public class TexturePack {
             if(ti.blocknames.isEmpty()) continue;
             int[] txtids = new int[ti.texture_ids.size()];
             for(int i = 0; i < txtids.length; i++) {
-                txtids[i] = ti.texture_ids.get(i).intValue();
+                txtids[i] = ti.texture_ids.get(i);
             }
             HDBlockStateTextureMap map = new HDBlockStateTextureMap(txtids, null, ti.colorMult, ti.custColorMult, ti.blockset, true, null, ti.trans);
             map.addToTable(ti.blocknames, ti.stateids);
@@ -583,7 +583,7 @@ public class TexturePack {
         if(map != null) {
             Integer txtidx = map.key_to_index.get(key);
             if(txtidx != null) {
-                idx = txtidx.intValue();
+                idx = txtidx;
             }
         }
         return idx;
@@ -1763,8 +1763,8 @@ public class TexturePack {
                     throw new NumberFormatException("invalid ID - " + val);
                 }
             }
-            if((offset != 0) && (v.intValue() > 0))
-                v = v.intValue() + offset;
+            if((offset != 0) && (v > 0))
+                v = v + offset;
             return v;
         }
         else {
@@ -2873,7 +2873,7 @@ public class TexturePack {
         // If block has custom coloring
         if (hasblockcoloring) {
             Integer idx = this.blockColoring.getBlkStateValue(blk);
-            LoadedImage img = imgs[idx.intValue()];
+            LoadedImage img = imgs[idx];
             if (img.argb != null) {
                 custclrmult = mapiter.getSmoothWaterColorMultiplier(img.argb);
             }
@@ -3268,7 +3268,7 @@ public class TexturePack {
     public int getCustomBlockMultiplier(DynmapBlockState blk) {
         Integer idx = this.blockColoring.getBlkStateValue(blk);
         if (idx != null) {
-            LoadedImage img = imgs[idx.intValue()];
+            LoadedImage img = imgs[idx];
             if (img.argb != null) {
                 return img.argb[BiomeMap.FOREST.biomeLookup()];
             }
@@ -3443,7 +3443,7 @@ public class TexturePack {
         int custclrmult = -1;
         // If block has custom coloring
         if (blockcoloring != null) {
-            LoadedImage img = imgs[blockcoloring.intValue()];
+            LoadedImage img = imgs[blockcoloring];
             if (img.argb != null) {
                 custclrmult = mapiter.getSmoothWaterColorMultiplier(img.argb);
             }
@@ -3588,7 +3588,7 @@ public class TexturePack {
         }
         Integer idx = this.blockColoring.getBlkStateValue(blk);
         if (idx != null) {
-            LoadedImage custimg = imgs[idx.intValue()];
+            LoadedImage custimg = imgs[idx];
             if (custimg.argb != null) {
                 mult = Color.blendColor(mult, custimg.argb[biome.biomeLookup()]);
             }
@@ -3628,7 +3628,7 @@ public class TexturePack {
                 matIDByTileID.put(tileid, id);
                 return;
             }
-            else if ((v != null) && (v.intValue() == tileid)) {
+            else if ((v != null) && (v == tileid)) {
                 return;
             }
             id = baseid + "_" + cnt;

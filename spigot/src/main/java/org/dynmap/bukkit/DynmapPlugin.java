@@ -511,7 +511,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
                     Log.severe(ix);
                     return null;
                 }
-                if((delay != null) && delay.booleanValue()) {
+                if((delay != null) && delay) {
                     try { Thread.sleep(25); } catch (InterruptedException ix) {}
                 }
             }
@@ -534,7 +534,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
                 try {
                     Object rslt =ismodloaded.invoke(null,  name);
                     if(rslt instanceof Boolean) {
-                        if(((Boolean)rslt).booleanValue()) {
+                        if((Boolean) rslt) {
                             modsused.add(name);
                             return true;
                         }

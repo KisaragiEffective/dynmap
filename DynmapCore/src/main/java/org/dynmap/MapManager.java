@@ -1376,7 +1376,7 @@ public class MapManager {
         	int insertIndex;
         	for(insertIndex = 0; insertIndex < worlds.size(); insertIndex++) {
         		Integer nextWorldIndex = indexLookup.get(worlds.get(insertIndex).getName());
-        		if (nextWorldIndex == null || worldIndex < nextWorldIndex.intValue()) {
+        		if (nextWorldIndex == null || worldIndex < nextWorldIndex) {
         			break;
        			}
         	}
