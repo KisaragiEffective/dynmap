@@ -253,8 +253,8 @@ public class ImmibisMicroRenderer extends CustomRenderer {
         NEGATIVE,
         POSITIVE,
         SPAN
-    };
-    
+    }
+
     private static final AxisPos axes_by_pos[][] = {
         { AxisPos.CENTER, AxisPos.CENTER, AxisPos.CENTER }, // Centre
         { AxisPos.NEGATIVE, AxisPos.SPAN, AxisPos.SPAN }, // FaceNX

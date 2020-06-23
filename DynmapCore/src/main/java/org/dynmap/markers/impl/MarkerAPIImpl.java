@@ -735,8 +735,8 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
         return true;
     }
     
-    enum MarkerUpdate { CREATED, UPDATED, DELETED };
-    
+    enum MarkerUpdate { CREATED, UPDATED, DELETED }
+
     /**
      * Signal marker update
      * @param marker - updated marker

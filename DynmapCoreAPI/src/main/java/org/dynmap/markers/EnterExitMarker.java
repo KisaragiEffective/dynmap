@@ -4,8 +4,9 @@ public interface EnterExitMarker {
 	class EnterExitText {
 		public String title;
 		public String subtitle;
-	};
-	/**
+	}
+
+    /**
 	 * Greeting text, if defined
 	 */
     EnterExitText getGreetingText();
@@ -25,4 +26,4 @@ public interface EnterExitMarker {
 	 * Test if point is inside marker volume
 	 */
     boolean testIfPointWithinMarker(String worldid, double x, double y, double z);
-};
+}

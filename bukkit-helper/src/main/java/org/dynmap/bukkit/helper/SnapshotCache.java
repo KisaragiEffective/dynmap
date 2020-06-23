@@ -19,7 +19,7 @@ public class SnapshotCache {
         public Snapshot ss;
         public long inhabitedTicks;
         public DynIntHashMap tileData;
-    };
+    }
 
     private CacheHashMap snapcache;
     private ReferenceQueue<SnapshotRec> refqueue;

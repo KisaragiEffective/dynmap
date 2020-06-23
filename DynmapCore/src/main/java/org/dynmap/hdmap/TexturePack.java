@@ -219,8 +219,8 @@ public class TexturePack {
         TILESET,
         BIOME,
         BED	// 1.13 bed texture
-    };
-    
+    }
+
     // Material type: used for setting advanced rendering/export characteristics for image in given file
     // (e.g. reflective surfaces, index of refraction, etc)
     public static enum MaterialType {
@@ -833,7 +833,8 @@ public class TexturePack {
             }
         }
     }
-    private enum HandlePos { CENTER, LEFT, RIGHT, NONE, LEFTFRONT, RIGHTFRONT };
+    private enum HandlePos { CENTER, LEFT, RIGHT, NONE, LEFTFRONT, RIGHTFRONT }
+
     /**
      * Make chest side image (based on chest and largechest layouts)
      * @param img_id - source image ID

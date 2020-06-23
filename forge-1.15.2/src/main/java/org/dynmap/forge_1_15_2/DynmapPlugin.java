@@ -1163,8 +1163,8 @@ public class DynmapPlugin
         public String getName()
         {
         	if(player != null) {
-        		String n = player.getEntity().getName().getString();;
-        		return n;
+        		String n = player.getEntity().getName().getString();
+                return n;
         	}
         	else
         		return "[Server]";

@@ -16,7 +16,8 @@ import org.dynmap.renderer.RenderPatchFactory;
 public class ChestRenderer extends CustomRenderer {
     protected enum ChestData {
         SINGLE_WEST, SINGLE_SOUTH, SINGLE_EAST, SINGLE_NORTH, LEFT_WEST, LEFT_SOUTH, LEFT_EAST, LEFT_NORTH, RIGHT_WEST, RIGHT_SOUTH, RIGHT_EAST, RIGHT_NORTH
-    };
+    }
+
     // Models, indexed by ChestData.ordinal()
     protected RenderPatch[][] models = new RenderPatch[ChestData.values().length][];
 

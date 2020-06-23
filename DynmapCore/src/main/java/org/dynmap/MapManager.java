@@ -101,7 +101,8 @@ public class MapManager {
     	DynmapPlayer player;
     	ArrayList<TextQueueRec> queue = new ArrayList<TextQueueRec>();
     	int tickdelay;    	
-    };    
+    }
+
     private HashMap<UUID, SendQueueRec> entersetsendqueue = new HashMap<UUID, SendQueueRec>();
 
     private boolean did_start = false;

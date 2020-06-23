@@ -14,7 +14,7 @@ import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 public class RedstoneWireRenderer extends CustomRenderer {
     private static final int TEXTURE_REDSTONE_STRAIGHT = 0;
     private static final int TEXTURE_REDSTONE_CROSS = 1;
-    private DynmapBlockState blkbs;;
+    private DynmapBlockState blkbs;
 
     // Patches for bottom - indexed by connection graph (bit0=N,bit1=S,bit2=E,bit3=W)
     private RenderPatch[] bottom_patches = new RenderPatch[16];

@@ -1,8 +1,8 @@
 package org.dynmap.renderer;
 
 public interface RenderPatchFactory {
-    enum SideVisible { TOP, BOTTOM, BOTH, FLIP };
-    
+    enum SideVisible { TOP, BOTTOM, BOTH, FLIP }
+
     /**
      * Get/create patch with given attributes.
      * 

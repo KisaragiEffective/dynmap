@@ -1078,8 +1078,8 @@ public class DynmapCore implements DynmapCommonAPI {
         public boolean matches(String c) {
             return cmd.equals(c);
         }
-    };
-    
+    }
+
     private static final CommandInfo[] commandinfo = {
         new CommandInfo("dynmap", "", "Control execution of dynmap."),
         new CommandInfo("dynmap", "hide", "Hides the current player from the map."),

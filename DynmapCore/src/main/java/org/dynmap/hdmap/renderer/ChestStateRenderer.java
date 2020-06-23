@@ -16,7 +16,7 @@ import org.dynmap.renderer.RenderPatchFactory;
 public class ChestStateRenderer extends ChestRenderer {
     protected enum ChestData {
         SINGLE_WEST, SINGLE_SOUTH, SINGLE_EAST, SINGLE_NORTH, LEFT_WEST, LEFT_SOUTH, LEFT_EAST, LEFT_NORTH, RIGHT_WEST, RIGHT_SOUTH, RIGHT_EAST, RIGHT_NORTH
-    };
+    }
 
     private ChestData[] byIndex = { 
             ChestData.SINGLE_NORTH, ChestData.RIGHT_NORTH, ChestData.LEFT_NORTH, 

@@ -14,7 +14,7 @@ public class SnapshotCache {
     public static class SnapshotRec {
         public ChunkSnapshot ss;
         public DynIntHashMap tileData;
-    };
+    }
 
     private CacheHashMap snapcache;
     private ReferenceQueue<SnapshotRec> refqueue;

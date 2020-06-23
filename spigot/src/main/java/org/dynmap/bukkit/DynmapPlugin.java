@@ -187,7 +187,8 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         int typeid;
         byte data;
         String trigger;
-    };
+    }
+
     private LinkedList<BlockToCheck> blocks_to_check = null;
     private LinkedList<BlockToCheck> blocks_to_check_accum = new LinkedList<BlockToCheck>();
     

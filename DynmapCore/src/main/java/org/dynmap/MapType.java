@@ -86,8 +86,8 @@ public abstract class MapType {
             }
             return null;
         }
-    };
-    
+    }
+
     public static class ZoomInfo {
         public String prefix;
         public int  background_argb;
