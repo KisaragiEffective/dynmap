@@ -33,7 +33,7 @@ public class DynmapBlockState {
     private static int nextGlobalStateIndex = 0;
     // Match flags
     private int matchflags;
-    private static int MATCH_AIR = 1 << 0;
+    private static int MATCH_AIR = 1    ;
     private static int MATCH_WATER = 1 << 1;
     private static int MATCH_SNOW = 1 << 2;
     private static int MATCH_LOG = 1 << 3;

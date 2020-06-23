@@ -146,7 +146,7 @@ public class CTMTexturePack {
     public enum CTMConnect {
         NONE, BLOCK, TILE, MATERIAL, UNKNOWN
     }
-    public static final int FACE_BOTTOM = (1 << 0);
+    public static final int FACE_BOTTOM = (1    );
     public static final int FACE_TOP = (1 << 1);
     public static final int FACE_NORTH = (1 << 2);
     public static final int FACE_SOUTH = (1 << 3);

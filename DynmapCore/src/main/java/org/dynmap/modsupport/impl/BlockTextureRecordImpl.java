@@ -30,22 +30,22 @@ public class BlockTextureRecordImpl implements BlockTextureRecord {
         1<<4,     // FACE_1
         1<<2,     // FACE_2
         1<<5,     // FACE_3
-        1<<0,     // FACE_4
+        1   ,     // FACE_4
         1<<3,     // FACE_5
         1<<1,     // BOTTOM
         1<<4,     // TOP
         1<<2,     // NORTH
         1<<5,     // SOUTH
-        1<<0,     // WEST
+        1   ,     // WEST
         1<<3,     // EAST
         1<<1,     // Y_MINUS
         1<<4,     // Y_PLUS
         1<<2,     // Z_MINUS
         1<<5,     // Z_PLUS
-        1<<0,     // X_MINUS
+        1   ,     // X_MINUS
         1<<3,     // X_PLUS
-        (1<<2) | (1<<5) | (1<<0) | (1<<3),   // ALLSIDES
-        (1<<0) | (1<<1) | (1<<2) | (1<<3) | (1<<4) | (1<<5) // ALLFACES
+        (1<<2) | (1<<5) | (1   ) | (1<<3),   // ALLSIDES
+        (1   ) | (1<<1) | (1<<2) | (1<<3) | (1<<4) | (1<<5) // ALLFACES
     };
     
     public static final int COLORMOD_GRASSTONED = 1;
