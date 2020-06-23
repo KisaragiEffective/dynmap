@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class HandlerRouter extends AbstractHandler {
 
-    PathMap<?> pathMap = new PathMap<Object>();
+    PathMap<Object> pathMap = new PathMap<Object>();
     public HandlerRouter() {
     }
     
