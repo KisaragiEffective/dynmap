@@ -1122,7 +1122,7 @@ public class IsoHDPerspective implements HDPerspective {
          * 6 = bottom-upper-right (XYz), 
          * 7 = top-upper-right (XYZ) */  
         Vector3D[] corners = new Vector3D[8];
-        double dx = -basemodscale, dy = -basemodscale;    /* Add 1 block on each axis */
+        double dx = -basemodscale, dy;    /* Add 1 block on each axis */
         for(int x = t.tx, idx = 0; x <= (t.tx+1); x++) {
             dy = -basemodscale;
             for(int y = t.ty; y <= (t.ty+1); y++) {

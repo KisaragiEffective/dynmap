@@ -27,7 +27,7 @@ public class DefaultHDShader implements HDShader {
     public enum BiomeColorOption {
         NONE, BIOME, TEMPERATURE, RAINFALL
     }
-    protected BiomeColorOption biomecolored = BiomeColorOption.NONE; /* Use biome for coloring */
+    protected BiomeColorOption biomecolored; /* Use biome for coloring */
     
     public DefaultHDShader(DynmapCore core, ConfigurationNode configuration) {
         name = (String) configuration.get("name");

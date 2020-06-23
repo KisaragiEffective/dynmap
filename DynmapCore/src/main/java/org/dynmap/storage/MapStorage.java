@@ -182,7 +182,6 @@ public abstract class MapStorage {
         }
         if (accum > 0) {    // Remainder?
             crc32.update(crcworkbuf, 0, accum);
-            accum = 0;
         }
         return crc32.getValue();
     }

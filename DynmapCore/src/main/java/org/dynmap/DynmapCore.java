@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -655,7 +656,7 @@ public class DynmapCore implements DynmapCommonAPI {
                         }
                         c.blendColor(custmult);
                     }
-                    String ln = "";
+                    String ln;
                     if (blk.stateIndex == 0) {
                         meta0color = c.getARGB();
                         ln = blk.blockName + " ";
@@ -995,10 +996,7 @@ public class DynmapCore implements DynmapCommonAPI {
     public static String[] parseArgs(String[] args, DynmapCommandSender snd) {
         ArrayList<String> rslt = new ArrayList<String>();
         /* Build command line, so we can parse our way - make sure there is trailing space */
-        String cmdline = "";
-        for (String arg : args) {
-            cmdline += arg + " ";
-        }
+        String cmdline = String.join(" ", args);
         boolean inquote = false;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < cmdline.length(); i++) {
@@ -1209,15 +1207,17 @@ public class DynmapCore implements DynmapCommonAPI {
             }
         }
         String subcmdlist = " Valid subcommands:";
-        TreeSet<String> ts = new TreeSet<String>();
+        TreeSet<String> treeSet = new TreeSet<String>();
         for(CommandInfo ci : commandinfo) {
             if(ci.matches(cmd)) {
-                ts.add(ci.subcmd);
+                treeSet.add(ci.subcmd);
             }
         }
-        for(String sc : ts) {
-            subcmdlist += " " + sc;
+        if (!treeSet.isEmpty()) {
+            subcmdlist += " ";
         }
+
+        subcmdlist += String.join(" ", treeSet);
         sender.sendMessage(subcmdlist);
     }
     
@@ -1301,7 +1301,7 @@ public class DynmapCore implements DynmapCommonAPI {
                     if(w == null) {
                         sender.sendMessage("World '" + args[1] + "' not defined/loaded");
                     }
-                    int x = 0, z = 0;
+                    int x, z;
                     try {
                         x = Integer.parseInt(args[2]);
                     } catch (NumberFormatException nfe) {
@@ -1345,7 +1345,7 @@ public class DynmapCore implements DynmapCommonAPI {
                     if(w == null) {
                         sender.sendMessage("World '" + args[1] + "' not defined/loaded");
                     }
-                    int x = 0, z = 0;
+                    int x, z;
                     try {
                         x = Integer.parseInt(args[2]);
                     } catch (NumberFormatException nfe) {
@@ -1548,7 +1548,7 @@ public class DynmapCore implements DynmapCommonAPI {
             } else if((c.equals("add-id-for-ip") && checkPlayerPermission(sender, "add-id-for-ip")) ||
                     (c.equals("del-id-for-ip") && checkPlayerPermission(sender, "del-id-for-ip"))) {
                 if(args.length > 2) {
-                    String ipaddr = "";
+                    String ipaddr;
                     try {
                         InetAddress ip = InetAddress.getByName(args[2]);
                         ipaddr = ip.getHostAddress();
@@ -2372,15 +2372,12 @@ public class DynmapCore implements DynmapCommonAPI {
         } finally {
             if (ins != null) {
                 try { ins.close(); } catch (IOException iox) {}
-                ins = null;
             }
             if (fos != null) {
                 try { fos.close(); } catch (IOException iox) {}
-                fos = null;
             }
             if (zf != null) {
                 try { zf.close(); } catch (IOException iox) {}
-                zf = null;
             }
         }
         

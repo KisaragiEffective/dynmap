@@ -66,7 +66,7 @@ public class VersionCheck {
                 loc = conn.getHeaderField("Location");
             }
             BufferedReader rdr = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line = null;
+            String line;
             while((line = rdr.readLine()) != null) {
                 String[] split = line.split(":");
                 if(split.length < 4) continue;

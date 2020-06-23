@@ -258,7 +258,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         @Override
         public final int getSmoothGrassColorMultiplier(int[] colormap)
         {
-            int mult = 0xFFFFFF;
+            int mult;
 
             try
             {
@@ -301,7 +301,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         @Override
         public final int getSmoothFoliageColorMultiplier(int[] colormap)
         {
-            int mult = 0xFFFFFF;
+            int mult;
 
             try
             {
@@ -344,7 +344,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         @Override
         public final int getSmoothColorMultiplier(int[] colormap, int[] swampmap)
         {
-            int mult = 0xFFFFFF;
+            int mult;
 
             try
             {
@@ -441,7 +441,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         @Override
         public final int getSmoothWaterColorMultiplier(int[] colormap)
         {
-            int mult = 0xFFFFFF;
+            int mult;
 
             try
             {
@@ -1047,8 +1047,8 @@ public class ForgeMapChunkCache extends MapChunkCache
         }
         try {
             AnvilChunkLoader acl = (AnvilChunkLoader)cps.chunkLoader;
-            Map<?,?> chunkstoremove = null;
-            Set<?> pendingcoords = null;
+            Map<?,?> chunkstoremove;
+            Set<?> pendingcoords;
             
             chunkstoremove = (Map<?,?>)chunksToRemove.get(acl);
             pendingcoords = (Set<?>)pendingAnvilChunksCoordinates.get(acl);
@@ -1199,7 +1199,7 @@ public class ForgeMapChunkCache extends MapChunkCache
     
     private boolean tryChunkCache(DynmapChunk chunk, boolean vis) {
         /* Check if cached chunk snapshot found */
-        ChunkSnapshot ss = null;
+        ChunkSnapshot ss;
         SnapshotRec ssr = DynmapPlugin.plugin.sscache.getSnapshot(dw.getName(), chunk.x, chunk.z, blockdata, biome, biomeraw, highesty); 
         if(ssr != null) {
             ss = ssr.ss;

@@ -153,7 +153,7 @@ public class ChunkSnapshot
             StdSection cursect = new StdSection();
             this.section[secnum] = cursect;
             DynmapBlockState[] states = cursect.states;
-            DynmapBlockState[] palette = null;
+            DynmapBlockState[] palette;
             // If we've got palette and block states list, process non-empty section
             if (sec.contains("Palette", 9) && sec.contains("BlockStates", 12)) {
                 NBTTagList plist = sec.getList("Palette", 10);

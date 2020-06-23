@@ -342,7 +342,6 @@ public class SQLiteMapStorage extends MapStorage {
             err = true;
         } finally {
             releaseConnection(c, err);
-            c = null;
         }
     }
     
@@ -409,7 +408,6 @@ public class SQLiteMapStorage extends MapStorage {
                 return false;
             } finally {
                 releaseConnection(c, err);
-                c = null;
             }
         }
         else if (version == 1) {	// Add ImageLen columns
@@ -425,7 +423,6 @@ public class SQLiteMapStorage extends MapStorage {
                 return false;
             } finally {
                 releaseConnection(c, err);
-                c = null;
             }
         }
         // Load maps table - cache results

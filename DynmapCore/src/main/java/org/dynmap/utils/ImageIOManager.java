@@ -224,7 +224,6 @@ public class ImageIOManager {
             } finally {
                 if(fis != null) {
                     try { fis.close(); } catch (IOException io) {}
-                    fis = null;
                 }
             }
             if(!done) {

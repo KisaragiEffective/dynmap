@@ -8,7 +8,7 @@ public class Events {
     @SuppressWarnings("unchecked")
     public <T> void addListener(String eventName, Event.Listener<T> listener) {
         Event<?> genericEvent = events.get(eventName);
-        Event<T> event = null;
+        Event<T> event;
         if (genericEvent != null) {
             event = (Event<T>)genericEvent;
         } else {
@@ -20,7 +20,7 @@ public class Events {
     @SuppressWarnings("unchecked")
     public <T> void removeListener(String eventName, Event.Listener<T> listener) {
         Event<?> genericEvent = events.get(eventName);
-        Event<T> event = null;
+        Event<T> event;
         if (genericEvent != null) {
             event = (Event<T>)genericEvent;
             event.removeListener(listener);

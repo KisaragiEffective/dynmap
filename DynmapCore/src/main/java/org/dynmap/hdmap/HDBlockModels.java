@@ -209,7 +209,6 @@ public class HDBlockModels {
                     }
                     if (zf != null) {
                         try { zf.close(); } catch (IOException e) { }
-                        zf = null;
                     }
                 }
             }
@@ -255,11 +254,9 @@ public class HDBlockModels {
         } finally {
             if (in != null) {
                 try { in.close(); } catch (IOException iox) {}
-                in = null;
             }
             if (zf != null) {
                 try { zf.close(); } catch (IOException iox) {}
-                zf = null;
             }
         }
     }
@@ -1097,7 +1094,6 @@ public class HDBlockModels {
             if(rdr != null) {
                 try {
                     rdr.close();
-                    rdr = null;
                 } catch (IOException e) {
                 }
             }

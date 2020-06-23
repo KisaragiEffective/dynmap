@@ -225,8 +225,8 @@ public class PlayerFaces {
             /* Write body file */
             if(refreshskins || (!has_body)) {
 
-                Image skin_image = null;
-                BufferedImage skin_buff = null;
+                Image skin_image;
+                BufferedImage skin_buff;
 
                 if (is_64x32_skin){
 

@@ -233,7 +233,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
         }
         @Override
         public final int getSmoothGrassColorMultiplier(int[] colormap) {
-            int mult = 0xFFFFFF;
+            int mult;
             try {
                 int rx = x - x_base;
                 int rz = z - z_base;
@@ -263,7 +263,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
         }
         @Override
         public final int getSmoothFoliageColorMultiplier(int[] colormap) {
-            int mult = 0xFFFFFF;
+            int mult;
             try {
                 int rx = x - x_base;
                 int rz = z - z_base;
@@ -293,7 +293,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
         }
         @Override
         public final int getSmoothColorMultiplier(int[] colormap, int[] swampmap) {
-            int mult = 0xFFFFFF;
+            int mult;
             try {
                 int rx = x - x_base;
                 int rz = z - z_base;
@@ -360,7 +360,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
         }
         @Override
         public final int getSmoothWaterColorMultiplier(int[] colormap) {
-            int mult = 0xFFFFFF;
+            int mult;
             try {
                 int rx = x - x_base;
                 int rz = z - z_base;
@@ -775,9 +775,9 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
                 }
             }
             /* Check if cached chunk snapshot found */
-            Snapshot ss = null;
-            long inhabited_ticks = 0;
-            DynIntHashMap tileData = null;
+            Snapshot ss;
+            long inhabited_ticks;
+            DynIntHashMap tileData;
             SnapshotRec ssr = SnapshotCache.sscache.getSnapshot(dw.getName(), chunk.x, chunk.z, blockdata, biome, biomeraw, highesty); 
             if(ssr != null) {
                 inhabited_ticks = ssr.inhabitedTicks;

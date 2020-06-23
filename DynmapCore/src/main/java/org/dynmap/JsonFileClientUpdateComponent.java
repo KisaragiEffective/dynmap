@@ -65,7 +65,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     private class FileProcessor implements Runnable {
         public void run() {
             while(true) {
-                FileToWrite f = null;
+                FileToWrite f;
                 synchronized(lock) {
                     if(!files_to_write.isEmpty()) {
                         f = files_to_write.removeFirst();
@@ -280,7 +280,6 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
                         try {
                             fos.close();
                         } catch (IOException x) {}
-                        fos = null;
                     }
                 }        		
         	}
@@ -480,8 +479,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     						} catch (IOException iox) {
 
     						}
-    						inputFileReader = null;
-    					}
+                        }
     				}
     				if (jsonMsgs != null) {
         				final JSONArray json = jsonMsgs;
@@ -521,7 +519,6 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
                         br.close();
                     } catch (IOException x) {
                     }
-                    br = null;
                 }
             }
             for (String line : lines) {

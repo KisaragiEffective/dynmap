@@ -788,7 +788,6 @@ public class TexturePack {
         } finally {
             if (is != null) {
                 try { is.close(); } catch (IOException iox) {}
-                is = null;
             }
             tpl.close();
         }
@@ -1620,7 +1619,6 @@ public class TexturePack {
                     }
                     if (zf != null) {
                         try { zf.close(); } catch (IOException e) { }
-                        zf = null;
                     }
                 }
             }
@@ -1679,11 +1677,9 @@ public class TexturePack {
         } finally {
             if (in != null) {
                 try { in.close(); } catch (IOException iox) {}
-                in = null;
             }
             if (zf != null) {
                 try { zf.close(); } catch (IOException iox) {}
-                zf = null;
             }
         }
         /* Finish processing of texture maps */
@@ -1778,7 +1774,7 @@ public class TexturePack {
 
     private static int parseTextureIndex(HashMap<String,Integer> filetoidx, int srctxtid, String val) throws NumberFormatException {
         int off = val.indexOf(':');
-        int txtid = -1;
+        int txtid;
         if(off > 0) {
             String txt = val.substring(off+1);
             if(filetoidx.containsKey(txt)) {
@@ -1885,7 +1881,6 @@ public class TexturePack {
             if(rdr != null) {
                 try {
                     rdr.close();
-                    rdr = null;
                 } catch (IOException e) {
                 }
             }
@@ -2575,7 +2570,6 @@ public class TexturePack {
             if(rdr != null) {
                 try {
                     rdr.close();
-                    rdr = null;
                 } catch (IOException e) {
                 }
             }
@@ -2826,18 +2820,15 @@ public class TexturePack {
                 if(mapiter.getBlockTypeAt(BlockStep.Y_PLUS).isSnow()) {
                     if(do_snow_side) {
                         texture = getTileARGB(TILEINDEX_SNOW); /* Snow full side block */
-                        textid = TILEINDEX_SNOW;
                     }
                     else {
                         texture = getTileARGB(TILEINDEX_SNOWSIDE); /* Snow block */
-                        textid = TILEINDEX_SNOWSIDE;
                     }
                     textop = 0;
                 }
                 else {  /* Else, check the grass color overlay */
                     if(do_grass_side) {
                         texture = getTileARGB(TILEINDEX_GRASS); /* Grass block */
-                        textid = TILEINDEX_GRASS;
                         textop = COLORMOD_GRASSTONED;   /* Force grass toning */
                     }
                     else {
@@ -3083,7 +3074,7 @@ public class TexturePack {
                         String[] v = a.split("=");
                         if(v.length != 2) continue;
                         if(v[0].startsWith("tile")) {
-                            int id = 0;
+                            int id;
                             try {
                                 id = Integer.parseInt(v[0].substring(4));
                             } catch (NumberFormatException nfx) {
@@ -3192,7 +3183,7 @@ public class TexturePack {
             String[] tok = id.split(":");
             int meta = -1;
             DynmapBlockState blk = null;
-            String blkname = null;
+            String blkname;
             if (tok.length == 1) {  /* Only ID */
                 blkname = tok[0];
                 blk = DynmapBlockState.getBaseStateByName(blkname);
@@ -3487,7 +3478,7 @@ public class TexturePack {
             }
             if (textid >= 0) {
                 rslt[patchidx] = getMatIDForTileID(textid);   // Default texture
-                int mult = 0xFFFFFF;
+                int mult;
                 BiomeMap bio;
                 if (blockcoloring == null) {
 

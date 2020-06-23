@@ -131,8 +131,8 @@ public abstract class DynmapWorld {
         int step = 1 << tile.zoom;
         MapStorageTile ztile = tile.getZoomOutTile();
         int width = 128, height = 128;
-        BufferedImage zIm = null;
-        DynmapBufferedImage kzIm = null;
+        BufferedImage zIm;
+        DynmapBufferedImage kzIm;
         boolean blank = true;
         int[] argb = new int[width*height];
         int tx = ztile.x;
@@ -171,7 +171,7 @@ public abstract class DynmapWorld {
                             im.getRGB(0, 0, width, height, argb, 0, width);    /* Read data */
                             im.flush();
                             /* Do binlinear scale to 64x64 */
-                            int off = 0;
+                            int off;
                             for(int y = 0; y < height; y += 2) {
                                 off = y*width;
                                 for(int x = 0; x < width; x += 2, off += 2) {

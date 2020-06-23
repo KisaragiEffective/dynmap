@@ -7,7 +7,7 @@ import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 
 public class TexturePackHDUnderwaterShader extends TexturePackHDShader {
-    private boolean hide_land = true;
+    private boolean hide_land;
     
     class UnderwaterShaderState extends TexturePackHDShader.ShaderState {
         private boolean ready;

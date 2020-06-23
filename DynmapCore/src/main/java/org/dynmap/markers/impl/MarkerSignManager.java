@@ -55,9 +55,9 @@ public class MarkerSignManager {
                     }
                     else if(v.length() > 0) {
                         if(label.length() > 0) {
-                            label = label + "<br/>";
+                            label += "<br/>";
                         }
-                        label = label + escapeMarkup(v);
+                        label += escapeMarkup(v);
                     }
                 }
                 /* Get the set and see if the marker is already defined */

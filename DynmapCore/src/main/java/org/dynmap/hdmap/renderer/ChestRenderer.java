@@ -99,7 +99,7 @@ public class ChestRenderer extends CustomRenderer {
         	blktype = DynmapBlockState.AIR;	// Force mismatch - always single
         }
         int blkdata = blktype.stateIndex;   /* Get block data */
-        ChestData cd = ChestData.SINGLE_NORTH;   /* Default to single facing north */
+        ChestData cd;   /* Default to single facing north */
         switch(blkdata) {   /* First, use orientation data */
             case 2: /* North */
                 if(ctx.getBlockTypeAt(-1, 0, 0).baseState == blktype) {

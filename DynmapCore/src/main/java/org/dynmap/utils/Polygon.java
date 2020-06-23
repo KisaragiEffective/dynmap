@@ -120,8 +120,7 @@ public class Polygon {
                                 poly.add(b);
                             }
                         }
-                        wrkpoly = newpoly;
-                        newpoly = poly; 
+                        newpoly = poly;
                     }
                 }
             }

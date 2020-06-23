@@ -74,7 +74,6 @@ public class TileHashManager {
             } finally {
                 if(fd != null) {
                     try { fd.close(); } catch (IOException iox) {}
-                    fd = null;
                 }
             }
         }
@@ -92,7 +91,6 @@ public class TileHashManager {
             } finally {
                 if(fd != null) {
                     try { fd.close(); } catch (IOException iox) {}
-                    fd = null;
                 }
             }
             if (!success) {

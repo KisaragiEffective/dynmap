@@ -917,7 +917,7 @@ public class DynmapPlugin
             }
 
             boolean done = false;
-            TaskRecord tr = null;
+            TaskRecord tr;
 
             while(!blockupdatequeue.isEmpty()) {
                 BlockUpdateRec r = blockupdatequeue.remove();
@@ -962,7 +962,7 @@ public class DynmapPlugin
             }
             while(!msgqueue.isEmpty()) {
                 ChatMessage cm = msgqueue.poll();
-                DynmapPlayer dp = null;
+                DynmapPlayer dp;
                 if(cm.sender != null)
                     dp = getOrAddPlayer(cm.sender);
                 else

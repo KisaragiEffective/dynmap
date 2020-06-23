@@ -145,7 +145,7 @@ public class DynmapPlugin
     private long perTickLimit = (50000000); // 50 ms
     private boolean isMCPC = false;
     private boolean useSaveFolder = true;
-    private Field displayName = null; // MCPC+ display name
+    private Field displayName; // MCPC+ display name
 
     private static final int SIGNPOST_ID = 63;
     private static final int WALLSIGN_ID = 68;
@@ -924,7 +924,7 @@ public class DynmapPlugin
             }
 
             boolean done = false;
-            TaskRecord tr = null;
+            TaskRecord tr;
 
             while(!blockupdatequeue.isEmpty()) {
                 BlockUpdateRec r = blockupdatequeue.remove();
@@ -974,7 +974,7 @@ public class DynmapPlugin
             }
             while(!msgqueue.isEmpty()) {
                 ChatMessage cm = msgqueue.poll();
-                DynmapPlayer dp = null;
+                DynmapPlayer dp;
                 if(cm.sender != null)
                     dp = getOrAddPlayer(cm.sender);
                 else

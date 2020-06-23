@@ -227,7 +227,7 @@ public class DynmapMapCommands {
                 try {
                     String[] toks = tok[1].split("/");
                     if(toks.length == 3) {
-                        double x = 0, y = 0, z = 0;
+                        double x, y, z;
                         x = Double.parseDouble(toks[0]);
                         y = Double.parseDouble(toks[1]);
                         z = Double.parseDouble(toks[2]);
@@ -371,7 +371,7 @@ public class DynmapMapCommands {
             sender.sendMessage("Cannot reset world that is not loaded or enabled");
             return true;
         }
-        ConfigurationNode cn = null;
+        ConfigurationNode cn;
         if(args.length > 2) {
             cn = core.getTemplateConfigurationNode(args[2]);
         }

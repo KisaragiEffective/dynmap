@@ -170,23 +170,23 @@ public class CTMTexturePack {
     }
 
     public static class CTMProps {
-        public String name = null;
-        public String basePath = null;
-        public int[] matchBlocks = null;
+        public String name;
+        public String basePath;
+        public int[] matchBlocks;
         public String[] matchTiles = null;
         public CTMMethod method = CTMMethod.NONE;
-        public String[] tiles = null;
+        public String[] tiles;
         public CTMConnect connect = CTMConnect.NONE;
         public int faces = FACE_ALL;
         public int metadata = -1;
         public int[] biomes = null;
-        public int minY = 0;
-        public int maxY = 1024;
-        public int renderPass = 0;
+        public int minY;
+        public int maxY;
+        public int renderPass;
         public boolean innerSeams = false;
-        public int width = 0;
-        public int height = 0;
-        public int[] weights = null;
+        public int width;
+        public int height;
+        public int[] weights;
         public CTMSymmetry symmetry = CTMSymmetry.NONE;
         public int[] sumWeights = null;
         public int sumAllWeights = 0;

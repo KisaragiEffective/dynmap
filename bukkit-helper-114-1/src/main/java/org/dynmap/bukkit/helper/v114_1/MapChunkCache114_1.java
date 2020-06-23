@@ -171,7 +171,7 @@ public class MapChunkCache114_1 extends AbstractMapChunkCache {
 	            StdSection cursect = new StdSection();
 	            this.section[secnum] = cursect;
 	            DynmapBlockState[] states = cursect.states;
-	            DynmapBlockState[] palette = null;
+	            DynmapBlockState[] palette;
 	            // If we've got palette and block states list, process non-empty section
 	            if (sec.hasKeyOfType("Palette", 9) && sec.hasKeyOfType("BlockStates", 12)) {
 	            	NBTTagList plist = sec.getList("Palette", 10);
@@ -377,7 +377,7 @@ public class MapChunkCache114_1 extends AbstractMapChunkCache {
                 }
             }
             /* Check if cached chunk snapshot found */
-            Snapshot ss = null;
+            Snapshot ss;
             long inhabited_ticks = 0;
             DynIntHashMap tileData = null;
             int idx = (chunk.x-x_min) + (chunk.z - z_min)*x_dim;

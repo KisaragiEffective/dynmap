@@ -122,7 +122,6 @@ public class FileTreeMapStorage extends MapStorage {
                 } finally {
                     if (fis != null) {
                         try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
                     }
                 }
                 tr.image = new BufferInputStream(buf);
@@ -504,7 +503,6 @@ public class FileTreeMapStorage extends MapStorage {
                 } finally {
                     if (fis != null) {
                         try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
                     }
                     releaseReadLock(baseFilename);
                 }
@@ -557,7 +555,6 @@ public class FileTreeMapStorage extends MapStorage {
                 } finally {
                     if (fis != null) {
                         try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
                     }
                     releaseReadLock(baseFilename);
                 }
@@ -603,7 +600,6 @@ public class FileTreeMapStorage extends MapStorage {
                 } finally {
                     if (fis != null) {
                         try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
                     }
                     releaseReadLock(baseFilename);
                 }

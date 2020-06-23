@@ -187,7 +187,7 @@ public class CaveHDShader implements HDShader {
             		return false;
             	}
                 int cr, cg, cb;
-                int mult = 256;
+                int mult;
 
                 int ys = mapiter.getY() >> yshift;
                 if (ys < 64) {

@@ -395,7 +395,6 @@ public class MariaDBMapStorage extends MapStorage {
             err = true;
         } finally {
             releaseConnection(c, err);
-            c = null;
         }
     }
     
@@ -463,7 +462,6 @@ public class MariaDBMapStorage extends MapStorage {
                 return false;
             } finally {
                 releaseConnection(c, err);
-                c = null;
             }
         }
         else if (version == 1) {
@@ -478,7 +476,6 @@ public class MariaDBMapStorage extends MapStorage {
                 return false;
             } finally {
                 releaseConnection(c, err);
-                c = null;
             }
         }
         else if (version == 2) {
@@ -494,7 +491,6 @@ public class MariaDBMapStorage extends MapStorage {
                 return false;
             } finally {
                 releaseConnection(c, err);
-                c = null;
             }
         }
         // Load maps table - cache results

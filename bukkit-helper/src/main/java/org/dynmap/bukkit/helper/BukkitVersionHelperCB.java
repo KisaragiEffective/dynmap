@@ -40,7 +40,7 @@ public class BukkitVersionHelperCB extends BukkitVersionHelperGeneric {
     private Method getidbybiome;
     private Method getbycombinedid;
     
-    private boolean isBadUnload = false;
+    private boolean isBadUnload;
     
     public BukkitVersionHelperCB() {
     	

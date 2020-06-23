@@ -840,7 +840,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
 
     private static boolean processAreaArgs(DynmapCommandSender sender, AreaMarker marker, Map<String,String> parms) {
         String val = null;
-        String val2 = null;
+        String val2;
         try {
             double ytop = marker.getTopY();
             double ybottom = marker.getBottomY();
@@ -959,7 +959,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
 
     private static boolean processCircleArgs(DynmapCommandSender sender, CircleMarker marker, Map<String,String> parms) {
-        String val = null, val2 = null;
+        String val = null, val2;
         try {
             int scolor = marker.getLineColor();
             int fcolor = marker.getFillColor();
@@ -1363,7 +1363,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
                     return true;
                 }
             }
-            DynmapLocation loc = null;
+            DynmapLocation loc;
             if((x == null) && (y == null) && (z == null) && (world == null)) {
                 if(player == null) {
                     sender.sendMessage("Must be issued by player, or x, y, z, and world parameters are required");
@@ -2104,7 +2104,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
         List<DynmapLocation> ll = api.pointaccum.get(id); /* Find list */
         
         if(args.length > 3) {   /* Enough for coord */
-            String w = null;
+            String w;
             if(args.length == 4) {  /* No world */
                 if(ll == null) {    /* No points?  Error */
                     sender.sendMessage("First added corner needs world ID after coordinates");
@@ -2585,7 +2585,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
                 return true;
             }
         }
-        DynmapLocation loc = null;
+        DynmapLocation loc;
         if((x == null) && (y == null) && (z == null) && (world == null)) {
             if(player == null) {
                 sender.sendMessage("Must be issued by player, or x, y, z, and world parameters are required");
@@ -2778,7 +2778,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
 
     private static MarkerDescription findMarkerDescription(DynmapCommandSender sender, Map<String, String> parms) {
-        MarkerDescription md = null;
+        MarkerDescription md;
         String id, setid, label, type;
         id = parms.get(ARG_ID);
         label = parms.get(ARG_LABEL);
@@ -2959,7 +2959,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
                 return true;
             }
             FileReader fr = null;
-            String val = null;
+            String val;
             try {
                 fr = new FileReader(f);
                 StringBuilder sb = new StringBuilder();
@@ -3006,7 +3006,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
                 return true;
             }
             FileReader fr = null;
-            String val = null;
+            String val;
             try {
                 fr = new FileReader(f);
                 StringBuilder sb = new StringBuilder();

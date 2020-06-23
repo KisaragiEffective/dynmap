@@ -66,7 +66,6 @@ public class DynmapBufferedImage {
             }
             if(ll.size() < CACHE_LIMIT) {
                 ll.add(img);
-                img = null;
             }
         }
     }    

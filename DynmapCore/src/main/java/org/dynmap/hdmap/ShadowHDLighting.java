@@ -133,7 +133,7 @@ public class ShadowHDLighting extends DefaultHDLighting {
         else if(ll2 > ll0)
             weight += w2;
         outcolor[0].setColor(incolor);
-        int cscale = 256;
+        int cscale;
         if(weight == 0) {
             cscale = shadowscale[ll0];
         }
@@ -173,7 +173,6 @@ public class ShadowHDLighting extends DefaultHDLighting {
             else if(ll2 > ll0)
                 weight += w2;
             outcolor[1].setColor(incolor);
-            cscale = 256;
             if(weight == 0) {
                 cscale = shadowscale[ll0];
             }

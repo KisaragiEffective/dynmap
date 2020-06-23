@@ -22,7 +22,7 @@ public class ForgeConfigFile {
     public boolean load() {
         settings.clear();
         FileInputStream fis = null;
-        BufferedReader rdr = null;
+        BufferedReader rdr;
         boolean rslt = true;
         
         try {
@@ -30,7 +30,7 @@ public class ForgeConfigFile {
             rdr = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
             String line;
             ArrayList<String> section = new ArrayList<String>();
-            String tok = "";
+            String tok;
             while((line = rdr.readLine()) != null) {
                 boolean skip = false;
                 boolean instr = false;
@@ -117,7 +117,6 @@ public class ForgeConfigFile {
         } finally {
             if(fis != null) {
                 try { fis.close(); } catch (IOException iox) {}
-                fis = null;
             }
         }
         return rslt;

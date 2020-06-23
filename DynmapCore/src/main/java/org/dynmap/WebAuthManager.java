@@ -86,11 +86,11 @@ public class WebAuthManager {
             byte[] checkbytes = check.getBytes(StandardCharsets.UTF_8);
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] rslt = md.digest(checkbytes);
-            String rslthash = "";
+            StringBuilder rslthash = new StringBuilder();
             for (byte b : rslt) {
-                rslthash += String.format("%02X", 0xFF & (int) b);
+                rslthash.append(String.format("%02X", 0xFF & (int) b));
             }
-            return rslthash;
+            return rslthash.toString();
         } catch (NoSuchAlgorithmException nsax) {
         }
         return null;
@@ -177,7 +177,7 @@ public class WebAuthManager {
         return false;
     }
     public boolean processWebRegisterCommand(DynmapCore core, DynmapCommandSender sender, DynmapPlayer player, String[] args) {
-        String uid = null;
+        String uid;
         boolean other = false;
         if(args.length > 1) {
             if(!core.checkPlayerPermission(sender, "webregister.other")) {

@@ -34,8 +34,8 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     private double fillopacity = 0.35;
     private int fillcolor = 0xFF0000;
     private boolean boostflag = false;
-    private int minzoom = -1;
-    private int maxzoom = -1;
+    private int minzoom;
+    private int maxzoom;
     private EnterExitText greeting;
     private EnterExitText farewell;
 

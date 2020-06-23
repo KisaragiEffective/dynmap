@@ -54,25 +54,25 @@ public class MapManager {
     private List<String> disabled_worlds = new ArrayList<String>();
     public Map<String, DynmapWorld> worldsLookup = new HashMap<String, DynmapWorld>();
     private DynmapCore core;
-    private long timeslice_int = 0; /* In milliseconds */
-    private int max_chunk_loads_per_tick = DEFAULT_CHUNKS_PER_TICK;
-    private int parallelrendercnt = 0;
-    private int progressinterval = 100;
-    private int tileupdatedelay = 30;
-    private int savependingperiod = 15 * 60; // every 15 minutes, by default
-    private boolean saverestorepending = true;
+    private long timeslice_int; /* In milliseconds */
+    private int max_chunk_loads_per_tick;
+    private int parallelrendercnt;
+    private int progressinterval;
+    private int tileupdatedelay;
+    private int savependingperiod; // every 15 minutes, by default
+    private boolean saverestorepending;
     private boolean pauseupdaterenders = false;
-    private boolean hideores = false;
-    private boolean useBrightnessTable = false;
-    private boolean usenormalpriority = false;
-    private HashMap<String, String> blockalias = new HashMap<String, String>();
+    private boolean hideores;
+    private boolean useBrightnessTable;
+    private boolean usenormalpriority;
+    private HashMap<String, String> blockalias;
     
     private boolean pausefullrenders = false;
 
     // TPS based render pauses
-    private double tpslimit_updaterenders = 18.0;
-    private double tpslimit_fullrenders = 18.0;
-    private double tpslimit_zoomout = 18.0;
+    private double tpslimit_updaterenders;
+    private double tpslimit_fullrenders;
+    private double tpslimit_zoomout;
     private boolean tpspauseupdaterenders = false;
     private boolean tpspausefullrenders = false;
     private boolean tpspausezoomout = false;
@@ -84,12 +84,12 @@ public class MapManager {
     private static final int DEFAULT_TITLE_FADEOUT = 20;	// 20 ticks = 1 second    
     private static final boolean DEFAULT_ENTEREXIT_USETITLE = true;
     private static final boolean DEFAULT_ENTEREPLACESEXITS = false;
-    private int enterexitperiod = DEFAULT_ENTEREXIT_PERIOD;	// Enter/exit processing period
-    private int titleFadeIn = DEFAULT_TITLE_FADEIN;
-    private int titleStay = DEFAULT_TITLE_STAY;
-    private int titleFadeOut = DEFAULT_TITLE_FADEOUT;
-    private boolean enterexitUseTitle = DEFAULT_ENTEREXIT_USETITLE;
-    private boolean enterReplacesExits = DEFAULT_ENTEREPLACESEXITS;
+    private int enterexitperiod;	// Enter/exit processing period
+    private int titleFadeIn;
+    private int titleStay;
+    private int titleFadeOut;
+    private boolean enterexitUseTitle;
+    private boolean enterReplacesExits;
     
     private HashMap<UUID, HashSet<EnterExitMarker>> entersetstate = new HashMap<UUID, HashSet<EnterExitMarker>>();
     
@@ -107,7 +107,7 @@ public class MapManager {
 
     private boolean did_start = false;
     
-    private int zoomout_period = DEFAULT_ZOOMOUT_PERIOD;	/* Zoom-out tile processing period, in seconds */
+    private int zoomout_period;	/* Zoom-out tile processing period, in seconds */
     /* Which fullrenders are active */
     private HashMap<String, FullWorldRenderState> active_renders = new HashMap<String, FullWorldRenderState>();
 
@@ -672,7 +672,7 @@ public class MapManager {
                 tile = tile0;
             }
 
-            boolean notdone = true;
+            boolean notdone;
             
             if(tileset != null) {
                 long save_timeaccum = timeaccum;
@@ -698,7 +698,7 @@ public class MapManager {
                 }
                 /* Now, join with others */
                 for(int i = 0; i < rslt.size(); i++) {
-                    boolean rsltflag = false;
+                    boolean rsltflag;
                     try {
                         rsltflag = rslt.get(i).get();
                     } catch (CancellationException cx) {
