@@ -1,5 +1,6 @@
 package org.dynmap.forge_1_10_2.permissions;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,9 +14,7 @@ public class OpPermissions implements PermissionProvider {
     public HashSet<String> usrCommands = new HashSet<>();
 
     public OpPermissions(String[] usrCommands) {
-        for (String usrCommand : usrCommands) {
-            this.usrCommands.add(usrCommand);
-        }
+        Collections.addAll(this.usrCommands, usrCommands);
         Log.info("Using ops.txt for access control");
     }
 

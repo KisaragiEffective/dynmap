@@ -1,5 +1,6 @@
 package org.dynmap.bukkit.permissions;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,9 +12,7 @@ public class OpPermissions implements PermissionProvider {
     public HashSet<String> opCommands = new HashSet<>();
 
     public OpPermissions(String[] opCommands) {
-        for (String opCommand : opCommands) {
-            this.opCommands.add(opCommand);
-        }
+        Collections.addAll(this.opCommands, opCommands);
         Log.info("Using ops.txt for access control");
     }
 

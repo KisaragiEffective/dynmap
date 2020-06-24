@@ -2,6 +2,7 @@ package org.dynmap.hdmap.renderer;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Map;
 
 import org.dynmap.renderer.MapDataContext;
@@ -57,9 +58,7 @@ public class RPSupportFrameRenderer extends RPMicroRenderer {
         /* Get patches from any microblocks */
         if((covermask & 0x3FFFFFFF) != 0) {
             RenderPatch[] rp = super.getRenderPatchList(ctx);
-            for (RenderPatch renderPatch : rp) {
-                list.add(renderPatch);
-            }
+            Collections.addAll(list, rp);
         }
         return list.toArray(new RenderPatch[list.size()]);
     }

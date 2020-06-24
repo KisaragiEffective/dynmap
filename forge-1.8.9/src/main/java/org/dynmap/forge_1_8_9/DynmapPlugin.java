@@ -552,9 +552,7 @@ public class DynmapPlugin
             BanList bl = server.getConfigurationManager().getBannedIPs();
             Set<String> ips = new HashSet<>();
 
-            for (String s : bl.getKeys()) {
-                ips.add(s);
-            }
+            Collections.addAll(ips, bl.getKeys());
             
             return ips;
         }

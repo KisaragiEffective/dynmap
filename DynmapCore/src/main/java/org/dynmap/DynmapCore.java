@@ -530,9 +530,7 @@ public class DynmapCore implements DynmapCommonAPI {
             }
         }
         else {
-            for (String def : deftriggers) {
-                enabledTriggers.add(def);
-            }
+            Collections.addAll(enabledTriggers, deftriggers);
         }
         
         // Load components.
