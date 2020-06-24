@@ -46,13 +46,9 @@ public class MapTypeState {
     }
 
     public int invalidateTiles(List<TileFlags.TileCoord> coords) {
-        int cnt = 0;
+        int cnt;
         synchronized(invTileLock) {
-            for(TileFlags.TileCoord c : coords) {
-                if(!pendingInvTiles.setFlag(c.x, c.y, true)) {
-                    cnt++;
-                }
-            }
+            cnt = (int) coords.stream().filter(c -> !pendingInvTiles.setFlag(c.x, c.y, true)).count();
         }
         return cnt;
     }

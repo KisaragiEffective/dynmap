@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
@@ -415,16 +416,8 @@ public class DynmapMapCommands {
             sender.sendMessage("Cannot update maps from disabled or unloaded world: " + wname);
             return true;
         }
-        HDMap mt = null;
+        HDMap mt = (HDMap) w.maps.stream().filter(map -> map instanceof HDMap).filter(map -> map.getName().equals(mname)).findFirst().orElse(null);
         /* Find the map */
-        for(MapType map : w.maps) {
-            if(map instanceof HDMap) {
-                if(map.getName().equals(mname)) {
-                    mt = (HDMap)map;
-                    break;
-                }
-            }
-        }
         /* If new, make default map instance */
         if(isnew) {
             if(mt != null) {
@@ -597,11 +590,8 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.perspectivelist"))
             return true;
         if(MapManager.mapman != null) {
-            StringBuilder sb = new StringBuilder();
-            for(HDPerspective p : MapManager.mapman.hdmapman.perspectives.values()) {
-                sb.append(p.getName()).append(' ');
-            }
-            sender.sendMessage(sb.toString());
+            String sb = MapManager.mapman.hdmapman.perspectives.values().stream().map(p -> p.getName() + ' ').collect(Collectors.joining());
+            sender.sendMessage(sb);
         }
         return true;
     }
@@ -610,11 +600,8 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.shaderlist"))
             return true;
         if(MapManager.mapman != null) {
-            StringBuilder sb = new StringBuilder();
-            for(HDShader p : MapManager.mapman.hdmapman.shaders.values()) {
-                sb.append(p.getName()).append(' ');
-            }
-            sender.sendMessage(sb.toString());
+            String sb = MapManager.mapman.hdmapman.shaders.values().stream().map(p -> p.getName() + ' ').collect(Collectors.joining());
+            sender.sendMessage(sb);
         }
         return true;
     }
@@ -623,11 +610,8 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.lightinglist"))
             return true;
         if(MapManager.mapman != null) {
-            StringBuilder sb = new StringBuilder();
-            for(HDLighting p : MapManager.mapman.hdmapman.lightings.values()) {
-                sb.append(p.getName()).append(' ');
-            }
-            sender.sendMessage(sb.toString());
+            String sb = MapManager.mapman.hdmapman.lightings.values().stream().map(p -> p.getName() + ' ').collect(Collectors.joining());
+            sender.sendMessage(sb);
         }
         return true;
     }

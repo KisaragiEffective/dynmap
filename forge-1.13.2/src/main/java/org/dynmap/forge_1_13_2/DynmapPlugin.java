@@ -4,17 +4,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -22,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFlowingFluid;
@@ -428,12 +419,7 @@ public class DynmapPlugin
 
     public boolean isOp(String player) {
     	String[] ops = server.getPlayerList().getOppedPlayers().getKeys();
-    	for (String op : ops) {
-    		if (op.equalsIgnoreCase(player)) {
-    			return true;
-    		}
-    	}
-    	return (server.isSinglePlayer() && player.equalsIgnoreCase(server.getServerOwner()));
+        return Arrays.stream(ops).anyMatch(op -> op.equalsIgnoreCase(player)) || (server.isSinglePlayer() && player.equalsIgnoreCase(server.getServerOwner()));
     }
     
     private boolean hasPerm(EntityPlayer psender, String permission) {  
@@ -552,17 +538,8 @@ public class DynmapPlugin
         {
             List<?> players = server.getPlayerList().getPlayers();
 
-            for (Object o : players)
-            {
-                EntityPlayer p = (EntityPlayer)o;
+            return players.stream().map(o -> (EntityPlayer) o).filter(p -> p.getEntity().getName().getString().equalsIgnoreCase(name)).findFirst().map(DynmapPlugin.this::getOrAddPlayer).orElse(null);
 
-                if (p.getEntity().getName().getString().equalsIgnoreCase(name))
-                {
-                    return getOrAddPlayer(p);
-                }
-            }
-
-            return null;
         }
         @Override
         public Set<String> getIPBans()
@@ -730,12 +707,7 @@ public class DynmapPlugin
         public String[] getBiomeIDs()
         {
             BiomeMap[] b = BiomeMap.values();
-            String[] bname = new String[b.length];
-
-            for (int i = 0; i < bname.length; i++)
-            {
-                bname[i] = b[i].toString();
-            }
+            String[] bname = Arrays.stream(b).map(BiomeMap::toString).toArray(String[]::new);
 
             return bname;
         }
@@ -1003,11 +975,8 @@ public class DynmapPlugin
         @Override
         public List<String> getModList() {
         	List<ModInfo> mil = ModList.get().getMods();
-        	List<String> lst = new ArrayList<>();
-        	for (ModInfo mi : mil) {
-        		lst.add(mi.getModId());
-        	}
-        	return lst;
+        	List<String> lst = mil.stream().map(ModInfo::getModId).collect(Collectors.toList());
+            return lst;
         }
 
         @Override
@@ -1029,16 +998,7 @@ public class DynmapPlugin
                 }
             }
             List<ModInfo> mcl = ModList.get().getMods();
-            for (ModInfo mci : mcl) {
-                Optional<? extends ModContainer> mc = ModList.get().getModContainerById(mci.getModId());
-                Object mod = mc.map(ModContainer::getMod).orElse(null);
-                if (mod == null) continue;
-                InputStream is = mod.getClass().getClassLoader().getResourceAsStream(rname);
-                if (is != null) {
-                    return is;
-                }
-            }
-            return null;
+            return mcl.stream().map(mci -> ModList.get().getModContainerById(mci.getModId())).map(mc -> mc.map(ModContainer::getMod).orElse(null)).filter(Objects::nonNull).map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname)).filter(Objects::nonNull).findFirst().orElse(null);
         }
         /**
          * Get block unique ID map (module:blockid)

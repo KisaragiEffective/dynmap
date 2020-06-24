@@ -4,13 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -241,9 +235,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         @Override
         public DynmapPlayer[] getOnlinePlayers() {
             Player[] players = helper.getOnlinePlayers();
-            DynmapPlayer[] dplay = new DynmapPlayer[players.length];
-            for(int i = 0; i < players.length; i++)
-                dplay[i] = new BukkitPlayer(players[i]);
+            DynmapPlayer[] dplay = Arrays.stream(players).map(BukkitPlayer::new).toArray(DynmapPlayer[]::new);
             return dplay;
         }
         @Override
@@ -394,9 +386,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         @Override
         public String[] getBiomeIDs() {
             BiomeMap[] b = BiomeMap.values();
-            String[] bname = new String[b.length];
-            for(int i = 0; i < bname.length; i++)
-                bname[i] = b[i].toString();
+            String[] bname = Arrays.stream(b).map(BiomeMap::toString).toArray(String[]::new);
             return bname;
         }
         @Override
@@ -1652,9 +1642,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             int maps = 0, hdmaps = 0;
             if (core.mapManager != null)
                 for (DynmapWorld w : core.mapManager.getWorlds()) {
-                    for (MapType mt : w.maps)
-                        if (mt instanceof HDMap)
-                            ++hdmaps;
+                    hdmaps += w.maps.stream().filter(mt -> mt instanceof HDMap).count();
                     maps += w.maps.size();
                 }
             hashMap.put("maps", maps);

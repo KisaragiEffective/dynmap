@@ -5,6 +5,8 @@ import org.bukkit.ChunkSnapshot;
 import org.dynmap.bukkit.helper.AbstractMapChunkCache.Snapshot;
 import org.dynmap.renderer.DynmapBlockState;
 
+import java.util.stream.IntStream;
+
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread
  */
@@ -15,12 +17,8 @@ public class MapChunkCacheClassic extends AbstractMapChunkCache {
     	private final int sectionmask;
 		public WrappedSnapshot(ChunkSnapshot ss) {
     		this.ss = ss;
-    		int mask = 0;
-    		for (int i = 0; i < 16; i++) {
-    			if (ss.isSectionEmpty(i))
-    				mask |= (1 << i);
-    		}
-    		sectionmask = mask;
+    		int mask = IntStream.range(0, 16).filter(ss::isSectionEmpty).map(i -> (1 << i)).reduce(0, (a, b) -> a | b);
+            sectionmask = mask;
     	}
 		@Override
     	public final DynmapBlockState getBlockType(int x, int y, int z) {

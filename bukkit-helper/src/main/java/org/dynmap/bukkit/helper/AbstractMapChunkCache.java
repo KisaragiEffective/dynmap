@@ -759,19 +759,13 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
             boolean vis = true;
             if(visible_limits != null) {
                 vis = false;
-                for(VisibilityLimit limit : visible_limits) {
-                    if (limit.doIntersectChunk(chunk.x, chunk.z)) {
-                        vis = true;
-                        break;
-                    }
+                if (visible_limits.stream().anyMatch(limit -> limit.doIntersectChunk(chunk.x, chunk.z))) {
+                    vis = true;
                 }
             }
             if(vis && (hidden_limits != null)) {
-                for(VisibilityLimit limit : hidden_limits) {
-                    if (limit.doIntersectChunk(chunk.x, chunk.z)) {
-                        vis = false;
-                        break;
-                    }
+                if (hidden_limits.stream().anyMatch(limit -> limit.doIntersectChunk(chunk.x, chunk.z))) {
+                    vis = false;
                 }
             }
             /* Check if cached chunk snapshot found */

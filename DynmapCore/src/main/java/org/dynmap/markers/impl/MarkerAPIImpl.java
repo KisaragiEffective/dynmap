@@ -1791,7 +1791,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
                 sender.sendMessage("<label> or id:<set-id> required");
                 return true;
             }
-            MarkerSet set = null;
+            MarkerSet set;
             if(id != null) {
                 set = api.getMarkerSet(id);
                 if(set == null) {
@@ -1801,12 +1801,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
             }
             else {
                 Set<MarkerSet> sets = api.getMarkerSets();
-                for(MarkerSet s : sets) {
-                    if(s.getMarkerSetLabel().equals(label)) {
-                        set = s;
-                        break;
-                    }
-                }
+                set = sets.stream().filter(s -> s.getMarkerSetLabel().equals(label)).findFirst().orElse(null);
                 if(set == null) {
                     sender.sendMessage("Error: matching set not found");
                     return true;                        
@@ -1891,13 +1886,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
             }
             else {
                 Set<MarkerSet> sets = api.getMarkerSets();
-                MarkerSet set = null;
-                for(MarkerSet s : sets) {
-                    if(s.getMarkerSetLabel().equals(label)) {
-                        set = s;
-                        break;
-                    }
-                }
+                MarkerSet set = sets.stream().filter(s -> s.getMarkerSetLabel().equals(label)).findFirst().orElse(null);
                 if(set == null) {
                     sender.sendMessage("Error: matching set not found");
                     return true;                        
@@ -2000,7 +1989,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
                 sender.sendMessage("<label> or id:<icon-id> required");
                 return true;
             }
-            MarkerIcon ico = null;
+            MarkerIcon ico;
             if(id != null) {
                 ico = MarkerAPIImpl.getMarkerIconImpl(id);
                 if(ico == null) {
@@ -2010,12 +1999,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
             }
             else {
                 Set<MarkerIcon> icons = api.getMarkerIcons();
-                for(MarkerIcon ic : icons) {
-                    if(ic.getMarkerIconLabel().equals(label)) {
-                        ico = ic;
-                        break;
-                    }
-                }
+                ico = icons.stream().filter(ic -> ic.getMarkerIconLabel().equals(label)).findFirst().orElse(null);
                 if(ico == null) {
                     sender.sendMessage("Error: matching icon not found");
                     return true;                        
@@ -2069,13 +2053,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
             }
             else {
                 Set<MarkerIcon> icos = api.getMarkerIcons();
-                MarkerIcon ico = null;
-                for(MarkerIcon ic : icos) {
-                    if(ic.getMarkerIconLabel().equals(label)) {
-                        ico = ic;
-                        break;
-                    }
-                }
+                MarkerIcon ico = icos.stream().filter(ic -> ic.getMarkerIconLabel().equals(label)).findFirst().orElse(null);
                 if(ico == null) {
                     sender.sendMessage("Error: matching icon not found");
                     return true;                        
@@ -3285,12 +3263,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
      */
     public static boolean testTileForBoostMarkers(DynmapWorld w, HDPerspective perspective, double tile_x, double tile_y, double tile_dim) {
         if (api == null) return false;
-        for(MarkerSetImpl ms : api.markersets.values()) {
-            if(ms.testTileForBoostMarkers(w, perspective, tile_x, tile_y, tile_dim)) {
-                return true;
-            }
-        }
-        return false;
+        return api.markersets.values().stream().anyMatch(ms -> ms.testTileForBoostMarkers(w, perspective, tile_x, tile_y, tile_dim));
     }
     /**
      * Build entered marker set based on given location

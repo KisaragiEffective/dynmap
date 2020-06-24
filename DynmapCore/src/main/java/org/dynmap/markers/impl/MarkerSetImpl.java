@@ -779,11 +779,7 @@ class MarkerSetImpl implements MarkerSet {
             }
         }
         if (boostingcirclemarkers != null) {
-            for (CircleMarkerImpl cm : boostingcirclemarkers.values()) {
-                if (cm.testTileForBoostMarkers(w, perspective, tile_x, tile_y, tile_dim)) {
-                    return true;
-                }
-            }
+            return boostingcirclemarkers.values().stream().anyMatch(cm -> cm.testTileForBoostMarkers(w, perspective, tile_x, tile_y, tile_dim));
         }
         return false;
     }

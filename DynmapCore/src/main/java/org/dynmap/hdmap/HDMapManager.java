@@ -122,19 +122,8 @@ public class HDMapManager {
         if(w == null) {
             return new HDShaderState[0];
         }
-        ArrayList<HDShaderState> shaders = new ArrayList<>();
-        for(MapType map : w.maps) {
-            if(map instanceof HDMap) {
-                HDMap hdmap = (HDMap)map;
-                if((hdmap.getPerspective() == tile.perspective) && (hdmap.getBoostZoom() == tile.boostzoom)) {
-                    /* If limited to one map, and this isn't it, skip */
-                    if((mapname != null) && (!hdmap.getName().equals(mapname)))
-                        continue;
-                    shaders.add(hdmap.getShader().getStateInstance(hdmap, cache, mapiter, scale));
-                }
-            }
-        }
-        return shaders.toArray(new HDShaderState[shaders.size()]);
+        /* If limited to one map, and this isn't it, skip */
+        return w.maps.stream().filter(map -> map instanceof HDMap).map(map -> (HDMap) map).filter(hdmap -> (hdmap.getPerspective() == tile.perspective) && (hdmap.getBoostZoom() == tile.boostzoom)).filter(hdmap -> (mapname == null) || (hdmap.getName().equals(mapname))).map(hdmap -> hdmap.getShader().getStateInstance(hdmap, cache, mapiter, scale)).toArray(HDShaderState[]::new);
     }
     
     private static final int BIOMEDATAFLAG = 0;

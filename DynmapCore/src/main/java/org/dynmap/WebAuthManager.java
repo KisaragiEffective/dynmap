@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
@@ -166,12 +167,7 @@ public class WebAuthManager {
     public static boolean checkUserName(String name) {
         int nlen = name.length();
         if ((nlen > 0) && (nlen <= 16)) {
-            for (int i = 0; i < nlen; i++) {
-                if ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".indexOf(name.charAt(i)) < 0) {
-                    return false;
-                }
-            }
-            return true;
+            return IntStream.range(0, nlen).noneMatch(i -> "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_".indexOf(name.charAt(i)) < 0);
         }
         return false;
     }

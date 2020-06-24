@@ -3,6 +3,7 @@ package org.dynmap.markers.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapWorld;
@@ -455,18 +456,14 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
             return true; // If tile corner inside, we intersect
         }
         /* Test if any polygon corners are inside square */
-        for(int i = 0; i < cnt; i++) { 
-            if((px[i] >= tile_x) && (px[i] <= tile_x2) && (py[i] >= tile_y) && (py[i] <= tile_y2)) {
-                return true; // If poly corner inside tile, we intersect
-            }
-        }
+        // If poly corner inside tile, we intersect
         // Otherwise, only intersects if at least one edge crosses
         //for (int i = 0, j = cnt-1; i < cnt; j = i++) {
         //    // Test for X=tile_x side
         //    if ((px[i] < tile_x) && (px[j] >= tile_x) && ()
         // }
         //System.out.println("tile: " + tile_x + " / " + tile_y + " - hit");
-        return false;
+        return IntStream.range(0, cnt).anyMatch(i -> (px[i] >= tile_x) && (px[i] <= tile_x2) && (py[i] >= tile_y) && (py[i] <= tile_y2));
     }
     @Override
     public int getMinZoom() {

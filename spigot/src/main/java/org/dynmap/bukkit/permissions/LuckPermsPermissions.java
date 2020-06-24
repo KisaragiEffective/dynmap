@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import me.lucko.luckperms.api.LuckPermsApi;
 import me.lucko.luckperms.api.User;
@@ -50,10 +51,7 @@ public class LuckPermsPermissions implements PermissionProvider {
         Set<String> result = new HashSet<>();
         PermissionData user = getUser(player);
         if (user != null) {
-            for (String p : perms) {
-                if (user.getPermissionValue(name + "." + p).asBoolean())
-                    result.add(p);
-            }
+            result = perms.stream().filter(p -> user.getPermissionValue(name + "." + p).asBoolean()).collect(Collectors.toSet());
         }
         return result;
     }

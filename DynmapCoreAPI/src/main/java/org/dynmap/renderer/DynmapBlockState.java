@@ -3,6 +3,7 @@ package org.dynmap.renderer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.IntStream;
 
 // This represents a distinct block state value for a simple block from the world data.
 // Each distinct persistent block state from the world data will map to exactly one instance of this class, such that
@@ -236,13 +237,7 @@ public class DynmapBlockState {
         		for (DynmapBlockState bb : blk.states) {
         		    boolean match = true;
                     for (String s : statelist) {
-                        boolean valmatch = false;
-                        for (int j = 0; j < bb.stateList.length; j++) {
-                            if (s.equals(bb.stateList[j])) {
-                                valmatch = true;
-                                break;
-                            }
-                        }
+                        boolean valmatch = IntStream.range(0, bb.stateList.length).anyMatch(j -> s.equals(bb.stateList[j]));
                         if (!valmatch) {
                             match = false;
                             break;

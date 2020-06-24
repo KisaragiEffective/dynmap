@@ -28,6 +28,7 @@ import org.json.simple.parser.ParseException;
 import static org.dynmap.JSONUtils.*;
 
 import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
 public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     protected long jsonInterval;
@@ -504,13 +505,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
             ArrayList<String> lines = new ArrayList<>();
             try {
                 br = new BufferedReader(new InputStreamReader(bis));
-                String line;
-                while ((line = br.readLine()) != null)   {
-                    if(line.startsWith("<?") || line.startsWith("*/")) {
-                        continue;
-                    }
-                    lines.add(line);
-                }
+                lines = br.lines().filter(line -> !line.startsWith("<?") && !line.startsWith("*/")).collect(Collectors.toCollection(ArrayList::new));
             } catch (IOException iox) {
                 Log.severe("Exception while reading dynmap_reg.php", iox);
             } finally {

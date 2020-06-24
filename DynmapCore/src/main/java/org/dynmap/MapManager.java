@@ -1,17 +1,7 @@
 package org.dynmap;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
@@ -411,13 +402,7 @@ public class MapManager {
             sl = n.getStrings("renderedmaps", null);
             if(sl != null) {
                 for(String s : sl) {
-                    for(int i = 0; i < world.maps.size(); i++) {
-                        MapType mt = world.maps.get(i);
-                        if(mt.getName().equals(s)) {
-                            renderedmaps.add(mt);
-                            break;
-                        }
-                    }
+                    world.maps.stream().filter(mt -> mt.getName().equals(s)).findFirst().ifPresent(mt -> renderedmaps.add(mt));
                 }
                 if(sl.size() > renderedmaps.size()) {   /* Missed one or more? */
                     throw new Exception();
@@ -456,19 +441,11 @@ public class MapManager {
             }
             v.put("found", found.save());
             v.put("rendered", rendered.save());
-            LinkedList<ConfigurationNode> queue = new LinkedList<>();
-            for(MapTile tq : renderQueue) {
-                ConfigurationNode n = tq.saveTile();
-                if(n != null)
-                    queue.add(n);
-            }
+            LinkedList<ConfigurationNode> queue = renderQueue.stream().map(MapTile::saveTile).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedList::new));
             v.put("queue", queue);
             v.put("count", rendercnt);
             v.put("timeaccum", timeaccum);
-            LinkedList<String> rmaps = new LinkedList<>();
-            for(MapType mt : renderedmaps) {
-                rmaps.add(mt.getName());
-            }
+            LinkedList<String> rmaps = renderedmaps.stream().map(MapType::getName).collect(Collectors.toCollection(LinkedList::new));
             v.put("renderedmaps", rmaps);
             v.put("activemaps", activemaps);
             v.put("activemapcnt", activemapcnt);
@@ -749,13 +726,7 @@ public class MapManager {
             List<DynmapChunk> requiredChunks = tile.getRequiredChunks();
             /* If we are doing radius limit render, see if any are inside limits */
             if(cxmin != Integer.MIN_VALUE) {
-                boolean good = false;
-                for(DynmapChunk c : requiredChunks) {
-                    if((c.x >= cxmin) && (c.x <= cxmax) && (c.z >= czmin) && (c.z <= czmax)) {
-                        good = true;
-                        break;
-                    }
-                }
+                boolean good = requiredChunks.stream().anyMatch(c -> (c.x >= cxmin) && (c.x <= cxmax) && (c.z >= czmin) && (c.z <= czmax));
                 if(!good) requiredChunks = Collections.emptyList();
             }
             /* Fetch chunk cache from server thread */
@@ -991,11 +962,9 @@ public class MapManager {
     	rec.queue.add(txtrec);
     	// If enter replaces exits, and we just added enter, purge exits
     	if (enterReplacesExits && isEnter) {
-    		ArrayList<TextQueueRec> newlst = new ArrayList<>();
-    		for (TextQueueRec r : rec.queue) {
-    			if (r.isEnter) newlst.add(r);	// Keep the enter records
-    		}
-    		rec.queue = newlst;
+    		ArrayList<TextQueueRec> newlst = rec.queue.stream().filter(r -> r.isEnter).collect(Collectors.toCollection(ArrayList::new));
+            // Keep the enter records
+            rec.queue = newlst;
     	}
     }
     
@@ -1300,13 +1269,7 @@ public class MapManager {
             sender.sendMessage("Could not purge map: world '" + worldname + "' not defined in configuration.");
             return;
         }
-        MapType mt = null;
-        for (MapType mtp : world.maps) {
-            if (mtp.getName().equals(mapname)) {
-                mt = mtp;
-                break;
-            }
-        }
+        MapType mt = world.maps.stream().filter(mtp -> mtp.getName().equals(mapname)).findFirst().orElse(null);
         if (mt == null) {
             sender.sendMessage("Could not purge map: map '" + mapname + "' not defined in configuration.");
             return;
@@ -1429,14 +1392,8 @@ public class MapManager {
             int cnt = 0;
             List<ConfigurationNode> tiles = cn.getNodes("tiles");
             if(tiles != null) {
-                for(ConfigurationNode tile : tiles) {
-                    MapTile mt = MapTile.restoreTile(w, tile);  /* Restore tile, if possible */
-                    if(mt != null) {
-                        if(tileQueue.push(mt)) {
-                            cnt++;
-                        }
-                    }
-                }
+                /* Restore tile, if possible */
+                cnt = (int) tiles.stream().map(tile -> MapTile.restoreTile(w, tile)).filter(Objects::nonNull).filter(mt -> tileQueue.push(mt)).count();
             }
             /* Get invalid tiles */
             ConfigurationNode invmap = cn.getNode("invalid");
@@ -1688,12 +1645,7 @@ public class MapManager {
     public void printStats(DynmapCommandSender sender, String prefix) {
         sender.sendMessage("Tile Render Statistics:");
         MapStats tot = new MapStats();
-        int invcnt = 0;
-        for(DynmapWorld dw : this.worlds) {
-            for(MapTypeState mts : dw.mapstate) {
-                invcnt += mts.getInvCount();
-            }
-        }
+        int invcnt = this.worlds.stream().mapToInt(dw -> dw.mapstate.stream().mapToInt(MapTypeState::getInvCount).sum()).sum();
         synchronized(lock) {
             for(String k: new TreeSet<>(mapstats.keySet())) {
                 if((prefix != null) && !k.startsWith(prefix))

@@ -3,6 +3,7 @@ package org.dynmap.hdmap.renderer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.dynmap.renderer.CustomRenderer;
 import org.dynmap.renderer.DynmapBlockState;
@@ -174,16 +175,12 @@ public class ThaumFurnaceRenderer extends CustomRenderer {
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
         ArrayList<RenderPatch> list = new ArrayList<>();
-        int[] txtids = new int[6];
+        int[] txtids;
         if (ctx.getBlockType().stateIndex == 0) {
-            for(int i = 0; i < 6; i++) {
-                txtids[i] = TXTIDX_LAVA;
-            }
+            txtids = IntStream.range(0, 6).map(i -> TXTIDX_LAVA).toArray();
         }
         else {
-            for(int i = 0; i < 6; i++) {
-                txtids[i] = calcTexture(ctx, i);
-            }
+            txtids = IntStream.range(0, 6).map(i -> calcTexture(ctx, i)).toArray();
         }
         CustomRenderer.addBox(ctx.getPatchFactory(), list, 0, 1, 0, 1, 0, 1, txtids);
         return list.toArray(new RenderPatch[6]);

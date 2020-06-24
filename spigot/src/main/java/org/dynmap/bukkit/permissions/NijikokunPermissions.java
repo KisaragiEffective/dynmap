@@ -2,6 +2,7 @@ package org.dynmap.bukkit.permissions;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -52,12 +53,7 @@ public class NijikokunPermissions implements PermissionProvider {
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
         if(permissions == null)
             permissions = ((Permissions)plugin).getHandler();
-        HashSet<String> hasperms = new HashSet<>();
-        for (String pp : perms) {
-            if (permissions.has(defworld, player, name + "." + pp)) {
-                hasperms.add(pp);
-            }
-        }
+        HashSet<String> hasperms = perms.stream().filter(pp -> permissions.has(defworld, player, name + "." + pp)).collect(Collectors.toCollection(HashSet::new));
         return hasperms;
     }
     

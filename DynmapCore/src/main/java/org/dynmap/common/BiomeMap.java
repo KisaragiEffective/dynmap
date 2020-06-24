@@ -2,6 +2,9 @@ package org.dynmap.common;
 
 import org.dynmap.hdmap.HDBlockModels;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /* Generic biome mapping */
 public class BiomeMap {
     private static final BiomeMap[] biome_by_index = new BiomeMap[1025];
@@ -121,12 +124,7 @@ public class BiomeMap {
     }
 
     private static boolean isUniqueID(String id) {
-        for (BiomeMap biomeByIndex : biome_by_index) {
-            if (biomeByIndex == null) continue;
-            if (biomeByIndex.id.equals(id))
-                return false;
-        }
-        return true;
+        return Arrays.stream(biome_by_index).filter(Objects::nonNull).noneMatch(biomeByIndex -> biomeByIndex.id.equals(id));
     }
     private BiomeMap(int idx, String id, double tmp, double rain, int waterColorMultiplier, int grassmult, int foliagemult) {
         /* Clamp values : we use raw values from MC code, which are clamped during color mapping only */

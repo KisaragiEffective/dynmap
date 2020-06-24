@@ -10,6 +10,8 @@ import org.dynmap.renderer.DynmapBlockState;
 
 import net.minecraft.server.v1_13_R2.DataPaletteBlock;
 
+import java.util.stream.IntStream;
+
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread
  */
@@ -22,12 +24,8 @@ public class MapChunkCache113_2 extends AbstractMapChunkCache {
 		public WrappedSnapshot(ChunkSnapshot ss) {
     		this.ss = ss;
     		blockids = (DataPaletteBlock<?>[]) BukkitVersionHelper.helper.getBlockIDFieldFromSnapshot(ss);
-    		int mask = 0;
-    		for (int i = 0; i < blockids.length; i++) {
-    			if (ss.isSectionEmpty(i))
-    				mask |= (1 << i);
-    		}
-    		sectionmask = mask;
+    		int mask = IntStream.range(0, blockids.length).filter(ss::isSectionEmpty).map(i -> (1 << i)).reduce(0, (a, b) -> a | b);
+            sectionmask = mask;
     	}
 		@Override
     	public final DynmapBlockState getBlockType(int x, int y, int z) {

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -42,20 +43,10 @@ public class PlayerFaces {
             this.typeID = typeid;
         }
         public static FaceType byID(String i_d) {
-            for (FaceType ft : values()) {
-                if (ft.id.equals(i_d)) {
-                    return ft;
-                }
-            }
-            return null;
+            return Arrays.stream(values()).filter(ft -> ft.id.equals(i_d)).findFirst().orElse(null);
         }
         public static FaceType byTypeID(int tid) {
-            for (FaceType ft : values()) {
-                if (ft.typeID == tid) {
-                    return ft;
-                }
-            }
-            return null;
+            return Arrays.stream(values()).filter(ft -> ft.typeID == tid).findFirst().orElse(null);
         }
     }
     

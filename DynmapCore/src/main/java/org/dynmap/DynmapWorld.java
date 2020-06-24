@@ -21,6 +21,7 @@ import org.dynmap.utils.Polygon;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 public abstract class DynmapWorld {
     public List<MapType> maps = new ArrayList<>();
@@ -507,11 +508,7 @@ public abstract class DynmapWorld {
         }
         node.put("hidestyle", hide);
         /* Handle map settings */
-        ArrayList<Map<String,Object>> mapinfo = new ArrayList<>();
-        for(MapType mt : maps) {
-            ConfigurationNode mnode = mt.saveConfiguration();
-            mapinfo.add(mnode);
-        }
+        ArrayList<Map<String,Object>> mapinfo = maps.stream().map(MapType::saveConfiguration).collect(Collectors.toCollection(ArrayList::new));
         node.put("maps", mapinfo);
 
         return node;

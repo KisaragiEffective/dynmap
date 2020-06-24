@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.dynmap.renderer.CustomRenderer;
 import org.dynmap.renderer.DynmapBlockState;
@@ -203,12 +204,7 @@ public class StairBlockRenderer extends CustomRenderer {
             }
             else if (o instanceof String) {
                 String os = (String) o;
-                for (int i = 0; i < texturemap.length; i++) {
-                    if (os.equals(texturemap[i])) {
-                        idx = i;
-                        break;
-                    }
-                }
+                idx = IntStream.range(0, texturemap.length).filter(i -> os.equals(texturemap[i])).findFirst().orElse(0);
             }
             if((idx < 0) || (idx >= textsetcnt)) {
                 idx = 0;

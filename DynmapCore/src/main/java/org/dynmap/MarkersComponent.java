@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.common.DynmapListenerManager.WorldEventListener;
@@ -116,12 +117,7 @@ public class MarkersComponent extends ClientComponent {
                 core.getServer().scheduleServerTask(new Runnable() {
                     public void run() {
                         long ts = System.currentTimeMillis();
-                        ArrayList<String> deleted = new ArrayList<>();
-                        for(Map.Entry<String,Long> me : offline_times.entrySet()) {
-                            if(ts > me.getValue()) {
-                                deleted.add(me.getKey());
-                            }
-                        }
+                        ArrayList<String> deleted = offline_times.entrySet().stream().filter(me -> ts > me.getValue()).map(Map.Entry::getKey).collect(Collectors.toCollection(ArrayList::new));
                         for(String id : deleted) {
                             Marker m = offlineset.findMarker(id);
                             if(m != null)

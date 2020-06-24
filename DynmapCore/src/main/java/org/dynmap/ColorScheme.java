@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -89,8 +90,7 @@ public class ColorScheme {
                 }
                 /* Make parser less pedantic - tabs or spaces should be fine */
                 String[] split = line.split("[\t ]");
-                int cnt = 0;
-                for(String s: split) { if(s.length() > 0) cnt++; }
+                int cnt = (int) Arrays.stream(split).filter(s -> s.length() > 0).count();
                 String[] nsplit = new String[cnt];
                 cnt = 0;
                 for(String s: split) { if(s.length() > 0) { nsplit[cnt] = s; cnt++; } }

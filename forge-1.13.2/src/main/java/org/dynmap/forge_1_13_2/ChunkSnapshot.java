@@ -1,6 +1,7 @@
 package org.dynmap.forge_1_13_2;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import org.dynmap.renderer.DynmapBlockState;
 
@@ -162,13 +163,10 @@ public class ChunkSnapshot
                     NBTTagCompound tc = plist.getCompound(pi);
                     String pname = tc.getString("Name");
                     if (tc.contains("Properties")) {
-                        StringBuilder statestr = new StringBuilder();
+                        String statestr;
                         NBTTagCompound prop = tc.getCompound("Properties");
-                        for (String pid : prop.keySet()) {
-                            if (statestr.length() > 0) statestr.append(',');
-                            statestr.append(pid).append('=').append(prop.get(pid).getString());
-                        }
-                        palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr.toString());
+                        statestr = prop.keySet().stream().map(pid -> pid + '=' + prop.get(pid).getString()).collect(Collectors.joining(","));
+                        palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr);
                     }
                     if (palette[pi] == null) {
                         palette[pi] = DynmapBlockState.getBaseStateByName(pname);

@@ -8,12 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -206,10 +202,7 @@ public class ConfigurationNode implements Map<String, Object> {
         if (!(o instanceof List<?>)) {
             return def;
         }
-        ArrayList<String> strings = new ArrayList<>();
-        for(Object i : (List<?>)o) {
-            strings.add(i.toString());
-        }
+        ArrayList<String> strings = ((List<?>) o).stream().map(Object::toString).collect(Collectors.toCollection(ArrayList::new));
         return strings;
     }
     
@@ -305,10 +298,7 @@ public class ConfigurationNode implements Map<String, Object> {
         else if(v instanceof List) {
             @SuppressWarnings("unchecked")
             List<Object> lv = (List<Object>)v;
-            ArrayList<Object> newv = new ArrayList<>();
-            for (Object o : lv) {
-                newv.add(copyValue(o));
-            }
+            ArrayList<Object> newv = lv.stream().map(ConfigurationNode::copyValue).collect(Collectors.toCollection(ArrayList::new));
             return newv;
         }
         else {
@@ -351,13 +341,7 @@ public class ConfigurationNode implements Map<String, Object> {
     
     public <T> List<T> createInstances(String path, Class<?>[] constructorParameters, Object[] constructorArguments) {
         List<ConfigurationNode> nodes = getNodes(path);
-        List<T> instances = new ArrayList<>();
-        for(ConfigurationNode node : nodes) {
-            T instance = node.<T>createInstance(constructorParameters, constructorArguments);
-            if (instance != null) {
-                instances.add(instance);
-            }
-        }
+        List<T> instances = nodes.stream().map(node -> node.<T>createInstance(constructorParameters, constructorArguments)).filter(Objects::nonNull).collect(Collectors.toList());
         return instances;
     }
 

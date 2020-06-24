@@ -563,10 +563,7 @@ public class TexturePack {
     private static void processTextureMaps() {
         for(TextureMap ti : textmap_by_id.values()) {
             if(ti.blocknames.isEmpty()) continue;
-            int[] txtids = new int[ti.texture_ids.size()];
-            for(int i = 0; i < txtids.length; i++) {
-                txtids[i] = ti.texture_ids.get(i);
-            }
+            int[] txtids = ti.texture_ids.stream().mapToInt(integer -> integer).toArray();
             HDBlockStateTextureMap map = new HDBlockStateTextureMap(txtids, null, ti.colorMult, ti.custColorMult, ti.blockset, true, null, ti.trans);
             map.addToTable(ti.blocknames, ti.stateids);
         }

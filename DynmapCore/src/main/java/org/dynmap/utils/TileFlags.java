@@ -1,10 +1,6 @@
 package org.dynmap.utils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.dynmap.Log;
 /**
@@ -112,14 +108,8 @@ public class TileFlags {
 			        row[idx] &= ~(mask);
 	                count--;
 	                if(row[idx] == 0L) { // All zero in element?
-	                    boolean nonzero = false;
-                        for (long l : row) {
-                            if (l != 0L) {
-                                nonzero = true;
-                                break;
-                            }
-                        }
-	                    if(!nonzero) {
+	                    boolean nonzero = Arrays.stream(row).anyMatch(l -> l != 0L);
+                        if(!nonzero) {
 	                        chunkmap.remove(k);
 	                        last_row = null;
 	                        last_key = Long.MAX_VALUE;

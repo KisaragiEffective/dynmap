@@ -2,6 +2,7 @@ package org.dynmap;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,12 +47,7 @@ public abstract class MapType {
         }
         public static ImageEncoding fromExt(String x) {
             ImageEncoding[] v = values();
-            for (ImageEncoding imageEncoding : v) {
-                if (imageEncoding.ext.equalsIgnoreCase(x)) {
-                    return imageEncoding;
-                }
-            }
-            return null;
+            return Arrays.stream(v).filter(imageEncoding -> imageEncoding.ext.equalsIgnoreCase(x)).findFirst().orElse(null);
         }
     }
     
@@ -79,12 +75,7 @@ public abstract class MapType {
         public ImageEncoding getEncoding() { return enc; }
 
         public static ImageFormat fromID(String imgfmt) {
-            for(ImageFormat i_f : MapType.ImageFormat.values()) {
-                if(i_f.getID().equals(imgfmt)) {
-                    return i_f;
-                }
-            }
-            return null;
+            return Arrays.stream(ImageFormat.values()).filter(i_f -> i_f.getID().equals(imgfmt)).findFirst().orElse(null);
         }
     }
 

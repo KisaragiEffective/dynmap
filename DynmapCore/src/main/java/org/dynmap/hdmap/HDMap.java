@@ -5,6 +5,7 @@ import static org.dynmap.JSONUtils.s;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dynmap.Client;
 import org.dynmap.ConfigurationNode;
@@ -223,15 +224,8 @@ public class HDMap extends MapType {
 
     /* Get maps rendered concurrently with this map in this world */
     public List<MapType> getMapsSharingRender(DynmapWorld w) {
-        ArrayList<MapType> maps = new ArrayList<>();
-        for(MapType mt : w.maps) {
-            if(mt instanceof HDMap) {
-                HDMap hdmt = (HDMap)mt;
-                if((hdmt.perspective == this.perspective) && (hdmt.boostzoom == this.boostzoom)) {  /* Same perspective */
-                    maps.add(hdmt);
-                }
-            }
-        }
+        ArrayList<MapType> maps = w.maps.stream().filter(mt -> mt instanceof HDMap).map(mt -> (HDMap) mt).filter(hdmt -> (hdmt.perspective == this.perspective) && (hdmt.boostzoom == this.boostzoom)).collect(Collectors.toCollection(ArrayList::new));
+        /* Same perspective */
         return maps;
     }
     

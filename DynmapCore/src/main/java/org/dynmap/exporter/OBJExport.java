@@ -605,10 +605,7 @@ public class OBJExport {
                 }
             }
         }
-        PatchDefinition[] pd = new PatchDefinition[list.size()];
-        for (int i = 0; i < pd.length; i++) {
-            pd[i] = (PatchDefinition) list.get(i);
-        }
+        PatchDefinition[] pd = list.stream().map(renderPatch -> (PatchDefinition) renderPatch).toArray(PatchDefinition[]::new);
         return pd;
     }
     

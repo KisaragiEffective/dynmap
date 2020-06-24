@@ -5,18 +5,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -574,17 +564,13 @@ public class DynmapPlugin
         {
             List<?> players = server.getPlayerList().getPlayers();
 
-            for (Object o : players)
-            {
-                EntityPlayer p = (EntityPlayer)o;
+            return players.stream()
+                    .map(o -> (EntityPlayer) o)
+                    .filter(p -> p.getCommandSenderEntity().getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .orElse(null);
 
-                if (p.getCommandSenderEntity().getName().equalsIgnoreCase(name))
-                {
-                    return getOrAddPlayer(p);
-                }
-            }
-
-            return null;
         }
         @Override
         public Set<String> getIPBans()
@@ -752,12 +738,7 @@ public class DynmapPlugin
         public String[] getBiomeIDs()
         {
             BiomeMap[] b = BiomeMap.values();
-            String[] bname = new String[b.length];
-
-            for (int i = 0; i < bname.length; i++)
-            {
-                bname[i] = b[i].toString();
-            }
+            String[] bname = Arrays.stream(b).map(BiomeMap::toString).toArray(String[]::new);
 
             return bname;
         }
@@ -1000,12 +981,7 @@ public class DynmapPlugin
 		    Map<String, ModContainer> list = Loader.instance().getIndexedModList();
 		    ModContainer mod = list.get(name);    // Try case sensitive lookup
 		    if (mod == null) {
-		        for (Entry<String, ModContainer> ent : list.entrySet()) {
-		            if (ent.getKey().equalsIgnoreCase(name)) {
-		                mod = ent.getValue();
-		                break;
-		            }
-		        }
+                mod = list.entrySet().stream().filter(ent -> ent.getKey().equalsIgnoreCase(name)).findFirst().map(Entry::getValue).orElse(mod);
 		    }
 		    if (mod == null) return null;
 		    return mod.getVersion();
@@ -1059,15 +1035,7 @@ public class DynmapPlugin
                 }
             }
             List<ModContainer> mcl = Loader.instance().getModList();
-            for (ModContainer mc : mcl) {
-                Object mod = mc.getMod();
-                if (mod == null) continue;
-                InputStream is = mod.getClass().getClassLoader().getResourceAsStream(rname);
-                if (is != null) {
-                    return is;
-                }
-            }
-            return null;
+            return mcl.stream().map(ModContainer::getMod).filter(Objects::nonNull).map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname)).filter(Objects::nonNull).findFirst().orElse(null);
         }
         /**
          * Get block unique ID map (module:blockid)

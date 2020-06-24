@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.dynmap.Log;
 import org.dynmap.renderer.CustomRenderer;
@@ -210,12 +211,7 @@ public class FrameRenderer extends CustomRenderer {
                         textureIdx = 0;
                 }
                 else {
-                    for(int i = 0; i < txtIndex.length; i++) {
-                        if(val == txtIndex[i]) {
-                            textureIdx = i;
-                            break;
-                        }
-                    }
+                    textureIdx = IntStream.range(0, txtIndex.length).filter(i -> val == txtIndex[i]).findFirst().orElse(0);
                 }
             }
         }

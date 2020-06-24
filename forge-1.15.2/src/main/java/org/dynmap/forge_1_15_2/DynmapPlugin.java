@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -454,12 +455,7 @@ public class DynmapPlugin
 
     public boolean isOp(String player) {
     	String[] ops = server.getPlayerList().getOppedPlayers().getKeys();
-    	for (String op : ops) {
-    		if (op.equalsIgnoreCase(player)) {
-    			return true;
-    		}
-    	}
-    	return (server.isSinglePlayer() && player.equalsIgnoreCase(server.getServerOwner()));
+        return Arrays.stream(ops).anyMatch(op -> op.equalsIgnoreCase(player)) || (server.isSinglePlayer() && player.equalsIgnoreCase(server.getServerOwner()));
     }
     
     private boolean hasPerm(PlayerEntity psender, String permission) {  
@@ -578,17 +574,8 @@ public class DynmapPlugin
         {
             List<?> players = server.getPlayerList().getPlayers();
 
-            for (Object o : players)
-            {
-                PlayerEntity p = (PlayerEntity)o;
+            return players.stream().map(o -> (PlayerEntity) o).filter(p -> p.getEntity().getName().getString().equalsIgnoreCase(name)).findFirst().map(DynmapPlugin.this::getOrAddPlayer).orElse(null);
 
-                if (p.getEntity().getName().getString().equalsIgnoreCase(name))
-                {
-                    return getOrAddPlayer(p);
-                }
-            }
-
-            return null;
         }
         @Override
         public Set<String> getIPBans()
@@ -756,12 +743,7 @@ public class DynmapPlugin
         public String[] getBiomeIDs()
         {
             BiomeMap[] b = BiomeMap.values();
-            String[] bname = new String[b.length];
-
-            for (int i = 0; i < bname.length; i++)
-            {
-                bname[i] = b[i].toString();
-            }
+            String[] bname = Arrays.stream(b).map(BiomeMap::toString).toArray(String[]::new);
 
             return bname;
         }
@@ -1027,11 +1009,8 @@ public class DynmapPlugin
         @Override
         public List<String> getModList() {
         	List<ModInfo> mil = ModList.get().getMods();
-        	List<String> lst = new ArrayList<>();
-        	for (ModInfo mi : mil) {
-        		lst.add(mi.getModId());
-        	}
-        	return lst;
+        	List<String> lst = mil.stream().map(ModInfo::getModId).collect(Collectors.toList());
+            return lst;
         }
 
         @Override

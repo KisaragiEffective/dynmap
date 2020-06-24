@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,10 +36,7 @@ public class FilePermissions implements PermissionProvider {
             List<String> p = cfg.getStrings(k, null);
             if(p != null) {
                 k = k.toLowerCase();
-                HashSet<String> pset = new HashSet<>();
-                for(String perm : p) {
-                    pset.add(perm.toLowerCase());
-                }
+                HashSet<String> pset = p.stream().map(String::toLowerCase).collect(Collectors.toCollection(HashSet::new));
                 perms.put(k,  pset);
                 if(k.equals("defaultuser")) {
                     defperms = pset;

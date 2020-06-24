@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import org.dynmap.DynmapCore;
 import org.dynmap.Log;
@@ -276,10 +277,7 @@ public class CTMTexturePack {
                     }
                 }
             }
-            int[] out = new int[rslt.size()];
-            for(int i = 0; i < out.length; i++) {
-                out[i] = rslt.get(i);
-            }
+            int[] out = rslt.stream().mapToInt(integer -> integer).toArray();
             return out;
         }
         private int parseRenderPass(Properties p, String fld, int def) {
@@ -901,7 +899,6 @@ public class CTMTexturePack {
      * @param is_rp - if true, resource pack; if false, texture pack
      */
     public CTMTexturePack(TexturePackLoader tpl, TexturePack tp, DynmapCore core, boolean is_rp) {
-        ArrayList<String> files = new ArrayList<>();
         this.tpl = tpl;
         biomenames = core.getBiomeNames();
         Set<String> ent = tpl.getEntries();
@@ -916,12 +913,7 @@ public class CTMTexturePack {
             ctmpath = ctmpath2 = "ctm/";
             vanillatextures = "textures/blocks/%2$s";
         }
-        for (String name : ent) {
-            if((name.startsWith(ctmpath) || name.startsWith(ctmpath2)) && name.endsWith(".properties")) {
-                files.add(name);
-            }
-        }
-        ctpfiles = files.toArray(new String[files.size()]);
+        ctpfiles = ent.stream().filter(name -> (name.startsWith(ctmpath) || name.startsWith(ctmpath2)) && name.endsWith(".properties")).toArray(String[]::new);
         Arrays.sort(ctpfiles);
         processFiles(core);
     }
@@ -1276,12 +1268,7 @@ public class CTMTexturePack {
     private int mapTextureCtm(CTMProps p, Context ctx) {
         int face = ctx.face;
         int[][] offsets = NEIGHBOR_OFFSET[face];
-        int neighborBits = 0;
-        for (int bit = 0; bit < 8; bit++) {
-            if (p.shouldConnect(ctx, offsets[bit])) {
-                neighborBits |= (1 << bit);
-            }
-        }
+        int neighborBits = IntStream.range(0, 8).filter(bit -> p.shouldConnect(ctx, offsets[bit])).map(bit -> (1 << bit)).reduce(0, (a, b) -> a | b);
         return p.tileIcons[neighborMapCtm[neighborBits]];
     }
     // Map texture using horizontal method
@@ -1328,7 +1315,7 @@ public class CTMTexturePack {
             face = 0;
         }
         face = ctx.reorient(face) / p.symmetry.shift;
-        int index = 0;
+        int index;
         // If no weights, consistent weight
         if (p.weights == null) {
             index = getRandom(ctx.x, ctx.y, ctx.z, face, p.tileIcons.length);
@@ -1337,12 +1324,7 @@ public class CTMTexturePack {
             int rnd = getRandom(ctx.x, ctx.y, ctx.z, face, p.sumAllWeights);
             int[] w = p.sumWeights;
             // Find which range matches
-            for (int i = 0; i < w.length; ++i) {
-                if (rnd < w[i]) {
-                    index = i;
-                    break;
-                }
-            }
+            index = IntStream.range(0, w.length).filter(i -> rnd < w[i]).findFirst().orElse(0);
         }
         return p.tileIcons[index];
     }
@@ -1545,10 +1527,7 @@ public class CTMTexturePack {
         if (a.length != b.length) {
             throw new RuntimeException("arrays to add are not same length");
         }
-        int[] c = new int[a.length];
-        for (int i = 0; i < c.length; i++) {
-            c[i] = a[i] + b[i];
-        }
+        int[] c = IntStream.range(0, a.length).map(i -> a[i] + b[i]).toArray();
         return c;
     }
 

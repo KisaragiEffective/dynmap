@@ -5,6 +5,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Json {
     public static String stringifyJson(Object o) {
@@ -44,11 +46,7 @@ public class Json {
             default:
                 if((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F')){
                     String ss=Integer.toHexString(ch);
-                    s2.append("\\u");
-                    for(int k=0;k<4-ss.length();k++){
-                        s2.append('0');
-                    }
-                    s2.append(ss.toUpperCase());
+                    s2.append(IntStream.range(0, 4 - ss.length()).mapToObj(k -> "0").collect(Collectors.joining("", "\\u", ss.toUpperCase())));
                 }
                 else{
                     s2.append(ch);

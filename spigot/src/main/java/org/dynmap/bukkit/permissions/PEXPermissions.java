@@ -2,6 +2,7 @@ package org.dynmap.bukkit.permissions;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -55,11 +56,7 @@ public class PEXPermissions implements PermissionProvider {
         HashSet<String> hasperms = new HashSet<>();
         PermissionUser pu = pm.getUser(player);
         if(pu != null) {
-            for (String pp : perms) {
-                if (pu.has(name + "." + pp)) {
-                    hasperms.add(pp);
-                }
-            }
+            hasperms = perms.stream().filter(pp -> pu.has(name + "." + pp)).collect(Collectors.toCollection(HashSet::new));
         }
         return hasperms;
     }

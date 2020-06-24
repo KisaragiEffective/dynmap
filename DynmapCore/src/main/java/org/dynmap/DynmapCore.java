@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -1206,12 +1207,7 @@ public class DynmapCore implements DynmapCommonAPI {
             }
         }
         String subcmdlist = " Valid subcommands:";
-        TreeSet<String> treeSet = new TreeSet<>();
-        for(CommandInfo ci : commandinfo) {
-            if(ci.matches(cmd)) {
-                treeSet.add(ci.subcmd);
-            }
-        }
+        TreeSet<String> treeSet = Arrays.stream(commandinfo).filter(ci -> ci.matches(cmd)).map(ci -> ci.subcmd).collect(Collectors.toCollection(TreeSet::new));
         if (!treeSet.isEmpty()) {
             subcmdlist += " ";
         }
@@ -1771,11 +1767,7 @@ public class DynmapCore implements DynmapCommonAPI {
         Set<String> existing_names = new HashSet<>();
         /* Make map, indexed by 'name' in map */
         if(existing != null) {
-            for(Map<String,Object> m : existing) {
-                Object name = m.get("name");
-                if(name instanceof String)
-                    existing_names.add((String)name);
-            }
+            existing_names = existing.stream().map(m -> m.get("name")).filter(name -> name instanceof String).map(name -> (String) name).collect(Collectors.toSet());
         }
         boolean did_update = false;
         /* Now, loop through defaults, and see if any are missing */

@@ -5,6 +5,7 @@ import static org.dynmap.JSONUtils.s;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -47,10 +48,7 @@ public class ClientComponent extends Component {
     
     @SuppressWarnings("unchecked")
     protected static JSONArray convertList(List<?> l) {
-        JSONArray o = new JSONArray();
-        for(Object entry : l) {
-            o.add(convert(entry));
-        }
+        JSONArray o = l.stream().map(ClientComponent::convert).collect(Collectors.toCollection(JSONArray::new));
         return o;
     }
     

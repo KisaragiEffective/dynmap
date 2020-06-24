@@ -13,6 +13,7 @@ import org.dynmap.bukkit.DynmapPlugin;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class VaultPermissions implements PermissionProvider, Listener {
     private RegisteredServiceProvider<Permission> permissionProvider;
@@ -67,13 +68,7 @@ public class VaultPermissions implements PermissionProvider, Listener {
         final Permission vault = this.permissionProvider.getProvider();
         OfflinePlayer player = Bukkit.getOfflinePlayer(playerName);
 
-        Set<String> hasperms = new HashSet<>();
-
-        for (String perm : perms) {
-            if (vault.playerHas(null, player, processPermission(perm))) {
-                hasperms.add(perm);
-            }
-        }
+        Set<String> hasperms = perms.stream().filter(perm -> vault.playerHas(null, player, processPermission(perm))).collect(Collectors.toSet());
 
         return hasperms;
     }

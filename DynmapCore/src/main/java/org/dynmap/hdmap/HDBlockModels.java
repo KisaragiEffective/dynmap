@@ -6,13 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -418,9 +412,7 @@ public class HDBlockModels {
                     String[] args = line.split(",");
                     layerbits = 0;
                     rownum = 0;
-                    for(String a: args) {
-                        layerbits |= (1 << Integer.parseInt(a));
-                    }
+                    layerbits |= Arrays.stream(args).mapToInt(a -> (1 << Integer.parseInt(a))).reduce(0, (a1, b) -> a1 | b);
                 }
                 else if(line.startsWith("rotate:")) {
                     line = line.substring(7);
@@ -855,10 +847,7 @@ public class HDBlockModels {
                     if (blknames.size() > 0) {
                         ArrayList<RenderPatch> pd = new ArrayList<>();
                         CustomRenderer.addBox(pdf, pd, xmin, xmax, ymin, ymax, zmin, zmax, boxPatchList);
-                        PatchDefinition[] patcharray = new PatchDefinition[pd.size()];
-                        for (int i = 0; i < patcharray.length; i++) {
-                            patcharray[i] = (PatchDefinition) pd.get(i);
-                        }
+                        PatchDefinition[] patcharray = pd.stream().map(renderPatch -> (PatchDefinition) renderPatch).toArray(PatchDefinition[]::new);
                         if(patcharray.length > max_patches)
                             max_patches = patcharray.length;
                         for(String nm : blknames) {
@@ -936,10 +925,7 @@ public class HDBlockModels {
                         for (BoxLimits bl : boxes) {
                             CustomRenderer.addBox(pdf, pd, bl.xmin, bl.xmax, bl.ymin, bl.ymax, bl.zmin, bl.zmax, bl.patches);
                         }
-                        PatchDefinition[] patcharray = new PatchDefinition[pd.size()];
-                        for (int i = 0; i < patcharray.length; i++) {
-                            patcharray[i] = (PatchDefinition) pd.get(i);
-                        }
+                        PatchDefinition[] patcharray = pd.stream().map(renderPatch -> (PatchDefinition) renderPatch).toArray(PatchDefinition[]::new);
                         if(patcharray.length > max_patches)
                             max_patches = patcharray.length;
                         for(String nm : blknames) {

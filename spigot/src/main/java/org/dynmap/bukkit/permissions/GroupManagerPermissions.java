@@ -2,6 +2,7 @@ package org.dynmap.bukkit.permissions;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -46,11 +47,7 @@ public class GroupManagerPermissions implements PermissionProvider {
         HashSet<String> hasperms = new HashSet<>();
         AnjoPermissionsHandler apm = gm.getWorldsHolder().getDefaultWorld().getPermissionsHandler();
         if (apm != null) {
-            for (String pp : perms) {
-                if (apm.permission(player, name + "." + pp)) {
-                    hasperms.add(pp);
-                }
-            }
+            hasperms = perms.stream().filter(pp -> apm.permission(player, name + "." + pp)).collect(Collectors.toCollection(HashSet::new));
         }
         return hasperms;
     }
