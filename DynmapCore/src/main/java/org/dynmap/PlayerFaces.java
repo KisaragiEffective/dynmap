@@ -27,7 +27,7 @@ public class PlayerFaces {
     private final boolean fetchskins;
     private final boolean refreshskins;
     private String skinurl;
-    public MapStorage storage;
+    public final MapStorage storage;
     
     public enum FaceType {
         FACE_8X8("8x8", 0),

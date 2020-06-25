@@ -4,7 +4,7 @@ import java.util.Map;
 
 
 public class Events {
-    public Map<String, Event<?>> events = new HashMap<>();
+    public final Map<String, Event<?>> events = new HashMap<>();
     @SuppressWarnings("unchecked")
     public <T> void addListener(String eventName, Event.Listener<T> listener) {
         Event<?> genericEvent = events.get(eventName);

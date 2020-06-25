@@ -112,8 +112,8 @@ public class CaveHDShader implements HDShader {
     
     private class OurShaderState implements HDShaderState {
         private final Color color;
-        protected MapIterator mapiter;
-        protected HDMap map;
+        protected final MapIterator mapiter;
+        protected final HDMap map;
         private boolean air;
         private int yshift;
         final int[] lightingTable;

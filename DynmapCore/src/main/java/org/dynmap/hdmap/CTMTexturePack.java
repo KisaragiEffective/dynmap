@@ -181,12 +181,12 @@ public class CTMTexturePack {
         public int faces = FACE_ALL;
         public int metadata = -1;
         public int[] biomes = null;
-        public int minY;
-        public int maxY;
-        public int renderPass;
+        public final int minY;
+        public final int maxY;
+        public final int renderPass;
         public boolean innerSeams = false;
-        public int width;
-        public int height;
+        public final int width;
+        public final int height;
         public int[] weights;
         public CTMSymmetry symmetry = CTMSymmetry.NONE;
         public int[] sumWeights = null;

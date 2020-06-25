@@ -35,7 +35,7 @@ import net.minecraft.server.v1_13_R2.Material;
 public class BukkitVersionHelperSpigot113_2 extends BukkitVersionHelperCB {
     
     /** CraftChunkSnapshot */
-    protected Class<?> datapalettearray;
+    protected final Class<?> datapalettearray;
     private final Field blockid_field;
 
     @Override

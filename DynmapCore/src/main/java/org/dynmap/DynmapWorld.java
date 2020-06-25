@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.util.stream.Collectors;
 
 public abstract class DynmapWorld {
-    public List<MapType> maps = new ArrayList<>();
-    public List<MapTypeState> mapstate = new ArrayList<>();
+    public final List<MapType> maps = new ArrayList<>();
+    public final List<MapTypeState> mapstate = new ArrayList<>();
     
-    public UpdateQueue updates = new UpdateQueue();
+    public final UpdateQueue updates = new UpdateQueue();
     public DynmapLocation center;
     public List<DynmapLocation> seedloc;    /* All seed location - both direct and based on visibility limits */
     private List<DynmapLocation> seedloccfg;    /* Configured full render seeds only */
@@ -48,7 +48,7 @@ public abstract class DynmapWorld {
     public int tileupdatedelay;
     private boolean is_enabled;
     boolean is_protected;   /* If true, user needs 'dynmap.world.<worldid>' privilege to see world */
-    protected int[] brightnessTable = new int[16];  // 0-256 scaled brightness table
+    protected final int[] brightnessTable = new int[16];  // 0-256 scaled brightness table
     
     private MapStorage storage; // Storage handler for this world's maps
     
@@ -56,7 +56,7 @@ public abstract class DynmapWorld {
     public final int worldheight;
     public final int heightshift;
     public final int heightmask;
-    public int sealevel;
+    public final int sealevel;
     
     protected DynmapWorld(String wname, int worldheight, int sealevel) {
         this.raw_wname = wname;

@@ -16,7 +16,7 @@ import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 public class VineStateRenderer extends CustomRenderer {
     
     // Meshes, indexed by state index (bit4=east, bit3=north, bit2=south, bit1=up, bit0=west)
-    protected RenderPatch[][] meshes = new RenderPatch[32][];
+    protected final RenderPatch[][] meshes = new RenderPatch[32][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

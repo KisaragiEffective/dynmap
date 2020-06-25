@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 import static org.dynmap.JSONUtils.*;
 
 public class InternalClientUpdateComponent extends ClientUpdateComponent {
-    protected long jsonInterval;
+    protected final long jsonInterval;
     protected long currentTimestamp = 0;
     protected long lastTimestamp = 0;
     protected long lastChatTimestamp = 0;

@@ -117,21 +117,21 @@ public class IsoHDPerspective implements HDPerspective {
         double mtend;
         int mxout, myout, mzout;
         /* Patch state and work variables */
-        Vector3D v0 = new Vector3D();
-        Vector3D vS = new Vector3D();
-        Vector3D d_cross_uv = new Vector3D();
+        final Vector3D v0 = new Vector3D();
+        final Vector3D vS = new Vector3D();
+        final Vector3D d_cross_uv = new Vector3D();
         // Double max patch count to be safe for patches + water patches
-        double[] patch_t = new double[2*HDBlockModels.getMaxPatchCount()];
-        double[] patch_u = new double[2*HDBlockModels.getMaxPatchCount()];
-        double[] patch_v = new double[2*HDBlockModels.getMaxPatchCount()];
-        BlockStep[] patch_step = new BlockStep[2*HDBlockModels.getMaxPatchCount()];
-        int[] patch_id = new int[2*HDBlockModels.getMaxPatchCount()];
+        final double[] patch_t = new double[2*HDBlockModels.getMaxPatchCount()];
+        final double[] patch_u = new double[2*HDBlockModels.getMaxPatchCount()];
+        final double[] patch_v = new double[2*HDBlockModels.getMaxPatchCount()];
+        final BlockStep[] patch_step = new BlockStep[2*HDBlockModels.getMaxPatchCount()];
+        final int[] patch_id = new int[2*HDBlockModels.getMaxPatchCount()];
         int cur_patch = -1;
         double cur_patch_u;
         double cur_patch_v;
         double cur_patch_t;
         
-        int[] subblock_xyz = new int[3];
+        final int[] subblock_xyz = new int[3];
         final MapIterator mapiter;
         final boolean isnether;
         boolean skiptoair;

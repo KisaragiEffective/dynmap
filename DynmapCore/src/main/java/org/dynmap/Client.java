@@ -28,11 +28,11 @@ public class Client {
 
     public static class ChatMessage extends Update {
         public String type = "chat";
-        public String source;
-        public String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
-        public String message;
-        public String account;
-        public String channel;
+        public final String source;
+        public final String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
+        public final String message;
+        public final String account;
+        public final String channel;
         public ChatMessage(String source, String channel, String playerName, String message, String playeraccount) {
             this.source = source;
             if (ClientUpdateComponent.hideNames)
@@ -61,8 +61,8 @@ public class Client {
 
     public static class PlayerJoinMessage extends Update {
         public String type = "playerjoin";
-        public String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
-        public String account;
+        public final String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
+        public final String account;
         public PlayerJoinMessage(String playerName, String playeraccount) {
             if (ClientUpdateComponent.hideNames)
                 this.playerName = "";
@@ -88,8 +88,8 @@ public class Client {
 
     public static class PlayerQuitMessage extends Update {
         public String type = "playerquit";
-        public String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
-        public String account;
+        public final String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
+        public final String account;
         public PlayerQuitMessage(String playerName, String playeraccount) {
             if (ClientUpdateComponent.hideNames)
                 this.playerName = "";
@@ -115,7 +115,7 @@ public class Client {
 
     public static class Tile extends Update {
         public String type = "tile";
-        public String name;
+        public final String name;
 
         public Tile(String name) {
             this.name = name;
@@ -136,7 +136,7 @@ public class Client {
 
     public static class DayNight extends Update {
         public String type = "daynight";
-        public boolean isday;
+        public final boolean isday;
 
         public DayNight(boolean isday) {
             this.isday = isday;

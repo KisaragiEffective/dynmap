@@ -12,7 +12,7 @@ import de.bananaco.bpermissions.api.User;
 import de.bananaco.bpermissions.api.WorldManager;
 
 public class bPermPermissions extends BukkitPermissions {
-    WorldManager wm;
+    final WorldManager wm;
 
     public static bPermPermissions create(Server server, String name, Map<String,Boolean> pd) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("bPermissions");

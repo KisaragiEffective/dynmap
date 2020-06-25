@@ -60,9 +60,9 @@ public abstract class MapType {
         FORMAT_JPG90("jpg-q90", 0.90f, ImageEncoding.JPG),
         FORMAT_JPG95("jpg-q95", 0.95f, ImageEncoding.JPG),
         FORMAT_JPG100("jpg-q100", 1.00f, ImageEncoding.JPG);
-        String id;
-        float qual;
-        ImageEncoding enc;
+        final String id;
+        final float qual;
+        final ImageEncoding enc;
         
         ImageFormat(String id, float quality, ImageEncoding enc) {
             this.id = id;
@@ -80,8 +80,8 @@ public abstract class MapType {
     }
 
     public static class ZoomInfo {
-        public String prefix;
-        public int  background_argb;
+        public final String prefix;
+        public final int  background_argb;
         public ZoomInfo(String pre, int bg) { prefix = pre; background_argb = bg; }
     }
 

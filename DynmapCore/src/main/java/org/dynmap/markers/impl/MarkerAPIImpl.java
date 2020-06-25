@@ -83,17 +83,19 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
     
     public static class MarkerUpdated extends MarkerComponentMessage {
-        public String msg;
-        public double x, y, z;
-        public String id;
-        public String label;
-        public String icon;
-        public String set;
-        public boolean markup;
-        public String desc;
-        public String dim;
-        public int minzoom;
-        public int maxzoom;
+        public final String msg;
+        public final double x;
+        public final double y;
+        public final double z;
+        public final String id;
+        public final String label;
+        public final String icon;
+        public final String set;
+        public final boolean markup;
+        public final String desc;
+        public final String dim;
+        public final int minzoom;
+        public final int maxzoom;
         
         public MarkerUpdated(Marker m, boolean deleted) {
             this.id = m.getMarkerID();
@@ -129,22 +131,23 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
 
     public static class AreaMarkerUpdated extends MarkerComponentMessage {
-        public String msg;
-        public double ytop, ybottom;
-        public double[] x;
-        public double[] z;
-        public int weight;
-        public double opacity;
-        public String color;
-        public double fillopacity;
-        public String fillcolor;
-        public String id;
-        public String label;
-        public String set;
-        public String desc;
-        public int minzoom;
-        public int maxzoom;
-        public boolean markup;
+        public final String msg;
+        public final double ytop;
+        public final double ybottom;
+        public final double[] x;
+        public final double[] z;
+        public final int weight;
+        public final double opacity;
+        public final String color;
+        public final double fillopacity;
+        public final String fillcolor;
+        public final String id;
+        public final String label;
+        public final String set;
+        public final String desc;
+        public final int minzoom;
+        public final int maxzoom;
+        public final boolean markup;
         
         public AreaMarkerUpdated(AreaMarker m, boolean deleted) {
             this.id = m.getMarkerID();
@@ -189,19 +192,19 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
 
     public static class PolyLineMarkerUpdated extends MarkerComponentMessage {
-        public String msg;
-        public double[] x;
-        public double[] y;
-        public double[] z;
-        public int weight;
-        public double opacity;
-        public String color;
-        public String id;
-        public String label;
-        public String set;
-        public String desc;
-        public int minzoom;
-        public int maxzoom;
+        public final String msg;
+        public final double[] x;
+        public final double[] y;
+        public final double[] z;
+        public final int weight;
+        public final double opacity;
+        public final String color;
+        public final String id;
+        public final String label;
+        public final String set;
+        public final String desc;
+        public final int minzoom;
+        public final int maxzoom;
         
         public PolyLineMarkerUpdated(PolyLineMarker m, boolean deleted) {
             this.id = m.getMarkerID();
@@ -243,23 +246,23 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
 
     public static class CircleMarkerUpdated extends MarkerComponentMessage {
-        public String msg;
-        public double x;
-        public double y;
-        public double z;
-        public double xr;
-        public double zr;
-        public int weight;
-        public double opacity;
-        public String color;
-        public double fillopacity;
-        public String fillcolor;
-        public String id;
-        public String label;
-        public String set;
-        public String desc;
-        public int minzoom;
-        public int maxzoom;
+        public final String msg;
+        public final double x;
+        public final double y;
+        public final double z;
+        public final double xr;
+        public final double zr;
+        public final int weight;
+        public final double opacity;
+        public final String color;
+        public final double fillopacity;
+        public final String fillcolor;
+        public final String id;
+        public final String label;
+        public final String set;
+        public final String desc;
+        public final int minzoom;
+        public final int maxzoom;
         
         public CircleMarkerUpdated(CircleMarker m, boolean deleted) {
             this.id = m.getMarkerID();
@@ -299,13 +302,13 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
     }
 
     public static class MarkerSetUpdated extends MarkerComponentMessage {
-        public String msg;
-        public String id;
-        public String label;
-        public int layerprio;
-        public int minzoom;
-        public int maxzoom;
-        public Boolean showlabels;
+        public final String msg;
+        public final String id;
+        public final String label;
+        public final int layerprio;
+        public final int minzoom;
+        public final int maxzoom;
+        public final Boolean showlabels;
         public MarkerSetUpdated(MarkerSet markerset, boolean deleted) {
             this.id = markerset.getMarkerSetID();
             this.label = markerset.getMarkerSetLabel();

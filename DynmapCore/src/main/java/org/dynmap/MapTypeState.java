@@ -9,7 +9,7 @@ import org.dynmap.utils.TileFlags;
 public class MapTypeState {
     public static final long DEF_INV_PERIOD = 30;
     public static final long NANOS_PER_SECOND = 1000000000L;
-    public MapType type;
+    public final MapType type;
     private final Object invTileLock = new Object();
     private TileFlags pendingInvTiles = new TileFlags();
     private TileFlags pendingInvTilesAlt = new TileFlags();

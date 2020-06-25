@@ -1,8 +1,8 @@
 package org.dynmap;
 
 public abstract class Component {
-    protected DynmapCore core;
-    protected ConfigurationNode configuration;
+    protected final DynmapCore core;
+    protected final ConfigurationNode configuration;
     public Component(DynmapCore core, ConfigurationNode configuration) {
         this.core = core;
         this.configuration = configuration;

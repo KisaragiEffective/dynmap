@@ -1645,7 +1645,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     
     public static boolean migrateChunks() {
         if ((plugin != null) && (plugin.core != null)) {
-            return plugin.core.migrateChunks();
+            return DynmapCore.migrateChunks();
         }
         return false;
     }

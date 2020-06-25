@@ -15,10 +15,10 @@ import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class NijikokunPermissions implements PermissionProvider {
-    String name;
+    final String name;
     PermissionHandler permissions;
-    Plugin plugin;
-    String defworld;
+    final Plugin plugin;
+    final String defworld;
     
     public static NijikokunPermissions create(Server server, String name) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("Permissions");

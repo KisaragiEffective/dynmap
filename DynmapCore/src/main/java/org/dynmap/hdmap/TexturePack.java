@@ -3273,7 +3273,7 @@ public class TexturePack {
     }
 
     private static class ExportedTexturePack {
-        Map<String, ExportedTexture> txtids = new HashMap<>();
+        final Map<String, ExportedTexture> txtids = new HashMap<>();
         DynmapBufferedImage img;
         OBJExport exp;
         String name;

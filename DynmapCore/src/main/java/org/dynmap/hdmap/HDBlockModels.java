@@ -30,10 +30,10 @@ import org.dynmap.utils.PatchDefinitionFactory;
  */
 public class HDBlockModels {
     private static int max_patches;
-    static HashMap<Integer, HDBlockModel> models_by_id_data = new HashMap<>();
-    static PatchDefinitionFactory pdf = new PatchDefinitionFactory();
-    static BitSet customModelsRequestingTileData = new BitSet(); // Index by globalStateIndex
-    static BitSet changeIgnoredBlocks = new BitSet();   // Index by globalStateIndex
+    static final HashMap<Integer, HDBlockModel> models_by_id_data = new HashMap<>();
+    static final PatchDefinitionFactory pdf = new PatchDefinitionFactory();
+    static final BitSet customModelsRequestingTileData = new BitSet(); // Index by globalStateIndex
+    static final BitSet changeIgnoredBlocks = new BitSet();   // Index by globalStateIndex
     private static final HashSet<String> loadedmods = new HashSet<>();
     private static final HashMap<Integer, HDScaledBlockModels> scaled_models_by_scale = new HashMap<>();
 
@@ -308,7 +308,7 @@ public class HDBlockModels {
 
     private static class BoxLimits {
         double xmin = 0.0, xmax = 1.0, ymin = 0.0, ymax = 1.0, zmin = 0.0, zmax = 1.0;
-        int[] patches = new int[6]; // Default all to patch0
+        final int[] patches = new int[6]; // Default all to patch0
     }
     /**
      * Load models from file

@@ -18,8 +18,8 @@ import org.bukkit.command.CommandSender;
 import org.dynmap.Log;
 
 public class LuckPermsPermissions implements PermissionProvider {
-    String name;
-    LuckPermsApi luckPerms;
+    final String name;
+    final LuckPermsApi luckPerms;
 
     public static LuckPermsPermissions create(Server server, String name) {
         try {

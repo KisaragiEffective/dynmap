@@ -62,7 +62,7 @@ public class ChunkSnapshot
     private static final EmptySection empty_section = new EmptySection();
     
     private static class StdSection implements Section {
-        DynmapBlockState[] states;
+        final DynmapBlockState[] states;
         byte[] skylight;
         byte[] emitlight;
 

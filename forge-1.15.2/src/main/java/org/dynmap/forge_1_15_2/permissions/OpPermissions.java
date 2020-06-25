@@ -10,7 +10,7 @@ import org.dynmap.Log;
 import org.dynmap.forge_1_15_2.DynmapPlugin;
 
 public class OpPermissions implements PermissionProvider {
-    public HashSet<String> usrCommands = new HashSet<>();
+    public final HashSet<String> usrCommands = new HashSet<>();
 
     public OpPermissions(String[] usrCommands) {
         Collections.addAll(this.usrCommands, usrCommands);

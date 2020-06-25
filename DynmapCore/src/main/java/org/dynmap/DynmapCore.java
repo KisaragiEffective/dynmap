@@ -101,8 +101,8 @@ public class DynmapCore implements DynmapCommonAPI {
     public PlayerList playerList;
     public ConfigurationNode configuration;
     public ConfigurationNode world_config;
-    public ComponentManager componentManager = new ComponentManager();
-    public DynmapListenerManager listenerManager = new DynmapListenerManager(this);
+    public final ComponentManager componentManager = new ComponentManager();
+    public final DynmapListenerManager listenerManager = new DynmapListenerManager(this);
     public PlayerFaces playerfacemgr;
     public SkinUrlProvider skinUrlProvider;
     public Events events = new Events();

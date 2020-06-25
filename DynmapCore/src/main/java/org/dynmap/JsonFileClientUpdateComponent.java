@@ -31,11 +31,11 @@ import java.nio.charset.Charset;
 import java.util.stream.Collectors;
 
 public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
-    protected long jsonInterval;
+    protected final long jsonInterval;
     protected long currentTimestamp = 0;
     protected long lastTimestamp = 0;
     protected long lastChatTimestamp = 0;
-    protected JSONParser parser = new JSONParser();
+    protected final JSONParser parser = new JSONParser();
     private final boolean hidewebchatip;
     private final boolean useplayerloginip;
     private final boolean requireplayerloginip;

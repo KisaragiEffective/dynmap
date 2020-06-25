@@ -14,9 +14,9 @@ import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 
 public class GroupManagerPermissions implements PermissionProvider {
-    String name;
-    GroupManager gm;
-    WorldsHolder wh;
+    final String name;
+    final GroupManager gm;
+    final WorldsHolder wh;
 
     public static GroupManagerPermissions create(Server server, String name) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("GroupManager");

@@ -15,9 +15,9 @@ import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 
 public class HDMapManager {
-    public HashMap<String, HDShader> shaders = new HashMap<>();
-    public HashMap<String, HDPerspective> perspectives = new HashMap<>();
-    public HashMap<String, HDLighting> lightings = new HashMap<>();
+    public final HashMap<String, HDShader> shaders = new HashMap<>();
+    public final HashMap<String, HDPerspective> perspectives = new HashMap<>();
+    public final HashMap<String, HDLighting> lightings = new HashMap<>();
     public HashSet<HDMap> maps = new HashSet<>();
     public HashMap<String, ArrayList<HDMap>> maps_by_world_perspective = new HashMap<>();
  

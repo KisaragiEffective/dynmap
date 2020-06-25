@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class MainServlet extends HttpServlet {
     public static class Header {
-        public String name;
-        public String value;
+        public final String name;
+        public final String value;
         public Header(String name, String value) {
             this.name = name;
             this.value = value;
@@ -24,8 +24,8 @@ public class MainServlet extends HttpServlet {
     }
     
     private static class Registration {
-        public String pattern;
-        public HttpServlet servlet;
+        public final String pattern;
+        public final HttpServlet servlet;
         
         public Registration(String pattern, HttpServlet servlet) {
             this.pattern = pattern;
@@ -33,8 +33,8 @@ public class MainServlet extends HttpServlet {
         }
     }
     
-    List<Registration> registrations = new LinkedList<>();
-    public List<Header> customHeaders = new LinkedList<>();
+    final List<Registration> registrations = new LinkedList<>();
+    public final List<Header> customHeaders = new LinkedList<>();
     
     public void addServlet(String pattern, HttpServlet servlet) {
         registrations.add(new Registration(pattern, servlet));
@@ -132,7 +132,7 @@ public class MainServlet extends HttpServlet {
     }
     
     class RequestWrapper extends HttpServletRequestWrapper {
-        String pathInfo;
+        final String pathInfo;
         public RequestWrapper(HttpServletRequest request, String pathInfo) {
             super(request);
             this.pathInfo = pathInfo;

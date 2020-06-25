@@ -37,13 +37,13 @@ import org.dynmap.utils.Polygon;
 import org.dynmap.utils.TileFlags;
 
 public class MapManager {
-    public AsynchronousQueue<MapTile> tileQueue;
+    public final AsynchronousQueue<MapTile> tileQueue;
 
     private static final int DEFAULT_CHUNKS_PER_TICK = 200;
     private static final int DEFAULT_ZOOMOUT_PERIOD = 60;
-    public List<DynmapWorld> worlds = new CopyOnWriteArrayList<>();
+    public final List<DynmapWorld> worlds = new CopyOnWriteArrayList<>();
     private final List<String> disabled_worlds = new ArrayList<>();
-    public Map<String, DynmapWorld> worldsLookup = new HashMap<>();
+    public final Map<String, DynmapWorld> worldsLookup = new HashMap<>();
     private final DynmapCore core;
     private final long timeslice_int; /* In milliseconds */
     private int max_chunk_loads_per_tick;
@@ -103,9 +103,9 @@ public class MapManager {
     private final HashMap<String, FullWorldRenderState> active_renders = new HashMap<>();
 
     /* Chunk load performance numbers */
-    AtomicInteger chunk_caches_created = new AtomicInteger(0);
-    AtomicInteger[] chunks_read;
-    AtomicLong[] chunks_read_times;
+    final AtomicInteger chunk_caches_created = new AtomicInteger(0);
+    final AtomicInteger[] chunks_read;
+    final AtomicLong[] chunks_read_times;
     
     /* lock for our data structures */
     public static final Object lock = new Object();
@@ -246,7 +246,7 @@ public class MapManager {
     
     /* This always runs on render pool threads - no bukkit calls from here */ 
     private class FullWorldRenderState implements Runnable {
-        DynmapWorld world;    /* Which world are we rendering */
+        final DynmapWorld world;    /* Which world are we rendering */
         DynmapLocation loc;        
         int    map_index = -1;    /* Which map are we on */
         MapType map;
@@ -272,10 +272,10 @@ public class MapManager {
         boolean resume = false;
         boolean quiet = false;
         String mapname;
-        AtomicLong total_render_ns = new AtomicLong(0L);
-        AtomicInteger rendercalls = new AtomicInteger(0);
+        final AtomicLong total_render_ns = new AtomicLong(0L);
+        final AtomicInteger rendercalls = new AtomicInteger(0);
         long lastPendingSaveTS = 0; // Timestamp of last pending state save (msec)
-        HashSet<String> storedTileIds = new HashSet<>();
+        final HashSet<String> storedTileIds = new HashSet<>();
 
         /* Full world, all maps render */
         FullWorldRenderState(DynmapWorld dworld, DynmapLocation l, DynmapCommandSender sender, String mapname, boolean updaterender, boolean resume) {
@@ -833,7 +833,7 @@ public class MapManager {
     }
     
     private class CheckWorldTimes implements Runnable {
-    	HashMap<String, Polygon> last_worldborder = new HashMap<>();
+    	final HashMap<String, Polygon> last_worldborder = new HashMap<>();
         public void run() {
             Future<Integer> f = core.getServer().callSyncMethod(() -> {
                 long now_nsec = System.nanoTime();

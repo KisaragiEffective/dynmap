@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class ComponentManager {
-    public Set<Component> components = new HashSet<>();
-    public Map<String, List<Component>> componentLookup = new HashMap<>();
+    public final Set<Component> components = new HashSet<>();
+    public final Map<String, List<Component>> componentLookup = new HashMap<>();
     
     public void add(Component c) {
         if (components.add(c)) {

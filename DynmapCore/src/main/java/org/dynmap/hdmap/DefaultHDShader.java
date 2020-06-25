@@ -21,13 +21,13 @@ import org.json.simple.JSONObject;
 
 public class DefaultHDShader implements HDShader {
     private final String name;
-    protected ColorScheme colorScheme;
+    protected final ColorScheme colorScheme;
 
-    protected boolean transparency; /* Is transparency support active? */
+    protected final boolean transparency; /* Is transparency support active? */
     public enum BiomeColorOption {
         NONE, BIOME, TEMPERATURE, RAINFALL
     }
-    protected BiomeColorOption biomecolored; /* Use biome for coloring */
+    protected final BiomeColorOption biomecolored; /* Use biome for coloring */
     
     public DefaultHDShader(DynmapCore core, ConfigurationNode configuration) {
         name = (String) configuration.get("name");
@@ -85,8 +85,8 @@ public class DefaultHDShader implements HDShader {
     
     private class OurShaderState implements HDShaderState {
         private final Color[] color;
-        protected MapIterator mapiter;
-        protected HDMap map;
+        protected final MapIterator mapiter;
+        protected final HDMap map;
         private final Color[] tmpcolor;
         private int pixelodd;
         private final HDLighting lighting;

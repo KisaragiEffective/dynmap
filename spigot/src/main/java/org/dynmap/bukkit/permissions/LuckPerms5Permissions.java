@@ -19,8 +19,8 @@ import org.bukkit.command.CommandSender;
 import org.dynmap.Log;
 
 public class LuckPerms5Permissions implements PermissionProvider {
-    String name;
-    LuckPerms luckPerms;
+    final String name;
+    final LuckPerms luckPerms;
 
     public static LuckPerms5Permissions create(Server server, String name) {
         try {

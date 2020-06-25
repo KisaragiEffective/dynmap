@@ -14,7 +14,7 @@ import org.dynmap.debug.Debug;
 public class ColorScheme {
     private static final HashMap<String, ColorScheme> cache = new HashMap<>();
 
-    public String name;
+    public final String name;
     /* Switch to arrays - faster than map */
     public Color[][] colors;    /* [blk-type][step] */
     public Color[][][] datacolors; /* [bkt-type][blk-dat][step] */

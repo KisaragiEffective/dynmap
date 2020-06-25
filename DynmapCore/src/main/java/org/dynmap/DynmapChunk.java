@@ -1,7 +1,8 @@
 package org.dynmap;
 
 public class DynmapChunk {
-    public int x, z;
+    public final int x;
+    public final int z;
 
     public DynmapChunk(int x, int z) {
         this.x = x;

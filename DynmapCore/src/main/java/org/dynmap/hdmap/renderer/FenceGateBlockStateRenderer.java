@@ -25,7 +25,7 @@ public class FenceGateBlockStateRenderer extends CustomRenderer {
         private static final int IDX_WEST = 8;
         private static final int IDX_EAST = 12;
         // Meshes, indexed by idx%2=open/closed, (idx/2)%2=in-wall/not-in-wall, (idx/4)%4=n/s/w/e
-        protected RenderPatch[][] meshes = new RenderPatch[16][];
+        protected final RenderPatch[][] meshes = new RenderPatch[16][];
         
         @Override
         public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

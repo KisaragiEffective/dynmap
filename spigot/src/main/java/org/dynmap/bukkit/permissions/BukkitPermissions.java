@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 import org.dynmap.Log;
 
 public class BukkitPermissions implements PermissionProvider {
-    protected String name;
-    protected Map<String, Boolean> pd;
+    protected final String name;
+    protected final Map<String, Boolean> pd;
 
     public static BukkitPermissions create(String name, Map<String,Boolean> pd) {
         try {

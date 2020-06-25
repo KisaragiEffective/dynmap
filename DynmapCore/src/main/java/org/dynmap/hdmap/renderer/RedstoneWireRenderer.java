@@ -21,7 +21,7 @@ public class RedstoneWireRenderer extends CustomRenderer {
     // Patches for sides - (N, S, E, W)
     private final RenderPatch[] side_patches = new RenderPatch[4];
     // Array of lists - index: bit 0-3=bottom index, bit4=N side, 5=southside, 6=E side, 7=W side present
-    protected RenderPatch[][] meshes = new RenderPatch[256][];
+    protected final RenderPatch[][] meshes = new RenderPatch[256][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

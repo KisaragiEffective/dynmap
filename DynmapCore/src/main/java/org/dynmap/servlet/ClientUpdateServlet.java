@@ -33,7 +33,7 @@ public class ClientUpdateServlet extends HttpServlet {
         this.core = plugin;
     }
 
-    Pattern updatePathPattern = Pattern.compile("/([^/]+)/([0-9]*)");
+    final Pattern updatePathPattern = Pattern.compile("/([^/]+)/([0-9]*)");
     @SuppressWarnings("unchecked")
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

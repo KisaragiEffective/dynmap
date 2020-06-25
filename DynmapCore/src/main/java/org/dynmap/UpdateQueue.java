@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class UpdateQueue {
-    public Object lock = new Object();
+    public final Object lock = new Object();
     private final HashMap<UpdateRec,UpdateRec> updateSet = new HashMap<>();
     private UpdateRec orderedlist = null;   /* Oldest to youngest */
     private static final long maxUpdateAge = 120000;

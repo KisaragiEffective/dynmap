@@ -29,14 +29,14 @@ import com.google.gson.JsonParseException;
  */
 public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
     private final String obc_package; // Package used for org.bukkit.craftbukkit
-    protected String nms_package; // Package used for net.minecraft.server
+    protected final String nms_package; // Package used for net.minecraft.server
     private boolean failed;
     protected static final Object[] nullargs = new Object[0];
     protected static final Class<?>[] nulltypes = new Class[0];
     private static final Map<?, ?> nullmap = Collections.emptyMap();
     
     /** CraftChunkSnapshot */
-    protected Class<?> craftchunksnapshot;
+    protected final Class<?> craftchunksnapshot;
     private Field ccss_biome;
     /** CraftChunk */
     private final Class<?> craftchunk;
@@ -104,9 +104,9 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
     protected Method nmsbp_getz;
     
     /** Server */
-    protected Method server_getonlineplayers;
+    protected final Method server_getonlineplayers;
     /** Player */
-    protected Method player_gethealth;
+    protected final Method player_gethealth;
     // CraftPlayer
     private final Class<?> obc_craftplayer;
     private final Method obcplayer_getprofile;

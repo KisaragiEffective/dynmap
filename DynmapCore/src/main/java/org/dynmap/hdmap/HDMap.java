@@ -43,7 +43,7 @@ public class HDMap extends MapType {
     private String append_to_world;
     private int mapzoomin;
     private int boostzoom;
-    public DynmapCore core;
+    public final DynmapCore core;
 
     public static final String IMGFORMAT_PNG = "png";
     public static final String IMGFORMAT_JPG = "jpg";

@@ -13,7 +13,8 @@ public class PatchDefinition implements RenderPatch {
     public double vmin, vmax;   /* Limits of patch - minimum and maximum v value */
     public double vmaxatumax;   /* Limits of patch - max v value at max u (allows triangle or trapezoid) */
     public double vminatumax;   /* Limits of patch - min v value at max u (allows triangle or trapezoid) */
-    public Vector3D u, v;       /* U and V vector, relative to origin */
+    public final Vector3D u;
+    public final Vector3D v;       /* U and V vector, relative to origin */
     public SideVisible sidevis;  /* Which side is visible */
     public int textureindex;
     public BlockStep step; /* Best approximation of orientation of surface, from top (positive determinent) */

@@ -138,7 +138,7 @@ public class DynmapPlugin
     	String wid;
     	int x, y, z;
     }
-    ConcurrentLinkedQueue<BlockUpdateRec> blockupdatequeue = new ConcurrentLinkedQueue<>();
+    final ConcurrentLinkedQueue<BlockUpdateRec> blockupdatequeue = new ConcurrentLinkedQueue<>();
 
     public static DynmapBlockState[] stateByID;
     
@@ -339,7 +339,7 @@ public class DynmapPlugin
     }
     
     public static class OurLog implements DynmapLogger {
-        Logger log;
+        final Logger log;
         public static final String DM = "[Dynmap] ";
         OurLog() {
             log = LogManager.getLogger("Dynmap");

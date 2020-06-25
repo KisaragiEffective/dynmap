@@ -27,7 +27,7 @@ public class DynmapMod
     public static DynmapMod instance;
 
     // Says where the client and server 'proxy' code is loaded.
-    public static Proxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> Proxy::new);
+    public static final Proxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> Proxy::new);
     
     public static DynmapPlugin plugin;
     public static File jarfile;

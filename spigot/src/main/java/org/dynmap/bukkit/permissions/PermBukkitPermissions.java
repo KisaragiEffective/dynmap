@@ -9,8 +9,8 @@ import org.dynmap.Log;
 import com.platymuus.bukkit.permissions.PermissionsPlugin;
 
 public class PermBukkitPermissions extends BukkitPermissions {
-    PermissionsPlugin plugin;
-    Map<String, Boolean> pd;
+    final PermissionsPlugin plugin;
+    final Map<String, Boolean> pd;
     
     public static PermBukkitPermissions create(Server server, String name, Map<String, Boolean> pd) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("PermissionsBukkit");

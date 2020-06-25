@@ -18,7 +18,7 @@ public interface MarkerIcon {
         MARKER_16x16("16x16"),
         MARKER_32x32("32x32");
         
-        String sz;
+        final String sz;
         MarkerSize(String sz) {
             this.sz = sz;
         }

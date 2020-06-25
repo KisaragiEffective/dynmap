@@ -14,7 +14,7 @@ public class AsynchronousQueue<T> {
     private final Handler<T> handler;
     private final int dequeueTime;
     private final int accelDequeueTime;
-    public int accelDequeueThresh;
+    public final int accelDequeueThresh;
     private int pendingcnt;
     private final int pendinglimit;
     private final boolean normalprio;

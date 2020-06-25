@@ -51,9 +51,9 @@ public class DynmapBlockState {
     private static final HashMap<Integer, DynmapBlockState> blocksByLegacyID = new HashMap<>();
         
     // Well known block names (some versions might need to overwrite these)
-    public static String AIR_BLOCK = "minecraft:air";
+    public static final String AIR_BLOCK = "minecraft:air";
     public static String STONE_BLOCK = "minecraft:stone";
-    public static String GRASS_BLOCK = "minecraft:grass";
+    public static final String GRASS_BLOCK = "minecraft:grass";
     public static String GOLD_ORE_BLOCK = "minecraft:gold_ore";
     public static String IRON_ORE_BLOCK = "minecraft:iron_ore";
     public static String COAL_ORE_BLOCK = "minecraft:coal_ore";
@@ -63,19 +63,19 @@ public class DynmapBlockState {
     public static String LIT_REDSTONE_ORE_BLOCK = "minecraft:lit_redstone_ore";
     public static String EMERALD_ORE_BLOCK = "minecraft:emerald_ore";
     public static String QUARTZ_ORE_BLOCK = "minecraft:quartz_ore";
-    public static String LOG_BLOCK = "minecraft:log";
-    public static String LOG2_BLOCK = "minecraft:log2";
+    public static final String LOG_BLOCK = "minecraft:log";
+    public static final String LOG2_BLOCK = "minecraft:log2";
     public static String LEAVES_BLOCK = "minecraft:leaves";
     public static String LEAVES2_BLOCK = "minecraft:leaves2";
     public static String GLASS_BLOCK = "minecraft:glass";
     public static String WOODEN_DOOR_BLOCK = "minecraft:wooden_door";
     public static String IRON_DOOR_BLOCK = "minecraft:iron_door";
-    public static String SNOW_LAYER_BLOCK = "minecraft:snow_layer";
-    public static String SNOW_BLOCK = "minecraft:snow";
+    public static final String SNOW_LAYER_BLOCK = "minecraft:snow_layer";
+    public static final String SNOW_BLOCK = "minecraft:snow";
     public static String ICE_BLOCK = "minecraft:ice";
     public static String QUARTZ_BLOCK = "minecraft:quartz_block";
-    public static String WATER_BLOCK = "minecraft:water";
-    public static String FLOWING_WATER_BLOCK = "minecraft:flowing_water";
+    public static final String WATER_BLOCK = "minecraft:water";
+    public static final String FLOWING_WATER_BLOCK = "minecraft:flowing_water";
 
     /** Names of log blocks: mod versions will need to add to this */
     private static final HashSet<String> log_blocks = new HashSet<>(Arrays.asList(LOG_BLOCK, LOG2_BLOCK));

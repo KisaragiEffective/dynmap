@@ -15,8 +15,8 @@ import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class PEXPermissions implements PermissionProvider {
-    String name;
-    PermissionManager pm;
+    final String name;
+    final PermissionManager pm;
 
     public static PEXPermissions create(Server server, String name) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("PermissionsEx");

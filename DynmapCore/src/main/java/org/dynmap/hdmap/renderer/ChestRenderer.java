@@ -19,7 +19,7 @@ public class ChestRenderer extends CustomRenderer {
     }
 
     // Models, indexed by ChestData.ordinal()
-    protected RenderPatch[][] models = new RenderPatch[ChestData.values().length][];
+    protected final RenderPatch[][] models = new RenderPatch[ChestData.values().length][];
 
     private static final double OFF1 = 1.0 / 16.0;
     private static final double OFF14 = 14.0 / 16.0;

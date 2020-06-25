@@ -17,7 +17,7 @@ public class MushroomStateRenderer extends CustomRenderer {
     private static final int TEXTURE_INSIDE = 1;
     
     // Meshes, indexed by state index (bit5=down, bit4=east, bit3=north, bit2=south, bit1=up, bit0=west)
-    protected RenderPatch[][] meshes = new RenderPatch[64][];
+    protected final RenderPatch[][] meshes = new RenderPatch[64][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

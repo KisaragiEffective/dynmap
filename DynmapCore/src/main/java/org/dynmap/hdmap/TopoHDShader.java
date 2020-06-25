@@ -121,8 +121,8 @@ public class TopoHDShader implements HDShader {
         private final Color[] color;
         private final Color[] tmpcolor;
         private final Color c;
-        protected MapIterator mapiter;
-        protected HDMap map;
+        protected final MapIterator mapiter;
+        protected final HDMap map;
         private final HDLighting lighting;
         private final int scale;
         private int heightshift;    /* Divide to keep in 0-127 range of colors */

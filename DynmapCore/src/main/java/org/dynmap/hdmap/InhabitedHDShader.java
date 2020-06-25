@@ -99,7 +99,7 @@ public class InhabitedHDShader implements HDShader {
     private class OurShaderState implements HDShaderState {
         private final Color[] color;
         private final Color c;
-        protected HDMap map;
+        protected final HDMap map;
         private final HDLighting lighting;
         final int[] lightingTable;
         
