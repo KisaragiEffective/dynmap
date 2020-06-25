@@ -98,14 +98,14 @@ public class ColorScheme {
                 if (split.length < 17) {
                     continue;
                 }
-                Integer id;
+                int id;
                 Integer dat = null;
                 boolean isbiome = false;
                 boolean istemp = false;
                 boolean israin = false;
                 int idx = split[0].indexOf(':');
                 if(idx > 0) {    /* ID:data - data color */
-                    id = new Integer(split[0].substring(0, idx));
+                    id = Integer.parseInt(split[0].substring(0, idx));
                     dat = new Integer(split[0].substring(idx+1));
                 }
                 else if(split[0].charAt(0) == '[') {    /* Biome color data */

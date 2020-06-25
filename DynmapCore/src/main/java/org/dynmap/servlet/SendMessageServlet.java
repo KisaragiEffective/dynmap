@@ -34,23 +34,23 @@ public class SendMessageServlet extends HttpServlet {
     private static final JSONParser parser = new JSONParser();
     public final Event<Message> onMessageReceived = new Event<>();
     private final Charset cs_utf8 = StandardCharsets.UTF_8;
-    public final int maximumMessageInterval = 1000;
-    public final boolean hideip = false;
-    public final boolean trustclientname = false;
+    public int maximumMessageInterval = 1000;
+    public boolean hideip = false;
+    public boolean trustclientname = false;
     
-    public final String spamMessage = "\"You may only chat once every %interval% seconds.\"";
+    public String spamMessage = "\"You may only chat once every %interval% seconds.\"";
     private final HashMap<String, WebUser> disallowedUsers = new HashMap<>();
     private final LinkedList<WebUser> disallowedUserQueue = new LinkedList<>();
     private final Object disallowedUsersLock = new Object();
     private final HashMap<String,String> useralias = new HashMap<>();
     private int aliasindex = 1;
-    public final boolean use_player_login_ip = false;
-    public final boolean require_player_login_ip = false;
-    public final boolean check_user_ban = false;
-    public final boolean require_login = false;
-    public final boolean chat_perms = false;
-    public final int lengthlimit = 256;
-    public final DynmapCore core;
+    public boolean use_player_login_ip = false;
+    public boolean require_player_login_ip = false;
+    public boolean check_user_ban = false;
+    public boolean require_login = false;
+    public boolean chat_perms = false;
+    public int lengthlimit = 256;
+    public DynmapCore core;
     public final HashSet<String> proxyaddress = new HashSet<>();
 
     @Override
@@ -207,7 +207,7 @@ public class SendMessageServlet extends HttpServlet {
         public String message;
     }
     public static class WebUser {
-        public final long nextMessageTime;
-        public final String name;
+        public long nextMessageTime;
+        public String name;
     }
 }

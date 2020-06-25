@@ -23,7 +23,7 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
         dcore.addServlet("/up/world/*", new ClientUpdateServlet(dcore));
 
         jsonInterval = (long)(configuration.getFloat("writeinterval", 1) * 1000);
-        final Boolean allowwebchat = configuration.getBoolean("allowwebchat", false);
+        final boolean allowwebchat = configuration.getBoolean("allowwebchat", false);
         final Boolean hidewebchatip = configuration.getBoolean("hidewebchatip", false);
         final Boolean trust_client_name = configuration.getBoolean("trustclientname", false);
         final float webchatInterval = configuration.getFloat("webchat-interval", 1);
