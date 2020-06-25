@@ -47,9 +47,10 @@ public class ClientComponent extends Component {
     }
     
     @SuppressWarnings("unchecked")
-    protected static JSONArray convertList(List<?> l) {
-        JSONArray o = l.stream().map(ClientComponent::convert).collect(Collectors.toCollection(JSONArray::new));
-        return o;
+    protected static JSONArray convertList(List<?> list) {
+        return list.stream()
+                .map(ClientComponent::convert)
+                .collect(Collectors.toCollection(JSONArray::new));
     }
     
     @SuppressWarnings("unchecked")

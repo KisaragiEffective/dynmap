@@ -44,7 +44,7 @@ public class Json {
                 s2.append("\\/");
                 break;
             default:
-                if((ch>='\u0000' && ch<='\u001F') || (ch>='\u007F')){
+                if(ch <= '\u001F' || ch >= '\u007F'){
                     String ss=Integer.toHexString(ch);
                     s2.append(IntStream.range(0, 4 - ss.length()).mapToObj(k -> "0").collect(Collectors.joining("", "\\u", ss.toUpperCase())));
                 }

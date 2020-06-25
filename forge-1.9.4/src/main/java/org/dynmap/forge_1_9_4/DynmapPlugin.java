@@ -77,10 +77,6 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.debug.Debug;
-import org.dynmap.forge_1_9_4.DmapCommand;
-import org.dynmap.forge_1_9_4.DmarkerCommand;
-import org.dynmap.forge_1_9_4.DynmapCommand;
-import org.dynmap.forge_1_9_4.DynmapMod;
 import org.dynmap.forge_1_9_4.permissions.FilePermissions;
 import org.dynmap.forge_1_9_4.permissions.OpPermissions;
 import org.dynmap.forge_1_9_4.permissions.PermissionProvider;
@@ -454,9 +450,9 @@ public class DynmapPlugin
         return rslt;
     }
     private boolean hasOfflinePermission(String player, String perm) {
-        PermissionsHandler ph = PermissionsHandler.getHandler();
-        if(ph != null) {
-            if(ph.hasOfflinePermission(player, perm)) {
+        PermissionsHandler handler = PermissionsHandler.getHandler();
+        if(handler != null) {
+            if(handler.hasOfflinePermission(player, perm)) {
                 return true;
             }
         }
@@ -469,7 +465,7 @@ public class DynmapPlugin
     public class ForgeServer extends DynmapServerInterface
     {
         /* Server thread scheduler */
-        private final Object schedlock = new Object();
+        private final Object mutex = new Object();
         private long cur_tick;
         private long next_id;
         private long cur_tick_starttime;
@@ -511,7 +507,7 @@ public class DynmapPlugin
             tr.future = new FutureTask<>(run, null);
 
             /* Add task record to queue */
-            synchronized (schedlock)
+            synchronized (mutex)
             {
                 tr.id = next_id++;
                 tr.ticktorun = cur_tick + delay;
@@ -521,19 +517,11 @@ public class DynmapPlugin
         @Override
         public DynmapPlayer[] getOnlinePlayers()
         {
-            if(server.getPlayerList() == null)
-                return new DynmapPlayer[0];
-            List<?> playlist = server.getPlayerList().getPlayerList();
-            int pcnt = playlist.size();
-            DynmapPlayer[] dplay = new DynmapPlayer[pcnt];
-
-            for (int i = 0; i < pcnt; i++)
-            {
-                EntityPlayer p = (EntityPlayer)playlist.get(i);
-                dplay[i] = getOrAddPlayer(p);
-            }
-
-            return dplay;
+            return server.getPlayerList()
+                    .getPlayerList()
+                    .stream()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .toArray(DynmapPlayer[]::new);
         }
         @Override
         public void reload()
@@ -545,9 +533,13 @@ public class DynmapPlugin
         @Override
         public DynmapPlayer getPlayer(String name)
         {
-            List<?> players = server.getPlayerList().getPlayerList();
-
-            return players.stream().map(o -> (EntityPlayer) o).filter(p -> p.getCommandSenderEntity().getName().equalsIgnoreCase(name)).findFirst().map(DynmapPlugin.this::getOrAddPlayer).orElse(null);
+            return server.getPlayerList()
+                    .getPlayerList()
+                    .stream()
+                    .filter(p -> p.getCommandSenderEntity().getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .orElse(null);
 
         }
         @Override
@@ -571,7 +563,7 @@ public class DynmapPlugin
             tr.future = ft;
 
             /* Add task record to queue */
-            synchronized (schedlock)
+            synchronized (mutex)
             {
                 tr.id = next_id++;
                 tr.ticktorun = cur_tick + delay;
@@ -583,13 +575,7 @@ public class DynmapPlugin
         @Override
         public String getServerName()
         {
-            String sn;
-            if (server.isSinglePlayer())
-                sn = "Integrated";
-            else
-                sn = server.getServerHostname();
-        	if(sn == null) sn = "Unknown Server";
-        	return sn;
+            return server.isSinglePlayer() ? "Integrated" : server.getServerHostname();
         }
         @Override
         public boolean isPlayerBanned(String pid)
@@ -713,10 +699,9 @@ public class DynmapPlugin
         @Override
         public String[] getBiomeIDs()
         {
-            BiomeMap[] b = BiomeMap.values();
-            String[] bname = Arrays.stream(b).map(BiomeMap::toString).toArray(String[]::new);
-
-            return bname;
+            return Arrays.stream(BiomeMap.values())
+                    .map(BiomeMap::toString)
+                    .toArray(String[]::new);
         }
         @Override
         public double getCacheHitRate()
@@ -750,11 +735,11 @@ public class DynmapPlugin
         @Override
         public Set<String> checkPlayerPermissions(String player, Set<String> perms)
         {
-            net.minecraft.server.management.PlayerList scm = server.getPlayerList();
-            if (scm == null) return Collections.emptySet();
-            UserListBans bl = scm.getBannedPlayers();
-            if (bl == null) return Collections.emptySet();
-            if(bl.isBanned(new GameProfile(null, player))) {
+            net.minecraft.server.management.PlayerList playerManager = server.getPlayerList();
+            if (playerManager == null) return Collections.emptySet();
+            UserListBans bannedList = playerManager.getBannedPlayers();
+            if (bannedList == null) return Collections.emptySet();
+            if(bannedList.isBanned(new GameProfile(null, player))) {
                 return Collections.emptySet();
             }
             Set<String> rslt = hasOfflinePermissions(player, perms);
@@ -769,11 +754,11 @@ public class DynmapPlugin
         @Override
         public boolean checkPlayerPermission(String player, String perm)
         {
-            net.minecraft.server.management.PlayerList scm = server.getPlayerList();
-            if (scm == null) return false;
-            UserListBans bl = scm.getBannedPlayers();
-            if (bl == null) return false;
-            if(bl.isBanned(new GameProfile(null, player))) {
+            net.minecraft.server.management.PlayerList playerList = server.getPlayerList();
+            if (playerList == null) return false;
+            UserListBans bans = playerList.getBannedPlayers();
+            if (bans == null) return false;
+            if(bans.isBanned(new GameProfile(null, player))) {
                 return false;
             }
             return hasOfflinePermission(player, perm);
@@ -883,25 +868,25 @@ public class DynmapPlugin
             TaskRecord tr;
 
             while(!blockupdatequeue.isEmpty()) {
-                BlockUpdateRec r = blockupdatequeue.remove();
+                BlockUpdateRec top = blockupdatequeue.remove();
                 int id = 0;
                 int meta = 0;
-                if((r.w != null) && (r.w.getChunkProvider().getLoadedChunk(r.x >> 4,  r.z >> 4) != null)) {
-                    id = getBlockID(r.w, r.x, r.y, r.z);
-                    IBlockState bs = r.w.getBlockState(new BlockPos(r.x, r.y, r.z));
+                if((top.w != null) && (top.w.getChunkProvider().getLoadedChunk(top.x >> 4,  top.z >> 4) != null)) {
+                    id = getBlockID(top.w, top.x, top.y, top.z);
+                    IBlockState bs = top.w.getBlockState(new BlockPos(top.x, top.y, top.z));
                     meta = bs.getBlock().getMetaFromState(bs);
                 }
                 if(!org.dynmap.hdmap.HDBlockModels.isChangeIgnoredBlock(stateByID[(id << 4) + meta])) {
                     if(onblockchange_with_id)
-                        mapManager.touch(r.wid, r.x, r.y, r.z, "blockchange[" + id + ":" + meta + "]");
+                        mapManager.touch(top.wid, top.x, top.y, top.z, "blockchange[" + id + ":" + meta + "]");
                     else
-                        mapManager.touch(r.wid, r.x, r.y, r.z, "blockchange");
+                        mapManager.touch(top.wid, top.x, top.y, top.z, "blockchange");
                 }
             }
 
             long now;
 
-            synchronized(schedlock) {
+            synchronized(mutex) {
                 cur_tick++;
                 now = System.nanoTime();
                 tr = runqueue.peek();
@@ -916,7 +901,7 @@ public class DynmapPlugin
             while (!done) {
                 tr.future.run();
 
-                synchronized(schedlock) {
+                synchronized(mutex) {
                     tr = runqueue.peek();
                     now = System.nanoTime();
                     /* Nothing due to run */
@@ -959,7 +944,12 @@ public class DynmapPlugin
 		    Map<String, ModContainer> list = Loader.instance().getIndexedModList();
 		    ModContainer mod = list.get(name);    // Try case sensitive lookup
 		    if (mod == null) {
-                mod = list.entrySet().stream().filter(ent -> ent.getKey().equalsIgnoreCase(name)).findFirst().map(Entry::getValue).orElse(mod);
+                mod = list.entrySet()
+                        .stream()
+                        .filter(ent -> ent.getKey().equalsIgnoreCase(name))
+                        .findFirst()
+                        .map(Entry::getValue)
+                        .orElse(null);
 		    }
 		    if (mod == null) return null;
 		    return mod.getVersion();
@@ -1014,7 +1004,12 @@ public class DynmapPlugin
                 }
             }
             List<ModContainer> mcl = Loader.instance().getModList();
-            return mcl.stream().map(ModContainer::getMod).filter(Objects::nonNull).map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname)).filter(Objects::nonNull).findFirst().orElse(null);
+            return mcl.stream().map(ModContainer::getMod)
+                    .filter(Objects::nonNull)
+                    .map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
         }
         /**
          * Get block unique ID map (module:blockid)
@@ -1174,12 +1169,12 @@ public class DynmapPlugin
         @Override
         public InetSocketAddress getAddress()
         {
-            if((player != null) && (player instanceof EntityPlayerMP)) {
-            	NetHandlerPlayServer nsh = ((EntityPlayerMP)player).connection;
-            	if((nsh != null) && (getNetworkManager(nsh) != null)) {
-            		SocketAddress sa = getNetworkManager(nsh).getRemoteAddress();
-            		if(sa instanceof InetSocketAddress) {
-            			return (InetSocketAddress)sa;
+            if(player instanceof EntityPlayerMP) {
+            	NetHandlerPlayServer conn = ((EntityPlayerMP)player).connection;
+            	if((conn != null) && (getNetworkManager(conn) != null)) {
+            		SocketAddress addr = getNetworkManager(conn).getRemoteAddress();
+            		if(addr instanceof InetSocketAddress) {
+            			return (InetSocketAddress)addr;
             		}
             	}
             }
@@ -1198,16 +1193,7 @@ public class DynmapPlugin
         @Override
         public double getHealth()
         {
-            if (player != null)
-            {
-                double h = player.getHealth();
-                if(h > 20) h = 20;
-                return h;  // Scale to 20 range
-            }
-            else
-            {
-                return 0;
-            }
+            return player == null ? 0 : Math.max(player.getHealth(), 20.0);  // Scale to 20 range
         }
         @Override
         public int getArmorPoints()
@@ -1251,8 +1237,8 @@ public class DynmapPlugin
         @Override
         public void sendMessage(String msg)
         {
-            ITextComponent ichatcomponent = new TextComponentString(msg);
-            player.addChatComponentMessage(ichatcomponent);
+            ITextComponent component = new TextComponentString(msg);
+            player.addChatComponentMessage(component);
         }
         @Override
         public boolean isInvisible() {
@@ -1481,13 +1467,12 @@ public class DynmapPlugin
                 */
             }
         }
-        for(ForgeWorld w : worlds.values()) {
-            if (core.processWorldLoad(w)) {   /* Have core process load first - fire event listeners if good load after */
-                if(w.isLoaded()) {
-                    core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w);
-                }
-            }
-        }
+        /* Have core process load first - fire event listeners if good load after */
+        worlds.values()
+                .stream()
+                .filter(w -> core.processWorldLoad(w))
+                .filter(ForgeWorld::isLoaded)
+                .forEachOrdered(w -> core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w));
         core.updateConfigHashcode();
 
         /* Register our update trigger events */
@@ -1541,18 +1526,18 @@ public class DynmapPlugin
 
     void onCommand(ICommandSender sender, String cmd, String[] args)
     {
-        DynmapCommandSender dsender;
+        DynmapCommandSender dynSender;
 
         if (sender instanceof EntityPlayer)
         {
-            dsender = getOrAddPlayer((EntityPlayer)sender);
+            dynSender = getOrAddPlayer((EntityPlayer)sender);
         }
         else
         {
-            dsender = new ForgeCommandSender(sender);
+            dynSender = new ForgeCommandSender(sender);
         }
 
-        core.processCommand(dsender, cmd, cmd, args);
+        core.processCommand(dynSender, cmd, cmd, args);
     }
 
     private DynmapLocation toLoc(World worldObj, double x, double y, double z)
@@ -1606,7 +1591,7 @@ public class DynmapPlugin
     	}
     }
 
-    /**NOTYET - need rest of forge
+    /*NOTYET - need rest of forge
     public class WorldTracker {
     	@SubscribeEvent
     	public void handleWorldLoad(WorldEvent.Load event) {
@@ -1948,7 +1933,7 @@ public class DynmapPlugin
     private void saveWorlds() {
         File f = new File(core.getDataFolder(), "forgeworlds.yml");
         ConfigurationNode cn = new ConfigurationNode(f);
-        ArrayList<HashMap<String,Object>> lst = new ArrayList<>();
+        List<HashMap<String,Object>> lst = new ArrayList<>();
         for(DynmapWorld fw : core.mapManager.getWorlds()) {
             HashMap<String, Object> vals = new HashMap<>();
             vals.put("name", fw.getRawName());

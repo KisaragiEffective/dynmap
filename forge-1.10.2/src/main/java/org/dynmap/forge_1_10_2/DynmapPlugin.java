@@ -82,15 +82,9 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.debug.Debug;
-import org.dynmap.forge_1_10_2.DmapCommand;
-import org.dynmap.forge_1_10_2.DmarkerCommand;
-import org.dynmap.forge_1_10_2.DynmapCommand;
-import org.dynmap.forge_1_10_2.DynmapMod;
 import org.dynmap.forge_1_10_2.permissions.FilePermissions;
 import org.dynmap.forge_1_10_2.permissions.OpPermissions;
 import org.dynmap.forge_1_10_2.permissions.PermissionProvider;
-import org.dynmap.forge_1_10_2.ForgeWorld;
-import org.dynmap.forge_1_10_2.DynmapPlugin.WorldUpdateTracker;
 import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.DynmapLogger;
@@ -536,17 +530,12 @@ public class DynmapPlugin
         {
             if(server.getPlayerList() == null)
                 return new DynmapPlayer[0];
-            List<?> playlist = server.getPlayerList().getPlayerList();
-            int pcnt = playlist.size();
-            DynmapPlayer[] dplay = new DynmapPlayer[pcnt];
 
-            for (int i = 0; i < pcnt; i++)
-            {
-                EntityPlayer p = (EntityPlayer)playlist.get(i);
-                dplay[i] = getOrAddPlayer(p);
-            }
-
-            return dplay;
+            return server.getPlayerList()
+                    .getPlayerList()
+                    .stream()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .toArray(DynmapPlayer[]::new);
         }
         @Override
         public void reload()
@@ -558,10 +547,9 @@ public class DynmapPlugin
         @Override
         public DynmapPlayer getPlayer(String name)
         {
-            List<?> players = server.getPlayerList().getPlayerList();
+            List<? extends EntityPlayer> players = server.getPlayerList().getPlayerList();
 
             return players.stream()
-                    .map(o -> (EntityPlayer) o)
                     .filter(p -> p.getCommandSenderEntity().getName().equalsIgnoreCase(name))
                     .findFirst()
                     .map(DynmapPlugin.this::getOrAddPlayer)
@@ -975,7 +963,7 @@ public class DynmapPlugin
 		    Map<String, ModContainer> list = Loader.instance().getIndexedModList();
 		    ModContainer mod = list.get(name);    // Try case sensitive lookup
 		    if (mod == null) {
-                mod = list.entrySet().stream().filter(ent -> ent.getKey().equalsIgnoreCase(name)).findFirst().map(Entry::getValue).orElse(mod);
+                mod = list.entrySet().stream().filter(ent -> ent.getKey().equalsIgnoreCase(name)).findFirst().map(Entry::getValue).orElse(null);
 		    }
 		    if (mod == null) return null;
 		    return mod.getVersion();

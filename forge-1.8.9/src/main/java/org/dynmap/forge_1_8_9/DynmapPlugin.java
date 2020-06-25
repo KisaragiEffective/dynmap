@@ -78,10 +78,6 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.debug.Debug;
-import org.dynmap.forge_1_8_9.DmapCommand;
-import org.dynmap.forge_1_8_9.DmarkerCommand;
-import org.dynmap.forge_1_8_9.DynmapCommand;
-import org.dynmap.forge_1_8_9.DynmapMod;
 import org.dynmap.forge_1_8_9.permissions.FilePermissions;
 import org.dynmap.forge_1_8_9.permissions.OpPermissions;
 import org.dynmap.forge_1_8_9.permissions.PermissionProvider;
@@ -465,7 +461,7 @@ public class DynmapPlugin
     public class ForgeServer extends DynmapServerInterface
     {
         /* Server thread scheduler */
-        private final Object schedlock = new Object();
+        private final Object mutex = new Object();
         private long cur_tick;
         private long next_id;
         private long cur_tick_starttime;
@@ -507,7 +503,7 @@ public class DynmapPlugin
             tr.future = new FutureTask<>(run, null);
 
             /* Add task record to queue */
-            synchronized (schedlock)
+            synchronized (mutex)
             {
                 tr.id = next_id++;
                 tr.ticktorun = cur_tick + delay;
@@ -519,17 +515,12 @@ public class DynmapPlugin
         {
             if(server.getConfigurationManager() == null)
                 return new DynmapPlayer[0];
-            List<?> playlist = server.getConfigurationManager().playerEntityList;
-            int pcnt = playlist.size();
-            DynmapPlayer[] dplay = new DynmapPlayer[pcnt];
 
-            for (int i = 0; i < pcnt; i++)
-            {
-                EntityPlayer p = (EntityPlayer)playlist.get(i);
-                dplay[i] = getOrAddPlayer(p);
-            }
-
-            return dplay;
+            return server.getConfigurationManager()
+                    .playerEntityList
+                    .stream()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .toArray(DynmapPlayer[]::new);
         }
         @Override
         public void reload()
@@ -541,9 +532,13 @@ public class DynmapPlugin
         @Override
         public DynmapPlayer getPlayer(String name)
         {
-            List<?> players = server.getConfigurationManager().playerEntityList;
+            List<EntityPlayerMP> players = server.getConfigurationManager().playerEntityList;
 
-            return players.stream().map(o -> (EntityPlayer) o).filter(p -> p.getCommandSenderEntity().getName().equalsIgnoreCase(name)).findFirst().map(DynmapPlugin.this::getOrAddPlayer).orElse(null);
+            return players.stream()
+                    .filter(p -> p.getCommandSenderEntity().getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .orElse(null);
 
         }
         @Override
@@ -567,7 +562,7 @@ public class DynmapPlugin
             tr.future = ft;
 
             /* Add task record to queue */
-            synchronized (schedlock)
+            synchronized (mutex)
             {
                 tr.id = next_id++;
                 tr.ticktorun = cur_tick + delay;
@@ -903,7 +898,7 @@ public class DynmapPlugin
 
             long now;
 
-            synchronized(schedlock) {
+            synchronized(mutex) {
                 cur_tick++;
                 now = System.nanoTime();
                 tr = runqueue.peek();
@@ -918,7 +913,7 @@ public class DynmapPlugin
             while (!done) {
                 tr.future.run();
 
-                synchronized(schedlock) {
+                synchronized(mutex) {
                     tr = runqueue.peek();
                     now = System.nanoTime();
                     /* Nothing due to run */

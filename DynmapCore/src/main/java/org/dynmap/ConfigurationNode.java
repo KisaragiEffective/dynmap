@@ -199,11 +199,12 @@ public class ConfigurationNode implements Map<String, Object> {
     
     public List<String> getStrings(String path, List<String> def) {
         Object o = getObject(path);
-        if (!(o instanceof List<?>)) {
+        if (!(o instanceof List)) {
             return def;
         }
-        ArrayList<String> strings = ((List<?>) o).stream().map(Object::toString).collect(Collectors.toCollection(ArrayList::new));
-        return strings;
+        return ((List<?>) o).stream()
+                .map(Object::toString)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     
     public String getString(String path, String def) {

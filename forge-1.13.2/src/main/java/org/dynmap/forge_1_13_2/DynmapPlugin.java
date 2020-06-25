@@ -514,17 +514,12 @@ public class DynmapPlugin
         {
             if(server.getPlayerList() == null)
                 return new DynmapPlayer[0];
-            List<?> playlist = server.getPlayerList().getPlayers();
-            int pcnt = playlist.size();
-            DynmapPlayer[] dplay = new DynmapPlayer[pcnt];
 
-            for (int i = 0; i < pcnt; i++)
-            {
-                EntityPlayer p = (EntityPlayer)playlist.get(i);
-                dplay[i] = getOrAddPlayer(p);
-            }
-
-            return dplay;
+            return server.getPlayerList()
+                    .getPlayers()
+                    .stream()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .toArray(DynmapPlayer[]::new);
         }
         @Override
         public void reload()
@@ -536,9 +531,13 @@ public class DynmapPlugin
         @Override
         public DynmapPlayer getPlayer(String name)
         {
-            List<?> players = server.getPlayerList().getPlayers();
+            List<EntityPlayerMP> players = server.getPlayerList().getPlayers();
 
-            return players.stream().map(o -> (EntityPlayer) o).filter(p -> p.getEntity().getName().getString().equalsIgnoreCase(name)).findFirst().map(DynmapPlugin.this::getOrAddPlayer).orElse(null);
+            return players.stream()
+                    .filter(p -> p.getEntity().getName().getString().equalsIgnoreCase(name))
+                    .findFirst()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .orElse(null);
 
         }
         @Override

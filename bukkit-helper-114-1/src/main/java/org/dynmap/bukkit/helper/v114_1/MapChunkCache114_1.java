@@ -421,7 +421,7 @@ public class MapChunkCache114_1 extends AbstractMapChunkCache {
             ssr = new SnapshotRec();
             ssr.ss = ss;
             ssr.inhabitedTicks = inhabited_ticks;
-            ssr.tileData = tileData;
+            ssr.tileData = null;
             SnapshotCache.sscache.putSnapshot(dw.getName(), chunk.x, chunk.z, ssr, blockdata, biome, biomeraw, highesty);
             snaparray[idx] = ss;
             snaptile[idx] = ssr.tileData;
