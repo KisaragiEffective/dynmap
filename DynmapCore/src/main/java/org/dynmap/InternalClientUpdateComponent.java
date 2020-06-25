@@ -36,14 +36,11 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
         final int length_limit = configuration.getInteger("chatlengthlimit", 256);
         final List<String> trustedproxy = dcore.configuration.getStrings("trusted-proxies", null);
 
-        dcore.events.addListener("buildclientconfiguration", new Event.Listener<JSONObject>() {
-            @Override
-            public void triggered(JSONObject t) {
-                s(t, "allowwebchat", allowwebchat);
-                s(t, "webchat-interval", webchatInterval);
-                s(t, "webchat-requires-login", req_login);
-                s(t, "chatlengthlimit", length_limit);
-            }
+        dcore.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> {
+            s(t, "allowwebchat", allowwebchat);
+            s(t, "webchat-interval", webchatInterval);
+            s(t, "webchat-requires-login", req_login);
+            s(t, "chatlengthlimit", length_limit);
         });
 
         if (allowwebchat) {
@@ -69,12 +66,7 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
                     this.proxyaddress.add("127.0.0.1");
                     this.proxyaddress.add("0:0:0:0:0:0:0:1");
                 }
-                onMessageReceived.addListener(new Event.Listener<Message> () {
-                    @Override
-                    public void triggered(Message t) {
-                        core.webChat(t.name, t.message);
-                    }
-                });
+                onMessageReceived.addListener(t -> core.webChat(t.name, t.message));
             }};
             dcore.addServlet("/up/sendmessage", messageHandler);
         }
@@ -95,19 +87,13 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
                 core.getServer().scheduleServerTask(this, jsonInterval/50);
             }}, jsonInterval/50);
         
-        core.events.addListener("initialized", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-            }
+        core.events.addListener("initialized", t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
         });
-        core.events.addListener("worldactivated", new Event.Listener<DynmapWorld>() {
-            @Override
-            public void triggered(DynmapWorld t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-            }
+        core.events.addListener("worldactivated", (Event.Listener<DynmapWorld>) t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
         });
 
         /* Initialize */

@@ -848,15 +848,13 @@ public class DynmapPlugin
             
             //Now handle any chunks in server thread that are already loaded (on server thread)
             final ForgeMapChunkCache cc = c;
-            Future<Boolean> f = this.callSyncMethod(new Callable<Boolean>() {
-                public Boolean call() throws Exception {
-                    // Update busy state on world
-                    ForgeWorld fw = (ForgeWorld)cc.getWorld();
-                    //TODO
-                    //setBusy(fw.getWorld());
-                    cc.getLoadedChunks();
-                    return true;
-                }
+            Future<Boolean> f = this.callSyncMethod(() -> {
+                // Update busy state on world
+                ForgeWorld fw = (ForgeWorld)cc.getWorld();
+                //TODO
+                //setBusy(fw.getWorld());
+                cc.getLoadedChunks();
+                return true;
             }, 0);
             try {
                 f.get();
@@ -1589,11 +1587,7 @@ public class DynmapPlugin
 			if(!core_enabled) return;
             final DynmapPlayer dp = getOrAddPlayer(event.getPlayer());
             /* This event can be called from off server thread, so push processing there */
-            core.getServer().scheduleServerTask(new Runnable() {
-                public void run() {
-                    core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp);
-                }
-            }, 2);
+            core.getServer().scheduleServerTask(() -> core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp), 2);
 		}
         @SubscribeEvent
 		public void onPlayerLogout(PlayerLoggedOutEvent event) {
@@ -1601,11 +1595,9 @@ public class DynmapPlugin
             final DynmapPlayer dp = getOrAddPlayer(event.getPlayer());
             final String name = event.getPlayer().getEntity().getName().getString();
             /* This event can be called from off server thread, so push processing there */
-            core.getServer().scheduleServerTask(new Runnable() {
-                public void run() {
-                    core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, dp);
-                    players.remove(name);
-                }
+            core.getServer().scheduleServerTask(() -> {
+                core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, dp);
+                players.remove(name);
             }, 0);
 		}
         @SubscribeEvent
@@ -1637,11 +1629,9 @@ public class DynmapPlugin
 			if(!(w instanceof ServerWorld)) return;
             final ForgeWorld fw = getWorld(w);
             // This event can be called from off server thread, so push processing there
-            core.getServer().scheduleServerTask(new Runnable() {
-            	public void run() {
-            		if(core.processWorldLoad(fw))    // Have core process load first - fire event listeners if good load after
-            			core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, fw);
-            	}
+            core.getServer().scheduleServerTask(() -> {
+                if(core.processWorldLoad(fw))    // Have core process load first - fire event listeners if good load after
+                    core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, fw);
             }, 0);
     	}
         @SubscribeEvent(priority=EventPriority.LOWEST)
@@ -1652,11 +1642,9 @@ public class DynmapPlugin
             final ForgeWorld fw = getWorld(w);
             if(fw != null) {
                 // This event can be called from off server thread, so push processing there
-                core.getServer().scheduleServerTask(new Runnable() {
-                	public void run() {
-                		core.listenerManager.processWorldEvent(EventType.WORLD_UNLOAD, fw);
-                		core.processWorldUnload(fw);
-                	}
+                core.getServer().scheduleServerTask(() -> {
+                    core.listenerManager.processWorldEvent(EventType.WORLD_UNLOAD, fw);
+                    core.processWorldUnload(fw);
                 }, 0);
                 // Set world unloaded (needs to be immediate, since it may be invalid after event)
                 fw.setWorldUnloaded();

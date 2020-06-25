@@ -402,21 +402,19 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
      * @return API object
      */
     public static void completeInitializeMarkerAPI(MarkerAPIImpl api) {
-        MapManager.scheduleDelayedJob(new Runnable() {
-        	public void run() {
-                /* Now publish marker files to the tiles directory */
-                for(MarkerIcon ico : api.getMarkerIcons()) {
-                    api.publishMarkerIcon(ico);
-                }
-                /* Freshen files */
-                api.freshenMarkerFiles();
-                /* Add listener so we update marker files for other worlds as they become active */
-                api.core.events.addListener("worldactivated", api);
+        MapManager.scheduleDelayedJob(() -> {
+/* Now publish marker files to the tiles directory */
+for(MarkerIcon ico : api.getMarkerIcons()) {
+api.publishMarkerIcon(ico);
+}
+/* Freshen files */
+api.freshenMarkerFiles();
+/* Add listener so we update marker files for other worlds as they become active */
+api.core.events.addListener("worldactivated", api);
 
-                api.scheduleWriteJob(); /* Start write job */        		
+api.scheduleWriteJob(); /* Start write job */
 
-        		Log.info("Finish marker initialization");
-    		}
+            Log.info("Finish marker initialization");
         }, 0);
     }
     
@@ -668,15 +666,13 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
             }
             conf.put("playersets", psets);
             
-            MapManager.scheduleDelayedJob(new Runnable() {
-                public void run() {
-                    /* And shift old file file out */
-                    if(api.markerpersist_old.exists()) api.markerpersist_old.delete();
-                    if(api.markerpersist.exists()) api.markerpersist.renameTo(api.markerpersist_old);
-                    /* And write it out */
-                    if(!conf.save())
-                        Log.severe("Error writing markers - " + api.markerpersist.getPath());
-                }
+            MapManager.scheduleDelayedJob(() -> {
+                /* And shift old file file out */
+                if(api.markerpersist_old.exists()) api.markerpersist_old.delete();
+                if(api.markerpersist.exists()) api.markerpersist.renameTo(api.markerpersist_old);
+                /* And write it out */
+                if(!conf.save())
+                    Log.severe("Error writing markers - " + api.markerpersist.getPath());
             }, 0);
             /* Refresh JSON files */
             api.freshenMarkerFiles();
@@ -3170,11 +3166,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
         }
         worlddata.put("sets", markerdata);
 
-        MapManager.scheduleDelayedJob(new Runnable() {
-            public void run() {
-                core.getDefaultMapStorage().setMarkerFile(wname, Json.stringifyJson(worlddata));
-            }
-        }, 0);
+        MapManager.scheduleDelayedJob(() -> core.getDefaultMapStorage().setMarkerFile(wname, Json.stringifyJson(worlddata)), 0);
     }
 
     @Override

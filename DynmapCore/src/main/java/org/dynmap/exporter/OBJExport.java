@@ -116,27 +116,21 @@ public class OBJExport {
             int ord = s.ordinal();
             defaultPathces[ord] = fact.getPatch(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], 0, 1, 0, 0, 1, 1, SideVisible.TOP, ord);
         }
-        vertices = new IndexedVector3DList(new IndexedVector3DList.ListCallback() {
-            @Override
-            public void elementAdded(IndexedVector3DList list, IndexedVector3D newElement) {
-                try {
-                    /* Minecraft XYZ maps to OBJ YZX */
-                    addStringToExportedFile(String.format(Locale.US, "v %.4f %.4f %.4f\n", 
-                            (newElement.x - originX) * scale,
-                            (newElement.y - originY) * scale,
-                            (newElement.z - originZ) * scale
-                            ));
-                } catch (IOException iox) {
-                }
+        vertices = new IndexedVector3DList((list, newElement) -> {
+            try {
+                /* Minecraft XYZ maps to OBJ YZX */
+                addStringToExportedFile(String.format(Locale.US, "v %.4f %.4f %.4f\n",
+                        (newElement.x - originX) * scale,
+                        (newElement.y - originY) * scale,
+                        (newElement.z - originZ) * scale
+                        ));
+            } catch (IOException iox) {
             }
         });
-        uvs = new IndexedVector3DList(new IndexedVector3DList.ListCallback() {
-            @Override
-            public void elementAdded(IndexedVector3DList list, IndexedVector3D newElement) {
-                try {
-                    addStringToExportedFile(String.format(Locale.US, "vt %.4f %.4f\n", newElement.x, newElement.y));
-                } catch (IOException iox) {
-                }
+        uvs = new IndexedVector3DList((list, newElement) -> {
+            try {
+                addStringToExportedFile(String.format(Locale.US, "vt %.4f %.4f\n", newElement.x, newElement.y));
+            } catch (IOException iox) {
             }
         });
         // Get models

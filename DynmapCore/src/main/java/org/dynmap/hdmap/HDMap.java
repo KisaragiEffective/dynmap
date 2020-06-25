@@ -311,31 +311,28 @@ public class HDMap extends MapType {
     
     public void purgeOldTiles(final DynmapWorld world, final TileFlags rendered) {
         final MapStorage ms = world.getMapStorage();
-        ms.enumMapTiles(world, this, new MapStorageTileEnumCB() {
-            @Override
-            public void tileFound(MapStorageTile tile, ImageEncoding fmt) {
-                if (fmt != getImageFormat().getEncoding()) { // Wrong format?  toss it
-                    /* Otherwise, delete tile */
-                    tile.delete();
+        ms.enumMapTiles(world, this, (tile, fmt) -> {
+            if (fmt != getImageFormat().getEncoding()) { // Wrong format?  toss it
+                /* Otherwise, delete tile */
+                tile.delete();
+            }
+            else if (tile.zoom == 1) {   // First tier zoom?  sensitive to newly rendered tiles
+                // If any were rendered, already triggered (and still needed
+                if (rendered.getFlag(tile.x, tile.y) || rendered.getFlag(tile.x+1, tile.y) ||
+                    rendered.getFlag(tile.x, tile.y-1) || rendered.getFlag(tile.x+1, tile.y-1)) {
+                    return;
                 }
-                else if (tile.zoom == 1) {   // First tier zoom?  sensitive to newly rendered tiles
-                    // If any were rendered, already triggered (and still needed
-                    if (rendered.getFlag(tile.x, tile.y) || rendered.getFlag(tile.x+1, tile.y) ||
-                        rendered.getFlag(tile.x, tile.y-1) || rendered.getFlag(tile.x+1, tile.y-1)) {
-                        return;
-                    }
-                    tile.enqueueZoomOutUpdate();
+                tile.enqueueZoomOutUpdate();
+            }
+            else if (tile.zoom == 0) {
+                if (rendered.getFlag(tile.x, tile.y)) {  /* If we rendered this tile, its good */
+                    return;
                 }
-                else if (tile.zoom == 0) {
-                    if (rendered.getFlag(tile.x, tile.y)) {  /* If we rendered this tile, its good */
-                        return;
-                    }
-                    /* Otherwise, delete tile */
-                    tile.delete();
-                    /* Push updates, clear hash code, and signal zoom tile update */
-                    MapManager.mapman.pushUpdate(world, new Client.Tile(tile.getURI()));
-                    tile.enqueueZoomOutUpdate();
-                }
+                /* Otherwise, delete tile */
+                tile.delete();
+                /* Push updates, clear hash code, and signal zoom tile update */
+                MapManager.mapman.pushUpdate(world, new Client.Tile(tile.getURI()));
+                tile.enqueueZoomOutUpdate();
             }
         });
     }

@@ -77,12 +77,7 @@ public class AsynchronousQueue<T> {
     
     public void start() {
         synchronized (lock) {
-            thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    running();
-                }
-            });
+            thread = new Thread(() -> running());
             thread.setDaemon(true);
             thread.start();
             try {

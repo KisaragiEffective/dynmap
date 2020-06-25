@@ -159,57 +159,37 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
                 core.getServer().scheduleServerTask(this, jsonInterval/50);
             }}, jsonInterval/50);
         
-        core.events.addListener("buildclientconfiguration", new Event.Listener<JSONObject>() {
-            @Override
-            public void triggered(JSONObject t) {
-                s(t, "jsonfile", true);
-                s(t, "allowwebchat", allowwebchat);
-                s(t, "webchat-requires-login", req_login);
-                s(t, "loginrequired", core.isLoginRequired());
-                // For 'sendmessage.php'
-                s(t, "webchat-interval", configuration.getFloat("webchat-interval", 5.0f));
-                s(t, "chatlengthlimit", lengthlimit);
-            }
+        core.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> {
+            s(t, "jsonfile", true);
+            s(t, "allowwebchat", allowwebchat);
+            s(t, "webchat-requires-login", req_login);
+            s(t, "loginrequired", core.isLoginRequired());
+            // For 'sendmessage.php'
+            s(t, "webchat-interval", configuration.getFloat("webchat-interval", 5.0f));
+            s(t, "chatlengthlimit", lengthlimit);
         });
-        core.events.addListener("initialized", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-                writeLogins();
-                writeAccess();
-            }
+        core.events.addListener("initialized", t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
+            writeLogins();
+            writeAccess();
         });
-        core.events.addListener("server-started", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-                writeLogins();
-                writeAccess();
-            }
+        core.events.addListener("server-started", t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
+            writeLogins();
+            writeAccess();
         });
-        core.events.addListener("worldactivated", new Event.Listener<DynmapWorld>() {
-            @Override
-            public void triggered(DynmapWorld t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-                writeAccess();
-            }
+        core.events.addListener("worldactivated", (Event.Listener<DynmapWorld>) t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
+            writeAccess();
         });
-        core.events.addListener("loginupdated", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeLogins();
-                writeAccess();
-            }
+        core.events.addListener("loginupdated", t -> {
+            writeLogins();
+            writeAccess();
         });
-        core.events.addListener("playersetupdated", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeAccess();
-            }
-        });
+        core.events.addListener("playersetupdated", t -> writeAccess());
     }
         
     private void generateConfigJS(DynmapCore core) {
@@ -267,23 +247,21 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         sb.append("'\n }\n};\n");
         
         byte[] outputBytes = sb.toString().getBytes(cs_utf8);
-        MapManager.scheduleDelayedJob(new Runnable() {
-        	public void run() {
-                File f = new File(baseStandaloneDir, "config.js");
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(f);
-                    fos.write(outputBytes);
-                } catch (IOException iox) {
-                    Log.severe("Exception while writing " + f.getPath(), iox);
-                } finally {
-                    if(fos != null) {
-                        try {
-                            fos.close();
-                        } catch (IOException x) {}
-                    }
-                }        		
-        	}
+        MapManager.scheduleDelayedJob(() -> {
+File f = new File(baseStandaloneDir, "config.js");
+FileOutputStream fos = null;
+try {
+fos = new FileOutputStream(f);
+fos.write(outputBytes);
+} catch (IOException iox) {
+Log.severe("Exception while writing " + f.getPath(), iox);
+} finally {
+if(fos != null) {
+try {
+fos.close();
+} catch (IOException x) {}
+}
+}
         }, 0);
     }
     
@@ -460,41 +438,34 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     }
     
     protected void handleWebChat() {
-    	MapManager.scheduleDelayedJob(new Runnable() {
-    		public void run() {
-    			BufferInputStream bis = storage.getStandaloneFile("dynmap_webchat.json");
-    			if (bis != null && lastTimestamp != 0) {
-    				JSONArray jsonMsgs = null;
-    				Reader inputFileReader = null;
-    				try {
-    					inputFileReader = new InputStreamReader(bis, cs_utf8);
-    					jsonMsgs = (JSONArray) parser.parse(inputFileReader);
-    				} catch (IOException ex) {
-    					Log.severe("Exception while reading JSON-file.", ex);
-    				} catch (ParseException ex) {
-    					Log.severe("Exception while parsing JSON-file.", ex);
-    				} finally {
-    					if(inputFileReader != null) {
-    						try {
-    							inputFileReader.close();
-    						} catch (IOException iox) {
+    	MapManager.scheduleDelayedJob(() -> {
+            BufferInputStream bis = storage.getStandaloneFile("dynmap_webchat.json");
+            if (bis != null && lastTimestamp != 0) {
+                JSONArray jsonMsgs = null;
+                Reader inputFileReader = null;
+                try {
+                    inputFileReader = new InputStreamReader(bis, cs_utf8);
+                    jsonMsgs = (JSONArray) parser.parse(inputFileReader);
+                } catch (IOException ex) {
+                    Log.severe("Exception while reading JSON-file.", ex);
+                } catch (ParseException ex) {
+                    Log.severe("Exception while parsing JSON-file.", ex);
+                } finally {
+                    if(inputFileReader != null) {
+                        try {
+                            inputFileReader.close();
+                        } catch (IOException iox) {
 
-    						}
                         }
-    				}
-    				if (jsonMsgs != null) {
-        				final JSONArray json = jsonMsgs;
-    					// Process content on server thread
-    					core.getServer().scheduleServerTask(new Runnable() {
-    						@Override
-    						public void run() {
-    							processWebChat(json);
-    						}
-    					}, 0);
-    				}
-    			}
-    		}
-		}, 0);
+}
+                }
+                if (jsonMsgs != null) {
+                    final JSONArray json = jsonMsgs;
+                    // Process content on server thread
+                    core.getServer().scheduleServerTask(() -> processWebChat(json), 0);
+                }
+            }
+        }, 0);
     }
     protected void handleRegister() {
         if(!core.pendingRegisters())
@@ -502,12 +473,12 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         BufferInputStream bis = storage.getStandaloneFile("dynmap_reg.php");
         if (bis != null) {
             BufferedReader br = null;
-            ArrayList<String> lines = new ArrayList<>();
+            List<String> lines;
             try {
                 br = new BufferedReader(new InputStreamReader(bis));
-                lines = br.lines().filter(line -> !line.startsWith("<?") && !line.startsWith("*/")).collect(Collectors.toCollection(ArrayList::new));
-            } catch (IOException iox) {
-                Log.severe("Exception while reading dynmap_reg.php", iox);
+                lines = br.lines()
+                        .filter(line -> !line.startsWith("<?") && !line.startsWith("*/"))
+                        .collect(Collectors.toCollection(ArrayList::new));
             } finally {
                 if (br != null) {
                     try {
@@ -516,12 +487,10 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
                     }
                 }
             }
-            for (String line : lines) {
-                String[] vals = line.split("=");
-                if (vals.length == 3) {
-                    core.processCompletedRegister(vals[0].trim(), vals[1].trim(), vals[2].trim());
-                }
-            }
+            lines.stream()
+                    .map(line -> line.split("="))
+                    .filter(vals -> vals.length == 3)
+                    .forEachOrdered(vals -> core.processCompletedRegister(vals[0].trim(), vals[1].trim(), vals[2].trim()));
         }
     }
     

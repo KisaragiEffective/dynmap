@@ -807,14 +807,12 @@ public class DynmapPlugin
             
             //Now handle any chunks in server thread that are already loaded (on server thread)
             final ForgeMapChunkCache cc = c;
-            Future<Boolean> f = this.callSyncMethod(new Callable<Boolean>() {
-                public Boolean call() throws Exception {
-                    // Update busy state on world
-                    ForgeWorld fw = (ForgeWorld)cc.getWorld();
-                    setBusy(fw.getWorld());
-                    cc.getLoadedChunks();
-                    return true;
-                }
+            Future<Boolean> f = this.callSyncMethod(() -> {
+                // Update busy state on world
+                ForgeWorld fw = (ForgeWorld)cc.getWorld();
+                setBusy(fw.getWorld());
+                cc.getLoadedChunks();
+                return true;
             }, 0);
             try {
                 f.get();
@@ -1551,11 +1549,7 @@ public class DynmapPlugin
 			if(!core_enabled) return;
             final DynmapPlayer dp = getOrAddPlayer(event.player);
             /* This event can be called from off server thread, so push processing there */
-            core.getServer().scheduleServerTask(new Runnable() {
-                public void run() {
-                    core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp);
-                }
-            }, 2);
+            core.getServer().scheduleServerTask(() -> core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp), 2);
 		}
         @SubscribeEvent
 		public void onPlayerLogout(PlayerLoggedOutEvent event) {
@@ -1563,11 +1557,9 @@ public class DynmapPlugin
             final DynmapPlayer dp = getOrAddPlayer(event.player);
             final String name = event.player.getCommandSenderEntity().getName();
             /* This event can be called from off server thread, so push processing there */
-            core.getServer().scheduleServerTask(new Runnable() {
-                public void run() {
-                    core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, dp);
-                    players.remove(name);
-                }
+            core.getServer().scheduleServerTask(() -> {
+                core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, dp);
+                players.remove(name);
             }, 0);
 		}
         @SubscribeEvent

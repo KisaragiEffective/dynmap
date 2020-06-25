@@ -328,13 +328,11 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
                         public void onPlayerChat(AsyncPlayerChatEvent evt) {
                             final Player p = evt.getPlayer();
                             final String msg = evt.getMessage();
-                            getServer().getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, new Runnable() {
-                                public void run() {
-                                    DynmapPlayer dp = null;
-                                    if(p != null)
-                                        dp = new BukkitPlayer(p);
-                                    core.listenerManager.processChatEvent(EventType.PLAYER_CHAT, dp, msg);
-                                }
+                            getServer().getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, () -> {
+                                DynmapPlayer dp = null;
+                                if(p != null)
+                                    dp = new BukkitPlayer(p);
+                                core.listenerManager.processChatEvent(EventType.PLAYER_CHAT, dp, msg);
                             });
                         }
                     }, DynmapPlugin.this);
@@ -464,26 +462,24 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             final MapChunkCache cc = c;
 
             while(!cc.isDoneLoading()) {
-                Future<Boolean> f = core.getServer().callSyncMethod(new Callable<Boolean>() {
-                    public Boolean call() throws Exception {
-                        boolean exhausted = true;
-                        
-                        if (prev_tick != cur_tick) {
-                            prev_tick = cur_tick;
-                            cur_tick_starttime = System.nanoTime();
-                        }                            
-                        if(chunks_in_cur_tick > 0) {
-                            boolean done = false;
-                            while (!done) {
-                                int cnt = chunks_in_cur_tick;
-                                if (cnt > 5) cnt = 5;
-                                chunks_in_cur_tick -= cc.loadChunks(cnt);
-                                exhausted = (chunks_in_cur_tick == 0) || ((System.nanoTime() - cur_tick_starttime) > perTickLimit);
-                                done = exhausted || cc.isDoneLoading();
-                            }
-                        }
-                        return exhausted;
+                Future<Boolean> f = core.getServer().callSyncMethod(() -> {
+                    boolean exhausted = true;
+
+                    if (prev_tick != cur_tick) {
+                        prev_tick = cur_tick;
+                        cur_tick_starttime = System.nanoTime();
                     }
+                    if(chunks_in_cur_tick > 0) {
+                        boolean done = false;
+                        while (!done) {
+                            int cnt = chunks_in_cur_tick;
+                            if (cnt > 5) cnt = 5;
+                            chunks_in_cur_tick -= cc.loadChunks(cnt);
+                            exhausted = (chunks_in_cur_tick == 0) || ((System.nanoTime() - cur_tick_starttime) > perTickLimit);
+                            done = exhausted || cc.isDoneLoading();
+                        }
+                    }
+                    return exhausted;
                 });
                 if (f == null) {
                     return null;
@@ -935,11 +931,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         tps = 20.0;
         perTickLimit = core.getMaxTickUseMS() * 1000000;
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            public void run() {
-                processTick();
-            }
-        }, 1, 1);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> processTick(), 1, 1);
     }
     
     private boolean readyToEnable() {
@@ -1146,12 +1138,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             public void onPlayerJoin(PlayerJoinEvent evt) {
                 final DynmapPlayer dp = new BukkitPlayer(evt.getPlayer());
                 // Give other handlers a change to prep player (nicknames and such from Essentials)
-                getServer().getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, new Runnable() {
-                    @Override
-                    public void run() {
-                        core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp);
-                    }
-                }, 2);
+                getServer().getScheduler().scheduleSyncDelayedTask(DynmapPlugin.this, () -> core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp), 2);
             }
             @EventHandler(priority=EventPriority.MONITOR, ignoreCancelled=true)
             public void onPlayerQuit(PlayerQuitEvent evt) {

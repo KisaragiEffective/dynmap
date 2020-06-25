@@ -544,18 +544,8 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         
         /* Add login/logoff listeners */
-        listenerManager.addListener(EventType.PLAYER_JOIN, new DynmapListenerManager.PlayerEventListener() {
-            @Override
-            public void playerEvent(DynmapPlayer p) {
-                playerJoined(p);
-            }
-        });
-        listenerManager.addListener(EventType.PLAYER_QUIT, new DynmapListenerManager.PlayerEventListener() {
-            @Override
-            public void playerEvent(DynmapPlayer p) {
-                playerQuit(p);
-            }
-        });
+        listenerManager.addListener(EventType.PLAYER_JOIN, (DynmapListenerManager.PlayerEventListener) p -> playerJoined(p));
+        listenerManager.addListener(EventType.PLAYER_QUIT, (DynmapListenerManager.PlayerEventListener) p -> playerQuit(p));
         
         /* Print version info */
         Log.info("version " + plugin_ver + " is enabled - core version " + version );
@@ -2158,12 +2148,9 @@ public class DynmapCore implements DynmapCommonAPI {
     public void webChat(final String name, final String message) {
         if(mapManager == null)
             return;
-        Runnable c = new Runnable() {
-            @Override
-            public void run() {
-                ChatEvent event = new ChatEvent("web", name, message);
-                events.trigger("webchat", event);
-            }
+        Runnable c = () -> {
+            ChatEvent event = new ChatEvent("web", name, message);
+            events.trigger("webchat", event);
         };
         getServer().scheduleServerTask(c, 1);
     }

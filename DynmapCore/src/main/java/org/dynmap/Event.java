@@ -36,12 +36,9 @@ public class Event<T> {
     
     /* Trigger on main thread */
     public boolean triggerSync(DynmapCore core, final T t) {
-        Future<T> future = core.getServer().callSyncMethod(new Callable<T>() {
-            @Override
-            public T call() throws Exception {
-                trigger(t);
-                return t;
-            }            
+        Future<T> future = core.getServer().callSyncMethod(() -> {
+            trigger(t);
+            return t;
         });
         boolean success = false;
         try {

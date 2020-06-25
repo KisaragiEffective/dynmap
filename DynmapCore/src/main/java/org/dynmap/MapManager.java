@@ -215,14 +215,12 @@ public class MapManager {
         @Override
         public void execute(final Runnable r) {
             try {
-                super.execute(new Runnable() {
-                    public void run() {
-                        try {
-                            r.run();
-                        } catch (Exception x) {
-                            Log.severe("Exception during render job: " + r);
-                            x.printStackTrace();                        
-                        }
+                super.execute(() -> {
+                    try {
+                        r.run();
+                    } catch (Exception x) {
+                        Log.severe("Exception during render job: " + r);
+                        x.printStackTrace();
                     }
                 });
             } catch (RejectedExecutionException rxe) {  /* Pool shutdown - nominal for reload or unload */
@@ -231,14 +229,12 @@ public class MapManager {
         @Override
         public ScheduledFuture<?> schedule(final Runnable command, long delay, TimeUnit unit) {
             try {
-                return super.schedule(new Runnable() {
-                    public void run() {
-                        try {
-                            command.run();
-                        } catch (Exception x) {
-                            Log.severe("Exception during render job: " + command);
-                            x.printStackTrace();                        
-                        }
+                return super.schedule(() -> {
+                    try {
+                        command.run();
+                    } catch (Exception x) {
+                        Log.severe("Exception during render job: " + command);
+                        x.printStackTrace();
                     }
                 }, delay, unit);
             } catch (RejectedExecutionException rxe) {
@@ -299,19 +295,11 @@ public class MapManager {
 
             if (resume) { // if resume render
                 final MapStorage ms = world.getMapStorage();
-                ms.enumMapBaseTiles(world, map, new MapStorageBaseTileEnumCB() {
-                    @Override
-                    public void tileFound(MapStorageTile tile, MapType.ImageEncoding enc) {
-                        String tileId = String.format("%s_%s_%d_%d", tile.world.getName(), tile.map.getName(), tile.x, tile.y);
-                        //sender.sendMessage("Tile found: " + tileId);
-                        storedTileIds.add(tileId);
-                    }
-                }, new MapStorageTileSearchEndCB() {
-                    @Override
-                    public void searchEnded() {
-                        latch.countDown();
-                    }
-                });
+                ms.enumMapBaseTiles(world, map, (tile, enc) -> {
+                    String tileId = String.format("%s_%s_%d_%d", tile.world.getName(), tile.map.getName(), tile.x, tile.y);
+                    //sender.sendMessage("Tile found: " + tileId);
+                    storedTileIds.add(tileId);
+                }, () -> latch.countDown());
 
                 try {
                     latch.await(10, TimeUnit.SECONDS);
@@ -659,11 +647,7 @@ public class MapManager {
                     final MapTile mt = tileset.get(i);
                     if((mapman != null) && (mapman.render_pool != null)) {
                         final long ts = tstart;
-                        Future<Boolean> future = mapman.render_pool.submit(new Callable<Boolean>() {
-                            public Boolean call() {
-                                return processTile(mt, ts, cnt);
-                            }
-                        });
+                        Future<Boolean> future = mapman.render_pool.submit(() -> processTile(mt, ts, cnt));
                         rslt.add(future);
                     }
                 }
@@ -856,36 +840,34 @@ public class MapManager {
     private class CheckWorldTimes implements Runnable {
     	HashMap<String, Polygon> last_worldborder = new HashMap<>();
         public void run() {
-            Future<Integer> f = core.getServer().callSyncMethod(new Callable<Integer>() {
-                public Integer call() throws Exception {
-                    long now_nsec = System.nanoTime();
-                    for(DynmapWorld w : worlds) {
-                        if(w.isLoaded()) {
-                            int new_servertime = (int)(w.getTime() % 24000);
-                            /* Check if we went from night to day */
-                            boolean wasday = w.servertime >= 0 && w.servertime < 13700;
-                            boolean isday = new_servertime >= 0 && new_servertime < 13700;
-                            w.servertime = new_servertime;
-                            if(wasday != isday) {
-                                pushUpdate(w, new Client.DayNight(isday));            
-                            }
-                            // Check world border
-                            Polygon wb = w.getWorldBorder();
-                            Polygon oldwb = last_worldborder.get(w.getName());
-                            if (((wb == null) && (oldwb == null)) ||
-                            		wb.equals(oldwb)) {	// No change
-                            }
-                            else { 
-                                core.listenerManager.processWorldEvent(EventType.WORLD_SPAWN_CHANGE, w);
-                            }
+            Future<Integer> f = core.getServer().callSyncMethod(() -> {
+                long now_nsec = System.nanoTime();
+                for(DynmapWorld w : worlds) {
+                    if(w.isLoaded()) {
+                        int new_servertime = (int)(w.getTime() % 24000);
+                        /* Check if we went from night to day */
+                        boolean wasday = w.servertime >= 0 && w.servertime < 13700;
+                        boolean isday = new_servertime >= 0 && new_servertime < 13700;
+                        w.servertime = new_servertime;
+                        if(wasday != isday) {
+                            pushUpdate(w, new Client.DayNight(isday));
                         }
-                        /* Tick invalidated tiles processing */
-                        for(MapTypeState mts : w.mapstate) {
-                            mts.tickMapTypeState(now_nsec);
+                        // Check world border
+                        Polygon wb = w.getWorldBorder();
+                        Polygon oldwb = last_worldborder.get(w.getName());
+                        if (((wb == null) && (oldwb == null)) ||
+                                wb.equals(oldwb)) {	// No change
+                        }
+                        else {
+                            core.listenerManager.processWorldEvent(EventType.WORLD_SPAWN_CHANGE, w);
                         }
                     }
-                    return 0;
+                    /* Tick invalidated tiles processing */
+                    for(MapTypeState mts : w.mapstate) {
+                        mts.tickMapTypeState(now_nsec);
+                    }
                 }
+                return 0;
             });
             if (f == null) {
                 return;
@@ -935,17 +917,15 @@ public class MapManager {
     }
     
     private void sendPlayerEnterExit(DynmapPlayer player, EnterExitText txt) {
-		core.getServer().scheduleServerTask(new Runnable() {
-			public void run() {
-				if (enterexitUseTitle) {
-					player.sendTitleText(txt.title, txt.subtitle, titleFadeIn, titleStay, titleFadeOut);
-				}
-				else {
-					if (txt.title != null) player.sendMessage(txt.title);
-					if (txt.subtitle != null) player.sendMessage(txt.subtitle);
-				}
-			}
-		}, 0);    	
+		core.getServer().scheduleServerTask(() -> {
+            if (enterexitUseTitle) {
+                player.sendTitleText(txt.title, txt.subtitle, titleFadeIn, titleStay, titleFadeOut);
+            }
+            else {
+                if (txt.title != null) player.sendMessage(txt.title);
+                if (txt.subtitle != null) player.sendMessage(txt.subtitle);
+            }
+        }, 0);
     }
     
     private void enqueueMessage(UUID uuid, DynmapPlayer player, EnterExitText txt, boolean isEnter) {
@@ -1120,13 +1100,10 @@ public class MapManager {
         if ((savependingperiod > 0) && (savependingperiod < 60)) savependingperiod = 60;
         
         this.tileQueue = new AsynchronousQueue<>(
-                new Handler<MapTile>() {
-                    @Override
-                    public void handle(MapTile t) {
-                        FullWorldRenderState job = new FullWorldRenderState(t);
-                        if (!scheduleDelayedJob(job, 0))
-                            job.cleanup();
-                    }
+                t -> {
+                    FullWorldRenderState job = new FullWorldRenderState(t);
+                    if (!scheduleDelayedJob(job, 0))
+                        job.cleanup();
                 },
                 (int) (configuration.getDouble("renderinterval", 0.5) * 1000),
                 configuration.getInteger("renderacceleratethreshold", 30),
@@ -1275,11 +1252,9 @@ public class MapManager {
             return;
         }
         final MapType mtf = mt;
-        Runnable purgejob = new Runnable() {
-            public void run() {
-                world.purgeMap(mtf);
-                sender.sendMessage("Purge of tiles for map '" + mapname + "' for world '" + worldname + "' completed");
-            }
+        Runnable purgejob = () -> {
+            world.purgeMap(mtf);
+            sender.sendMessage("Purge of tiles for map '" + mapname + "' for world '" + worldname + "' completed");
         };
         /* Schedule first tile to be worked */
         scheduleDelayedJob(purgejob, 0);
@@ -1298,11 +1273,9 @@ public class MapManager {
         // And purge update queue for world
         purgeQueue(sender, worldname);
         
-        Runnable purgejob = new Runnable() {
-            public void run() {
-                world.purgeTree();
-                sender.sendMessage("Purge of files for world '" + worldname + "' completed");
-            }
+        Runnable purgejob = () -> {
+            world.purgeTree();
+            sender.sendMessage("Purge of files for world '" + worldname + "' completed");
         };
         /* Schedule first tile to be worked */
         scheduleDelayedJob(purgejob, 0);

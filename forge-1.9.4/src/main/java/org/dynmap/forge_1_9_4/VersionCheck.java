@@ -11,11 +11,7 @@ import org.dynmap.Log;
 public class VersionCheck {
     private static final String VERSION_URL = "http://mikeprimm.com/dynmap/releases.php";
     public static void runCheck(final DynmapCore core) {
-        new Thread(new Runnable() {
-            public void run() {
-                doCheck(core);
-            }
-        }).start();
+        new Thread(() -> doCheck(core)).start();
     }
     
     private static int getReleaseVersion(String s) {

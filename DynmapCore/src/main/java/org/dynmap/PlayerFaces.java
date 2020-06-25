@@ -288,15 +288,12 @@ public class PlayerFaces {
         		skinurl.equals("http://skins.minecraft.net/MinecraftSkins/%player%.png")) {
             skinurl = "";
         }
-        core.listenerManager.addListener(EventType.PLAYER_JOIN, new PlayerEventListener() {
-            @Override
-            public void playerEvent(DynmapPlayer p) {
-                Runnable job = new LoadPlayerImages(p.getName(), p.getSkinURL(), p.getUUID(), core.skinUrlProvider);
-                if(fetchskins)
-                    MapManager.scheduleDelayedJob(job, 0);
-                else
-                    job.run();
-            }
+        core.listenerManager.addListener(EventType.PLAYER_JOIN, (PlayerEventListener) p -> {
+            Runnable job = new LoadPlayerImages(p.getName(), p.getSkinURL(), p.getUUID(), core.skinUrlProvider);
+            if(fetchskins)
+                MapManager.scheduleDelayedJob(job, 0);
+            else
+                job.run();
         });
         storage = core.getDefaultMapStorage();
     }
