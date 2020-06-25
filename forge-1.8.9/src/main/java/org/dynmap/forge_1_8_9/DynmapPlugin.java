@@ -174,10 +174,11 @@ public class DynmapPlugin
                         String statename = "meta=" + m;
                         if (blkstate != null) {
                             String pstate = null;
-                            for(Entry<IProperty<?>, Comparable<?>> p : blkstate.getValues()) {
+                            // It is NMS issue
+                            for(@SuppressWarnings("rawtypes") Entry<IProperty, Comparable> p : blkstate.getProperties().entrySet()) {
                             	if (pstate == null)
                             		pstate = "";
-                            	else 
+                            	else
                             		pstate += ",";
                             	pstate += p.getKey().getName() + "=" + p.getValue().toString();
                             }
