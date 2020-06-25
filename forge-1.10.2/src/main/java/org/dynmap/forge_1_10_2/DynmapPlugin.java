@@ -283,18 +283,7 @@ public class DynmapPlugin
             {
                 return 1;
             }
-            else if (this.id < tr.id)
-            {
-                return -1;
-            }
-            else if (this.id > tr.id)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            else return Long.compare(this.id, tr.id);
         }
     }
 
