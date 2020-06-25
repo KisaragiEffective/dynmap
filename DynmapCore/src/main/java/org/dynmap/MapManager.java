@@ -130,9 +130,7 @@ public class MapManager {
         public boolean equals(Object o) {
             if(this == o) return true;
             TouchEvent te = (TouchEvent)o;
-            if((x != te.x) || (y != te.y) || (z != te.z) || (!world.equals(te.world)))
-                return false;
-            return true;
+            return (x == te.x) && (y == te.y) && (z == te.z) && (world.equals(te.world));
         }        
     }
     private static class TouchVolumeEvent {
@@ -719,10 +717,7 @@ public class MapManager {
                                                       tile.isRawBiomeDataNeeded());
             if(cache == null) {
                 /* If world unloaded, don't cancel */
-                if(!world.isLoaded()) {
-                    return true;
-                }
-                return false; /* Cancelled/aborted */
+                return !world.isLoaded();/* Cancelled/aborted */
             }
             /* Update stats */
             chunk_caches_created.incrementAndGet();

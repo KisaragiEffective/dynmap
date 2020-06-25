@@ -758,10 +758,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
             DynmapChunk chunk = iterator.next();
             boolean vis = true;
             if(visible_limits != null) {
-                vis = false;
-                if (visible_limits.stream().anyMatch(limit -> limit.doIntersectChunk(chunk.x, chunk.z))) {
-                    vis = true;
-                }
+                vis = visible_limits.stream().anyMatch(limit -> limit.doIntersectChunk(chunk.x, chunk.z));
             }
             if(vis && (hidden_limits != null)) {
                 if (hidden_limits.stream().anyMatch(limit -> limit.doIntersectChunk(chunk.x, chunk.z))) {

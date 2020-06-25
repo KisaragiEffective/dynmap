@@ -18,11 +18,7 @@ public class OpPermissions implements PermissionProvider {
 
     @Override
     public boolean has(CommandSender sender, String permission) {
-        return (sender instanceof Player)
-            ? opCommands.contains(permission)
-                ? sender.isOp()
-                : true
-            : true;
+        return (!(sender instanceof Player)) || (!opCommands.contains(permission) || sender.isOp());
     }
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {

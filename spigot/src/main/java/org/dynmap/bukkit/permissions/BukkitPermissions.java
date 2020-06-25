@@ -33,9 +33,7 @@ public class BukkitPermissions implements PermissionProvider {
     @Override
     public boolean has(CommandSender sender, String permission) {
         Player player = sender instanceof Player ? (Player) sender : null;
-        return player != null
-                ? player.hasPermission(name + "." + permission) || player.hasPermission(name + ".*")
-                : true;
+        return player == null || (player.hasPermission(name + "." + permission) || player.hasPermission(name + ".*"));
     }
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
@@ -60,10 +58,7 @@ public class BukkitPermissions implements PermissionProvider {
         }
         else {
             OfflinePlayer op = Bukkit.getOfflinePlayer(player);
-            if((op != null) && op.isOp()) {
-                return true;
-            }
-            return false;
+            return (op != null) && op.isOp();
         }
     }
 }

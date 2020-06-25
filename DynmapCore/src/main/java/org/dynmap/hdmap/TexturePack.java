@@ -2546,12 +2546,7 @@ public class TexturePack {
                 }
                 else if(line.startsWith("noterrainpng:")) {
                     line = line.substring(line.indexOf(':')+1);
-                    if (line.startsWith("true")) {
-                        terrain_ok = false;
-                    }
-                    else {
-                        terrain_ok = true;
-                    }
+                    terrain_ok = !line.startsWith("true");
                 }
             }
             if(mod_cfg_needed) {
@@ -3040,11 +3035,8 @@ public class TexturePack {
         f.tilecnt_x = xdim;
         f.tilecnt_y = ydim;
         f.format = fmt;
-        f.used = false;
         // Assume all biome files are used (not referred to by index)
-        if (fmt == TileFileFormat.BIOME) {
-            f.used = true;
-        }
+        f.used = fmt == TileFileFormat.BIOME;
         switch(fmt) {
             case GRID:
                 f.tile_to_dyntile = new int[xdim*ydim];

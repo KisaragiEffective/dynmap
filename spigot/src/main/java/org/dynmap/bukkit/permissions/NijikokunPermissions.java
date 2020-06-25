@@ -44,9 +44,7 @@ public class NijikokunPermissions implements PermissionProvider {
         if(permissions == null)
             permissions = ((Permissions)plugin).getHandler();
         Player player = sender instanceof Player ? (Player) sender : null;
-        return player != null
-                ? permissions.has(player, name + "." + permission) || permissions.has(player, name + ".*")
-                : true;
+        return player == null || (permissions.has(player, name + "." + permission) || permissions.has(player, name + ".*"));
     }
     
     @Override

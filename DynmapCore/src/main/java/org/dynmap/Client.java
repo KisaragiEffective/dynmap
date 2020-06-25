@@ -143,10 +143,7 @@ public class Client {
         }
         @Override
         public boolean equals(Object o) {
-            if(o instanceof DayNight) {
-                return true;
-            }
-            return false;
+            return o instanceof DayNight;
         }
         @Override
         public int hashCode() {

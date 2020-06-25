@@ -14,10 +14,7 @@ public class TFCLooseRockRenderer extends CustomRenderer {
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
-        if(!super.initializeRenderer(rpf, blkname, blockdatamask, custparm))
-            return false;
-
-        return true;
+        return super.initializeRenderer(rpf, blkname, blockdatamask, custparm);
     }
 
     @Override

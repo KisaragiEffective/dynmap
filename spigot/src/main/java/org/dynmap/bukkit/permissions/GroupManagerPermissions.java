@@ -38,7 +38,7 @@ public class GroupManagerPermissions implements PermissionProvider {
     @Override
     public boolean has(CommandSender sender, String permission) {        
         Player player = sender instanceof Player ? (Player) sender : null;
-        boolean rslt = (player != null) ? gm.getWorldsHolder().getDefaultWorld().getPermissionsHandler().permission(player, name + "." + permission) : true;
+        boolean rslt = (player == null) || gm.getWorldsHolder().getDefaultWorld().getPermissionsHandler().permission(player, name + "." + permission);
         return rslt;
     }
     

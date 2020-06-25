@@ -702,9 +702,7 @@ public class CTMTexturePack {
                 return true;
             } else if (this.metadata != -1 && block.stateIndex >= 0 && block.stateIndex < 32) {
                 int altMetadata = getOrientationFromMetadata(block) & META_MASK;
-                if ((this.metadata & ((1 << block.stateIndex) | (1 << altMetadata))) == 0) {
-                    return true;
-                }
+                return (this.metadata & ((1 << block.stateIndex) | (1 << altMetadata))) == 0;
             }
             return false;
         }

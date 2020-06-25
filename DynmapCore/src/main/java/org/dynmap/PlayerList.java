@@ -133,7 +133,7 @@ public class PlayerList {
             if (p == null) continue;
             if ((worldName != null) && (!p.getWorld().equals(worldName))) continue;
             String pname = p.getName().toLowerCase();
-            if (!(useWhitelist ^ hiddenPlayerNames.contains(pname))) {
+            if (useWhitelist == hiddenPlayerNames.contains(pname)) {
                 if (!invisibility_asserts.containsKey(pname)) {
                     visiblePlayers.add(p);
                 }
@@ -155,7 +155,7 @@ public class PlayerList {
         for (DynmapPlayer p : onlinePlayers) {
             if (p == null) continue;
             String pname = p.getName().toLowerCase();
-            if (!(useWhitelist ^ hiddenPlayerNames.contains(pname))) {
+            if (useWhitelist == hiddenPlayerNames.contains(pname)) {
                 if (invisibility_asserts.containsKey(pname)) {
                     hidden.add(p);
                 }
@@ -169,7 +169,7 @@ public class PlayerList {
     public boolean isVisiblePlayer(String p) {
         p = p.toLowerCase();
         boolean useWhitelist = configuration.getBoolean("display-whitelist", false);
-        return (!(useWhitelist ^ hiddenPlayerNames.contains(p))) && (!invisibility_asserts.containsKey(p));
+        return (useWhitelist == hiddenPlayerNames.contains(p)) && (!invisibility_asserts.containsKey(p));
     }
 
     /**

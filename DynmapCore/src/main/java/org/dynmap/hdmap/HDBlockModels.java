@@ -1146,9 +1146,6 @@ public class HDBlockModels {
         if ((low.length() > 0) && (parseVersion(low, false) > v)) {
             return false;
         }
-        if ((high.length() > 0) && (parseVersion(high, true) < v)) {
-            return false;
-        }
-        return true;
+        return (high.length() <= 0) || (parseVersion(high, true) >= v);
     }
 }

@@ -49,10 +49,7 @@ public class FilePermissions implements PermissionProvider {
         if((ps != null) && (ps.contains(perm))) {
             return true;
         }
-        if(defperms.contains(perm)) {
-            return true;
-        }
-        return false;
+        return defperms.contains(perm);
     }
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {

@@ -666,9 +666,7 @@ public class IsoHDPerspective implements HDPerspective {
                 laststep = stepy;
                 mapiter.stepPosition(laststep);
                 /* If outside 0-(height-1) range */
-                if((y & (~heightmask)) != 0) {
-                    return false;
-                }
+                return (y & (~heightmask)) == 0;
             }
             /* If X step is next best */
             else if ((t_next_x <= t_next_y) && (t_next_x <= t_next_z)) {

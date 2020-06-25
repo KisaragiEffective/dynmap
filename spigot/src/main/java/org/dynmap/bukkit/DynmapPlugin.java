@@ -277,9 +277,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         @Override
         public boolean isPlayerBanned(String pid) {
             OfflinePlayer p = getServer().getOfflinePlayer(pid);
-            if((p != null) && p.isBanned())
-                return true;
-            return false;
+            return (p != null) && p.isBanned();
         }
         @Override
         public boolean isServerThread() {
@@ -739,9 +737,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
 
         @Override
         public boolean isConnected() {
-            if(sender != null)
-                return true;
-            return false;
+            return sender != null;
         }
         @Override
         public boolean isOp() {

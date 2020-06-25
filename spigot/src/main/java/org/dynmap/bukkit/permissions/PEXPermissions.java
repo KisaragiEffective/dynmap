@@ -48,7 +48,7 @@ public class PEXPermissions implements PermissionProvider {
     @Override
     public boolean has(CommandSender sender, String permission) {
         Player player = sender instanceof Player ? (Player) sender : null;
-        return (player != null) ? pm.has(player, name + "." + permission) : true;
+        return (player == null) || pm.has(player, name + "." + permission);
     }
     
     @Override
