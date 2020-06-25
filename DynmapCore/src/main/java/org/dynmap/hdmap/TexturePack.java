@@ -3301,9 +3301,7 @@ public class TexturePack {
             }
         }
         else {  // Else, just copy into destination
-            for (int i = 0; i < etp.img.argb_buf.length; i++) {
-                etp.img.argb_buf[i] = argb[i];
-            }
+            System.arraycopy(argb, 0, etp.img.argb_buf, 0, etp.img.argb_buf.length);
         }
         boolean hasAlpha = false;
         // Compute simple color

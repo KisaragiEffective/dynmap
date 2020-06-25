@@ -83,9 +83,7 @@ public class PlayerFaces {
         }
     	// Write to dest
         for (int y = 0; y < h; y++) {
-        	for (int x = 0; x < w; x++) {
-        		dest[destoff + (y*destscansize + x)] = l1[(y*w)+x];
-        	}
+            if (w >= 0) System.arraycopy(l1, (y * w) + 0, dest, destoff + (y * destscansize + x), w);
         }
     }
 
