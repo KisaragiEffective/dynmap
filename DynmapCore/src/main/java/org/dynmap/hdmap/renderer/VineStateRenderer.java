@@ -40,7 +40,7 @@ public class VineStateRenderer extends CustomRenderer {
             if ((i & 0x04) == 0) list.add(South);
             if ((i & 0x02) == 0) list.add(Top);
             if ((i & 0x01) == 0) list.add(West);
-            meshes[i] = list.toArray(new RenderPatch[list.size()]);
+            meshes[i] = list.toArray(new RenderPatch[0]);
         }
     }
     @Override

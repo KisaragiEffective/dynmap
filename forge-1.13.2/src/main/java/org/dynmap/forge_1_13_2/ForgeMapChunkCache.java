@@ -1272,7 +1272,7 @@ public class ForgeMapChunkCache extends MapChunkCache
                     }
                 }
                 if(vals.size() > 0) {
-                    Object[] vlist = vals.toArray(new Object[vals.size()]);
+                    Object[] vlist = vals.toArray(new Object[0]);
                     tileData.put(getIndexInChunk(cx, ty, cz), vlist);
                 }
             }

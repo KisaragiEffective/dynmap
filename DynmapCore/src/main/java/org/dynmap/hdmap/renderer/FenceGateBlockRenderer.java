@@ -96,7 +96,7 @@ public class FenceGateBlockRenderer extends CustomRenderer {
                 }
             }
             
-            meshes[dat] = list.toArray(new RenderPatch[list.size()]);
+            meshes[dat] = list.toArray(new RenderPatch[0]);
             
             list.clear();
         }

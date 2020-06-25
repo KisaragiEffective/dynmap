@@ -36,7 +36,7 @@ public class FluidStateRenderer extends CustomRenderer {
         for (int i = 0; i < 10; i++) {
             list.clear();
             CustomRenderer.addBox(rpf, list, 0.0, 1.0, 0.0, 1.0 - (i / 9.0), 0.0, 1.0, still_patches);
-            putCachedModel(9 - i, 9 - i, 9 - i, 9 - i, list.toArray(new RenderPatch[list.size()]));
+            putCachedModel(9 - i, 9 - i, 9 - i, 9 - i, list.toArray(new RenderPatch[0]));
         }
         if (bottom == null) {
         	bottom = rpf.getPatch(0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, SideVisible.TOP, PATCH_STILL);
@@ -214,7 +214,7 @@ public class FluidStateRenderer extends CustomRenderer {
 			else {	// bh_1_n1 and bh_n1_n1 (zMinus)
 				addTop(list, rpf, 1, 0, 0, 0, bh_1_n1, bh_n1_n1, bh_1_1, bh_n1_1);
 			}
-			mod = list.toArray(new RenderPatch[list.size()]);
+			mod = list.toArray(new RenderPatch[0]);
 	    	putCachedModel(bh_1_1, bh_n1_1, bh_1_n1, bh_n1_n1, mod);
 	    	
 	    	//Log.info(String.format("%d:%d:%d::bh_1_1=%d,bh_1_n1=%d,bh_n1_1=%d,bh_n1_n1=%d", ctx.getX(), ctx.getY(), ctx.getZ(), bh_1_1, bh_1_n1, bh_n1_1, bh_n1_n1));

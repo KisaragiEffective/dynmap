@@ -102,7 +102,7 @@ public class RotatedPatchRenderer extends CustomRenderer {
             }
         }
         /* Save patch list as base model */
-        basemodel = patches.toArray(new RenderPatch[patches.size()]);
+        basemodel = patches.toArray(new RenderPatch[0]);
         /* Now build rotated models for all the defined rotations */
         models = new RenderPatch[rotations.size()][];
         for(int i = 0; i < rotations.size(); i++) {

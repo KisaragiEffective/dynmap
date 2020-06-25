@@ -89,7 +89,7 @@ public class RailCraftSlabBlockRenderer extends CustomRenderer {
                 addBox(rpf, list, 0, 1, 0, 1, 0, 1);
                 break;
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
     
     @Override

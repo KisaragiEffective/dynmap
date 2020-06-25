@@ -69,7 +69,7 @@ public class StairStateRenderer extends CustomRenderer {
                 addBox(rpf, list, 0, 1, 0, 1, 0, 0.5);
                 break;
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
 
     private RenderPatch[] buildCornerStepMeshes(RenderPatchFactory rpf, int dat) {
@@ -95,7 +95,7 @@ public class StairStateRenderer extends CustomRenderer {
                 addBox(rpf, list, 0.5, 1, 0, 1, 0, 0.5);
                 break;
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
 
     private RenderPatch[] buildIntCornerStepMeshes(RenderPatchFactory rpf, int dat) {
@@ -125,7 +125,7 @@ public class StairStateRenderer extends CustomRenderer {
                 addBox(rpf, list, 0.5, 1, 0, 1, 0.5, 1);
                 break;
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
 
     // Outer and inner left equivalent to outer and innter right minus 90 degrees

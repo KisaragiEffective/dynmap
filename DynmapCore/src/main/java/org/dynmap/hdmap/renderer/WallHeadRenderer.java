@@ -32,7 +32,7 @@ public class WallHeadRenderer extends CustomRenderer {
         list.add(side);
         list.add(side2);
         list.add(side3);
-        basemesh = list.toArray(new RenderPatch[list.size()]);
+        basemesh = list.toArray(new RenderPatch[0]);
         return true;
     }
 

@@ -39,7 +39,7 @@ public class MushroomStateRenderer extends CustomRenderer {
             faces[4] = ((i & 0x08) == 0) ? TEXTURE_OUTSIDE : TEXTURE_INSIDE;    // North
             faces[5] = ((i & 0x04) == 0) ? TEXTURE_OUTSIDE : TEXTURE_INSIDE;    // North
             CustomRenderer.addBox(rpf, list, 0, 1, 0, 1, 0, 1, faces);
-            meshes[i] = list.toArray(new RenderPatch[list.size()]);
+            meshes[i] = list.toArray(new RenderPatch[0]);
         }
     }
     @Override

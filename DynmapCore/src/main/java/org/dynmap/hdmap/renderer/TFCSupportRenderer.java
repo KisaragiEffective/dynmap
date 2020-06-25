@@ -96,7 +96,7 @@ public class TFCSupportRenderer extends CustomRenderer {
             else {
                 addBox(rpf, list, 0.25, 0.75, 0.5, 1.0, 0.25, 0.75);
             }
-            meshes[dat] = list.toArray(new RenderPatch[list.size()]);
+            meshes[dat] = list.toArray(new RenderPatch[0]);
             list.clear();
         }
     }

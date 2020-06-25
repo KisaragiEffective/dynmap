@@ -202,7 +202,7 @@ public class CTMTexturePack {
             while (tok.hasMoreTokens()) {
                 rslt.add(tok.nextToken());
             }
-            return rslt.toArray(new String[rslt.size()]);
+            return rslt.toArray(new String[0]);
         }
 
         private void getFaces(Properties p) {

@@ -776,7 +776,7 @@ public class HDBlockModels {
                     /* If we have everything, build block */
                     pmodlist.clear();
                     if (blknames.size() > 0) {
-                        PatchDefinition[] patcharray = patches.toArray(new PatchDefinition[patches.size()]);
+                        PatchDefinition[] patcharray = patches.toArray(new PatchDefinition[0]);
                         if(patcharray.length > max_patches)
                             max_patches = patcharray.length;
 

@@ -85,7 +85,7 @@ public class CuboidRenderer extends CustomRenderer {
                 }
             }
         }
-        model = list.toArray(new RenderPatch[list.size()]);
+        model = list.toArray(new RenderPatch[0]);
         
         return true;
     }

@@ -60,6 +60,6 @@ public class RPSupportFrameRenderer extends RPMicroRenderer {
             RenderPatch[] rp = super.getRenderPatchList(ctx);
             Collections.addAll(list, rp);
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
 }

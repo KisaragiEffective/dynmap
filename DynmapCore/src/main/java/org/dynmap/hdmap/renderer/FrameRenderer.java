@@ -184,7 +184,7 @@ public class FrameRenderer extends CustomRenderer {
                 sides);
         }
         
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
 
     private static final int[] x_off = { -1, 1, 0, 0, 0, 0 };

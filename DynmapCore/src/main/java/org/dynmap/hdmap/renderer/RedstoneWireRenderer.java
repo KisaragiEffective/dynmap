@@ -110,6 +110,6 @@ public class RedstoneWireRenderer extends CustomRenderer {
                 lst.add(side_patches[i]);
             }
         }
-        return lst.toArray(new RenderPatch[lst.size()]);
+        return lst.toArray(new RenderPatch[0]);
     }
 }

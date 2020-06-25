@@ -1012,7 +1012,7 @@ public class DynmapCore implements DynmapCommonAPI {
             snd.sendMessage("Error: unclosed doublequote");
             return null;
         }
-        return rslt.toArray(new String[rslt.size()]);
+        return rslt.toArray(new String[0]);
     }
 
     private static final Set<String> commands = new HashSet<>(Arrays.asList(new String[]{

@@ -106,7 +106,7 @@ public class FenceWallBlockRenderer extends CustomRenderer {
                     addBox(rpf, list, 0.4375, 0.5625, 0.75, 0.9275, 0.0, 1.0);
                     break;
             }
-            meshes[dat] = list.toArray(new RenderPatch[list.size()]);
+            meshes[dat] = list.toArray(new RenderPatch[0]);
             list.clear();
         }
     }
@@ -144,7 +144,7 @@ public class FenceWallBlockRenderer extends CustomRenderer {
             if(need_post) {
                 addBox(rpf, list, 0.25, 0.75, 0.0, 1.0, 0.25, 0.75);
             }
-            meshes[dat] = list.toArray(new RenderPatch[list.size()]);
+            meshes[dat] = list.toArray(new RenderPatch[0]);
             list.clear();
         }
     }

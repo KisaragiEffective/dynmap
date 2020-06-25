@@ -32,7 +32,7 @@ public class RotatedBoxRenderer extends CustomRenderer {
             if(v == null) break;
             map.add(Integer.valueOf(v));
         }
-        rotValues = map.toArray(new Integer[map.size()]);
+        rotValues = map.toArray(new Integer[0]);
         models = new RenderPatch[rotValues.length][];
         /* Build unrotated base model */
         ArrayList<RenderPatch> list = new ArrayList<>();

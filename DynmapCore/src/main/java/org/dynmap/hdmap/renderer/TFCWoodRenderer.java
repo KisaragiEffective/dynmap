@@ -79,7 +79,7 @@ public class TFCWoodRenderer extends CustomRenderer {
                     addBox(rpf, list, 0.375, 0.625, 0.375, 0.625, 0.0, 1.0);
                     break;
             }
-            meshes[dat] = list.toArray(new RenderPatch[list.size()]);
+            meshes[dat] = list.toArray(new RenderPatch[0]);
             list.clear();
         }
     }
