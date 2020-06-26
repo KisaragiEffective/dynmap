@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -508,7 +509,7 @@ public class CTMTexturePack {
                 if (v.length() == 0) {
                     return null;
                 }
-                ArrayList<String> lst = new ArrayList<>();
+                List<String> lst = new ArrayList<>();
                 String[] tok = tokenize(v, " ,");
                 for (String t : tok) {
                     if (t.indexOf('-') >= 0) {

@@ -563,10 +563,8 @@ public class HDBlockModels {
                         	Log.severe("Invalid update ignore block name " + nm + " at line " + rdr.getLineNumber());
                     	}
                     }
-                }
-                else if(line.startsWith("#") || line.startsWith(";")) {
-                }
-                else if(line.startsWith("enabled:")) {  /* Test if texture file is enabled */
+                } else if(line.startsWith("#") || line.startsWith(";")) {
+                } else if(line.startsWith("enabled:")) {  /* Test if texture file is enabled */
                     line = line.substring(8).trim();
                     if(line.startsWith("true")) {   /* We're enabled? */
                         /* Nothing to do - keep processing */
@@ -581,8 +579,7 @@ public class HDBlockModels {
                     else {
                         Log.info(line + " models enabled");
                     }
-                }
-                else if(line.startsWith("var:")) {  /* Test if variable declaration */
+                } else if(line.startsWith("var:")) {  /* Test if variable declaration */
                     line = line.substring(4).trim();
                     String[] args = line.split(",");
                     for (String arg : args) {
@@ -600,8 +597,7 @@ public class HDBlockModels {
                             return;
                         }
                     }
-                }
-                else if(line.startsWith("cfgfile:")) { /* If config file */
+                } else if(line.startsWith("cfgfile:")) { /* If config file */
                     File cfgfile = new File(line.substring(8).trim());
                     ForgeConfigFile cfg = new ForgeConfigFile(cfgfile);
                     if (!mod_cfg_loaded) {

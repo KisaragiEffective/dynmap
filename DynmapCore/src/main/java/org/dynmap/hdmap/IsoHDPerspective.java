@@ -2,13 +2,24 @@ package org.dynmap.hdmap;
 
 import static org.dynmap.JSONUtils.s;
 
-import org.dynmap.*;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
+import org.dynmap.Client;
+import org.dynmap.Color;
+import org.dynmap.ConfigurationNode;
+import org.dynmap.DynmapChunk;
+import org.dynmap.DynmapCore;
+import org.dynmap.DynmapWorld;
+import org.dynmap.JSONUtils;
+import org.dynmap.Log;
+import org.dynmap.MapManager;
+import org.dynmap.MapTile;
+import org.dynmap.MapType;
 import org.dynmap.MapType.ImageFormat;
 import org.dynmap.markers.impl.MarkerAPIImpl;
 import org.dynmap.renderer.DynmapBlockState;
@@ -903,7 +914,7 @@ public class IsoHDPerspective implements HDPerspective {
         }
         /**
          * Light level cache
-         * @param index of light level (0-3)
+         * @param idx of light level (0-3)
          */
         @Override
         public final LightLevels getCachedLightLevels(int idx) {
@@ -1203,12 +1214,10 @@ public class IsoHDPerspective implements HDPerspective {
             bgnight[i] = shaderstate[i].getMap().getBackgroundARGBNight();
         }
         // Mark the tiles we're going to render as validated
-        for (HDShaderState shaderState : shaderstate) {
-            MapTypeState mts = world.getMapState(shaderState.getMap());
-            if (mts != null) {
-                mts.validateTile(tile.tx, tile.ty);
-            }
-        }
+        Arrays.stream(shaderstate)
+                .map(shaderState -> world.getMapState(shaderState.getMap()))
+                .filter(Objects::nonNull)
+                .forEachOrdered(mts -> mts.validateTile(tile.tx, tile.ty));
         /* Create perspective state object */
         OurPerspectiveState ps = new OurPerspectiveState(mapiter, isnether, scaled);        
         

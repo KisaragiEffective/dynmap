@@ -112,12 +112,12 @@ public class ClientUpdateServlet extends HttpServlet {
                 }
             }
             JSONArray updates = (JSONArray)u.get("updates");
-            JSONArray newupdates = new JSONArray();
-            u.put("updates", newupdates);
+            JSONArray newUpdates = new JSONArray();
+            u.put("updates", newUpdates);
             if(updates != null) {
                 for (Client.Update update : (Iterable<Client.Update>) updates) {
                     if (update.timestamp >= since) {
-                        newupdates.add(update);
+                        newUpdates.add(update);
                     }
                 }
             }

@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
-import org.dynmap.hdmap.TexturePack;
 import org.dynmap.Log;
-import org.dynmap.hdmap.HDBlockModels;
 import org.dynmap.hdmap.TexturePack.BlockTransparency;
 import org.dynmap.hdmap.TexturePack.ColorizingData;
 import org.dynmap.renderer.CustomColorMultiplier;
@@ -99,8 +97,7 @@ public class HDBlockStateTextureMap {
                         }
                         copyToStateIndex(bs, this, null);
                     }
-                }
-                else {  // Else, loop over all state IDs for given block
+                } else {  // Else, loop over all state IDs for given block
                     for (int stateid = 0; stateid < baseblk.getStateCount(); stateid++) {
                         DynmapBlockState bs = baseblk.getState(stateid);
                         if (bs.isAir()) {
@@ -113,8 +110,7 @@ public class HDBlockStateTextureMap {
                         copyToStateIndex(bs, this, null);
                     }
                 }
-            }
-            else {
+            } else {
             	Log.warning("Invalid texture block name: " + blkname);
             }
         }
