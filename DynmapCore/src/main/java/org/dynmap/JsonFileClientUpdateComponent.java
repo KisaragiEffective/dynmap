@@ -160,13 +160,13 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
             }}, jsonInterval/50);
         
         core.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> {
-            s(t, "jsonfile", true);
-            s(t, "allowwebchat", allowwebchat);
-            s(t, "webchat-requires-login", req_login);
-            s(t, "loginrequired", core.isLoginRequired());
+            setValue(t, "jsonfile", true);
+            setValue(t, "allowwebchat", allowwebchat);
+            setValue(t, "webchat-requires-login", req_login);
+            setValue(t, "loginrequired", core.isLoginRequired());
             // For 'sendmessage.php'
-            s(t, "webchat-interval", configuration.getFloat("webchat-interval", 5.0f));
-            s(t, "chatlengthlimit", lengthlimit);
+            setValue(t, "webchat-interval", configuration.getFloat("webchat-interval", 5.0f));
+            setValue(t, "chatlengthlimit", lengthlimit);
         });
         core.events.addListener("initialized", t -> {
             writeConfiguration();

@@ -2,24 +2,14 @@ package org.dynmap.hdmap;
 
 import static org.dynmap.JSONUtils.s;
 
-import org.dynmap.DynmapWorld;
+import org.dynmap.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.dynmap.Client;
-import org.dynmap.Color;
-import org.dynmap.ConfigurationNode;
-import org.dynmap.DynmapChunk;
-import org.dynmap.DynmapCore;
-import org.dynmap.Log;
-import org.dynmap.MapManager;
-import org.dynmap.MapTile;
-import org.dynmap.MapType;
 import org.dynmap.MapType.ImageFormat;
-import org.dynmap.MapTypeState;
 import org.dynmap.markers.impl.MarkerAPIImpl;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.renderer.RenderPatch;
@@ -1395,14 +1385,14 @@ public class IsoHDPerspective implements HDPerspective {
     private static final String[] directions = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
     @Override
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "perspective", name);
-        s(mapObject, "azimuth", azimuth);
-        s(mapObject, "inclination", inclination);
-        s(mapObject, "scale", basemodscale);
-        s(mapObject, "worldtomap", world_to_map.toJSON());
-        s(mapObject, "maptoworld", map_to_world.toJSON());
+        JSONUtils.setValue(mapObject, "perspective", name);
+        JSONUtils.setValue(mapObject, "azimuth", azimuth);
+        JSONUtils.setValue(mapObject, "inclination", inclination);
+        JSONUtils.setValue(mapObject, "scale", basemodscale);
+        JSONUtils.setValue(mapObject, "worldtomap", world_to_map.toJSON());
+        JSONUtils.setValue(mapObject, "maptoworld", map_to_world.toJSON());
         int dir = (((360 + (int)(22.5+azimuth)) / 45) + 6) % 8;
-        s(mapObject, "compassview", directions[dir]);
+        JSONUtils.setValue(mapObject, "compassview", directions[dir]);
     }
     
     private static int fastFloor(double f) {

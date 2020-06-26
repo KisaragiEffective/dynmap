@@ -4,6 +4,7 @@ import static org.dynmap.JSONUtils.s;
 
 import org.dynmap.DynmapCore;
 import org.dynmap.Event;
+import org.dynmap.JSONUtils;
 import org.dynmap.Log;
 import org.dynmap.web.HttpField;
 import org.json.simple.JSONObject;
@@ -190,7 +191,7 @@ public class SendMessageServlet extends HttpServlet {
                 onMessageReceived.trigger(message);
         }
         JSONObject json = new JSONObject();
-        s(json, "error", error);
+        JSONUtils.setValue(json, "error", error);
         bytes = json.toJSONString().getBytes(cs_utf8);
         
         String dateStr = new Date().toString();

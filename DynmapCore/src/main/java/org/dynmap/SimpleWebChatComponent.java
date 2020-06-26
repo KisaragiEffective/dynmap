@@ -30,7 +30,7 @@ public class SimpleWebChatComponent extends Component {
             }
         });
         
-        plugin.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> s(t, "allowchat", configuration.getBoolean("allowchat", false)));
+        plugin.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> JSONUtils.setValue(t, "allowchat", configuration.getBoolean("allowchat", false)));
         
         if (configuration.getBoolean("allowchat", false)) {
             plugin.listenerManager.addListener(EventType.PLAYER_CHAT, (ChatEventListener) (p, msg) -> {

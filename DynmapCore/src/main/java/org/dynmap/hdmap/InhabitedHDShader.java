@@ -6,11 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-import org.dynmap.Color;
-import org.dynmap.ConfigurationNode;
-import org.dynmap.DynmapCore;
-import org.dynmap.Log;
-import org.dynmap.MapManager;
+import org.dynmap.*;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.exporter.OBJExport;
 import org.dynmap.renderer.DynmapBlockState;
@@ -229,7 +225,7 @@ public class InhabitedHDShader implements HDShader {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "shader", name);
+        JSONUtils.setValue(mapObject, "shader", name);
     }
     @Override
     public void exportAsMaterialLibrary(DynmapCommandSender sender, OBJExport out) throws IOException {

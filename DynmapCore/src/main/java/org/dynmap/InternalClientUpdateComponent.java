@@ -37,10 +37,10 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
         final List<String> trustedproxy = dcore.configuration.getStrings("trusted-proxies", null);
 
         dcore.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> {
-            s(t, "allowwebchat", allowwebchat);
-            s(t, "webchat-interval", webchatInterval);
-            s(t, "webchat-requires-login", req_login);
-            s(t, "chatlengthlimit", length_limit);
+            setValue(t, "allowwebchat", allowwebchat);
+            setValue(t, "webchat-interval", webchatInterval);
+            setValue(t, "webchat-requires-login", req_login);
+            setValue(t, "chatlengthlimit", length_limit);
         });
 
         if (allowwebchat) {

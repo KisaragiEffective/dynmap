@@ -26,7 +26,7 @@ public class ClientComponent extends Component {
     
     protected void buildClientConfiguration(JSONObject root) {
         JSONObject o = createClientConfiguration();
-        a(root, "components", o);
+        JSONUtils.array(root, "components", o);
     }
     
     protected JSONObject createClientConfiguration() {
@@ -38,7 +38,7 @@ public class ClientComponent extends Component {
     protected static JSONObject convertMap(Map<String, ?> m) {
         JSONObject o = new JSONObject();
         for(Map.Entry<String, ?> entry : m.entrySet()) {
-            s(o, entry.getKey(), convert(entry.getValue()));
+            JSONUtils.setValue(o, entry.getKey(), convert(entry.getValue()));
         }
         return o;
     }

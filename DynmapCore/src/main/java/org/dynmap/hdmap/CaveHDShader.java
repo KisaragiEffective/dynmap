@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;
 
-import org.dynmap.Color;
-import org.dynmap.ConfigurationNode;
-import org.dynmap.DynmapCore;
-import org.dynmap.MapManager;
+import org.dynmap.*;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.exporter.OBJExport;
 import org.dynmap.renderer.DynmapBlockState;
@@ -271,7 +268,7 @@ public class CaveHDShader implements HDShader {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "shader", name);
+        JSONUtils.setValue(mapObject, "shader", name);
     }
     @Override
     public void exportAsMaterialLibrary(DynmapCommandSender sender, OBJExport out) throws IOException {

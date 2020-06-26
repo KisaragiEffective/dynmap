@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;
 import org.dynmap.InternalClientUpdateComponent;
+import org.dynmap.JSONUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import static org.dynmap.JSONUtils.s;
@@ -39,26 +40,26 @@ public class ClientConfigurationServlet extends HttpServlet {
         boolean guest = user.equals(LoginServlet.USERID_GUEST);
         JSONObject json = new JSONObject();
         if(core.getLoginRequired() && guest) {
-            s(json, "error", "login-required");
+            JSONUtils.setValue(json, "error", "login-required");
         }
         else if(core.isLoginSupportEnabled()) {
             if(guest) {
-                s(json, "loggedin", false);
+                JSONUtils.setValue(json, "loggedin", false);
             }
             else {
-                s(json, "loggedin", true);
-                s(json, "player", user);
+                JSONUtils.setValue(json, "loggedin", true);
+                JSONUtils.setValue(json, "player", user);
             }
             JSONObject obj = InternalClientUpdateComponent.getClientConfig();
             if(obj != null) {
                 json.putAll(obj);
             }
             /* Prune based on security */
-            JSONArray wlist = (JSONArray)g(json, "worlds");
+            JSONArray wlist = (JSONArray) JSONUtils.getValue(json, "worlds");
             JSONArray newwlist = new JSONArray();
             json.put("worlds", newwlist);
             for (JSONObject w : (Iterable<JSONObject>) wlist) {
-                String n = (String) g(w, "name");
+                String n = (String) JSONUtils.getValue(w, "name");
                 DynmapWorld dw = core.getWorld(n);
                 /* If protected, and we're guest or don't have permission, drop it */
                 if (dw.isProtected() && (guest || (!core.getServer().checkPlayerPermission(user, "world." + n)))) {
@@ -67,18 +68,18 @@ public class ClientConfigurationServlet extends HttpServlet {
                     JSONObject neww = new JSONObject();
                     neww.putAll(w);
                     newwlist.add(neww);
-                    JSONArray mlist = (JSONArray) g(w, "maps");
+                    JSONArray mlist = (JSONArray) JSONUtils.getValue(w, "maps");
                     JSONArray newmlist = new JSONArray();
                     neww.put("maps", newmlist);
                     for (JSONObject m : (Iterable<JSONObject>) mlist) {
-                        Boolean prot = (Boolean) g(m, "protected");
+                        Boolean prot = (Boolean) JSONUtils.getValue(m, "protected");
                         /* If not protected, leave it in */
                         if ((prot == null) || (!prot)) {
                             newmlist.add(m);
                             continue;
                         }
                         /* If not guest and we have permission, keep it */
-                        String mn = (String) g(m, "name");
+                        String mn = (String) JSONUtils.getValue(m, "name");
                         if ((!guest) && core.getServer().checkPlayerPermission(user, "map." + n + "." + mn)) {
                             newmlist.add(m);
                         }
@@ -87,7 +88,7 @@ public class ClientConfigurationServlet extends HttpServlet {
             }
         }
         else { 
-            s(json, "loggedin", !guest);
+            JSONUtils.setValue(json, "loggedin", !guest);
             JSONObject obj = InternalClientUpdateComponent.getClientConfig();
             if(obj != null) {
                 json.putAll(obj);

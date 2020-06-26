@@ -16,10 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.dynmap.Client;
-import org.dynmap.DynmapCore;
-import org.dynmap.DynmapWorld;
-import org.dynmap.InternalClientUpdateComponent;
+import org.dynmap.*;
 import org.dynmap.web.HttpField;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -44,7 +41,7 @@ public class ClientUpdateServlet extends HttpServlet {
         boolean guest = user.equals(LoginServlet.USERID_GUEST);
         if(core.getLoginRequired() && guest) {
             JSONObject json = new JSONObject();
-            s(json, "error", "login-required");
+            JSONUtils.setValue(json, "error", "login-required");
             bytes = json.toJSONString().getBytes(cs_utf8);
         }
         else {
@@ -89,7 +86,7 @@ public class ClientUpdateServlet extends HttpServlet {
                 }
             }
             if(!see_all) {
-                JSONArray players = (JSONArray)g(u, "players");
+                JSONArray players = (JSONArray) JSONUtils.getValue(u, "players");
                 JSONArray newplayers = new JSONArray();
                 u.put("players",  newplayers);
                 if(players != null) {
@@ -104,12 +101,12 @@ public class ClientUpdateServlet extends HttpServlet {
                             hide = true;
                         }
                         if (hide) {
-                            s(newp, "world", "-some-other-bogus-world-");
-                            s(newp, "x", 0.0);
-                            s(newp, "y", 64.0);
-                            s(newp, "z", 0.0);
-                            s(newp, "health", 0);
-                            s(newp, "armor", 0);
+                            JSONUtils.setValue(newp, "world", "-some-other-bogus-world-");
+                            JSONUtils.setValue(newp, "x", 0.0);
+                            JSONUtils.setValue(newp, "y", 64.0);
+                            JSONUtils.setValue(newp, "z", 0.0);
+                            JSONUtils.setValue(newp, "health", 0);
+                            JSONUtils.setValue(newp, "armor", 0);
                         }
                     }
                 }

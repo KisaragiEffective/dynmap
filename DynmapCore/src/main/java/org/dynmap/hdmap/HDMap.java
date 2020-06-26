@@ -7,15 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.dynmap.Client;
-import org.dynmap.ConfigurationNode;
-import org.dynmap.DynmapChunk;
-import org.dynmap.DynmapCore;
-import org.dynmap.DynmapWorld;
-import org.dynmap.Log;
-import org.dynmap.MapManager;
-import org.dynmap.MapTile;
-import org.dynmap.MapType;
+import org.dynmap.*;
 import org.dynmap.storage.MapStorage;
 import org.dynmap.storage.MapStorageTile;
 import org.dynmap.storage.MapStorageTileEnumCB;
@@ -253,27 +245,27 @@ public class HDMap extends MapType {
     @Override
     public void buildClientConfiguration(JSONObject worldObject, DynmapWorld world) {
         JSONObject o = new JSONObject();
-        s(o, "type", "HDMapType");
-        s(o, "name", name);
-        s(o, "title", title);
-        s(o, "icon", icon);
-        s(o, "prefix", prefix);
-        s(o, "background", bg_cfg);
-        s(o, "backgroundday", bg_day_cfg);
-        s(o, "backgroundnight", bg_night_cfg);
-        s(o, "bigmap", true);
-        s(o, "mapzoomout", (world.getExtraZoomOutLevels()+mapzoomout));
-        s(o, "mapzoomin", mapzoomin);
-        s(o, "boostzoom", boostzoom);
-        s(o, "protected", isProtected());
-        s(o, "image-format", imgformat.getFileExt());
+        JSONUtils.setValue(o, "type", "HDMapType");
+        JSONUtils.setValue(o, "name", name);
+        JSONUtils.setValue(o, "title", title);
+        JSONUtils.setValue(o, "icon", icon);
+        JSONUtils.setValue(o, "prefix", prefix);
+        JSONUtils.setValue(o, "background", bg_cfg);
+        JSONUtils.setValue(o, "backgroundday", bg_day_cfg);
+        JSONUtils.setValue(o, "backgroundnight", bg_night_cfg);
+        JSONUtils.setValue(o, "bigmap", true);
+        JSONUtils.setValue(o, "mapzoomout", (world.getExtraZoomOutLevels() + mapzoomout));
+        JSONUtils.setValue(o, "mapzoomin", mapzoomin);
+        JSONUtils.setValue(o, "boostzoom", boostzoom);
+        JSONUtils.setValue(o, "protected", isProtected());
+        JSONUtils.setValue(o, "image-format", imgformat.getFileExt());
         if(append_to_world.length() > 0)
-            s(o, "append_to_world", append_to_world);
+            JSONUtils.setValue(o, "append_to_world", append_to_world);
         perspective.addClientConfiguration(o);
         shader.addClientConfiguration(o);
         lighting.addClientConfiguration(o);
         
-        a(worldObject, "maps", o);
+        JSONUtils.array(worldObject, "maps", o);
 
     }
     

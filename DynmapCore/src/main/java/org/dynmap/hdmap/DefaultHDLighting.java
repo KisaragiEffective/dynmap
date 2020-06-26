@@ -1,9 +1,6 @@
 package org.dynmap.hdmap;
 
-import org.dynmap.Color;
-import org.dynmap.ConfigurationNode;
-import org.dynmap.DynmapCore;
-import org.dynmap.DynmapWorld;
+import org.dynmap.*;
 import org.json.simple.JSONObject;
 
 import static org.dynmap.JSONUtils.s;
@@ -77,8 +74,8 @@ public class DefaultHDLighting implements HDLighting {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "lighting", name);
-        s(mapObject, "nightandday", isNightAndDayEnabled());
+        JSONUtils.setValue(mapObject, "lighting", name);
+        JSONUtils.setValue(mapObject, "nightandday", isNightAndDayEnabled());
     }
 
     @Override

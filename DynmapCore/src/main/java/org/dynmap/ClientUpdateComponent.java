@@ -47,16 +47,16 @@ public class ClientUpdateComponent extends Component {
                 see_all = false;
         }
         if((e.include_all_users) && is_protected) { /* If JSON request AND protected, leave mark for script */
-            s(u, "protected", true);
+            JSONUtils.setValue(u, "protected", true);
         }
         
-        s(u, "confighash", core.getConfigHashcode());
+        JSONUtils.setValue(u, "confighash", core.getConfigHashcode());
 
-        s(u, "servertime", world.getTime() % 24000);
-        s(u, "hasStorm", world.hasStorm());
-        s(u, "isThundering", world.isThundering());
+        JSONUtils.setValue(u, "servertime", world.getTime() % 24000);
+        JSONUtils.setValue(u, "hasStorm", world.hasStorm());
+        JSONUtils.setValue(u, "isThundering", world.isThundering());
 
-        s(u, "players", new JSONArray());
+        JSONUtils.setValue(u, "players", new JSONArray());
         List<DynmapPlayer> players = core.playerList.getVisiblePlayers();
         for(DynmapPlayer p : players) {
             boolean hide = false;
@@ -67,14 +67,14 @@ public class ClientUpdateComponent extends Component {
             }
             JSONObject jp = new JSONObject();
             
-            s(jp, "type", "player");
+            JSONUtils.setValue(jp, "type", "player");
             if (hideNames)
-                s(jp, "name", "");
+                JSONUtils.setValue(jp, "name", "");
             else if (usePlayerColors)
-                s(jp, "name", Client.encodeColorInHTML(p.getDisplayName()));
+                JSONUtils.setValue(jp, "name", Client.encodeColorInHTML(p.getDisplayName()));
             else
-                s(jp, "name", Client.stripColor(p.getDisplayName()));
-            s(jp, "account", p.getName());
+                JSONUtils.setValue(jp, "name", Client.stripColor(p.getDisplayName()));
+            JSONUtils.setValue(jp, "account", p.getName());
             if((!hide) && (hideifshadow < 15)) {
                 if(pw.getLightLevel((int)pl.x, (int)pl.y, (int)pl.z) <= hideifshadow) {
                     hide = true;
@@ -112,59 +112,59 @@ public class ClientUpdateComponent extends Component {
             /* Fix typo on 'sendpositon' to 'sendposition', keep bad one in case someone used it */
             if(configuration.getBoolean("sendposition", true) && configuration.getBoolean("sendpositon", true) &&
                     (pworld != null) && pworld.sendposition && (!hide)) {
-                s(jp, "world", pl.world);
-                s(jp, "x", pl.x);
-                s(jp, "y", pl.y);
-                s(jp, "z", pl.z);
+                JSONUtils.setValue(jp, "world", pl.world);
+                JSONUtils.setValue(jp, "x", pl.x);
+                JSONUtils.setValue(jp, "y", pl.y);
+                JSONUtils.setValue(jp, "z", pl.z);
             }
             else {
-                s(jp, "world", "-some-other-bogus-world-");
-                s(jp, "x", 0.0);
-                s(jp, "y", 64.0);
-                s(jp, "z", 0.0);
+                JSONUtils.setValue(jp, "world", "-some-other-bogus-world-");
+                JSONUtils.setValue(jp, "x", 0.0);
+                JSONUtils.setValue(jp, "y", 64.0);
+                JSONUtils.setValue(jp, "z", 0.0);
             }
             /* Only send health if enabled AND we're on visible world */
             if (configuration.getBoolean("sendhealth", false) && (pworld != null) && pworld.sendhealth && (!hide)) {
-                s(jp, "health", p.getHealth());
-                s(jp, "armor", p.getArmorPoints());
+                JSONUtils.setValue(jp, "health", p.getHealth());
+                JSONUtils.setValue(jp, "armor", p.getArmorPoints());
             }
             else {
-                s(jp, "health", 0);
-                s(jp, "armor", 0);
+                JSONUtils.setValue(jp, "health", 0);
+                JSONUtils.setValue(jp, "armor", 0);
             }
-            s(jp, "sort", p.getSortWeight());
-            a(u, "players", jp);
+            JSONUtils.setValue(jp, "sort", p.getSortWeight());
+            JSONUtils.array(u, "players", jp);
         }
         List<DynmapPlayer> hidden = core.playerList.getHiddenPlayers();
         if(configuration.getBoolean("includehiddenplayers", false)) {
             for(DynmapPlayer p : hidden) {
                 JSONObject jp = new JSONObject();
-                s(jp, "type", "player");
+                JSONUtils.setValue(jp, "type", "player");
                 if (hideNames) 
-                    s(jp, "name", "");
+                    JSONUtils.setValue(jp, "name", "");
                 else if (usePlayerColors)
-                    s(jp, "name", Client.encodeColorInHTML(p.getDisplayName()));
+                    JSONUtils.setValue(jp, "name", Client.encodeColorInHTML(p.getDisplayName()));
                 else
-                    s(jp, "name", Client.stripColor(p.getDisplayName()));
-                s(jp, "account", p.getName());
-                s(jp, "world", "-hidden-player-");
-                s(jp, "x", 0.0);
-                s(jp, "y", 64.0);
-                s(jp, "z", 0.0);
-                s(jp, "health", 0);
-                s(jp, "armor", 0);
-                s(jp, "sort", p.getSortWeight());
-                a(u, "players", jp);
+                    JSONUtils.setValue(jp, "name", Client.stripColor(p.getDisplayName()));
+                JSONUtils.setValue(jp, "account", p.getName());
+                JSONUtils.setValue(jp, "world", "-hidden-player-");
+                JSONUtils.setValue(jp, "x", 0.0);
+                JSONUtils.setValue(jp, "y", 64.0);
+                JSONUtils.setValue(jp, "z", 0.0);
+                JSONUtils.setValue(jp, "health", 0);
+                JSONUtils.setValue(jp, "armor", 0);
+                JSONUtils.setValue(jp, "sort", p.getSortWeight());
+                JSONUtils.array(u, "players", jp);
             }
-            s(u, "currentcount", core.getCurrentPlayers());
+            JSONUtils.setValue(u, "currentcount", core.getCurrentPlayers());
         }
         else {
-            s(u, "currentcount", core.getCurrentPlayers() - hidden.size());
+            JSONUtils.setValue(u, "currentcount", core.getCurrentPlayers() - hidden.size());
         }
 
-        s(u, "updates", new JSONArray());
+        JSONUtils.setValue(u, "updates", new JSONArray());
         for(Object update : core.mapManager.getWorldUpdates(worldName, since)) {
-            a(u, "updates", update);
+            JSONUtils.array(u, "updates", update);
         }
     }
 
