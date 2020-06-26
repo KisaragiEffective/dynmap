@@ -18,14 +18,14 @@ public class Debug {
     }
 
     public synchronized static void debug(String message) {
-        for (Debugger debugger : debuggers) debugger.debug(message);
+        debuggers.forEach(debugger -> debugger.debug(message));
     }
 
     public synchronized static void error(String message) {
-        for (Debugger debugger : debuggers) debugger.error(message);
+        debuggers.forEach(debugger -> debugger.error(message));
     }
 
     public synchronized static void error(String message, Throwable thrown) {
-        for (Debugger debugger : debuggers) debugger.error(message, thrown);
+        debuggers.forEach(debugger -> debugger.error(message, thrown));
     }
 }

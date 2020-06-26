@@ -437,13 +437,13 @@ public abstract class DynmapWorld {
         /* Add seed locations, if any */
         if(seedloccfg.size() > 0) {
             ArrayList<Map<String,Object>> locs = new ArrayList<>();
-            for (DynmapLocation dl : seedloccfg) {
+            seedloccfg.forEach(dl -> {
                 ConfigurationNode ll = new ConfigurationNode();
                 ll.put("x", dl.x);
                 ll.put("y", dl.y);
                 ll.put("z", dl.z);
                 locs.add(ll.entries);
-            }
+            });
             node.put("fullrenderlocations", locs);
         }
         /* Add flags */
@@ -453,7 +453,7 @@ public abstract class DynmapWorld {
         /* Save visibility limits, if defined */
         if(visibility_limits != null) {
             ArrayList<Map<String,Object>> lims = new ArrayList<>();
-            for (VisibilityLimit lim : visibility_limits) {
+            visibility_limits.forEach(lim -> {
                 LinkedHashMap<String, Object> lv = new LinkedHashMap<>();
                 if (lim instanceof RectangleVisibilityLimit) {
                     RectangleVisibilityLimit rect_lim = (RectangleVisibilityLimit) lim;
@@ -468,7 +468,7 @@ public abstract class DynmapWorld {
                     lv.put("r", round_lim.radius);
                 }
                 lims.add(lv);
-            }
+            });
             node.put("visibilitylimits", lims);
         }
         /* Save hidden limits, if defined */

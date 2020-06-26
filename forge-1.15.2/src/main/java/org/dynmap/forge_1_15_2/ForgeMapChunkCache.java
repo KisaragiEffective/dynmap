@@ -2,6 +2,7 @@ package org.dynmap.forge_1_15_2;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -873,29 +874,28 @@ public class ForgeMapChunkCache extends MapChunkCache
     public static void init() {
     	if (!init)
     	{
-    		Field[] f;
-    		    		
-    		f = ServerWorld.class.getDeclaredFields();
-            for (Field value : f) {
-                if ((updateEntityTick == null) && value.getType().isAssignableFrom(int.class)) {
-                    updateEntityTick = value;
-                    //Log.info("Found updateEntityTick - " + f[i].getName());
-                    updateEntityTick.setAccessible(true);
-                }
+            {
+
+                Field[] fields = ServerWorld.class.getDeclaredFields();
+                //Log.info("Found updateEntityTick - " + f[i].getName());
+                Arrays.stream(fields)
+                        .filter(value -> (updateEntityTick == null))
+                        .filter(value -> value.getType().isAssignableFrom(int.class))
+                        .forEachOrdered(value -> {
+                            updateEntityTick = value;
+                            updateEntityTick.setAccessible(true);
+                        });
             }
 
-    		f = ChunkManager.class.getDeclaredFields();
-            for (Field field : f) {
-                if ((chunksToRemove == null) && (field.getType().equals(Map.class))) {
-                    chunksToRemove = field;
-                    //Log.info("Found chunksToRemove - " + f[i].getName());
-                    chunksToRemove.setAccessible(true);
-                }
-//    		    else if((pendingAnvilChunksCoordinates == null) && (f[i].getType().equals(it.unimi.dsi.fastutil.longs.LongSet.class))) {
-//                    //Log.info("Found pendingAnvilChunksCoordinates - " + f[i].getName());
-//    		        pendingAnvilChunksCoordinates = f[i];
-//    		        pendingAnvilChunksCoordinates.setAccessible(true);
-//    		    }
+            {
+                Field[] fields = ChunkManager.class.getDeclaredFields();
+                Arrays.stream(fields)
+                        .filter(field -> (chunksToRemove == null))
+                        .filter(field -> (field.getType().equals(Map.class)))
+                        .forEachOrdered(field -> {
+                            chunksToRemove = field;
+                            chunksToRemove.setAccessible(true);
+                        });
             }
 			if (updateEntityTick == null) {
 				Log.severe("ERROR: cannot find updateEntityTick - dynmap cannot drive entity cleanup when no players are active");
@@ -950,28 +950,20 @@ public class ForgeMapChunkCache extends MapChunkCache
             x_min = x_max = chunks.get(0).x;
             z_min = z_max = chunks.get(0).z;
 
-            for (DynmapChunk c : chunks)
-            {
-                if (c.x > x_max)
-                {
+            chunks.forEach(c -> {
+                if (c.x > x_max) {
                     x_max = c.x;
                 }
-
-                if (c.x < x_min)
-                {
+                if (c.x < x_min) {
                     x_min = c.x;
                 }
-
-                if (c.z > z_max)
-                {
+                if (c.z > z_max) {
                     z_max = c.z;
                 }
-
-                if (c.z < z_min)
-                {
+                if (c.z < z_min) {
                     z_min = c.z;
                 }
-            }
+            });
 
             x_dim = x_max - x_min + 1;
         }
@@ -1070,11 +1062,11 @@ public class ForgeMapChunkCache extends MapChunkCache
             case 10: // Map
                 CompoundNBT tc = (CompoundNBT) v;
                 HashMap<String, Object> vmap = new HashMap<>();
-                for (Object t : tc.keySet()) {
-                    String st = (String) t;
-                    INBT tg = tc.get(st);
-                    vmap.put(st, getNBTValue(tg));
-                }
+                tc.keySet()
+                        .forEach(st -> {
+                            INBT tg = tc.get(st);
+                            vmap.put(st, getNBTValue(tg));
+                        });
                 val = vmap;
                 break;
             case 11: // Int[]

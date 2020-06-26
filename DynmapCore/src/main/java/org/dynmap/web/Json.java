@@ -55,52 +55,52 @@ public class Json {
         }//for
     }
 
-    public static void appendJson(Object o, StringBuilder s) {
+    public static void appendJson(Object o, StringBuilder sb) {
         if (o == null) {
-            s.append("null");
+            sb.append("null");
         } else if (o instanceof Boolean) {
-            s.append(((Boolean) o) ? "true" : "false");
+            sb.append(((Boolean) o) ? "true" : "false");
         } else if (o instanceof String) {
-            s.append("\"");
-            escape((String)o, s);
-            s.append("\"");
+            sb.append("\"");
+            escape((String)o, sb);
+            sb.append("\"");
         } else if (o instanceof Integer || o instanceof Long || o instanceof Float || o instanceof Double) {
-            s.append(o.toString());
+            sb.append(o.toString());
         } else if (o instanceof Map<?, ?>) {
             Map<?, ?> m = (Map<?, ?>) o;
-            s.append("{");
+            sb.append("{");
             boolean first = true;
             for (Map.Entry<?, ?> entry : m.entrySet()) {
                 if (first)
                     first = false;
                 else
-                    s.append(",");
+                    sb.append(",");
 
-                appendJson(entry.getKey(), s);
-                s.append(": ");
-                appendJson(entry.getValue(), s);
+                appendJson(entry.getKey(), sb);
+                sb.append(": ");
+                appendJson(entry.getValue(), sb);
             }
-            s.append("}");
+            sb.append("}");
         } else if (o instanceof List<?>) {
             List<?> l = (List<?>) o;
-            s.append("[");
+            sb.append("[");
             int count = 0;
             for (Object value : l) {
-                if (count++ > 0) s.append(",");
-                appendJson(value, s);
+                if (count++ > 0) sb.append(",");
+                appendJson(value, sb);
             }
-            s.append("]");
+            sb.append("]");
         } else if (o.getClass().isArray()) {
             int length = Array.getLength(o);
-            s.append("[");
+            sb.append("[");
             int count = 0;
             for (int i = 0; i < length; i++) {
-                if (count++ > 0) s.append(",");
-                appendJson(Array.get(o, i), s);
+                if (count++ > 0) sb.append(",");
+                appendJson(Array.get(o, i), sb);
             }
-            s.append("]");
+            sb.append("]");
         } else if (o instanceof Object) /* TODO: Always true, maybe interface? */ {
-            s.append("{");
+            sb.append("{");
             boolean first = true;
 
             Class<?> c = o.getClass();
@@ -120,14 +120,14 @@ public class Json {
                 if (first)
                     first = false;
                 else
-                    s.append(",");
-                appendJson(fieldName, s);
-                s.append(": ");
-                appendJson(fieldValue, s);
+                    sb.append(",");
+                appendJson(fieldName, sb);
+                sb.append(": ");
+                appendJson(fieldValue, sb);
             }
-            s.append("}");
+            sb.append("}");
         } else {
-            s.append("undefined");
+            sb.append("undefined");
         }
     }
 }

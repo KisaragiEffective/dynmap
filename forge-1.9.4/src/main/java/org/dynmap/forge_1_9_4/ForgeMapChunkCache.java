@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -884,46 +885,56 @@ public class ForgeMapChunkCache extends MapChunkCache
     public static void init() {
     	if (!init)
     	{
-    		Field[] f = ChunkProviderServer.class.getDeclaredFields();
+            {
+                Field[] fields = ChunkProviderServer.class.getDeclaredFields();
 
-            for (Field item : f) {
-                if ((unloadqueue == null) && item.getType().isAssignableFrom(Set.class)) {
-                    unloadqueue = item;
-                    //Log.info("Found unloadqueue - " + f[i].getName());
-                    unloadqueue.setAccessible(true);
-                } else if ((currentchunkloader == null) && item.getType().isAssignableFrom(IChunkLoader.class)) {
-                    currentchunkloader = item;
-                    //Log.info("Found currentchunkprovider - " + f[i].getName());
-                    currentchunkloader.setAccessible(true);
-                }
-            }
-    		
-    		f = WorldServer.class.getDeclaredFields();
-            for (Field value : f) {
-                if ((updateEntityTick == null) && value.getType().isAssignableFrom(int.class)) {
-                    updateEntityTick = value;
-                    //Log.info("Found updateEntityTick - " + f[i].getName());
-                    updateEntityTick.setAccessible(true);
-                }
+                Arrays.stream(fields).forEachOrdered(item -> {
+                    if ((unloadqueue == null) && item.getType().isAssignableFrom(Set.class)) {
+                        unloadqueue = item;
+                        //Log.info("Found unloadqueue - " + f[i].getName());
+                        unloadqueue.setAccessible(true);
+                    } else if ((currentchunkloader == null) && item.getType().isAssignableFrom(IChunkLoader.class)) {
+                        currentchunkloader = item;
+                        //Log.info("Found currentchunkprovider - " + f[i].getName());
+                        currentchunkloader.setAccessible(true);
+                    }
+                });
             }
 
-    		f = AnvilChunkLoader.class.getDeclaredFields();
-            for (Field field : f) {
-                if ((chunksToRemove == null) && (field.getType().equals(Map.class))) {
-                    chunksToRemove = field;
-                    chunksToRemove.setAccessible(true);
-                } else if ((pendingAnvilChunksCoordinates == null) && (field.getType().equals(Set.class))) {
-                    pendingAnvilChunksCoordinates = field;
-                    pendingAnvilChunksCoordinates.setAccessible(true);
-                }
+            {
+                Field[] fields = WorldServer.class.getDeclaredFields();
+                //Log.info("Found updateEntityTick - " + f[i].getName());
+                Arrays.stream(fields)
+                        .filter(value -> (updateEntityTick == null))
+                        .filter(value -> value.getType().isAssignableFrom(int.class))
+                        .forEachOrdered(value -> {
+                            updateEntityTick = value;
+                            updateEntityTick.setAccessible(true);
+                        });
+            }
+
+            {
+                Field[] fields = AnvilChunkLoader.class.getDeclaredFields();
+                Arrays.stream(fields).forEachOrdered(field -> {
+                    if ((chunksToRemove == null) && (field.getType().equals(Map.class))) {
+                        chunksToRemove = field;
+                        chunksToRemove.setAccessible(true);
+                    } else if ((pendingAnvilChunksCoordinates == null) && (field.getType().equals(Set.class))) {
+                        pendingAnvilChunksCoordinates = field;
+                        pendingAnvilChunksCoordinates.setAccessible(true);
+                    }
+                });
             }
     		// Get writeChunkToNBT method
-    	    Method[] ma = AnvilChunkLoader.class.getDeclaredMethods();
-    	    for (Method m : ma) {
-    	        Class<?>[] p = m.getParameterTypes();
-    	        if ((p.length == 3) && (p[0].equals(Chunk.class)) && (p[1].equals(World.class)) && (p[2].equals(NBTTagCompound.class))) {
-    	            writechunktonbt = m;
-    	            m.setAccessible(true);
+    	    Method[] methods = AnvilChunkLoader.class.getDeclaredMethods();
+    	    for (Method method : methods) {
+    	        Class<?>[] p = method.getParameterTypes();
+    	        if ((p.length == 3)
+                        && (p[0].equals(Chunk.class))
+                        && (p[1].equals(World.class))
+                        && (p[2].equals(NBTTagCompound.class))) {
+    	            writechunktonbt = method;
+    	            method.setAccessible(true);
     	            break;
     	        }
     	    }
@@ -1057,14 +1068,14 @@ public class ForgeMapChunkCache extends MapChunkCache
             if (pendingcoords.contains(coord)) {
                 for (Object o : chunkstoremove.values()) {
                     if (chunkCoord == null) {
-                        Field[] f = o.getClass().getDeclaredFields();
-                        for(Field ff : f) {
-                            if((chunkCoord == null) && (ff.getType().equals(ChunkPos.class))) {
-                                chunkCoord = ff;
+                        Field[] fields = o.getClass().getDeclaredFields();
+                        for(Field field : fields) {
+                            if((chunkCoord == null) && (field.getType().equals(ChunkPos.class))) {
+                                chunkCoord = field;
                                 chunkCoord.setAccessible(true);
                             }
-                            else if((nbtTag == null) && (ff.getType().equals(NBTTagCompound.class))) {
-                                nbtTag = ff;
+                            else if((nbtTag == null) && (field.getType().equals(NBTTagCompound.class))) {
+                                nbtTag = field;
                                 nbtTag.setAccessible(true);
                             }
                         }
@@ -1159,11 +1170,11 @@ public class ForgeMapChunkCache extends MapChunkCache
             case 10: // Map
                 NBTTagCompound tc = (NBTTagCompound) v;
                 HashMap<String, Object> vmap = new HashMap<>();
-                for (Object t : tc.getKeySet()) {
-                    String st = (String) t;
-                    NBTBase tg = tc.getTag(st);
-                    vmap.put(st, getNBTValue(tg));
-                }
+                tc.getKeySet()
+                        .forEach(st -> {
+                            NBTBase tg = tc.getTag(st);
+                            vmap.put(st, getNBTValue(tg));
+                        });
                 val = vmap;
                 break;
             case 11: // Int[]

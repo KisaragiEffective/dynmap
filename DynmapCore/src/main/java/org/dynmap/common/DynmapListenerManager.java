@@ -2,6 +2,7 @@ package org.dynmap.common;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dynmap.DynmapCore;
@@ -46,11 +47,11 @@ public class DynmapListenerManager {
         BLOCK_BREAK,
         SIGN_CHANGE
     }
-    private final Map<EventType, ArrayList<EventListener>> listeners = new EnumMap<>(EventType.class);
+    private final Map<EventType, List<EventListener>> listeners = new EnumMap<>(EventType.class);
     
     public void addListener(EventType type, EventListener listener) {
         synchronized(listeners) {
-            ArrayList<EventListener> lst = listeners.get(type);
+            List<EventListener> lst = listeners.get(type);
             if(lst == null) {
                 lst = new ArrayList<>();
                 listeners.put(type, lst);
@@ -61,80 +62,80 @@ public class DynmapListenerManager {
     }
     
     public void processWorldEvent(EventType type, DynmapWorld w) {
-        ArrayList<EventListener> lst = listeners.get(type);
+        List<EventListener> lst = listeners.get(type);
         if(lst == null) return;
-        int sz = lst.size();
-        for (EventListener el : lst) {
-            if (el instanceof WorldEventListener) {
-                try {
-                    ((WorldEventListener) el).worldEvent(w);
-                } catch (Throwable t) {
-                    Log.warning("processWorldEvent(" + type + "," + w + ") - exception", t);
-                }
-            }
-        }
+        lst.stream()
+                .filter(WorldEventListener.class::isInstance)
+                .map(WorldEventListener.class::cast)
+                .forEachOrdered(el -> {
+                    try {
+                        el.worldEvent(w);
+                    } catch (Throwable t) {
+                        Log.warning("processWorldEvent(" + type + "," + w + ") - exception", t);
+                    }
+                });
     }
     public void processPlayerEvent(EventType type, DynmapPlayer p) {
-        ArrayList<EventListener> lst = listeners.get(type);
+        List<EventListener> lst = listeners.get(type);
         if(lst == null) return;
-        int sz = lst.size();
-        for (EventListener el : lst) {
-            if (el instanceof PlayerEventListener) {
-                try {
-                    ((PlayerEventListener) el).playerEvent(p);
-                } catch (Throwable t) {
-                    Log.warning("processPlayerEvent(" + type + "," + p + ") - exception", t);
-                }
-            }
-        }
+        lst.stream()
+                .filter(PlayerEventListener.class::isInstance)
+                .map(PlayerEventListener.class::cast)
+                .forEachOrdered(el -> {
+                    try {
+                        el.playerEvent(p);
+                    } catch (Throwable t) {
+                        Log.warning("processPlayerEvent(" + type + "," + p + ") - exception", t);
+                    }
+                });
     }
     public void processChatEvent(EventType type, DynmapPlayer p, String msg) {
-        ArrayList<EventListener> lst = listeners.get(type);
+        List<EventListener> lst = listeners.get(type);
         if(lst == null) return;
-        int sz = lst.size();
-        for (EventListener el : lst) {
-            if (el instanceof ChatEventListener) {
-                try {
-                    ((ChatEventListener) el).chatEvent(p, msg);
-                } catch (Throwable t) {
-                    Log.warning("processChatEvent(" + type + "," + msg + ") - exception", t);
-                }
-            }
-        }
+        lst.stream()
+                .filter(ChatEventListener.class::isInstance)
+                .map(ChatEventListener.class::cast)
+                .forEachOrdered(el -> {
+                    try {
+                        el.chatEvent(p, msg);
+                    } catch (Throwable t) {
+                        Log.warning("processChatEvent(" + type + "," + msg + ") - exception", t);
+                    }
+                });
     }
     public void processBlockEvent(EventType type, String material, String world, int x, int y, int z)
     {
-        ArrayList<EventListener> lst = listeners.get(type);
+        List<EventListener> lst = listeners.get(type);
         if(lst == null) return;
-        int sz = lst.size();
-        for (EventListener el : lst) {
-            if (el instanceof BlockEventListener) {
-                try {
-                    ((BlockEventListener) el).blockEvent(material, world, x, y, z);
-                } catch (Throwable t) {
-                    Log.warning("processBlockEvent(" + type + "," + material + "," + world + "," + x + "," + y + "," + z + ") - exception", t);
-                }
-            }
-        }
+        lst.stream()
+                .filter(BlockEventListener.class::isInstance)
+                .map(BlockEventListener.class::cast)
+                .forEachOrdered(el -> {
+                    try {
+                        el.blockEvent(material, world, x, y, z);
+                    } catch (Throwable t) {
+                        Log.warning("processBlockEvent(" + type + "," + material + "," + world + "," + x + "," + y + "," + z + ") - exception", t);
+                    }
+                });
     }
     public void processSignChangeEvent(EventType type, String material, String world, int x, int y, int z, String[] lines, DynmapPlayer p)
     {
-        ArrayList<EventListener> lst = listeners.get(type);
+        List<EventListener> lst = listeners.get(type);
         if(lst == null) return;
-        int sz = lst.size();
-        for (EventListener el : lst) {
-            if (el instanceof SignChangeEventListener) {
-                try {
-                    ((SignChangeEventListener) el).signChangeEvent(material, world, x, y, z, lines, p);
-                } catch (Throwable t) {
-                    Log.warning("processSignChangeEvent(" + type + "," + material + "," + world + "," + x + "," + y + "," + z + ") - exception", t);
-                }
-            }
-        }
+        lst.stream()
+                .filter(SignChangeEventListener.class::isInstance)
+                .map(SignChangeEventListener.class::cast)
+                .forEachOrdered(el -> {
+                    try {
+                        el.signChangeEvent(material, world, x, y, z, lines, p);
+                    } catch (Throwable t) {
+                        Log.warning("processSignChangeEvent(" + type + "," + material + "," + world + "," + x + "," + y + "," + z + ") - exception", t);
+                    }
+                });
     }
     /* Clean up registered listeners */
     public void cleanup() {
-        for(ArrayList<EventListener> l : listeners.values())
+        for(List<EventListener> l : listeners.values())
             l.clear();
         listeners.clear();
     }

@@ -48,11 +48,10 @@ public class CaveHDShader implements HDShader {
 
         List<Object> hidden = configuration.getList("hiddennames");
         if(hidden != null) {
-            for(Object o : hidden) {
-                if(o instanceof String) {
-                    setHidden((String) o);
-                }
-            }
+            hidden.stream()
+                    .filter(o -> o instanceof String)
+                    .map(o -> (String) o)
+                    .forEach(this::setHidden);
         }
         else {
             setHidden(DynmapBlockState.LOG_BLOCK);

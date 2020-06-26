@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -368,39 +369,25 @@ public class FileTreeMapStorage extends MapStorage {
     @Override
     public void enumMapTiles(DynmapWorld world, MapType map, MapStorageTileEnumCB cb) {
         File base = new File(baseTileDir, world.getName()); // Get base directory for world
-        List<MapType> mtlist;
+        List<MapType> mapTypes = map != null ? Collections.singletonList(map) : new ArrayList<>(world.maps);
 
-        if (map != null) {
-            mtlist = Collections.singletonList(map);
-        }
-        else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<>(world.maps);
-        }
-        for (MapType mt : mtlist) {
+        // Else, add all directories under world directory (for maps)
+        mapTypes.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, base, var, cb, null, null);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processEnumMapTiles(world, mt, base, var, cb, null, null));
+        });
     }
 
     @Override
     public void enumMapBaseTiles(DynmapWorld world, MapType map, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
         File base = new File(baseTileDir, world.getName()); // Get base directory for world
-        List<MapType> mtlist;
+        List<MapType> mapTypes = map != null ? Collections.singletonList(map) : new ArrayList<>(world.maps);
 
-        if (map != null) {
-            mtlist = Collections.singletonList(map);
-        }
-        else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<>(world.maps);
-        }
-        for (MapType mt : mtlist) {
+        // Else, add all directories under world directory (for maps)
+        mapTypes.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, base, var, null, cbBase, cbEnd);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processEnumMapTiles(world, mt, base, var, null, cbBase, cbEnd));
+        });
     }
 
     private void processPurgeMapTiles(DynmapWorld world, MapType map, File base, ImageVariant var) {
@@ -408,12 +395,11 @@ public class FileTreeMapStorage extends MapStorage {
         // Clean up hash files
         String[] hlist = base.list();
         if (hlist != null) {
-            for (String h : hlist) {
-                if (!h.endsWith(".hash")) continue;
-                if (h.startsWith(mname + "_")) continue;
-                File f = new File(base, h);
-                f.delete();
-            }
+            Arrays.stream(hlist)
+                    .filter(h -> h.endsWith(".hash"))
+                    .filter(h -> !h.startsWith(mname + "_"))
+                    .map(h -> new File(base, h))
+                    .forEachOrdered(File::delete);
         }
         File bdir = new File(base, mname);
         if (!bdir.isDirectory()) return;
@@ -458,12 +444,10 @@ public class FileTreeMapStorage extends MapStorage {
         else {  // Else, add all directories under world directory (for maps)
             mtlist = new ArrayList<>(world.maps);
         }
-        for (MapType mt : mtlist) {
+        mtlist.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processPurgeMapTiles(world, mt, base, var);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processPurgeMapTiles(world, mt, base, var));
+        });
     }
 
     @Override

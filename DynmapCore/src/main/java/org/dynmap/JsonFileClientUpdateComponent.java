@@ -288,8 +288,8 @@ fos.close();
     protected void writeUpdates() {
         if(core.mapManager == null) return;
         //Handles Updates
-        ArrayList<DynmapWorld> wlist = new ArrayList<>(core.mapManager.getWorlds());	// Grab copy of world list
-        for (DynmapWorld dynmapWorld : wlist) {
+        List<DynmapWorld> copyOfWorlds = new ArrayList<>(core.mapManager.getWorlds());	// Grab copy of world list
+        for (DynmapWorld dynmapWorld : copyOfWorlds) {
             JSONObject update = new JSONObject();
             update.put("timestamp", currentTimestamp);
             ClientUpdateEvent clientUpdate = new ClientUpdateEvent(currentTimestamp - 30000, dynmapWorld, update);

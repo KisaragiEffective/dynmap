@@ -106,15 +106,14 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
     protected void writeUpdates() {
         if(core.mapManager == null) return;
         //Handles Updates
-        for (DynmapWorld dynmapWorld : core.mapManager.getWorlds()) {
+        core.mapManager.getWorlds().forEach(dynmapWorld -> {
             JSONObject update = new JSONObject();
             update.put("timestamp", currentTimestamp);
             ClientUpdateEvent clientUpdate = new ClientUpdateEvent(currentTimestamp - 30000, dynmapWorld, update);
             clientUpdate.include_all_users = true;
             core.events.trigger("buildclientupdate", clientUpdate);
-
             updates.put(dynmapWorld.getName(), update);
-        }
+        });
     }
     protected void writeConfiguration() {
         JSONObject clientConfiguration = new JSONObject();

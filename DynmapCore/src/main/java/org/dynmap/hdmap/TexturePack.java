@@ -468,9 +468,7 @@ public class TexturePack {
         }
         public void scrubValues(Integer val) {
             List<Integer> badvals = map.keysWithValue(val);
-            for (Integer v : badvals) {
-                map.remove(v);
-            }
+            badvals.forEach(v -> map.remove(v));
         }
     }
     
@@ -2510,17 +2508,19 @@ public class TexturePack {
                             Log.severe("Format error - line " + rdr.getLineNumber() + " of " + txtname);
                             return;
                         }
-                        if (v[0].equals("id")) {
+
+                        final String key = v[0];
+                        if (key.equals("id")) {
                             id = getIntValue(varvals, v[1]);
-                        } else if (v[0].equals("grassColorMult")) {
+                        } else if (key.equals("grassColorMult")) {
                             grasscolormult = Integer.valueOf(v[1], 16);
-                        } else if (v[0].equals("foliageColorMult")) {
+                        } else if (key.equals("foliageColorMult")) {
                             foliagecolormult = Integer.valueOf(v[1], 16);
-                        } else if (v[0].equals("waterColorMult")) {
+                        } else if (key.equals("waterColorMult")) {
                             watercolormult = Integer.valueOf(v[1], 16);
-                        } else if (v[0].equals("temp")) {
+                        } else if (key.equals("temp")) {
                             tmp = Double.parseDouble(v[1]);
-                        } else if (v[0].equals("rain")) {
+                        } else if (key.equals("rain")) {
                             rain = Double.parseDouble(v[1]);
                         }
                     }
@@ -2577,12 +2577,12 @@ public class TexturePack {
     /* Process any block aliases */
     public static void handleBlockAlias() {
         Set<String> aliased = MapManager.mapman.getAliasedBlocks();
-        for (String an : aliased) {
+        aliased.forEach(an -> {
             String newid = MapManager.mapman.getBlockAlias(an);
             if (!newid.equals(an)) {
                 HDBlockStateTextureMap.remapTexture(an, newid);
             }
-        }
+        });
     }
 
     /**

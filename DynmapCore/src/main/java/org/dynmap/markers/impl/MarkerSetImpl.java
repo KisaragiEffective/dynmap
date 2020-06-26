@@ -789,12 +789,11 @@ class MarkerSetImpl implements MarkerSet {
 	 * Add entered markers to set based on given coordinates
 	 */
     @Override
-	public void addEnteredMarkers(Set<EnterExitMarker> entered, String worldid, double x, double y, double z) {
+	public void addEnteredMarkers(/* Destination */Set<EnterExitMarker> entered, String worldid, double x, double y, double z) {
     	if (enterexitmarkers == null) return;
-		for (EnterExitMarker m : enterexitmarkers.values()) {
-			if (m.testIfPointWithinMarker(worldid, x, y, z)) {
-				entered.add(m);
-			}
-		}
+        enterexitmarkers.values()
+                .stream()
+                .filter(m -> m.testIfPointWithinMarker(worldid, x, y, z))
+                .forEachOrdered(entered::add);
     }
 }

@@ -1,6 +1,7 @@
 package org.dynmap.modsupport.impl;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import org.dynmap.modsupport.PatchBlockModel;
 import org.dynmap.renderer.RenderPatchFactory.SideVisible;
@@ -18,22 +19,20 @@ public class PatchBlockModelImpl extends BlockModelImpl implements PatchBlockMod
     public PatchBlockModelImpl(int blkid, ModModelDefinitionImpl mdf, PatchBlockModel mod, int xrot, int yrot, int zrot) {
         super(blkid, mdf);
         PatchBlockModelImpl m = (PatchBlockModelImpl) mod;
-        for (String pid : m.patches) {
-            String rotpid = mdf.getRotatedPatchID(pid, xrot, yrot, zrot);
-            if (rotpid != null) {
-                patches.add(rotpid);
-            }
-        }
+        m.patches
+                .stream()
+                .map(pid -> mdf.getRotatedPatchID(pid, xrot, yrot, zrot))
+                .filter(Objects::nonNull)
+                .forEachOrdered(patches::add);
     }
     public PatchBlockModelImpl(String blkname, ModModelDefinitionImpl mdf, PatchBlockModel mod, int xrot, int yrot, int zrot) {
         super(blkname, mdf);
         PatchBlockModelImpl m = (PatchBlockModelImpl) mod;
-        for (String pid : m.patches) {
-            String rotpid = mdf.getRotatedPatchID(pid, xrot, yrot, zrot);
-            if (rotpid != null) {
-                patches.add(rotpid);
-            }
-        }
+        m.patches
+                .stream()
+                .map(pid -> mdf.getRotatedPatchID(pid, xrot, yrot, zrot))
+                .filter(Objects::nonNull)
+                .forEachOrdered(patches::add);
     }
 
     @Override

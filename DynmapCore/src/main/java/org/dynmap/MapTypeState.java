@@ -115,13 +115,11 @@ public class MapTypeState {
                 List<String> val;
                 if (tf == null) {
                     val = Collections.emptyList();
-                }
-                else {
+                } else {
                     val = tf.save();
                     if (val == null) {
                         val = Collections.emptyList();
-                    }
-                    else {
+                    } else {
                         empty = false;
                     }
                 }
@@ -131,13 +129,11 @@ public class MapTypeState {
                 List<String> val;
                 if (tf == null) {
                     val = Collections.emptyList();
-                }
-                else {
+                } else {
                     val = tf.save();
                     if (val == null) {
                         val = Collections.emptyList();
-                    }
-                    else {
+                    } else {
                         empty = false;
                     }
                 }

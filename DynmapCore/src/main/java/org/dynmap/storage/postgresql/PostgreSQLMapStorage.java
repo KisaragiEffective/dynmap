@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -609,20 +610,13 @@ public class PostgreSQLMapStorage extends MapStorage {
     @Override
     public void enumMapTiles(DynmapWorld world, MapType map,
             MapStorageTileEnumCB cb) {
-        List<MapType> mtlist;
+        List<MapType> mtlist = map != null ? Collections.singletonList(map) : new ArrayList<>(world.maps);
 
-        if (map != null) {
-            mtlist = Collections.singletonList(map);
-        }
-        else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<>(world.maps);
-        }
-        for (MapType mt : mtlist) {
+        // Else, add all directories under world directory (for maps)
+        mtlist.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, var, cb, null, null);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processEnumMapTiles(world, mt, var, cb, null, null));
+        });
     }
     private void processEnumMapTiles(DynmapWorld world, MapType map, ImageVariant var, MapStorageTileEnumCB cb, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
         Connection c = null;
@@ -660,38 +654,24 @@ public class PostgreSQLMapStorage extends MapStorage {
     }
     @Override
     public void enumMapBaseTiles(DynmapWorld world, MapType map, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
-        List<MapType> mtlist;
+        List<MapType> mtlist = map != null ? Collections.singletonList(map) : new ArrayList<>(world.maps);
 
-        if (map != null) {
-            mtlist = Collections.singletonList(map);
-        }
-        else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<>(world.maps);
-        }
-        for (MapType mt : mtlist) {
+        // Else, add all directories under world directory (for maps)
+        mtlist.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, var, null, cbBase, cbEnd);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processEnumMapTiles(world, mt, var, null, cbBase, cbEnd));
+        });
     }
 
     @Override
     public void purgeMapTiles(DynmapWorld world, MapType map) {
-        List<MapType> mtlist;
+        List<MapType> mtlist = map != null ? Collections.singletonList(map) : new ArrayList<>(world.maps);
 
-        if (map != null) {
-            mtlist = Collections.singletonList(map);
-        }
-        else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<>(world.maps);
-        }
-        for (MapType mt : mtlist) {
+        // Else, add all directories under world directory (for maps)
+        mtlist.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processPurgeMapTiles(world, mt, var);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processPurgeMapTiles(world, mt, var));
+        });
     }
 
     private void processPurgeMapTiles(DynmapWorld world, MapType map, ImageVariant var) {

@@ -125,11 +125,16 @@ public class TexturePackLoader {
             try { zf.close(); } catch (IOException iox) {}
             zf = null;
         }
-        for (ModSource ms : src_by_mod.values()) {
-            if (ms.zf != null) {
-                try { ms.zf.close(); } catch (IOException iox) {}
-            }
-        }
+        src_by_mod.values()
+                .stream()
+                .map(ms -> ms.zf)
+                .filter(zf -> zf != null)
+                .forEachOrdered(zf -> {
+                    try {
+                        zf.close();
+                    } catch (IOException iox) {
+                    }
+                });
         src_by_mod.clear();
     }
     public void closeResource(InputStream is) {

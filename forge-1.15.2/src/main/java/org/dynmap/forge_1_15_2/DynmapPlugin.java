@@ -230,13 +230,10 @@ public class DynmapPlugin
             // Only do defined names, and not "air"
             if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                 Material mat = bs.getMaterial();
-                String statename = "";
-                for (IProperty<?> p : bs.getProperties()) {
-                    if (statename.length() > 0) {
-                        statename += ",";
-                    }
-                    statename += p.getName() + "=" + bs.get(p).toString();
-                }
+                String statename = bs.getProperties()
+                        .stream()
+                        .map(p -> p.getName() + "=" + bs.get(p).toString())
+                        .collect(Collectors.joining(","));
                 //Log.info("bn=" + bn + ", statenme=" + statename + ",idx=" + idx + ",baseidx=" + baseidx);
                 DynmapBlockState dbs = new DynmapBlockState(basebs, idx - baseidx, bn, statename, mat.toString(), idx);
                 stateByID[idx] = dbs;
@@ -1006,11 +1003,13 @@ public class DynmapPlugin
         }
 
         @Override
-        public InputStream openResource(String modid, String rname) {
-        	if (modid == null) modid = "minecraft";
+        public InputStream openResource(String modid2, String rname) {
+            final String modid = modid2 == null ? "minecraft" : modid2;
 
-        	Optional<? extends ModContainer> mc = ModList.get().getModContainerById(modid);
-            Object mod = mc.map(ModContainer::getMod).orElse(null);
+            Object mod = ModList.get()
+                    .getModContainerById(modid)
+                    .map(ModContainer::getMod)
+                    .orElse(null);
             if (mod != null) {
                 ClassLoader cl = mod.getClass().getClassLoader();
                 if (cl == null) cl = ClassLoader.getSystemClassLoader();
@@ -1019,12 +1018,14 @@ public class DynmapPlugin
                     return is;
                 }
             }
-            List<ModInfo> mcl = ModList.get().getMods();
-            for (ModInfo mci : mcl) {
-                mc = ModList.get().getModContainerById(mci.getModId());
-                mod = mc.map(ModContainer::getMod).orElse(null);
-                if (mod == null) continue;
-                ClassLoader cl = mod.getClass().getClassLoader();
+            List<ModInfo> infoList = ModList.get().getMods();
+            for (ModInfo info : infoList) {
+                Object mod2 = ModList.get()
+                        .getModContainerById(info.getModId())
+                        .map(ModContainer::getMod)
+                        .orElse(null);
+                if (mod2 == null) continue;
+                ClassLoader cl = mod2.getClass().getClassLoader();
                 if (cl == null) cl = ClassLoader.getSystemClassLoader();
                 InputStream is = cl.getResourceAsStream(rname);
                 if (is != null) {
@@ -1761,7 +1762,6 @@ public class DynmapPlugin
             	if (fw == null) continue;
             	Long2ObjectLinkedOpenHashMap<ChunkHolder> chunks = world.getChunkProvider().chunkManager.immutableLoadedChunks;
             	for (Entry<Long, ChunkHolder> k : chunks.long2ObjectEntrySet()) {
-            		long key = k.getKey();
             		ChunkHolder ch = k.getValue();
             		IChunk c = null;
             		try {

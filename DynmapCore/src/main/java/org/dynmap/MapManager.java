@@ -2,7 +2,6 @@ package org.dynmap;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -29,9 +28,6 @@ import org.dynmap.markers.EnterExitMarker.EnterExitText;
 import org.dynmap.markers.impl.MarkerAPIImpl;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.storage.MapStorage;
-import org.dynmap.storage.MapStorageBaseTileEnumCB;
-import org.dynmap.storage.MapStorageTileSearchEndCB;
-import org.dynmap.storage.MapStorageTile;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.Polygon;
 import org.dynmap.utils.TileFlags;
@@ -108,7 +104,7 @@ public class MapManager {
     final AtomicLong[] chunks_read_times;
     
     /* lock for our data structures */
-    public static final Object lock = new Object();
+    public static final Object mutex = new Object();
 
     public static MapManager mapman;    /* Our singleton */
     public HDMapManager hdmapman;
@@ -459,7 +455,7 @@ public class MapManager {
         
         public void cleanup() {
             if(tile0 == null) {
-                synchronized(lock) {
+                synchronized(mutex) {
                     String wn = world.getName();
                     FullWorldRenderState rs = active_renders.get(wn);
                     if (rs == this) {
@@ -595,12 +591,13 @@ public class MapManager {
                     renderedmaps.addAll(map.getMapsSharingRender(world));
 
                     /* Now, prime the render queue */
-                    for (MapTile mt : map.getTiles(world, (int)loc.x, (int)loc.y, (int)loc.z)) {
-                        if (!found.getFlag(mt.tileOrdinalX(), mt.tileOrdinalY())) {
-                            found.setFlag(mt.tileOrdinalX(), mt.tileOrdinalY(), true);
-                            renderQueue.add(mt);
-                        }
-                    }
+                    map.getTiles(world, (int) loc.x, (int) loc.y, (int) loc.z)
+                            .stream()
+                            .filter(mt -> !found.getFlag(mt.tileOrdinalX(), mt.tileOrdinalY()))
+                            .forEachOrdered(mt -> {
+                                found.setFlag(mt.tileOrdinalX(), mt.tileOrdinalY(), true);
+                                renderQueue.add(mt);
+                            });
                     if(!updaterender) { /* Only add other seed points for fullrender */
                         /* Add spawn location too (helps with some worlds where 0,64,0 may not be generated */
                         DynmapLocation sloc = world.getSpawnLocation();
@@ -611,14 +608,13 @@ public class MapManager {
                             }
                         }
                         if(world.seedloc != null) {
-                            for(DynmapLocation seed : world.seedloc) {
-                                for (MapTile mt : map.getTiles(world, (int)seed.x, (int)seed.y, (int)seed.z)) {
-                                    if (!found.getFlag(mt.tileOrdinalX(),mt.tileOrdinalY())) {
-                                        found.setFlag(mt.tileOrdinalX(),mt.tileOrdinalY(), true);
+                            world.seedloc.forEach(seed -> map.getTiles(world, (int) seed.x, (int) seed.y, (int) seed.z)
+                                    .stream()
+                                    .filter(mt -> !found.getFlag(mt.tileOrdinalX(), mt.tileOrdinalY()))
+                                    .forEachOrdered(mt -> {
+                                        found.setFlag(mt.tileOrdinalX(), mt.tileOrdinalY(), true);
                                         renderQueue.add(mt);
-                                    }
-                                }
-                            }
+                                    }));
                         }
                     }
                 }
@@ -768,20 +764,20 @@ public class MapManager {
                         total_render_ns.addAndGet(System.nanoTime()-rt0);
                         rendercalls.incrementAndGet();
                     }
-                    synchronized(lock) {
+                    synchronized(mutex) {
                         rendered.setFlag(tile.tileOrdinalX(), tile.tileOrdinalY(), true);
                         if(upd || (!updaterender)) {    /* If updated or not an update render */
                             /* Add adjacent unrendered tiles to queue */
-                            for (MapTile adjTile : map.getAdjecentTiles(tile)) {
-                                if (!found.getFlag(adjTile.tileOrdinalX(),adjTile.tileOrdinalY())) {
-                                    found.setFlag(adjTile.tileOrdinalX(), adjTile.tileOrdinalY(), true);
-                                    renderQueue.add(adjTile);
-                                }
-                            }
+                            Arrays.stream(map.getAdjecentTiles(tile))
+                                    .filter(adjTile -> !found.getFlag(adjTile.tileOrdinalX(), adjTile.tileOrdinalY()))
+                                    .forEachOrdered(adjTile -> {
+                                        found.setFlag(adjTile.tileOrdinalX(), adjTile.tileOrdinalY(), true);
+                                        renderQueue.add(adjTile);
+                                    });
                         }
                     }
                 }
-                synchronized(lock) {
+                synchronized(mutex) {
                     if(!cache.isEmpty()) {
                         rendercnt++;
                         timeaccum += System.currentTimeMillis() - tstart;
@@ -961,55 +957,53 @@ public class MapManager {
         public void run() {
             HashMap<UUID, HashSet<EnterExitMarker>> newstate = new HashMap<>();
         	DynmapPlayer[] pl = core.playerList.getOnlinePlayers();
-        	for (DynmapPlayer player : pl) {
-        		if (player == null) continue;
-        		UUID puuid = player.getUUID();
-        		HashSet<EnterExitMarker> newset = new HashSet<>();
-        		DynmapLocation dl = player.getLocation();
-        		if (dl != null) {
-        			MarkerAPIImpl.getEnteredMarkers(dl.world, dl.x, dl.y, dl.z, newset);
-        		}
-        		HashSet<EnterExitMarker> oldset = entersetstate.get(puuid);
-        		// See which we just left
-        		if (oldset != null) {
-            		for (EnterExitMarker m : oldset) {
-            			EnterExitText txt = m.getFarewellText();
-            			if ((txt != null) && (!newset.contains(m))) {
-            				enqueueMessage(puuid, player, txt, false);
-            			}
-            		}        			
-        		}
-        		// See which we just entered
-        		for (EnterExitMarker m : newset) {
-        			EnterExitText txt = m.getGreetingText();
-        			if ((txt != null) && ((oldset == null) || (!oldset.contains(m)))) {
-        				enqueueMessage(puuid, player, txt, true);
-        			}
-        		}
-        		newstate.put(puuid, newset);
-        	}
+            // See which we just left
+            // See which we just entered
+            Arrays.stream(pl).filter(Objects::nonNull).forEachOrdered(player -> {
+                UUID puuid = player.getUUID();
+                HashSet<EnterExitMarker> newset = new HashSet<>();
+                DynmapLocation dl = player.getLocation();
+                if (dl != null) {
+                    MarkerAPIImpl.getEnteredMarkers(dl.world, dl.x, dl.y, dl.z, newset);
+                }
+                Set<EnterExitMarker> oldset = entersetstate.get(puuid);
+                if (oldset != null) {
+                    oldset.forEach(m -> {
+                        EnterExitText txt = m.getFarewellText();
+                        if ((txt != null) && (!newset.contains(m))) {
+                            enqueueMessage(puuid, player, txt, false);
+                        }
+                    });
+                }
+                newset.forEach(m -> {
+                    EnterExitText txt = m.getGreetingText();
+                    if ((txt != null) && ((oldset == null) || (!oldset.contains(m)))) {
+                        enqueueMessage(puuid, player, txt, true);
+                    }
+                });
+                newstate.put(puuid, newset);
+            });
         	entersetstate = newstate;	// Replace old with new
         	
         	// Go through queues - send pending messages
         	List<UUID> keys = new ArrayList<>(entersetsendqueue.keySet());
-        	for (UUID id : keys) {
-        		SendQueueRec rec = entersetsendqueue.get(id);
-        		// Check delay - count down if needed
-        		if (rec.tickdelay > enterexitperiod) {
-        			rec.tickdelay -= enterexitperiod;
-        			continue;
-        		}
-        		rec.tickdelay = 0;
-        		// If something to send, send it
-        		if (rec.queue.size() > 0) {
-        			TextQueueRec txt = rec.queue.remove(0);
-        			sendPlayerEnterExit(rec.player, txt.txt);	// And send it
-        			rec.tickdelay = 50 * (titleFadeIn + 10);	// Delay by fade in time plus 1/2 second       			
-        		}
-        		else {	// Else, if we are empty and exhausted delay, remove it
-        			entersetsendqueue.remove(id);
-        		}
-        	}			
+            // Check delay - count down if needed
+            // If something to send, send it
+            keys.forEach(id -> {
+                SendQueueRec rec = entersetsendqueue.get(id);
+                if (rec.tickdelay > enterexitperiod) {
+                    rec.tickdelay -= enterexitperiod;
+                    return;
+                }
+                rec.tickdelay = 0;
+                if (rec.queue.size() > 0) {
+                    TextQueueRec txt = rec.queue.remove(0);
+                    sendPlayerEnterExit(rec.player, txt.txt);    // And send it
+                    rec.tickdelay = 50 * (titleFadeIn + 10);    // Delay by fade in time plus 1/2 second
+                } else {    // Else, if we are empty and exhausted delay, remove it
+                    entersetsendqueue.remove(id);
+                }
+            });
         	if (enterexitperiod > 0) {
         		scheduleDelayedJob(this, enterexitperiod);
         	}
@@ -1017,15 +1011,15 @@ public class MapManager {
     }
 
     private void addNextTilesToUpdate(int cnt) {
-        ArrayList<MapTile> tiles = new ArrayList<>();
-        TileFlags.TileCoord coord = new TileFlags.TileCoord();
+        List<MapTile> tiles = new ArrayList<>();
+        TileFlags.TileCoord coords = new TileFlags.TileCoord();
         while(cnt > 0) {
             tiles.clear();
             for(DynmapWorld w : worlds) {
                 for(MapTypeState mts : w.mapstate) {
-                    if(mts.getNextInvalidTileCoord(coord)) {
-                        mts.type.addMapTiles(tiles, w, coord.x, coord.y);
-                        mts.validateTile(coord.x, coord.y);
+                    if(mts.getNextInvalidTileCoord(coords)) {
+                        mts.type.addMapTiles(tiles, w, coords.x, coords.y);
+                        mts.validateTile(coords.x, coords.y);
                     }
                 }
             }
@@ -1068,13 +1062,13 @@ public class MapManager {
         }
         ConfigurationNode ba = configuration.getNode("block-alias");
         if (ba != null) {
-            for (String id : ba.keySet()) {
-                String srcname = id.trim();
-                String newname = ba.getString(id, srcname);
-                if (srcname != newname) {
-                    setBlockAlias(srcname, newname);
+            ba.keySet().forEach(id -> {
+                String current = id.trim();
+                String newOne = ba.getString(id, current);
+                if (!current.equals(newOne)) {
+                    setBlockAlias(current, newOne);
                 }
-            }
+            });
         }
         
         /* See what priority to use */
@@ -1139,7 +1133,7 @@ public class MapManager {
         }
         String wname = l.world;
         FullWorldRenderState rndr;
-        synchronized(lock) {
+        synchronized(mutex) {
             rndr = active_renders.get(wname);
             if(rndr != null) {
                 sender.sendMessage(rndr.rendertype + " of world '" + wname + "' already active.");
@@ -1167,7 +1161,7 @@ public class MapManager {
         }
         String wname = l.world;
         FullWorldRenderState rndr;
-        synchronized(lock) {
+        synchronized(mutex) {
             rndr = active_renders.get(wname);
             if(rndr != null) {
                 sender.sendMessage(rndr.rendertype + " of world '" + wname + "' already active.");
@@ -1189,7 +1183,7 @@ public class MapManager {
     }
 
     void cancelRender(String w, DynmapCommandSender sender) {
-    	synchronized(lock) {
+    	synchronized(mutex) {
     		if(w != null) {
     			FullWorldRenderState rndr;
     			rndr = active_renders.remove(w);
@@ -1573,9 +1567,7 @@ public class MapManager {
 
     public void pushUpdate(Client.Update update) {
         int sz = worlds.size();
-        for (DynmapWorld world : worlds) {
-            world.updates.pushUpdate(update);
-        }
+        worlds.forEach(world -> world.updates.pushUpdate(update));
     }
 
     public void pushUpdate(DynmapWorld world, Client.Update update) {
@@ -1604,7 +1596,7 @@ public class MapManager {
      * @param transparent - true if tile transparent
      */
     public void updateStatistics(MapTile tile, String prefix, boolean rendered, boolean updated, boolean transparent) {
-        synchronized(lock) {
+        synchronized(mutex) {
             String k = tile.getDynmapWorld().getName() + "." + prefix;
             MapStats ms = mapstats.get(k);
             if(ms == null) {
@@ -1632,7 +1624,7 @@ public class MapManager {
                 .stream()
                 .mapToInt(dw -> dw.mapstate.stream().mapToInt(MapTypeState::getInvCount).sum())
                 .sum();
-        synchronized(lock) {
+        synchronized(mutex) {
             for(String k: new TreeSet<>(mapstats.keySet())) {
                 if((prefix != null) && !k.startsWith(prefix))
                     continue;
@@ -1648,10 +1640,10 @@ public class MapManager {
         sender.sendMessage(String.format("  TOTALS: processed=%d, rendered=%d, updated=%d, transparent=%d",
                 tot.loggedcnt, tot.renderedcnt, tot.updatedcnt, tot.transparentcnt));
         sender.sendMessage(String.format("  Triggered update queue size: %d + %d", tileQueue.size(), invcnt));
-        String act = "";
+        StringBuilder act = new StringBuilder();
         for(String wn : active_renders.keySet())
-        	act += wn + " ";
-        sender.sendMessage(String.format("  Active render jobs: %s", act));
+        	act.append(wn).append(" ");
+        sender.sendMessage(String.format("  Active render jobs: %s", act.toString()));
         /* Chunk load stats */
         sender.sendMessage("Chunk Loading Statistics:");
         sender.sendMessage(String.format("  Cache hit rate: %.2f%%", core.getServer().getCacheHitRate()));
@@ -1668,7 +1660,7 @@ public class MapManager {
      */
     public void printTriggerStats(DynmapCommandSender sender) {
         sender.sendMessage("Render Trigger Statistics:");
-        synchronized(lock) {
+        synchronized(mutex) {
             for(String k: new TreeSet<>(trigstats.keySet())) {
                 TriggerStats ts = trigstats.get(k);
                 sender.sendMessage("  " + k + ": calls=" + ts.callsmade + ", calls-adding-tiles=" + ts.callswithtiles + ", tiles-added=" + ts.tilesqueued);
@@ -1682,7 +1674,7 @@ public class MapManager {
      * @param prefix - prefix of map IDs to be reset
      */
     public void resetStats(DynmapCommandSender sender, String prefix) {
-        synchronized(lock) {
+        synchronized(mutex) {
             for(String k : mapstats.keySet()) {
                 if((prefix != null) && !k.startsWith(prefix))
                     continue;
@@ -1791,9 +1783,7 @@ public class MapManager {
 
         if(!touch_events.isEmpty()) {
             te = new ArrayList<>(touch_events.keySet());
-            for (TouchEvent touchEvent : te) {
-                touch_events.remove(touchEvent);
-            }
+            te.forEach(touch_events::remove);
         }
 
         synchronized(touch_lock) {
@@ -1803,24 +1793,22 @@ public class MapManager {
             }
         }
         DynmapWorld world = null;
-        String wname = "";
+        String worldName = "";
 
         /* If any touch events, process them */
         if(te != null) {
             for(TouchEvent evt : te) {
                 int invalidates = 0;
                 /* If different world, look it up */
-                if(!evt.world.equals(wname)) {
-                    wname = evt.world;
-                    world = getWorld(wname);
+                if(!evt.world.equals(worldName)) {
+                    worldName = evt.world;
+                    world = getWorld(worldName);
                 }
                 if(world == null) continue;
-                for (MapTypeState mts : world.mapstate) {
-                    List<TileFlags.TileCoord> tiles = mts.type.getTileCoords(world, evt.x, evt.y, evt.z);
-                    invalidates += mts.invalidateTiles(tiles);
-                }
+                DynmapWorld finalWorld1 = world;
+                invalidates = world.mapstate.stream().mapToInt(mts -> mts.invalidateTiles(mts.type.getTileCoords(finalWorld1, evt.x, evt.y, evt.z))).sum();
                 if(evt.reason != null) {
-                    synchronized(lock) {
+                    synchronized(mutex) {
                         TriggerStats ts = trigstats.get(evt.reason);
                         if(ts == null) {
                             ts = new TriggerStats();
@@ -1841,18 +1829,22 @@ public class MapManager {
         if(tve != null) {
             for(TouchVolumeEvent evt : tve) {
                 /* If different world, look it up */
-                if(!evt.world.equals(wname)) {
-                    wname = evt.world;
-                    world = getWorld(wname);
+                if(!evt.world.equals(worldName)) {
+                    worldName = evt.world;
+                    world = getWorld(worldName);
                 }
                 if(world == null) continue;
-                int invalidates = 0;
-                for (MapTypeState mts : world.mapstate) {
-                    List<TileFlags.TileCoord> tiles = mts.type.getTileCoords(world, evt.xmin, evt.ymin, evt.zmin, evt.xmax, evt.ymax, evt.zmax);
-                    invalidates += mts.invalidateTiles(tiles);
-                }
+                DynmapWorld finalWorld = world;
+                int invalidates = world.mapstate
+                        .stream()
+                        .mapToInt(mts -> mts.invalidateTiles(
+                                mts.type.getTileCoords(
+                                        finalWorld, evt.xmin, evt.ymin, evt.zmin, evt.xmax, evt.ymax, evt.zmax
+                                )
+                        )).sum();
+
                 if(evt.reason != null) {
-                    synchronized(lock) {
+                    synchronized(mutex) {
                         TriggerStats ts = trigstats.get(evt.reason);
                         if(ts == null) {
                             ts = new TriggerStats();
@@ -1898,15 +1890,14 @@ public class MapManager {
         if (sender instanceof DynmapPlayer) {
             player = (DynmapPlayer) sender;
         }
-        synchronized (lock) {
+        synchronized (mutex) {
             for (FullWorldRenderState job : active_renders.values()) {
                 if (job.sender instanceof DynmapPlayer) {
                     DynmapPlayer js = (DynmapPlayer) job.sender;
                     if ((player != null) && (player.getName().equals(js.getName()))) {
                         job.quiet = true;
                     }
-                }
-                else if (player == null) {  // If both are console
+                } else if (player == null) {  // If both are console
                     job.quiet = true;
                 }
             }

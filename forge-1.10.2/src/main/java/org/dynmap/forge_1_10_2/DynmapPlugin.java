@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -183,16 +184,11 @@ public class DynmapPlugin
                         String statename = "meta=" + m;
                         if (blkstate != null) {
                             mat = blkstate.getMaterial();
-                            String pstate = null;
-                            for(Entry<IProperty<?>, Comparable<?>> p : blkstate.getProperties().entrySet()) {
-                            	if (pstate == null)
-                            		pstate = "";
-                            	else 
-                            		pstate += ",";
-                            	pstate += p.getKey().getName() + "=" + p.getValue().toString();
-                            }
-                            if (pstate != null)
-                            	statename = pstate;
+                            statename = blkstate.getProperties()
+                                    .entrySet()
+                                    .stream()
+                                    .map(x -> x.getKey().getName() + "=" + x.getValue().toString())
+                                    .collect(Collectors.joining(","));
                         }
                         DynmapBlockState bs = new DynmapBlockState(basebs, m, bn, statename, mat.toString(), i);
                         if (basebs == null) basebs = bs;

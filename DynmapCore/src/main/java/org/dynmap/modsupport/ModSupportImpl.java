@@ -2,6 +2,7 @@ package org.dynmap.modsupport;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.dynmap.Log;
@@ -36,10 +37,7 @@ public class ModSupportImpl extends ModSupportAPI {
         dynamicrenderdata.mkdirs();
         // Clean up anything in directory
         File[] files = dynamicrenderdata.listFiles();
-        for (File f : files) {
-            if (f.isFile())
-                f.delete();
-        }
+        Arrays.stream(files).filter(File::isFile).forEachOrdered(File::delete);
         // If no API init, quit here
         if (ModSupportAPI.api == null) {
             return;

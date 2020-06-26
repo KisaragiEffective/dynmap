@@ -234,10 +234,10 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
         node.put("markup", markup);
         List<Double> xx = new ArrayList<>();
         List<Double> zz = new ArrayList<>();
-        for (Coord corner : corners) {
+        corners.forEach(corner -> {
             xx.add(corner.x);
             zz.add(corner.z);
-        }
+        });
         node.put("x", xx);
         node.put("ytop", ytop);
         node.put("ybottom", ybottom);

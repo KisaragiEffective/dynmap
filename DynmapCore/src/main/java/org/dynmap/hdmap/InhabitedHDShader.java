@@ -1,12 +1,16 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-import org.dynmap.*;
+import org.dynmap.Color;
+import org.dynmap.ConfigurationNode;
+import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
+import org.dynmap.Log;
+import org.dynmap.MapManager;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.exporter.OBJExport;
 import org.dynmap.renderer.DynmapBlockState;
@@ -36,16 +40,17 @@ public class InhabitedHDShader implements HDShader {
     public InhabitedHDShader(DynmapCore core, ConfigurationNode configuration) {
         name = (String) configuration.get("name");
         HashMap<Long, Color> map = new HashMap<>();
-        for (String key : configuration.keySet()) {
-            if (key.startsWith("color")) {
-                try {
-                    long val = Long.parseLong(key.substring(5));
-                    Color clr = readColor(key, configuration);
-                    map.put(val, clr);
-                } catch (NumberFormatException nfx) {
-                }
-            }
-        }
+        configuration.keySet()
+                .stream()
+                .filter(key -> key.startsWith("color"))
+                .forEachOrdered(key -> {
+                    try {
+                        long val = Long.parseLong(key.substring(5));
+                        Color clr = readColor(key, configuration);
+                        map.put(val, clr);
+                    } catch (NumberFormatException nfx) {
+                    }
+                });
         TreeSet<Long> keys = new TreeSet<>(map.keySet());
         filllevel = new long[keys.size()];
         fillcolor = new Color[keys.size()];
@@ -141,7 +146,7 @@ public class InhabitedHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for (Color value : color) value.setTransparent();
+            Arrays.stream(color).forEachOrdered(Color::setTransparent);
         }
         /**
          * Process next ray step - called for each block on route

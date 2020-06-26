@@ -646,10 +646,9 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.blklist"))
             return true;
         Map<String, Integer> map = core.getServer().getBlockUniqueIDMap();
-        TreeSet<String> keys = new TreeSet<>(map.keySet());
-        for (String k : keys) {
-            sender.sendMessage(k + ": " + map.get(k));
-        }
+        new TreeSet<>(map.keySet()).stream()
+                .map(k -> k + ": " + map.get(k))
+                .forEach(sender::sendMessage);
         return true;
     }
 }

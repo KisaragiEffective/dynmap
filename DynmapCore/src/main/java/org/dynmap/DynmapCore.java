@@ -1537,8 +1537,7 @@ public class DynmapCore implements DynmapCommonAPI {
                             List<String> ids = getIDsForIP(args[1]);
                             sender.sendMessage("IDs logged in from address " + args[1] + " (most recent to least):");
                             if (ids != null) {
-                                for (String id : ids)
-                                    sender.sendMessage("  " + id);
+                                ids.stream().map(id -> "  " + id).forEach(sender::sendMessage);
                             }
                         } else {
                             sender.sendMessage("IP address required as parameter");
@@ -2420,24 +2419,24 @@ public class DynmapCore implements DynmapCommonAPI {
     // Add mod block IDs to value map
     public void addModBlockItemIDs(String mod2, Map<String, Integer> modvals) {
         final String mod = getNormalizedModID(mod2);
-        for (String k : blockmap.keySet()) {
+        blockmap.keySet().forEach(k -> {
             String[] ks = k.split(":", 2);
-            if (ks.length != 2) continue;
+            if (ks.length != 2) return;
             int id = blockmap.get(k);
             final String key = getNormalizedModID(ks[0]);
             if (mod.equals(key)) {
                 modvals.put("%" + ks[1], id);
             }
-        }
-        for (String k : itemmap.keySet()) {
+        });
+        itemmap.keySet().forEach(k -> {
             String[] keyValue = k.split(":", 2);
-            if (keyValue.length != 2) continue;
+            if (keyValue.length != 2) return;
             int id = itemmap.get(k);
             final String key = getNormalizedModID(keyValue[0]);
             if (mod.equals(key)) {
                 modvals.put("&" + keyValue[1], id);
             }
-        }
+        });
     }
 
     @Override

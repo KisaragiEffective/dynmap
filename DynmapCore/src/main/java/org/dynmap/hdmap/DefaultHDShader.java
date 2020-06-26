@@ -1,10 +1,14 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
+import java.util.Arrays;
 
-import org.dynmap.*;
+import org.dynmap.Color;
+import org.dynmap.ColorScheme;
+import org.dynmap.ConfigurationNode;
+import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
+import org.dynmap.MapManager;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.exporter.OBJExport;
@@ -130,7 +134,7 @@ public class DefaultHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for (Color value : color) value.setTransparent();
+            Arrays.stream(color).forEachOrdered(Color::setTransparent);
             pixelodd = (ps.getPixelX() & 0x3) + (ps.getPixelY()<<1);
         }
         
@@ -184,7 +188,7 @@ public class DefaultHDShader implements HDShader {
                     lighting.applyLighting(ps, this, c, tmpcolor);
                     /* If we got alpha from subblock model, use it instead */
                     if(subalpha >= 0) {
-                        for (Color value : tmpcolor) value.setAlpha(Math.max(subalpha, value.getAlpha()));
+                        Arrays.stream(tmpcolor).forEachOrdered(value -> value.setAlpha(Math.max(subalpha, value.getAlpha())));
                     }
                     /* Blend color with accumulated color (weighted by alpha) */
                     if(!transparency) {  /* No transparency support */

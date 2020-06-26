@@ -25,13 +25,11 @@ public class Event<T> {
     
     /* Only use from main thread */
     public void trigger(T t) {
-        ArrayList<Listener<T>> iterlist;
+        List<Listener<T>> iterlist;
         synchronized(lock) {
             iterlist = new ArrayList<>(listeners);
         }
-        for (Listener<T> l : iterlist) {
-            l.triggered(t);
-        }
+        iterlist.forEach(l -> l.triggered(t));
     }
     
     /* Trigger on main thread */

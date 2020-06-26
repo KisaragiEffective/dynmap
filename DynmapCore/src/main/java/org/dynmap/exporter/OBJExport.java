@@ -29,9 +29,9 @@ import org.dynmap.hdmap.TexturePack.BlockTransparency;
 import org.dynmap.renderer.CustomRenderer;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.renderer.RenderPatch;
+import org.dynmap.renderer.RenderPatchFactory;
 import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 import org.dynmap.utils.BlockStep;
-import org.dynmap.utils.IndexedVector3D;
 import org.dynmap.utils.IndexedVector3DList;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
@@ -111,11 +111,11 @@ public class OBJExport {
         this.basename = basename;
         this.defaultPathces = new PatchDefinition[6];
         PatchDefinitionFactory fact = HDBlockModels.getPatchDefinitionFactory();
-        for (BlockStep s : BlockStep.values()) {
+        Arrays.stream(BlockStep.values()).forEachOrdered(s -> {
             double[] p = pp[s.getFaceEntered()];
             int ord = s.ordinal();
-            defaultPathces[ord] = fact.getPatch(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], 0, 1, 0, 0, 1, 1, SideVisible.TOP, ord);
-        }
+            defaultPathces[ord] = fact.getPatch(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], 0, 1, 0, 0, 1, 1, RenderPatchFactory.SideVisible.TOP, ord);
+        });
         vertices = new IndexedVector3DList((list, newElement) -> {
             try {
                 /* Minecraft XYZ maps to OBJ YZX */

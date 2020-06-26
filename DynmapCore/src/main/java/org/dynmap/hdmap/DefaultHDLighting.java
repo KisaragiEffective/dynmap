@@ -1,9 +1,14 @@
 package org.dynmap.hdmap;
 
-import org.dynmap.*;
+import org.dynmap.Color;
+import org.dynmap.ConfigurationNode;
+import org.dynmap.DynmapCore;
+import org.dynmap.DynmapWorld;
+import org.dynmap.JSONUtils;
 import org.json.simple.JSONObject;
 
-import static org.dynmap.JSONUtils.s;
+import java.util.Arrays;
+
 
 public class DefaultHDLighting implements HDLighting {
     private final String name;
@@ -23,22 +28,17 @@ public class DefaultHDLighting implements HDLighting {
         blackthreshold = configuration.getInteger("blackthreshold",  0x40);
     }
     
-    protected void checkGrayscale(Color[] outcolor) {
+    protected void checkGrayscale(Color[] colors) {
         if (grayscale) {
-            for (Color color : outcolor) {
+            Arrays.stream(colors).forEachOrdered(color -> {
                 color.setGrayscale();
                 color.scaleColor(graytonedark, graytone);
-            }
-        }
-        else if (blackandwhite) {
-            for (Color color : outcolor) {
+            });
+        } else if (blackandwhite) {
+            Arrays.stream(colors).forEachOrdered(color -> {
                 color.setGrayscale();
-                if (color.getRed() > blackthreshold) {
-                    color.setColor(graytone);
-                } else {
-                    color.setColor(graytonedark);
-                }
-            }
+                color.setColor(color.getRed() > blackthreshold ? graytone : graytonedark);
+            });
         }
     }
 
@@ -47,7 +47,7 @@ public class DefaultHDLighting implements HDLighting {
     
     /* Apply lighting to given pixel colors (1 outcolor if normal, 2 if night/day) */
     public void    applyLighting(HDPerspectiveState ps, HDShaderState ss, Color incolor, Color[] outcolor) {
-        for (Color color : outcolor) color.setColor(incolor);
+        Arrays.stream(outcolor).forEachOrdered(color -> color.setColor(incolor));
         checkGrayscale(outcolor);
     }
     

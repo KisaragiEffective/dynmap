@@ -3,10 +3,15 @@ package org.dynmap.hdmap;
 import static org.dynmap.JSONUtils.s;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
-import org.dynmap.*;
+import org.dynmap.Color;
+import org.dynmap.ConfigurationNode;
+import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
+import org.dynmap.MapManager;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.exporter.OBJExport;
 import org.dynmap.renderer.DynmapBlockState;
@@ -62,11 +67,10 @@ public class TopoHDShader implements HDShader {
         setHidden(DynmapBlockState.AIR_BLOCK);  /* Air is hidden always */
         List<Object> hidden = configuration.getList("hiddennames");
         if(hidden != null) {
-            for(Object o : hidden) {
-                if(o instanceof String) {
-                    setHidden((String) o);
-                }
-            }
+            hidden.stream()
+                    .filter(o -> o instanceof String)
+                    .map(o -> (String) o)
+                    .forEachOrdered(this::setHidden);
         }
         linespacing = configuration.getInteger("linespacing", 1);
     }
@@ -180,7 +184,7 @@ public class TopoHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for (Color value : color) value.setTransparent();
+            Arrays.stream(color).forEachOrdered(Color::setTransparent);
             inWater = false;
         }
         
@@ -269,7 +273,7 @@ public class TopoHDShader implements HDShader {
                               (tmpcolor[i].getGreen()*alpha2 + color[i].getGreen()*alpha) / talpha,
                               (tmpcolor[i].getBlue()*alpha2 + color[i].getBlue()*alpha) / talpha, talpha);
                 else
-                    for (Color value : color) value.setTransparent();
+                    Arrays.stream(color).forEachOrdered(Color::setTransparent);
                     
                 return (talpha >= 254);   /* If only one short, no meaningful contribution left */
             }

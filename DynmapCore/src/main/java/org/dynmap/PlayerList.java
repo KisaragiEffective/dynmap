@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -34,16 +35,20 @@ public class PlayerList {
     }
 
     public void save() {
-        OutputStream stream;
-        try {
-            stream = new FileOutputStream(hiddenPlayersFile);
-            OutputStreamWriter writer = new OutputStreamWriter(stream);
-            for (String player : hiddenPlayerNames) {
-                writer.write(player);
-                writer.write("\n");
-            }
-            writer.close();
-            stream.close();
+        try (OutputStream stream = new FileOutputStream(hiddenPlayersFile);
+             OutputStreamWriter writer = new OutputStreamWriter(stream)){
+            hiddenPlayerNames.forEach(player -> {
+                try {
+                    writer.write(player);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    writer.write("\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -129,18 +134,19 @@ public class PlayerList {
         ArrayList<DynmapPlayer> visiblePlayers = new ArrayList<>();
         DynmapPlayer[] onlinePlayers = online;    /* Use copied list - we don't call from server thread */
         boolean useWhitelist = configuration.getBoolean("display-whitelist", false);
-        for (DynmapPlayer p : onlinePlayers) {
-            if (p == null) continue;
-            if ((worldName != null) && (!p.getWorld().equals(worldName))) continue;
-            String pname = p.getName().toLowerCase();
-            if (useWhitelist == hiddenPlayerNames.contains(pname)) {
-                if (!invisibility_asserts.containsKey(pname)) {
-                    visiblePlayers.add(p);
-                }
-            } else if (visibility_asserts.containsKey(pname)) {
-                visiblePlayers.add(p);
-            }
-        }
+        Arrays.stream(onlinePlayers)
+                .filter(Objects::nonNull)
+                .filter(p -> (worldName == null) || (p.getWorld().equals(worldName)))
+                .forEachOrdered(p -> {
+                    String pname = p.getName().toLowerCase();
+                    if (useWhitelist == hiddenPlayerNames.contains(pname)) {
+                        if (!invisibility_asserts.containsKey(pname)) {
+                            visiblePlayers.add(p);
+                        }
+                    } else if (visibility_asserts.containsKey(pname)) {
+                        visiblePlayers.add(p);
+                    }
+                });
         return visiblePlayers;
     }
 
@@ -152,17 +158,18 @@ public class PlayerList {
         ArrayList<DynmapPlayer> hidden = new ArrayList<>();
         DynmapPlayer[] onlinePlayers = online;    /* Use copied list - we don't call from server thread */
         boolean useWhitelist = configuration.getBoolean("display-whitelist", false);
-        for (DynmapPlayer p : onlinePlayers) {
-            if (p == null) continue;
-            String pname = p.getName().toLowerCase();
-            if (useWhitelist == hiddenPlayerNames.contains(pname)) {
-                if (invisibility_asserts.containsKey(pname)) {
-                    hidden.add(p);
-                }
-            } else if (!visibility_asserts.containsKey(pname)) {
-                hidden.add(p);
-            }
-        }
+        Arrays.stream(onlinePlayers)
+                .filter(Objects::nonNull)
+                .forEachOrdered(p -> {
+                    String pname = p.getName().toLowerCase();
+                    if (useWhitelist == hiddenPlayerNames.contains(pname)) {
+                        if (invisibility_asserts.containsKey(pname)) {
+                            hidden.add(p);
+                        }
+                    } else if (!visibility_asserts.containsKey(pname)) {
+                        hidden.add(p);
+                    }
+                });
         return hidden;
     }
 
