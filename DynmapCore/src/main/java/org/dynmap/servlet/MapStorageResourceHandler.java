@@ -133,7 +133,7 @@ public class MapStorageResourceHandler extends AbstractHandler {
     }
 
     private void handleFace(HttpServletResponse response, String uri) throws IOException, ServletException {
-        String[] suri = uri.split("[/\\.]");
+        String[] suri = uri.split("[/.]");
         if (suri.length < 3) {  // 3 parts : face ID, player name, png
             response.sendError(HttpStatus.NOT_FOUND_404);
             return;

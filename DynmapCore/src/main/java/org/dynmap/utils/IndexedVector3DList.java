@@ -36,14 +36,7 @@ public class IndexedVector3DList {
      * @param maxz - maximum Z (exclusive)
      */
     public void resetSet(double minx, double miny, double minz, double maxx, double maxy, double maxz) {
-        Iterator<Map.Entry<Vector3D, IndexedVector3D>> iter = set.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<Vector3D, IndexedVector3D> ne = iter.next();
-            Vector3D n = ne.getKey();
-            if ((n.x >= minx) && (n.x < maxx) && (n.y >= miny) && (n.y < maxy) && (n.z >= minz) && (n.z < maxz)) {
-                iter.remove();
-            }
-        }
+        set.keySet().removeIf(n -> (n.x >= minx) && (n.x < maxx) && (n.y >= miny) && (n.y < maxy) && (n.z >= minz) && (n.z < maxz));
     }
     
     /**

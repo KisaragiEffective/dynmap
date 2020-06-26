@@ -583,7 +583,7 @@ public class MariaDBMapStorage extends MapStorage {
         }
         // Now, take the last section and parse out coordinates and zoom
         String fname = suri[suri.length-1];
-        String[] coord = fname.split("[_\\.]");
+        String[] coord = fname.split("[_.]");
         if (coord.length < 3) { // 3 or 4
             return null;
         }
