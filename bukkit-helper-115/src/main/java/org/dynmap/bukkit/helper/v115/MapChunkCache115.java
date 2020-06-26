@@ -194,7 +194,10 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
                         if (tc.hasKey("Properties")) {
                             String statestr;
                             NBTTagCompound prop = tc.getCompound("Properties");
-                            statestr = prop.getKeys().stream().map(pid -> pid + '=' + prop.get(pid).asString()).collect(Collectors.joining(","));
+                            statestr = prop.getKeys()
+									.stream()
+									.map(pid -> pid + '=' + prop.get(pid).asString())
+									.collect(Collectors.joining(","));
 	            			palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr);
 	            		}
 	            		if (palette[pi] == null) {

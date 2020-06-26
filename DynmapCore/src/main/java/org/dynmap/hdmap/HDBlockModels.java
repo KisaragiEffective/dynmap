@@ -845,9 +845,11 @@ public class HDBlockModels {
                     /* If we have everything, build block */
                     pmodlist.clear();
                     if (blknames.size() > 0) {
-                        ArrayList<RenderPatch> pd = new ArrayList<>();
+                        List<RenderPatch> pd = new ArrayList<>();
                         CustomRenderer.addBox(pdf, pd, xmin, xmax, ymin, ymax, zmin, zmax, boxPatchList);
-                        PatchDefinition[] patcharray = pd.stream().map(renderPatch -> (PatchDefinition) renderPatch).toArray(PatchDefinition[]::new);
+                        PatchDefinition[] patcharray = pd.stream()
+                                .map(renderPatch -> (PatchDefinition) renderPatch)
+                                .toArray(PatchDefinition[]::new);
                         if(patcharray.length > max_patches)
                             max_patches = patcharray.length;
                         for(String nm : blknames) {
@@ -867,85 +869,86 @@ public class HDBlockModels {
                 }
                 // Shortcut for defining a patchblock that is a simple rectangular prism, with sidex corresponding to full block sides
                 else if(line.startsWith("boxlist:")) {
-                    ArrayList<String> blknames = new ArrayList<>();
+                    List<String> blknames = new ArrayList<>();
                     databits.clear();
                     line = line.substring(8);
                     String[] args = line.split(",");
-                    ArrayList<BoxLimits> boxes = new ArrayList<>();
+                    List<BoxLimits> boxes = new ArrayList<>();
                     for(String a : args) {
-                        String[] av = a.split("=");
-                        if(av.length < 2) continue;
-                        if(av[0].equals("id")) {
-                            blknames.add(getBlockName(modname,av[1]));
-                        }
-                        else if(av[0].equals("data")) {
-                            if(av[1].equals("*")) {
-                                databits.clear();
-                            }
-                            else if (av[1].indexOf('-') > 0) {
-                                String[] sp = av[1].split("-");
-                                int m0 = getIntValue(varvals, sp[0]);
-                                int m1 = getIntValue(varvals, sp[1]);
-                                for (int m = m0; m <= m1; m++) {
-                                    databits.set(m);
+                        String[] eqSplit = a.split("=");
+                        if(eqSplit.length < 2) continue;
+                        final String key = eqSplit[0], value = eqSplit[1];
+                        switch (key) {
+                            case "id":
+                                blknames.add(getBlockName(modname, value));
+                                break;
+                            case "data":
+                                if (value.equals("*")) {
+                                    databits.clear();
+                                } else if (value.indexOf('-') > 0) {
+                                    String[] sp = value.split("-");
+                                    int m0 = getIntValue(varvals, sp[0]);
+                                    int m1 = getIntValue(varvals, sp[1]);
+                                    for (int m = m0; m <= m1; m++) {
+                                        databits.set(m);
+                                    }
+                                } else
+                                    databits.set(getIntValue(varvals, eqSplit[1]));
+                                break;
+                            case "box":
+                                String[] coronSplit = eqSplit[1].split(":");
+                                BoxLimits box = new BoxLimits();
+                                switch (coronSplit.length) {
+                                    default:
+                                        String[] slashSplit = coronSplit[6].split("/");
+                                        for (int i = 0; (i < 6) && (i < slashSplit.length); i++) {
+                                            box.patches[i] = Integer.parseInt(slashSplit[i]);
+                                        }
+                                    case 6:
+                                        box.zmax = Double.parseDouble(coronSplit[5]);
+                                    case 5:
+                                        box.zmin = Double.parseDouble(coronSplit[4]);
+                                    case 4:
+                                        box.ymax = Double.parseDouble(coronSplit[3]);
+                                    case 3:
+                                        box.ymin = Double.parseDouble(coronSplit[2]);
+                                    case 2:
+                                        box.xmax = Double.parseDouble(coronSplit[1]);
+                                    case 1:
+                                        box.xmin = Double.parseDouble(coronSplit[0]);
+                                    case 0:
+                                        // NOP
                                 }
-                            }
-                            else
-                                databits.set(getIntValue(varvals,av[1]));
-                        }
-                        else if(av[0].equals("box")) {
-                        	String[] prms = av[1].split(":");
-                        	BoxLimits box = new BoxLimits();
-                        	if (prms.length > 0)
-                        		box.xmin = Double.parseDouble(prms[0]);
-                        	if (prms.length > 1)
-                        		box.xmax = Double.parseDouble(prms[1]);
-                        	if (prms.length > 2)
-                        		box.ymin = Double.parseDouble(prms[2]);
-                        	if (prms.length > 3)
-                        		box.ymax = Double.parseDouble(prms[3]);
-                        	if (prms.length > 4)
-                        		box.zmin = Double.parseDouble(prms[4]);
-                        	if (prms.length > 5)
-                        		box.zmax = Double.parseDouble(prms[5]);
-                        	if (prms.length > 6) {
-                        		String[] pl = prms[6].split("/");
-                        		for (int p = 0; (p < 6) && (p < pl.length); p++) {
-                        			box.patches[p] = Integer.parseInt(pl[p]);
-                        		}
-                        	}
-                        	boxes.add(box);
+                                boxes.add(box);
+                                break;
                         }
                     }
                     /* If we have everything, build block */
                     pmodlist.clear();
-                    if (blknames.size() > 0) {
-                        ArrayList<RenderPatch> pd = new ArrayList<>();
-                        
-                        for (BoxLimits bl : boxes) {
-                            CustomRenderer.addBox(pdf, pd, bl.xmin, bl.xmax, bl.ymin, bl.ymax, bl.zmin, bl.zmax, bl.patches);
-                        }
-                        PatchDefinition[] patcharray = pd.stream().map(renderPatch -> (PatchDefinition) renderPatch).toArray(PatchDefinition[]::new);
-                        if(patcharray.length > max_patches)
-                            max_patches = patcharray.length;
+                    if (blknames.isEmpty()) {
+                        Log.severe("Box list block model missing required parameters = line " + rdr.getLineNumber() + " of " + fname);
+                    } else {
+                        List<RenderPatch> pd = new ArrayList<>();
+                        boxes.forEach(bl -> CustomRenderer.addBox(pdf, pd, bl.xmin, bl.xmax, bl.ymin, bl.ymax, bl.zmin, bl.zmax, bl.patches));
+                        PatchDefinition[] patches = pd.stream()
+                                .map(PatchDefinition.class::cast)
+                                .toArray(PatchDefinition[]::new);
+                        if(patches.length > max_patches)
+                            max_patches = patches.length;
                         for(String nm : blknames) {
                             DynmapBlockState bs = DynmapBlockState.getBaseStateByName(nm);
                             if (bs.isNotAir()) {
-                                pmodlist.add(new HDBlockPatchModel(bs, databits, patcharray, blockset));
+                                pmodlist.add(new HDBlockPatchModel(bs, databits, patches, blockset));
                                 cnt++;
-                            }
-                            else {
+                            } else {
                             	Log.severe("Invalid boxlist block name " + nm + " at line " + rdr.getLineNumber());
                             }
                         }
                     }
-                    else {
-                        Log.severe("Box list block model missing required parameters = line " + rdr.getLineNumber() + " of " + fname);
-                    }
                 }
                 else if(line.startsWith("customblock:")) {
-                    ArrayList<String> blknames = new ArrayList<>();
-                    HashMap<String,String> custargs = new HashMap<>();
+                    List<String> blknames = new ArrayList<>();
+                    Map<String,String> custargs = new HashMap<>();
                     databits.clear();
                     line = line.substring(12);
                     String[] args = line.split(",");
@@ -953,34 +956,34 @@ public class HDBlockModels {
                     for(String a : args) {
                         String[] av = a.split("=");
                         if(av.length < 2) continue;
-                        if(av[0].equals("id")) {
-                            blknames.add(getBlockName(modname, av[1]));
-                        }
-                        else if(av[0].equals("data")) {
-                            if(av[1].equals("*")) {
-                                databits.clear();
-                            }
-                            else if (av[1].indexOf('-') > 0) {
-                                String[] sp = av[1].split("-");
-                                int m0 = getIntValue(varvals, sp[0]);
-                                int m1 = getIntValue(varvals, sp[1]);
-                                for (int m = m0; m <= m1; m++) {
-                                    databits.set(m);
-                                }
-                            }
-                            else
-                                databits.set(getIntValue(varvals,av[1]));
-                        }
-                        else if(av[0].equals("class")) {
-                            cls = av[1];
-                        }
-                        else {
-                            /* See if substitution value available */
-                            Integer vv = varvals.get(av[1]);
-                            if(vv == null)
-                                custargs.put(av[0], av[1]);
-                            else
-                                custargs.put(av[0], vv.toString());
+                        switch (av[0]) {
+                            case "id":
+                                blknames.add(getBlockName(modname, av[1]));
+                                break;
+                            case "data":
+                                if (av[1].equals("*")) {
+                                    databits.clear();
+                                } else if (av[1].indexOf('-') > 0) {
+                                    String[] sp = av[1].split("-");
+                                    int m0 = getIntValue(varvals, sp[0]);
+                                    int m1 = getIntValue(varvals, sp[1]);
+                                    for (int m = m0; m <= m1; m++) {
+                                        databits.set(m);
+                                    }
+                                } else
+                                    databits.set(getIntValue(varvals, av[1]));
+                                break;
+                            case "class":
+                                cls = av[1];
+                                break;
+                            default:
+                                /* See if substitution value available */
+                                Integer vv = varvals.get(av[1]);
+                                if (vv == null)
+                                    custargs.put(av[0], av[1]);
+                                else
+                                    custargs.put(av[0], vv.toString());
+                                break;
                         }
                     }
                     /* If we have everything, build block */
@@ -991,8 +994,7 @@ public class HDBlockModels {
                                 CustomBlockModel cbm = new CustomBlockModel(bs, databits, cls, custargs, blockset);
                                 if(cbm.render == null) {
                                     Log.severe("Custom block model failed to initialize = line " + rdr.getLineNumber() + " of " + fname);
-                                }
-                                else {
+                                } else {
                                     /* Update maximum texture count */
                                     int texturecnt = cbm.getTextureCount();
                                     if(texturecnt > max_patches) {
@@ -1000,8 +1002,7 @@ public class HDBlockModels {
                                     }
                                 }
                                 cnt++;
-                            }
-                            else {
+                            } else {
                             	Log.severe("Invalid custommodel block name " + nm + " at line " + rdr.getLineNumber());
                             }
                         }
@@ -1014,6 +1015,7 @@ public class HDBlockModels {
                     String[] names = line.substring(8).split(",");
                     boolean found = false;
                     for(String n : names) {
+                        // []
                         String[] ntok = n.split("[\\[\\]]");
                         String rng = null;
                         if (ntok.length > 1) {
@@ -1117,8 +1119,7 @@ public class HDBlockModels {
                     ver += vscale[i] * Integer.parseInt(vv[i]);
                 } catch (NumberFormatException nfx) {
                 }
-            }
-            else if (up) {
+            } else if (up) {
                 ver += vscale[i] * 99;
             }
         }
@@ -1128,21 +1129,14 @@ public class HDBlockModels {
     public static boolean checkVersionRange(String ver, String range) {
         if (ver.equals(range))
             return true;
-        String[] rng = range.split("-", -1);
-        String low;
-        String high;
-        
+        String[] versionRange = range.split("-", -1);
+
         long v = parseVersion(ver, false);
         if (v == 0) return false;
-        
-        if (rng.length == 1) {
-            low = rng[0];
-            high = rng[0];
-        }
-        else {
-            low = rng[0];
-            high = rng[1];
-        }
+
+        String begin = versionRange[0];
+        String low = versionRange[0];
+        String high = versionRange.length == 1 ? versionRange[0] : versionRange[1];
         if ((low.length() > 0) && (parseVersion(low, false) > v)) {
             return false;
         }

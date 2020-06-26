@@ -508,7 +508,9 @@ public abstract class DynmapWorld {
         }
         node.put("hidestyle", hide);
         /* Handle map settings */
-        ArrayList<Map<String,Object>> mapinfo = maps.stream().map(MapType::saveConfiguration).collect(Collectors.toCollection(ArrayList::new));
+        List<Map<String,Object>> mapinfo = maps.stream()
+                .map(MapType::saveConfiguration)
+                .collect(Collectors.toCollection(ArrayList::new));
         node.put("maps", mapinfo);
 
         return node;

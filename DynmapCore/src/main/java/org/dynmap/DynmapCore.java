@@ -1793,7 +1793,11 @@ public class DynmapCore implements DynmapCommonAPI {
         Set<String> existing_names = new HashSet<>();
         /* Make map, indexed by 'name' in map */
         if(existing != null) {
-            existing_names = existing.stream().map(m -> m.get("name")).filter(name -> name instanceof String).map(name -> (String) name).collect(Collectors.toSet());
+            existing_names = existing.stream()
+                    .map(m -> m.get("name"))
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .collect(Collectors.toSet());
         }
         boolean did_update = false;
         /* Now, loop through defaults, and see if any are missing */

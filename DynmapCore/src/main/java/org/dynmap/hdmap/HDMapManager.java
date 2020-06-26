@@ -20,7 +20,7 @@ public class HDMapManager {
     public final HashMap<String, HDLighting> lightings = new HashMap<>();
     public HashSet<HDMap> maps = new HashSet<>();
     public HashMap<String, ArrayList<HDMap>> maps_by_world_perspective = new HashMap<>();
- 
+
     public void loadHDShaders(DynmapCore core) {
         Log.verboseinfo("Loading shaders...");
         /* Update mappings, if needed */
@@ -123,7 +123,15 @@ public class HDMapManager {
             return new HDShaderState[0];
         }
         /* If limited to one map, and this isn't it, skip */
-        return w.maps.stream().filter(map -> map instanceof HDMap).map(map -> (HDMap) map).filter(hdmap -> (hdmap.getPerspective() == tile.perspective) && (hdmap.getBoostZoom() == tile.boostzoom)).filter(hdmap -> (mapname == null) || (hdmap.getName().equals(mapname))).map(hdmap -> hdmap.getShader().getStateInstance(hdmap, cache, mapiter, scale)).toArray(HDShaderState[]::new);
+        return w.maps
+                .stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .filter(hdmap -> (hdmap.getPerspective() == tile.perspective))
+                .filter(hdmap -> (hdmap.getBoostZoom() == tile.boostzoom))
+                .filter(hdmap -> (mapname == null) || (hdmap.getName().equals(mapname)))
+                .map(hdmap -> hdmap.getShader().getStateInstance(hdmap, cache, mapiter, scale))
+                .toArray(HDShaderState[]::new);
     }
     
     private static final int BIOMEDATAFLAG = 0;

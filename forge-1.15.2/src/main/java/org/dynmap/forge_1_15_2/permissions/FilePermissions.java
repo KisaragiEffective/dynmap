@@ -31,17 +31,19 @@ public class FilePermissions implements PermissionProvider {
     
     private FilePermissions(ConfigurationNode cfg) {
         perms = new HashMap<>();
-        for(String k : cfg.keySet()) {
-            List<String> p = cfg.getStrings(k, null);
-            if(p != null) {
-                k = k.toLowerCase();
-                HashSet<String> pset = p.stream().map(String::toLowerCase).collect(Collectors.toCollection(HashSet::new));
-                perms.put(k,  pset);
-                if(k.equals("defaultuser")) {
-                    defperms = pset;
+        cfg.keySet().forEach(k2 -> {
+            List<String> strings = cfg.getStrings(k2, null);
+            if (strings != null) {
+                final String k = k2.toLowerCase();
+                HashSet<String> lowercase = strings.stream()
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toCollection(HashSet::new));
+                perms.put(k, lowercase);
+                if (k.equals("defaultuser")) {
+                    defperms = lowercase;
                 }
             }
-        }
+        });
     }
 
     private boolean hasPerm(String player, String perm) {

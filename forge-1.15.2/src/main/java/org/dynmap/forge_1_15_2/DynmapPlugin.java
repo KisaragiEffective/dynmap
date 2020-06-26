@@ -992,9 +992,11 @@ public class DynmapPlugin
         }
         @Override
         public List<String> getModList() {
-        	List<ModInfo> mil = ModList.get().getMods();
-        	List<String> lst = mil.stream().map(ModInfo::getModId).collect(Collectors.toList());
-            return lst;
+            return ModList.get()
+                    .getMods()
+                    .stream()
+                    .map(ModInfo::getModId)
+                    .collect(Collectors.toList());
         }
 
         @Override

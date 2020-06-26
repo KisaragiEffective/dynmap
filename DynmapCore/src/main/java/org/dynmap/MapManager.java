@@ -387,9 +387,11 @@ public class MapManager {
             renderedmaps = new HashSet<>();
             sl = n.getStrings("renderedmaps", null);
             if(sl != null) {
-                for(String s : sl) {
-                    world.maps.stream().filter(mt -> mt.getName().equals(s)).findFirst().ifPresent(mt -> renderedmaps.add(mt));
-                }
+                sl.forEach(s -> world.maps
+                        .stream()
+                        .filter(mt -> mt.getName().equals(s))
+                        .findFirst()
+                        .ifPresent(renderedmaps::add));
                 if(sl.size() > renderedmaps.size()) {   /* Missed one or more? */
                     throw new Exception();
                 }
@@ -427,11 +429,16 @@ public class MapManager {
             }
             v.put("found", found.save());
             v.put("rendered", rendered.save());
-            LinkedList<ConfigurationNode> queue = renderQueue.stream().map(MapTile::saveTile).filter(Objects::nonNull).collect(Collectors.toCollection(LinkedList::new));
+            LinkedList<ConfigurationNode> queue = renderQueue.stream()
+                    .map(MapTile::saveTile)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(LinkedList::new));
             v.put("queue", queue);
             v.put("count", rendercnt);
             v.put("timeaccum", timeaccum);
-            LinkedList<String> rmaps = renderedmaps.stream().map(MapType::getName).collect(Collectors.toCollection(LinkedList::new));
+            LinkedList<String> rmaps = renderedmaps.stream()
+                    .map(MapType::getName)
+                    .collect(Collectors.toCollection(LinkedList::new));
             v.put("renderedmaps", rmaps);
             v.put("activemaps", activemaps);
             v.put("activemapcnt", activemapcnt);
@@ -708,7 +715,12 @@ public class MapManager {
             List<DynmapChunk> requiredChunks = tile.getRequiredChunks();
             /* If we are doing radius limit render, see if any are inside limits */
             if(cxmin != Integer.MIN_VALUE) {
-                boolean good = requiredChunks.stream().anyMatch(c -> (c.x >= cxmin) && (c.x <= cxmax) && (c.z >= czmin) && (c.z <= czmax));
+                boolean good = requiredChunks
+                        .stream()
+                        .filter(c -> (c.x >= cxmin))
+                        .filter(c -> (c.x <= cxmax))
+                        .filter(c -> (c.z >= czmin))
+                        .anyMatch(c -> (c.z <= czmax));
                 if(!good) requiredChunks = Collections.emptyList();
             }
             /* Fetch chunk cache from server thread */
@@ -937,9 +949,11 @@ public class MapManager {
     	rec.queue.add(txtrec);
     	// If enter replaces exits, and we just added enter, purge exits
     	if (enterReplacesExits && isEnter) {
-    		ArrayList<TextQueueRec> newlst = rec.queue.stream().filter(r -> r.isEnter).collect(Collectors.toCollection(ArrayList::new));
             // Keep the enter records
-            rec.queue = newlst;
+            rec.queue = rec.queue
+                    .stream()
+                    .filter(r -> r.isEnter)
+                    .collect(Collectors.toCollection(ArrayList::new));
     	}
     }
     
@@ -1357,12 +1371,13 @@ public class MapManager {
             ConfigurationNode cn = new ConfigurationNode(f);
             cn.load();
             /* Get the saved tile definitions */
-            int cnt = 0;
             List<ConfigurationNode> tiles = cn.getNodes("tiles");
-            if(tiles != null) {
-                /* Restore tile, if possible */
-                cnt = (int) tiles.stream().map(tile -> MapTile.restoreTile(w, tile)).filter(Objects::nonNull).filter(mt -> tileQueue.push(mt)).count();
-            }
+            /* Restore tile, if possible */
+            int cnt = tiles != null ? (int) tiles.stream()
+                    .map(tile -> MapTile.restoreTile(w, tile))
+                    .filter(Objects::nonNull)
+                    .filter(tileQueue::push)
+                    .count() : 0;
             /* Get invalid tiles */
             ConfigurationNode invmap = cn.getNode("invalid");
             if(invmap != null) {
@@ -1613,7 +1628,10 @@ public class MapManager {
     public void printStats(DynmapCommandSender sender, String prefix) {
         sender.sendMessage("Tile Render Statistics:");
         MapStats tot = new MapStats();
-        int invcnt = this.worlds.stream().mapToInt(dw -> dw.mapstate.stream().mapToInt(MapTypeState::getInvCount).sum()).sum();
+        int invcnt = this.worlds
+                .stream()
+                .mapToInt(dw -> dw.mapstate.stream().mapToInt(MapTypeState::getInvCount).sum())
+                .sum();
         synchronized(lock) {
             for(String k: new TreeSet<>(mapstats.keySet())) {
                 if((prefix != null) && !k.startsWith(prefix))

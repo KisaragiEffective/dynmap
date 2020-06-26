@@ -990,8 +990,10 @@ public class DynmapPlugin
                     }
                 }
             }
-            List<ModContainer> mcl = Loader.instance().getModList();
-            return mcl.stream().map(ModContainer::getMod)
+            return Loader.instance()
+                    .getModList()
+                    .stream()
+                    .map(ModContainer::getMod)
                     .filter(Objects::nonNull)
                     .map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname))
                     .filter(Objects::nonNull)

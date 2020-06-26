@@ -588,19 +588,20 @@ public class OBJExport {
         }
     }
     private PatchDefinition[] getScaledModelAsPatches(short[] mod) {
-        ArrayList<RenderPatch> list = new ArrayList<>();
+        List<RenderPatch> patches = new ArrayList<>();
         short[] tmod = Arrays.copyOf(mod, mod.length);  // Make copy
         for (int y = 0; y < MODELSCALE; y++) {
             for (int z = 0; z < MODELSCALE; z++) {
                 for (int x = 0; x < MODELSCALE; x++) {
                     if (getSubblock(tmod, x, y, z)) {   // If occupied, try to add to list
-                        addSubblock(tmod, x, y, z, list);
+                        addSubblock(tmod, x, y, z, patches);
                     }
                 }
             }
         }
-        PatchDefinition[] pd = list.stream().map(renderPatch -> (PatchDefinition) renderPatch).toArray(PatchDefinition[]::new);
-        return pd;
+        return patches.stream()
+                .map(renderPatch -> (PatchDefinition) renderPatch)
+                .toArray(PatchDefinition[]::new);
     }
     
     private String updateGroup(int grpIndex, String newgroup) {

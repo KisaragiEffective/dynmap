@@ -416,7 +416,12 @@ public class DynmapMapCommands {
             sender.sendMessage("Cannot update maps from disabled or unloaded world: " + wname);
             return true;
         }
-        HDMap mt = (HDMap) w.maps.stream().filter(map -> map instanceof HDMap).filter(map -> map.getName().equals(mname)).findFirst().orElse(null);
+        HDMap mt = (HDMap) w.maps
+                .stream()
+                .filter(HDMap.class::isInstance)
+                .filter(map -> map.getName().equals(mname))
+                .findFirst()
+                .orElse(null);
         /* Find the map */
         /* If new, make default map instance */
         if(isnew) {
@@ -590,7 +595,14 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.perspectivelist"))
             return true;
         if(MapManager.mapman != null) {
-            String sb = MapManager.mapman.hdmapman.perspectives.values().stream().map(p -> p.getName() + ' ').collect(Collectors.joining());
+            String sb = MapManager.mapman
+                    .hdmapman
+                    .perspectives
+                    .values()
+                    .stream()
+                    .map(HDPerspective::getName)
+                    .map(s -> s + ' ')
+                    .collect(Collectors.joining());
             sender.sendMessage(sb);
         }
         return true;
@@ -600,7 +612,14 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.shaderlist"))
             return true;
         if(MapManager.mapman != null) {
-            String sb = MapManager.mapman.hdmapman.shaders.values().stream().map(p -> p.getName() + ' ').collect(Collectors.joining());
+            String sb = MapManager.mapman
+                    .hdmapman
+                    .shaders
+                    .values()
+                    .stream()
+                    .map(HDShader::getName)
+                    .map(s -> s + ' ')
+                    .collect(Collectors.joining());
             sender.sendMessage(sb);
         }
         return true;
@@ -610,7 +629,14 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.lightinglist"))
             return true;
         if(MapManager.mapman != null) {
-            String sb = MapManager.mapman.hdmapman.lightings.values().stream().map(p -> p.getName() + ' ').collect(Collectors.joining());
+            String sb = MapManager.mapman
+                    .hdmapman
+                    .lightings
+                    .values()
+                    .stream()
+                    .map(HDLighting::getName)
+                    .map(s -> s + ' ')
+                    .collect(Collectors.joining());
             sender.sendMessage(sb);
         }
         return true;

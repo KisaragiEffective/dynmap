@@ -107,7 +107,9 @@ class PlayerSetImpl implements PlayerSet {
     @Override
     public void setPlayers(Set<String> players) {
         if(players.size() == this.players.size()) {
-            boolean match = players.stream().allMatch(s -> this.players.contains(s.toLowerCase()));
+            boolean match = players.stream()
+                    .map(String::toLowerCase)
+                    .allMatch(this.players::contains);
             if(match)
                 return;
         }

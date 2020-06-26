@@ -561,12 +561,17 @@ public class TexturePack {
      * Finish processing of texture indexes - add to texture maps
      */
     private static void processTextureMaps() {
-        for(TextureMap ti : textmap_by_id.values()) {
-            if(ti.blocknames.isEmpty()) continue;
-            int[] txtids = ti.texture_ids.stream().mapToInt(integer -> integer).toArray();
-            HDBlockStateTextureMap map = new HDBlockStateTextureMap(txtids, null, ti.colorMult, ti.custColorMult, ti.blockset, true, null, ti.trans);
-            map.addToTable(ti.blocknames, ti.stateids);
-        }
+        textmap_by_id.values()
+                .stream()
+                .filter(ti -> !ti.blocknames.isEmpty())
+                .forEachOrdered(ti -> {
+                    int[] txtids = ti.texture_ids
+                            .stream()
+                            .mapToInt(integer -> integer)
+                            .toArray();
+                    HDBlockStateTextureMap map = new HDBlockStateTextureMap(txtids, null, ti.colorMult, ti.custColorMult, ti.blockset, true, null, ti.trans);
+                    map.addToTable(ti.blocknames, ti.stateids);
+                });
     }
     /**
      * Get index of texture in texture map

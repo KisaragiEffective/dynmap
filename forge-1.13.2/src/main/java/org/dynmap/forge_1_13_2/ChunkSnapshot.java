@@ -165,7 +165,10 @@ public class ChunkSnapshot
                     if (tc.contains("Properties")) {
                         String statestr;
                         NBTTagCompound prop = tc.getCompound("Properties");
-                        statestr = prop.keySet().stream().map(pid -> pid + '=' + prop.get(pid).getString()).collect(Collectors.joining(","));
+                        statestr = prop.keySet()
+                                .stream()
+                                .map(pid -> pid + '=' + prop.get(pid).getString())
+                                .collect(Collectors.joining(","));
                         palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr);
                     }
                     if (palette[pi] == null) {

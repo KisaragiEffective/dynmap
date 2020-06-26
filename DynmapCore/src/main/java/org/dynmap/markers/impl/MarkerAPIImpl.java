@@ -1797,10 +1797,12 @@ api.scheduleWriteJob(); /* Start write job */
                     sender.sendMessage("Error: set does not exist - id:" + id);
                     return true;
                 }
-            }
-            else {
-                Set<MarkerSet> sets = api.getMarkerSets();
-                set = sets.stream().filter(s -> s.getMarkerSetLabel().equals(label)).findFirst().orElse(null);
+            } else {
+                set = api.getMarkerSets()
+                        .stream()
+                        .filter(s -> s.getMarkerSetLabel().equals(label))
+                        .findFirst()
+                        .orElse(null);
                 if(set == null) {
                     sender.sendMessage("Error: matching set not found");
                     return true;                        
@@ -1884,8 +1886,11 @@ api.scheduleWriteJob(); /* Start write job */
                 set.deleteMarkerSet();
             }
             else {
-                Set<MarkerSet> sets = api.getMarkerSets();
-                MarkerSet set = sets.stream().filter(s -> s.getMarkerSetLabel().equals(label)).findFirst().orElse(null);
+                MarkerSet set = api.getMarkerSets()
+                        .stream()
+                        .filter(s -> s.getMarkerSetLabel().equals(label))
+                        .findFirst()
+                        .orElse(null);
                 if(set == null) {
                     sender.sendMessage("Error: matching set not found");
                     return true;                        
@@ -1997,8 +2002,11 @@ api.scheduleWriteJob(); /* Start write job */
                 }
             }
             else {
-                Set<MarkerIcon> icons = api.getMarkerIcons();
-                ico = icons.stream().filter(ic -> ic.getMarkerIconLabel().equals(label)).findFirst().orElse(null);
+                ico = api.getMarkerIcons()
+                        .stream()
+                        .filter(ic -> ic.getMarkerIconLabel().equals(label))
+                        .findFirst()
+                        .orElse(null);
                 if(ico == null) {
                     sender.sendMessage("Error: matching icon not found");
                     return true;                        
@@ -2051,8 +2059,11 @@ api.scheduleWriteJob(); /* Start write job */
                 ico.deleteIcon();
             }
             else {
-                Set<MarkerIcon> icos = api.getMarkerIcons();
-                MarkerIcon ico = icos.stream().filter(ic -> ic.getMarkerIconLabel().equals(label)).findFirst().orElse(null);
+                Set<MarkerIcon> icons = api.getMarkerIcons();
+                MarkerIcon ico = icons.stream()
+                        .filter(ic -> ic.getMarkerIconLabel().equals(label))
+                        .findFirst()
+                        .orElse(null);
                 if(ico == null) {
                     sender.sendMessage("Error: matching icon not found");
                     return true;                        
@@ -3257,8 +3268,10 @@ api.scheduleWriteJob(); /* Start write job */
      * @return true if intersected, false if not
      */
     public static boolean testTileForBoostMarkers(DynmapWorld w, HDPerspective perspective, double tile_x, double tile_y, double tile_dim) {
-        if (api == null) return false;
-        return api.markersets.values().stream().anyMatch(ms -> ms.testTileForBoostMarkers(w, perspective, tile_x, tile_y, tile_dim));
+        return api != null && api.markersets
+                .values()
+                .stream()
+                .anyMatch(ms -> ms.testTileForBoostMarkers(w, perspective, tile_x, tile_y, tile_dim));
     }
     /**
      * Build entered marker set based on given location
@@ -3270,8 +3283,8 @@ api.scheduleWriteJob(); /* Start write job */
      */
     public static void getEnteredMarkers(String worldid, double x, double y, double z, Set<EnterExitMarker> entered) {
         if (api == null) return;
-        for(MarkerSetImpl ms : api.markersets.values()) {
-        	ms.addEnteredMarkers(entered, worldid, x, y, z);
-        }
+        api.markersets
+                .values()
+                .forEach(ms -> ms.addEnteredMarkers(entered, worldid, x, y, z));
     }
 }

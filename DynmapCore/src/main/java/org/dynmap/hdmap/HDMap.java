@@ -224,26 +224,27 @@ public class HDMap extends MapType {
 
     /* Get maps rendered concurrently with this map in this world */
     public List<MapType> getMapsSharingRender(DynmapWorld w) {
-        ArrayList<MapType> maps = w.maps.stream().filter(mt -> mt instanceof HDMap).map(mt -> (HDMap) mt).filter(hdmt -> (hdmt.perspective == this.perspective) && (hdmt.boostzoom == this.boostzoom)).collect(Collectors.toCollection(ArrayList::new));
         /* Same perspective */
-        return maps;
+        return w.maps
+                .stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .filter(hdmt -> (hdmt.perspective == this.perspective))
+                .filter(hdmt -> (hdmt.boostzoom == this.boostzoom))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     
     /* Get names of maps rendered concurrently with this map type in this world */
     public List<String> getMapNamesSharingRender(DynmapWorld w) {
-        ArrayList<String> lst = new ArrayList<>();
-        for(MapType mt : w.maps) {
-            if(mt instanceof HDMap) {
-                HDMap hdmt = (HDMap)mt;
-                if((hdmt.perspective == this.perspective)  && (hdmt.boostzoom == this.boostzoom)) {  /* Same perspective */
-                    if(hdmt.lighting.isNightAndDayEnabled())
-                        lst.add(hdmt.getName() + "(night/day)");
-                    else
-                        lst.add(hdmt.getName());
-                }
-            }
-        }
-        return lst;
+        /* Same perspective */
+        return w.maps
+                .stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .filter(hdmt -> (hdmt.perspective == this.perspective))
+                .filter(hdmt -> (hdmt.boostzoom == this.boostzoom))
+                .map(hdmt -> hdmt.lighting.isNightAndDayEnabled() ? hdmt.getName() + "(night/day)" : hdmt.getName())
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override

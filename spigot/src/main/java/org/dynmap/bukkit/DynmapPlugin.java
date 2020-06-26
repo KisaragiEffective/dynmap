@@ -1591,12 +1591,16 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         metrics.addCustomChart(new Metrics.MultiLineChart("map_data", () -> {
             Map<String, Integer> hashMap = new HashMap<>();
             hashMap.put("worlds", core.mapManager != null ? core.mapManager.getWorlds().size() : 0);
-            int maps = 0, hdmaps = 0;
-            if (core.mapManager != null)
-                for (DynmapWorld w : core.mapManager.getWorlds()) {
-                    hdmaps += w.maps.stream().filter(HDMap.class::isInstance).count();
-                    maps += w.maps.size();
-                }
+            final int maps;
+            final int hdmaps;
+            if (core.mapManager != null) {
+                Collection<DynmapWorld> worlds = core.mapManager.getWorlds();
+                maps = worlds.stream().mapToInt(world -> world.maps.size()).sum();
+                hdmaps = worlds.stream().mapToInt(w -> (int) w.maps.stream().filter(HDMap.class::isInstance).count()).sum();
+            } else {
+                maps = 0;
+                hdmaps = 0;
+            }
             hashMap.put("maps", maps);
             hashMap.put("hd_maps", hdmaps);
             return hashMap;

@@ -944,7 +944,12 @@ public class DynmapPlugin
 		    Map<String, ModContainer> list = Loader.instance().getIndexedModList();
 		    ModContainer mod = list.get(name);    // Try case sensitive lookup
 		    if (mod == null) {
-                mod = list.entrySet().stream().filter(ent -> ent.getKey().equalsIgnoreCase(name)).findFirst().map(Entry::getValue).orElse(mod);
+                mod = list.entrySet()
+                        .stream()
+                        .filter(ent -> ent.getKey().equalsIgnoreCase(name))
+                        .findFirst()
+                        .map(Entry::getValue)
+                        .orElse(null);
 		    }
 		    if (mod == null) return null;
 		    return mod.getVersion();
@@ -998,8 +1003,15 @@ public class DynmapPlugin
                     }
                 }
             }
-            List<ModContainer> mcl = Loader.instance().getModList();
-            return mcl.stream().map(ModContainer::getMod).filter(Objects::nonNull).map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname)).filter(Objects::nonNull).findFirst().orElse(null);
+            return Loader.instance()
+                    .getModList()
+                    .stream()
+                    .map(ModContainer::getMod)
+                    .filter(Objects::nonNull)
+                    .map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
         }
         /**
          * Get block unique ID map (module:blockid)

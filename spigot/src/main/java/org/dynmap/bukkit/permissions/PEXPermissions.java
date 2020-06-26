@@ -1,5 +1,6 @@
 package org.dynmap.bukkit.permissions;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,10 +54,14 @@ public class PEXPermissions implements PermissionProvider {
     
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> hasperms = new HashSet<>();
+        Set<String> hasperms;
         PermissionUser pu = pm.getUser(player);
         if(pu != null) {
-            hasperms = perms.stream().filter(pp -> pu.has(name + "." + pp)).collect(Collectors.toCollection(HashSet::new));
+            hasperms = perms.stream()
+                    .filter(pp -> pu.has(name + "." + pp))
+                    .collect(Collectors.toCollection(HashSet::new));
+        } else {
+            hasperms = Collections.emptySet();
         }
         return hasperms;
     }

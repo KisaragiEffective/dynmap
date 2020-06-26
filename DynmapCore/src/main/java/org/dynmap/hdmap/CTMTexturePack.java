@@ -277,8 +277,9 @@ public class CTMTexturePack {
                     }
                 }
             }
-            int[] out = rslt.stream().mapToInt(integer -> integer).toArray();
-            return out;
+            return rslt.stream()
+                    .mapToInt(integer -> integer)
+                    .toArray();
         }
         private int parseRenderPass(Properties p, String fld, int def) {
             String v = p.getProperty(fld);
