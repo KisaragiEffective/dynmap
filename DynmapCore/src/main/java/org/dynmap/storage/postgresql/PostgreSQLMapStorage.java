@@ -50,8 +50,8 @@ public class PostgreSQLMapStorage extends MapStorage {
 
     private int port;
     private static final int POOLSIZE = 5;
-    private final Connection[] cpool = new Connection[POOLSIZE];
-    private int cpoolCount = 0;
+    private final Connection[] connectionPool = new Connection[POOLSIZE];
+    private int connectionPoolCount = 0;
     private static final Charset UTF8 = StandardCharsets.UTF_8;
 
     private final HashMap<String, Integer> mapKey = new HashMap<>();
@@ -67,8 +67,7 @@ public class PostgreSQLMapStorage extends MapStorage {
 
             if (zoom > 0) {
                 uri = map.getPrefix() + var.variantSuffix + "/"+ (x >> 5) + "_" + (y >> 5) + "/" + "zzzzzzzzzzzzzzzz".substring(0, zoom) + "_" + x + "_" + y + "." + map.getImageFormat().getFileExt();
-            }
-            else {
+            } else {
                 uri = map.getPrefix() + var.variantSuffix + "/"+ (x >> 5) + "_" + (y >> 5) + "/" + x + "_" + y + "." + map.getImageFormat().getFileExt();
             }
         }
@@ -81,11 +80,12 @@ public class PostgreSQLMapStorage extends MapStorage {
             boolean err = false;
             try {
                 c = getConnection();
+                try (
                 Statement stmt = c.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                rslt = rs.next();
-                rs.close();
-                stmt.close();
+                ) {
+                    rslt = rs.next();
+                }
             } catch (SQLException x) {
                 Log.severe("Tile exists error - " + x.getMessage());
                 err = true;
@@ -98,100 +98,109 @@ public class PostgreSQLMapStorage extends MapStorage {
         @Override
         public boolean matchesHashCode(long hash) {
             if (mapkey == null) return false;
-            boolean rslt = false;
+            boolean result = false;
             Connection c = null;
             boolean err = false;
             try {
                 c = getConnection();
+                try (
                 Statement stmt = c.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                if (rs.next()) {
-                    long v = rs.getLong("HashCode");
-                    rslt = (v == hash);
+                ) {
+                    if (rs.next()) {
+                        long v = rs.getLong("HashCode");
+                        result = (v == hash);
+                    }
                 }
-                rs.close();
-                stmt.close();
             } catch (SQLException x) {
                 Log.severe("Tile matches hash error - " + x.getMessage());
                 err = true;
             } finally {
                 releaseConnection(c, err);
             }
-            return rslt;
+            return result;
         }
 
         @Override
         public TileRead read() {
             if (mapkey == null) return null;
-            TileRead rslt = null;
+            TileRead tile = null;
             Connection c = null;
             boolean err = false;
             try {
                 c = getConnection();
+                try (
                 Statement stmt = c.createStatement();
                 ResultSet rs = stmt.executeQuery("SELECT HashCode,LastUpdate,Format,Image FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                if (rs.next()) {
-                    rslt = new TileRead();
-                    rslt.hashCode = rs.getLong("HashCode");
-                    rslt.lastModified = rs.getLong("LastUpdate");
-                    rslt.format = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
-                    byte[] img = rs.getBytes("Image");
-                    rslt.image = new BufferInputStream(img);
+                ) {
+                    if (rs.next()) {
+                        tile = new TileRead();
+                        tile.hashCode = rs.getLong("HashCode");
+                        tile.lastModified = rs.getLong("LastUpdate");
+                        tile.format = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
+                        byte[] img = rs.getBytes("Image");
+                        tile.image = new BufferInputStream(img);
+                    }
                 }
-                rs.close();
-                stmt.close();
             } catch (SQLException x) {
                 Log.severe("Tile read error - " + x.getMessage());
                 err = true;
             } finally {
                 releaseConnection(c, err);
             }
-            return rslt;
+            return tile;
         }
 
         @Override
         public boolean write(long hash, BufferOutputStream encImage) {
             if (mapkey == null) return false;
-            Connection c = null;
-            boolean err = false;
             boolean exists = exists();
             // If delete, and doesn't exist, quit
             if ((encImage == null) && (!exists)) return false;
-            
+
+            Connection c = null;
+            boolean err = false;
             try {
                 c = getConnection();
-                PreparedStatement stmt;
                 if (encImage == null) { // If delete
-                    stmt = c.prepareStatement("DELETE FROM " + tableTiles + " WHERE MapID=? AND x=? and y=? AND zoom=?;");
-                    stmt.setInt(1, mapkey);
-                    stmt.setInt(2, x);
-                    stmt.setInt(3, y);
-                    stmt.setInt(4, zoom);
+                    try (
+                            PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableTiles + " WHERE MapID=? AND x=? and y=? AND zoom=?;");
+                    ) {
+                        stmt.setInt(1, mapkey);
+                        stmt.setInt(2, x);
+                        stmt.setInt(3, y);
+                        stmt.setInt(4, zoom);
+                        stmt.executeUpdate();
+                    }
+                } else if (exists) {
+                    try (
+                    PreparedStatement stmt = c.prepareStatement("UPDATE " + tableTiles + " SET HashCode=?, LastUpdate=?, Format=?, Image=? WHERE MapID=? AND x=? and y=? AND zoom=?;");
+                    ) {
+                        stmt.setLong(1, hash);
+                        stmt.setLong(2, System.currentTimeMillis());
+                        stmt.setInt(3, map.getImageFormat().getEncoding().ordinal());
+                        stmt.setBinaryStream(4, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                        stmt.setInt(5, mapkey);
+                        stmt.setInt(6, x);
+                        stmt.setInt(7, y);
+                        stmt.setInt(8, zoom);
+                        stmt.executeUpdate();
+                    }
+                } else {
+                    try (
+                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableTiles + " (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image) VALUES (?,?,?,?,?,?,?,?);");
+                    ) {
+                        stmt.setInt(1, mapkey);
+                        stmt.setInt(2, x);
+                        stmt.setInt(3, y);
+                        stmt.setInt(4, zoom);
+                        stmt.setLong(5, hash);
+                        stmt.setLong(6, System.currentTimeMillis());
+                        stmt.setInt(7, map.getImageFormat().getEncoding().ordinal());
+                        stmt.setBinaryStream(8, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                        stmt.executeUpdate();
+                    }
                 }
-                else if (exists) {
-                    stmt = c.prepareStatement("UPDATE " + tableTiles + " SET HashCode=?, LastUpdate=?, Format=?, Image=? WHERE MapID=? AND x=? and y=? AND zoom=?;");
-                    stmt.setLong(1, hash);
-                    stmt.setLong(2, System.currentTimeMillis());
-                    stmt.setInt(3, map.getImageFormat().getEncoding().ordinal());
-                    stmt.setBinaryStream(4, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
-                    stmt.setInt(5, mapkey);
-                    stmt.setInt(6, x);
-                    stmt.setInt(7, y);
-                    stmt.setInt(8, zoom);
-                }
-                else {
-                    stmt = c.prepareStatement("INSERT INTO " + tableTiles + " (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image) VALUES (?,?,?,?,?,?,?,?);");
-                    stmt.setInt(1, mapkey);
-                    stmt.setInt(2, x);
-                    stmt.setInt(3, y);
-                    stmt.setInt(4, zoom);
-                    stmt.setLong(5, hash);
-                    stmt.setLong(6, System.currentTimeMillis());
-                    stmt.setInt(7, map.getImageFormat().getEncoding().ordinal());
-                    stmt.setBinaryStream(8, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
-               }
-                stmt.executeUpdate();
-                stmt.close();
                 // Signal update for zoom out
                 if (zoom == 0) {
                     world.enqueueZoomOutUpdate(this);
@@ -241,13 +250,13 @@ public class PostgreSQLMapStorage extends MapStorage {
 
         @Override
         public MapStorageTile getZoomOutTile() {
-            int xx, yy;
+            int xx;
             int step = 1 << zoom;
             if(x >= 0)
                 xx = x - (x % (2*step));
             else
                 xx = x + (x % (2*step));
-            yy = -y;
+            int yy = -y;
             if(yy >= 0)
                 yy = yy - (yy % (2*step));
             else
@@ -344,13 +353,15 @@ public class PostgreSQLMapStorage extends MapStorage {
         Connection c = null;
         try {
             c = getConnection();    // Get connection (create DB if needed)
+            try (
             Statement stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery( "SELECT level FROM " + tableSchemaVersion + ";");
-            if (rs.next()) {
-                ver = rs.getInt("level");
+            ) {
+                if (rs.next()) {
+                    ver = rs.getInt("level");
+                }
+                rs.close();
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             err = true;
         } finally {
@@ -360,33 +371,35 @@ public class PostgreSQLMapStorage extends MapStorage {
     }
 
     private void doUpdate(Connection c, String sql) throws SQLException {
-        Statement stmt = c.createStatement();
-        stmt.executeUpdate(sql);
-        stmt.close();
+        try (Statement stmt = c.createStatement()) {
+            stmt.executeUpdate(sql);
+        }
     }
 
     private void doLoadMaps() {
-        Connection c = null;
-        boolean err = false;
-        
+
         mapKey.clear();
         // Read the maps table - cache results
+        boolean err = false;
+        Connection c = null;
         try {
             c = getConnection();
+            try (
             Statement stmt = c.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * from " + tableMaps + ";");
-            while (rs.next()) {
-                int key = rs.getInt("ID");
-                String worldID = rs.getString("WorldID");
-                String mapID = rs.getString("MapID");
-                String variant = rs.getString("Variant");
-                long serverid = rs.getLong("ServerID");
-                if (serverid == serverID) { // One of ours
-                    mapKey.put(worldID + ":" + mapID + ":" + variant, key);
+            ) {
+                while (rs.next()) {
+                    int key = rs.getInt("ID");
+                    String worldID = rs.getString("WorldID");
+                    String mapID = rs.getString("MapID");
+                    String variant = rs.getString("Variant");
+                    long serverid = rs.getLong("ServerID");
+                    if (serverid == serverID) { // One of ours
+                        mapKey.put(worldID + ":" + mapID + ":" + variant, key);
+                    }
                 }
+                rs.close();
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Error loading map table - " + x.getMessage());
             err = true;
@@ -405,26 +418,26 @@ public class PostgreSQLMapStorage extends MapStorage {
                 try {
                     c = getConnection();
                     // Insert row
-                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMaps + " (WorldID,MapID,Variant,ServerID) VALUES (?, ?, ?, ?);");
-                    stmt.setString(1, w.getName());
-                    stmt.setString(2, mt.getPrefix());
-                    stmt.setString(3, var.toString());
-                    stmt.setLong(4, serverID);
-                    stmt.executeUpdate();
-                    stmt.close();
-                    //  Query key assigned
-                    stmt = c.prepareStatement("SELECT ID FROM " + tableMaps + " WHERE WorldID = ? AND MapID = ? AND Variant = ? AND ServerID = ?;");
-                    stmt.setString(1, w.getName());
-                    stmt.setString(2, mt.getPrefix());
-                    stmt.setString(3, var.toString());
-                    stmt.setLong(4, serverID);
-                    ResultSet rs = stmt.executeQuery();
-                    if (rs.next()) {
-                        k = rs.getInt("ID");
-                        mapKey.put(id, k);
+                    try (PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMaps + " (WorldID,MapID,Variant,ServerID) VALUES (?, ?, ?, ?);")) {
+                        stmt.setString(1, w.getName());
+                        stmt.setString(2, mt.getPrefix());
+                        stmt.setString(3, var.toString());
+                        stmt.setLong(4, serverID);
+                        stmt.executeUpdate();
                     }
-                    rs.close();
-                    stmt.close();
+                    //  Query key assigned
+                    try (PreparedStatement stmt = c.prepareStatement("SELECT ID FROM " + tableMaps + " WHERE WorldID = ? AND MapID = ? AND Variant = ? AND ServerID = ?;")) {
+                        stmt.setString(1, w.getName());
+                        stmt.setString(2, mt.getPrefix());
+                        stmt.setString(3, var.toString());
+                        stmt.setLong(4, serverID);
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            if (rs.next()) {
+                                k = rs.getInt("ID");
+                                mapKey.put(id, k);
+                            }
+                        }
+                    }
                 } catch (SQLException x) {
                     Log.severe("Error updating Maps table - " + x.getMessage());
                     err = true;
@@ -460,8 +473,7 @@ public class PostgreSQLMapStorage extends MapStorage {
             } finally {
                 releaseConnection(c, err);
             }
-        }
-        else if (version == 1) {
+        } else if (version == 1) {
             try {
                 c = getConnection();
                 doUpdate(c, "CREATE TABLE " + tableStandaloneFiles + " (FileName VARCHAR(128) NOT NULL, ServerID BIGINT NOT NULL DEFAULT 0, Content TEXT, PRIMARY KEY (FileName, ServerID))");
@@ -474,8 +486,7 @@ public class PostgreSQLMapStorage extends MapStorage {
             } finally {
                 releaseConnection(c, err);
             }
-        }
-        else if (version == 2) {
+        } else if (version == 2) {
             try {
                 c = getConnection();
                 doUpdate(c, "DELETE FROM " + tableStandaloneFiles + ";");
@@ -497,25 +508,25 @@ public class PostgreSQLMapStorage extends MapStorage {
     }
 
     private Connection getConnection() throws SQLException {
-        Connection c = null;
-        synchronized (cpool) {
-            while (c == null) {
-                for (int i = 0; i < cpool.length; i++) {    // See if available connection
-                    if (cpool[i] != null) { // Found one
-                        c = cpool[i];
-                        cpool[i] = null;
+        Connection connection = null;
+        synchronized (connectionPool) {
+            while (connection == null) {
+                for (int i = 0; i < connectionPool.length; i++) {    // See if available connection
+                    if (connectionPool[i] != null) { // Found one
+                        connection = connectionPool[i];
+                        connectionPool[i] = null;
                         break;
                     }
                 }
-                if (c == null) {
-                    if (cpoolCount < POOLSIZE) {  // Still more we can have
-                        c = DriverManager.getConnection(connectionString, userid, password);
-                        configureConnection(c);
-                        cpoolCount++;
+                if (connection == null) {
+                    if (connectionPoolCount < POOLSIZE) {  // Still more we can have
+                        connection = DriverManager.getConnection(connectionString, userid, password);
+                        configureConnection(connection);
+                        connectionPoolCount++;
                     }
                     else {
                         try {
-                            cpool.wait();
+                            connectionPool.wait();
                         } catch (InterruptedException e) {
                             throw new SQLException("Interruped");
                         }
@@ -523,7 +534,7 @@ public class PostgreSQLMapStorage extends MapStorage {
                 }
             }
         }
-        return c;
+        return connection;
     }
     private static Connection configureConnection(Connection conn) throws SQLException {
         return conn;
@@ -531,21 +542,21 @@ public class PostgreSQLMapStorage extends MapStorage {
 
     private void releaseConnection(Connection c, boolean err) {
         if (c == null) return;
-        synchronized (cpool) {
+        synchronized (connectionPool) {
             if (!err)  {  // Find slot to keep it in pool
                 for (int i = 0; i < POOLSIZE; i++) {
-                    if (cpool[i] == null) {
-                        cpool[i] = c;
+                    if (connectionPool[i] == null) {
+                        connectionPool[i] = c;
                         c = null; // Mark it recovered (no close needed
-                        cpool.notifyAll();
+                        connectionPool.notifyAll();
                         break;
                     }
                 }
             }
             if (c != null) {  // If broken, just toss it
                 try { c.close(); } catch (SQLException x) {}
-                cpoolCount--;   // And reduce count
-                cpool.notifyAll();
+                connectionPoolCount--;   // And reduce count
+                connectionPool.notifyAll();
             }
         }
     }
@@ -583,18 +594,12 @@ public class PostgreSQLMapStorage extends MapStorage {
         if (coord.length < 3) { // 3 or 4
             return null;
         }
-        int zoom = 0;
-        int x, y;
         try {
-            if (coord[0].charAt(0) == 'z') {
-                zoom = coord[0].length();
-                x = Integer.parseInt(coord[1]);
-                y = Integer.parseInt(coord[2]);
-            }
-            else {
-                x = Integer.parseInt(coord[0]);
-                y = Integer.parseInt(coord[1]);
-            }
+            // [zoom]? <x> <y>
+            boolean zoomed = coord[0].charAt(0) == 'z';
+            int zoom = zoomed ? coord[0].length() : 0;
+            int x = zoomed ? Integer.parseInt(coord[1]) : Integer.parseInt(coord[0]);
+            int y = zoomed ? Integer.parseInt(coord[2]) : Integer.parseInt(coord[1]);
             return getTile(world, mt, x, y, zoom, imgvar);
         } catch (NumberFormatException nfx) {
             return null;
@@ -613,32 +618,32 @@ public class PostgreSQLMapStorage extends MapStorage {
         });
     }
     private void processEnumMapTiles(DynmapWorld world, MapType map, ImageVariant var, MapStorageTileEnumCB cb, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
-        Connection c = null;
-        boolean err = false;
         Integer mapkey = getMapKey(world, map, var);
         if (mapkey == null) {
             if(cbEnd != null)
                 cbEnd.searchEnded();
             return;
         }
+        boolean err = false;
+        Connection c = null;
         try {
             c = getConnection();
             // Query tiles for given mapkey
-            Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT x,y,zoom,Format FROM " + tableTiles + " WHERE MapID=" + mapkey + ";");
-            while (rs.next()) {
-                StorageTile st = new StorageTile(world, map, rs.getInt("x"), rs.getInt("y"), rs.getInt("zoom"), var);
-                final MapType.ImageEncoding encoding = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
-                if(cb != null)
-                    cb.tileFound(st, encoding);
-                if(cbBase != null && st.zoom == 0)
-                    cbBase.tileFound(st, encoding);
-                st.cleanup();
+            try (Statement stmt = c.createStatement()) {
+                try (ResultSet rs = stmt.executeQuery("SELECT x,y,zoom,Format FROM " + tableTiles + " WHERE MapID=" + mapkey + ";")) {
+                    while (rs.next()) {
+                        StorageTile st = new StorageTile(world, map, rs.getInt("x"), rs.getInt("y"), rs.getInt("zoom"), var);
+                        final MapType.ImageEncoding encoding = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
+                        if (cb != null)
+                            cb.tileFound(st, encoding);
+                        if (cbBase != null && st.zoom == 0)
+                            cbBase.tileFound(st, encoding);
+                        st.cleanup();
+                    }
+                    if (cbEnd != null)
+                        cbEnd.searchEnded();
+                }
             }
-            if(cbEnd != null)
-                cbEnd.searchEnded();
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Tile enum error - " + x.getMessage());
             err = true;
@@ -669,16 +674,16 @@ public class PostgreSQLMapStorage extends MapStorage {
     }
 
     private void processPurgeMapTiles(DynmapWorld world, MapType map, ImageVariant var) {
-        Connection c = null;
-        boolean err = false;
         Integer mapkey = getMapKey(world, map, var);
         if (mapkey == null) return;
+        boolean err = false;
+        Connection c = null;
         try {
             c = getConnection();
             // Query tiles for given mapkey
-            Statement stmt = c.createStatement();
-            stmt.executeUpdate("DELETE FROM " + tableTiles + " WHERE MapID=" + mapkey + ";");
-            stmt.close();
+            try (Statement stmt = c.createStatement()) {
+                stmt.executeUpdate("DELETE FROM " + tableTiles + " WHERE MapID=" + mapkey + ";");
+            }
         } catch (SQLException x) {
             Log.severe("Tile purge error - " + x.getMessage());
             err = true;
@@ -690,34 +695,37 @@ public class PostgreSQLMapStorage extends MapStorage {
     @Override
     public boolean setPlayerFaceImage(String playername, FaceType facetype,
             BufferOutputStream encImage) {
-        Connection c = null;
-        boolean err = false;
         boolean exists = hasPlayerFaceImage(playername, facetype);
         // If delete, and doesn't exist, quit
         if ((encImage == null) && (!exists)) return false;
-        
+
+        boolean err = false;
+        Connection c = null;
         try {
             c = getConnection();
-            PreparedStatement stmt;
             if (encImage == null) { // If delete
-                stmt = c.prepareStatement("DELETE FROM " + tableFaces + " WHERE PlayerName=? AND TypeIDx=?;");
-                stmt.setString(1, playername);
-                stmt.setInt(2, facetype.typeID);
+                try (PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableFaces + " WHERE PlayerName=? AND TypeIDx=?;")) {
+                    stmt.setString(1, playername);
+                    stmt.setInt(2, facetype.typeID);
+                    stmt.executeUpdate();
+                }
             }
             else if (exists) {
-                stmt = c.prepareStatement("UPDATE " + tableFaces + " SET Image=? WHERE PlayerName=? AND TypeID=?;");
-                stmt.setBinaryStream(1, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
-                stmt.setString(2, playername);
-                stmt.setInt(3, facetype.typeID);
+                try (PreparedStatement stmt = c.prepareStatement("UPDATE " + tableFaces + " SET Image=? WHERE PlayerName=? AND TypeID=?;")) {
+                    stmt.setBinaryStream(1, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                    stmt.setString(2, playername);
+                    stmt.setInt(3, facetype.typeID);
+                    stmt.executeUpdate();
+                }
             }
             else {
-                stmt = c.prepareStatement("INSERT INTO " + tableFaces + " (PlayerName,TypeID,Image) VALUES (?,?,?);");
-                stmt.setString(1, playername);
-                stmt.setInt(2, facetype.typeID);
-                stmt.setBinaryStream(3, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                try (PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableFaces + " (PlayerName,TypeID,Image) VALUES (?,?,?);")) {
+                    stmt.setString(1, playername);
+                    stmt.setInt(2, facetype.typeID);
+                    stmt.setBinaryStream(3, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                    stmt.executeUpdate();
+                }
             }
-            stmt.executeUpdate();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Face write error - " + x.getMessage());
             err = true;
@@ -735,16 +743,16 @@ public class PostgreSQLMapStorage extends MapStorage {
         BufferInputStream image = null;
         try {
             c = getConnection();
-            PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;");
-            stmt.setString(1, playername);
-            stmt.setInt(2, facetype.typeID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                byte[] img = rs.getBytes("Image");
-                image = new BufferInputStream(img);
+            try (PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;")) {
+                stmt.setString(1, playername);
+                stmt.setInt(2, facetype.typeID);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        byte[] img = rs.getBytes("Image");
+                        image = new BufferInputStream(img);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Face read error - " + x.getMessage());
             err = true;
@@ -761,15 +769,15 @@ public class PostgreSQLMapStorage extends MapStorage {
         boolean exists = false;
         try {
             c = getConnection();
-            PreparedStatement stmt = c.prepareStatement("SELECT TypeID FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;");
-            stmt.setString(1, playername);
-            stmt.setInt(2, facetype.typeID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                exists = true;
+            try (PreparedStatement stmt = c.prepareStatement("SELECT TypeID FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;")) {
+                stmt.setString(1, playername);
+                stmt.setInt(2, facetype.typeID);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        exists = true;
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Face exists error - " + x.getMessage());
             err = true;
@@ -783,46 +791,45 @@ public class PostgreSQLMapStorage extends MapStorage {
     public boolean setMarkerImage(String markerid, BufferOutputStream encImage) {
         Connection c = null;
         boolean err = false;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         
         try {
-            c = getConnection();
             boolean exists = false;
-            stmt = c.prepareStatement("SELECT IconName FROM " + tableMarkerIcons + " WHERE IconName=?;");
-            stmt.setString(1, markerid);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                exists = true;
+            c = getConnection();
+            {
+                try (PreparedStatement stmt = c.prepareStatement("SELECT IconName FROM " + tableMarkerIcons + " WHERE IconName=?;")) {
+                    stmt.setString(1, markerid);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        exists = rs.next();
+                    }
+                }
             }
-            rs.close();
-            rs = null;
-            stmt.close();
-            stmt = null;
+
             if (encImage == null) { // If delete
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
-                stmt = c.prepareStatement("DELETE FROM " + tableMarkerIcons + " WHERE IconName=?;");
-                stmt.setString(1, markerid);
-                stmt.executeUpdate();
+                try (PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableMarkerIcons + " WHERE IconName=?;")) {
+                    stmt.setString(1, markerid);
+                    stmt.executeUpdate();
+                }
             }
             else if (exists) {
-                stmt = c.prepareStatement("UPDATE " + tableMarkerIcons + " SET Image=? WHERE IconName=?;");
-                stmt.setBinaryStream(1, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
-                stmt.setString(2, markerid);
+                try (PreparedStatement stmt = c.prepareStatement("UPDATE " + tableMarkerIcons + " SET Image=? WHERE IconName=?;")) {
+                    stmt.setBinaryStream(1, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                    stmt.setString(2, markerid);
+                    stmt.executeUpdate();
+                }
             }
             else {
-                stmt = c.prepareStatement("INSERT INTO " + tableMarkerIcons + " (IconName,Image) VALUES (?,?);");
-                stmt.setString(1, markerid);
-                stmt.setBinaryStream(2, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                try (PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMarkerIcons + " (IconName,Image) VALUES (?,?);")) {
+                    stmt.setString(1, markerid);
+                    stmt.setBinaryStream(2, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
+                    stmt.executeUpdate();
+                }
             }
-            stmt.executeUpdate();
         } catch (SQLException x) {
             Log.severe("Marker write error - " + x.getMessage());
             err = true;
         } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException sx) {} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException sx) {} }
             releaseConnection(c, err);
         }
         return !err;
@@ -835,15 +842,15 @@ public class PostgreSQLMapStorage extends MapStorage {
         BufferInputStream image = null;
         try {
             c = getConnection();
-            PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableMarkerIcons + " WHERE IconName=?;");
-            stmt.setString(1, markerid);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                byte[] img = rs.getBytes("Image");
-                image = new BufferInputStream(img);
+            try (PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableMarkerIcons + " WHERE IconName=?;")) {
+                stmt.setString(1, markerid);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        byte[] img = rs.getBytes("Image");
+                        image = new BufferInputStream(img);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Marker read error - " + x.getMessage());
             err = true;
@@ -857,45 +864,43 @@ public class PostgreSQLMapStorage extends MapStorage {
     public boolean setMarkerFile(String world, String content) {
         Connection c = null;
         boolean err = false;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
             c = getConnection();
             boolean exists = false;
-            stmt = c.prepareStatement("SELECT FileName FROM " + tableMarkerFiles + " WHERE FileName=?;");
-            stmt.setString(1, world);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                exists = true;
+            {
+                try (PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM " + tableMarkerFiles + " WHERE FileName=?;")) {
+                    stmt.setString(1, world);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        exists = rs.next();
+                    }
+                }
             }
-            rs.close();
-            rs = null;
-            stmt.close();
-            stmt = null;
             if (content == null) { // If delete
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
-                stmt = c.prepareStatement("DELETE FROM " + tableMarkerFiles + " WHERE FileName=?;");
-                stmt.setString(1, world);
-                stmt.executeUpdate();
+                try (PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableMarkerFiles + " WHERE FileName=?;")) {
+                    stmt.setString(1, world);
+                    stmt.executeUpdate();
+                }
             }
             else if (exists) {
-                stmt = c.prepareStatement("UPDATE " + tableMarkerFiles + " SET Content=? WHERE FileName=?;");
-                stmt.setBytes(1, content.getBytes(UTF8));
-                stmt.setString(2, world);
+                try (PreparedStatement stmt = c.prepareStatement("UPDATE " + tableMarkerFiles + " SET Content=? WHERE FileName=?;")) {
+                    stmt.setBytes(1, content.getBytes(UTF8));
+                    stmt.setString(2, world);
+                    stmt.executeUpdate();
+                }
             }
             else {
-                stmt = c.prepareStatement("INSERT INTO " + tableMarkerFiles + " (FileName,Content) VALUES (?,?);");
-                stmt.setString(1, world);
-                stmt.setBytes(2, content.getBytes(UTF8));
+                try (PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMarkerFiles + " (FileName,Content) VALUES (?,?);")) {
+                    stmt.setString(1, world);
+                    stmt.setBytes(2, content.getBytes(UTF8));
+                    stmt.executeUpdate();
+                }
             }
-            stmt.executeUpdate();
         } catch (SQLException x) {
             Log.severe("Marker file write error - " + x.getMessage());
             err = true;
         } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException sx) {} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException sx) {} }
             releaseConnection(c, err);
         }
         return !err;
@@ -908,15 +913,15 @@ public class PostgreSQLMapStorage extends MapStorage {
         String content = null;
         try {
             c = getConnection();
-            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableMarkerFiles + " WHERE FileName=?;");
-            stmt.setString(1, world);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                byte[] img = rs.getBytes("Content");
-                content = new String(img, UTF8);
+            try (PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableMarkerFiles + " WHERE FileName=?;")) {
+                stmt.setString(1, world);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        byte[] img = rs.getBytes("Content");
+                        content = new String(img, UTF8);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Marker file read error - " + x.getMessage());
             err = true;
@@ -958,16 +963,16 @@ public class PostgreSQLMapStorage extends MapStorage {
         BufferInputStream content = null;
         try {
             c = getConnection();
-            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;");
-            stmt.setString(1, fileid);
-            stmt.setLong(2, serverID);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                byte[] img = rs.getBytes("Content");
-                content = new BufferInputStream(img);
+            try (PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;")) {
+                stmt.setString(1, fileid);
+                stmt.setLong(2, serverID);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        byte[] img = rs.getBytes("Content");
+                        content = new BufferInputStream(img);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Standalone file read error - " + x.getMessage());
             err = true;
@@ -981,49 +986,47 @@ public class PostgreSQLMapStorage extends MapStorage {
     public boolean setStandaloneFile(String fileid, BufferOutputStream content) {
         Connection c = null;
         boolean err = false;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        boolean exists = false;
         try {
             c = getConnection();
-            boolean exists = false;
-            stmt = c.prepareStatement("SELECT FileName FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;");
-            stmt.setString(1, fileid);
-            stmt.setLong(2, serverID);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                exists = true;
+            {
+                try (PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;")) {
+                    stmt.setString(1, fileid);
+                    stmt.setLong(2, serverID);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        if (rs.next()) {
+                            exists = true;
+                        }
+                    }
+                }
             }
-            rs.close();
-            rs = null;
-            stmt.close();
-            stmt = null;
             if (content == null) { // If delete
                 // If delete, and doesn't exist, quit
                 if (!exists) return true;
-                stmt = c.prepareStatement("DELETE FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;");
-                stmt.setString(1, fileid);
-                stmt.setLong(2, serverID);
-                stmt.executeUpdate();
+                try (PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;")) {
+                    stmt.setString(1, fileid);
+                    stmt.setLong(2, serverID);
+                    stmt.executeUpdate();
+                }
+            } else if (exists) {
+                try (PreparedStatement stmt = c.prepareStatement("UPDATE " + tableStandaloneFiles + " SET Content=? WHERE FileName=? AND ServerID=?;")) {
+                    stmt.setBinaryStream(1, new BufferInputStream(content.buf, content.len), content.len);
+                    stmt.setString(2, fileid);
+                    stmt.setLong(3, serverID);
+                    stmt.executeUpdate();
+                }
+            } else {
+                try (PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableStandaloneFiles + " (FileName,ServerID,Content) VALUES (?,?,?);")) {
+                    stmt.setString(1, fileid);
+                    stmt.setLong(2, serverID);
+                    stmt.setBinaryStream(3, new BufferInputStream(content.buf, content.len), content.len);
+                    stmt.executeUpdate();
+                }
             }
-            else if (exists) {
-                stmt = c.prepareStatement("UPDATE " + tableStandaloneFiles + " SET Content=? WHERE FileName=? AND ServerID=?;");
-                stmt.setBinaryStream(1, new BufferInputStream(content.buf, content.len), content.len);
-                stmt.setString(2, fileid);
-                stmt.setLong(3, serverID);
-            }
-            else {
-                stmt = c.prepareStatement("INSERT INTO " + tableStandaloneFiles + " (FileName,ServerID,Content) VALUES (?,?,?);");
-                stmt.setString(1, fileid);
-                stmt.setLong(2, serverID);
-                stmt.setBinaryStream(3, new BufferInputStream(content.buf, content.len), content.len);
-            }
-            stmt.executeUpdate();
         } catch (SQLException x) {
             Log.severe("Standalone file write error - " + x.getMessage());
             err = true;
         } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException sx) {} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException sx) {} }
             releaseConnection(c, err);
         }
         return !err;
