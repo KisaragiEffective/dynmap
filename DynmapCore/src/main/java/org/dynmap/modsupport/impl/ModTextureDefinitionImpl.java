@@ -265,9 +265,7 @@ public class ModTextureDefinitionImpl implements ModTextureDefinition {
     
     public void writeToFile(File destdir) throws IOException {
         File f = new File(destdir, this.modid + "-texture.txt");
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(f);
+        try (FileWriter fw = new FileWriter(f)) {
             // Write modname line
             String s = "modname:" + this.modid;
             fw.write(s + "\n\n");
@@ -291,10 +289,6 @@ public class ModTextureDefinitionImpl implements ModTextureDefinition {
                 if (line != null) {
                     fw.write(line + "\n");
                 }
-            }
-        } finally {
-            if (fw != null) {
-                fw.close(); 
             }
         }
     }

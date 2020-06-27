@@ -965,15 +965,13 @@ public class CTMTexturePack {
         biomenames = newbiomes;
         
         for(String f : ctpfiles) {
-            InputStream is = null;
-            try {
-                is = tpl.openTPResource(f);
+            try (InputStream is = tpl.openTPResource(f)) {
                 Properties p = new Properties();
-                if(is != null) {
+                if (is != null) {
                     p.load(is);
-                    
+
                     CTMProps ctmp = new CTMProps(p, f, this);
-                    if(ctmp.isValid(f)) {
+                    if (ctmp.isValid(f)) {
                         ctmp.registerTiles(this.vanillatextures, f);
                         bytilelist = addToList(bytilelist, mappedtiles, ctmp.matchTileIcons, ctmp);
                         bybaseblockstatelist = addToList(bybaseblockstatelist, mappedblocks, ctmp.matchBlocks, ctmp);
@@ -981,10 +979,6 @@ public class CTMTexturePack {
                 }
             } catch (IOException iox) {
                 Log.severe("Cannot process CTM file - " + f, iox);
-            } finally {
-                if(is != null) {
-                    try { is.close(); } catch (IOException iox) {}
-                }
             }
         }
 //        for (int i = 0; i < bybaseblockstatelist.length; i++) {

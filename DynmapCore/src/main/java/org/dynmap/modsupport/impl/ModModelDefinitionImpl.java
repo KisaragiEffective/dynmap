@@ -238,9 +238,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
             return;
         }
         File f = new File(destdir, this.txtDef.getModID() + "-models.txt");
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(f);
+        try (FileWriter fw = new FileWriter(f)) {
             // Write modname line
             String s = "modname:" + this.txtDef.getModID();
             fw.write(s + "\n\n");
@@ -274,10 +272,6 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
                     fw.write(line + "\n");
                 }
             }
-        } finally {
-            if (fw != null) {
-                fw.close(); 
-            }
-        }        
+        }
     }
 }

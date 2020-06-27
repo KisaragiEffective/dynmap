@@ -1953,21 +1953,15 @@ api.scheduleWriteJob(); /* Start write job */
             }
             /* Open stream to filename */
             File iconf = new File(file);
-            FileInputStream fis = null;
-            try {
-                fis = new FileInputStream(iconf);
+            try (FileInputStream fis = new FileInputStream(iconf)) {
                 /* Create new icon */
                 MarkerIcon mi = api.createMarkerIcon(id, label, fis);
-                if(mi == null) {
+                if (mi == null) {
                     sender.sendMessage("Error creating icon");
                     return true;
                 }
             } catch (IOException iox) {
                 sender.sendMessage("Error loading icon file - " + iox);
-            } finally {
-                if(fis != null) {
-                    try { fis.close(); } catch (IOException iox) {}
-                }
             }
         }
         else {
@@ -2016,16 +2010,10 @@ api.scheduleWriteJob(); /* Start write job */
             /* Handle new file */
             if(file != null) {
                 File iconf = new File(file);
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(iconf);
-                    ico.setMarkerIconImage(fis);                        
+                try (FileInputStream fis = new FileInputStream(iconf)) {
+                    ico.setMarkerIconImage(fis);
                 } catch (IOException iox) {
                     sender.sendMessage("Error loading icon file - " + iox);
-                } finally {
-                    if(fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                    }
                 }
             }
             sender.sendMessage("Icon '" + ico.getMarkerIconID() + "' updated");

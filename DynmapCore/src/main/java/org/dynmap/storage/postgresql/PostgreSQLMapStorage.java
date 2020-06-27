@@ -309,9 +309,7 @@ public class PostgreSQLMapStorage extends MapStorage {
         return writeConfigPHP(core);
     }
     private boolean writeConfigPHP(DynmapCore core) {
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(new File(baseStandaloneDir, "PostgreSQL_config.php"));
+        try (FileWriter fw = new FileWriter(new File(baseStandaloneDir, "PostgreSQL_config.php"))) {
             fw.write("<?php\n$dbname = '");
             fw.write(WebAuthManager.esc(database));
             fw.write("';\n");
@@ -331,15 +329,11 @@ public class PostgreSQLMapStorage extends MapStorage {
             fw.write(WebAuthManager.esc(prefix));
             fw.write("';\n");
             fw.write("$loginenabled = ");
-            fw.write(core.isLoginSupportEnabled()?"true;\n":"false;\n");
+            fw.write(core.isLoginSupportEnabled() ? "true;\n" : "false;\n");
             fw.write("?>\n");
         } catch (IOException iox) {
             Log.severe("Error writing PostgreSQL_config.php", iox);
-            return false; 
-        } finally {
-            if (fw != null) {
-                try { fw.close(); } catch (IOException x) {}
-            }
+            return false;
         }
         return true;
     }

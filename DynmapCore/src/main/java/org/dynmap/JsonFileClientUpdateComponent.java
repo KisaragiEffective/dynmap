@@ -249,19 +249,11 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         byte[] outputBytes = sb.toString().getBytes(cs_utf8);
         MapManager.scheduleDelayedJob(() -> {
 File f = new File(baseStandaloneDir, "config.js");
-FileOutputStream fos = null;
-try {
-fos = new FileOutputStream(f);
-fos.write(outputBytes);
-} catch (IOException iox) {
-Log.severe("Exception while writing " + f.getPath(), iox);
-} finally {
-if(fos != null) {
-try {
-fos.close();
-} catch (IOException x) {}
-}
-}
+            try (FileOutputStream fos = new FileOutputStream(f)) {
+                fos.write(outputBytes);
+            } catch (IOException iox) {
+                Log.severe("Exception while writing " + f.getPath(), iox);
+            }
         }, 0);
     }
     
@@ -442,22 +434,12 @@ fos.close();
             BufferInputStream bis = storage.getStandaloneFile("dynmap_webchat.json");
             if (bis != null && lastTimestamp != 0) {
                 JSONArray jsonMsgs = null;
-                Reader inputFileReader = null;
-                try {
-                    inputFileReader = new InputStreamReader(bis, cs_utf8);
+                try (Reader inputFileReader = new InputStreamReader(bis, cs_utf8)) {
                     jsonMsgs = (JSONArray) parser.parse(inputFileReader);
                 } catch (IOException ex) {
                     Log.severe("Exception while reading JSON-file.", ex);
                 } catch (ParseException ex) {
                     Log.severe("Exception while parsing JSON-file.", ex);
-                } finally {
-                    if(inputFileReader != null) {
-                        try {
-                            inputFileReader.close();
-                        } catch (IOException iox) {
-
-                        }
-}
                 }
                 if (jsonMsgs != null) {
                     final JSONArray json = jsonMsgs;

@@ -1599,10 +1599,8 @@ public class TexturePack {
         for (String modid : core.getServer().getModList()) {
             File f = core.getServer().getModContainerFile(modid);   // Get mod file
             if ((f != null) && f.isFile()) {
-                ZipFile zf = null;
                 in = null;
-                try {
-                    zf = new ZipFile(f);
+                try (ZipFile zf = new ZipFile(f)) {
                     String fn = "assets/" + modid.toLowerCase() + "/dynmap-texture.txt";
                     ZipEntry ze = zf.getEntry(fn);
                     if (ze != null) {
@@ -1614,11 +1612,11 @@ public class TexturePack {
                 } catch (IOException e) {
                 } finally {
                     if (in != null) {
-                        try { in.close(); } catch (IOException e) { }
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                        }
                         in = null;
-                    }
-                    if (zf != null) {
-                        try { zf.close(); } catch (IOException e) { }
                     }
                 }
             }

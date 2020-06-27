@@ -113,17 +113,11 @@ public class FileTreeMapStorage extends MapStorage {
             if (ff.isFile()) {
                 TileRead tr = new TileRead();
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
-                } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                    }
                 }
                 tr.image = new BufferInputStream(buf);
                 tr.format = fmt;
@@ -477,17 +471,12 @@ public class FileTreeMapStorage extends MapStorage {
         if (ff.exists()) {
             if (getReadLock(baseFilename, 5000)) {
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
                 } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                    }
                     releaseReadLock(baseFilename);
                 }
                 return new BufferInputStream(buf);
@@ -529,17 +518,12 @@ public class FileTreeMapStorage extends MapStorage {
         if (ff.exists()) {
             if (getReadLock(baseFilename, 5000)) {
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
                 } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                    }
                     releaseReadLock(baseFilename);
                 }
                 return new BufferInputStream(buf);
@@ -574,17 +558,12 @@ public class FileTreeMapStorage extends MapStorage {
         if (ff.exists()) {
             if (getReadLock(baseFilename, 5000)) {
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
                 } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                    }
                     releaseReadLock(baseFilename);
                 }
                 return new String(buf, UTF8);

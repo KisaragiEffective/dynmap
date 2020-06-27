@@ -78,24 +78,17 @@ public class ConfigurationNode implements Map<String, Object> {
     public boolean load() {
         initparse();
 
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(f);
+        try (FileInputStream fis = new FileInputStream(f)) {
             Object o = yaml.load(new UnicodeReader(fis));
-            if((o != null) && (o instanceof Map))
-                entries = (Map<String, Object>)o;
+            if ((o != null) && (o instanceof Map))
+                entries = (Map<String, Object>) o;
             fis.close();
-        }
-        catch (YAMLException e) {
-            Log.severe("Error parsing " + f.getPath() + ". Use http://yamllint.com to debug the YAML syntax." );
+        } catch (YAMLException e) {
+            Log.severe("Error parsing " + f.getPath() + ". Use http://yamllint.com to debug the YAML syntax.");
             throw e;
-        } catch(IOException iox) {
+        } catch (IOException iox) {
             Log.severe("Error reading " + f.getPath());
             return false;
-        } finally {
-            if(fis != null) {
-                try { fis.close(); } catch (IOException x) {}
-            }
         }
         return (entries != null);
     }
