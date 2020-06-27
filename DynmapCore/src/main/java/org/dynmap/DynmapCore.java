@@ -47,6 +47,7 @@ import org.dynmap.storage.mariadb.MariaDBMapStorage;
 import org.dynmap.storage.sqllte.SQLiteMapStorage;
 import org.dynmap.storage.postgresql.PostgreSQLMapStorage;
 import org.dynmap.utils.BlockStep;
+import org.dynmap.utils.EnumerationIntoIterator;
 import org.dynmap.utils.ImageIOManager;
 import org.dynmap.web.BanIPFilter;
 import org.dynmap.web.CustomHeaderFilter;
@@ -2345,22 +2346,6 @@ public class DynmapCore implements DynmapCommonAPI {
         /* Open JAR as ZIP */
         String n = null;
         try (ZipFile zf = new ZipFile(jarfile)){
-            class EnumerationIntoIterator<T> implements Iterator<T> {
-                private final Enumeration<T> enumeration;
-                public EnumerationIntoIterator(Enumeration<T> enumeration) {
-                    this.enumeration = enumeration;
-                }
-
-                @Override
-                public boolean hasNext() {
-                    return enumeration.hasMoreElements();
-                }
-
-                @Override
-                public T next() {
-                    return enumeration.nextElement();
-                }
-            }
             Iterator<? extends ZipEntry> e = new EnumerationIntoIterator<>(zf.entries());
             byte[] buf = new byte[2048];
             while (e.hasNext()) {
