@@ -30,7 +30,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
     private static final int POOLSIZE = 5;
     private final Connection[] connectionPool = new Connection[POOLSIZE];
     private int connectionCount = 0;
-    private static final Charset UTF8 = StandardCharsets.UTF_8;
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public SQLiteMapStorageBase() {
         super();
@@ -56,50 +56,54 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         @Override
         public boolean exists() {
             if (mapkey == null) return false;
-            boolean rslt = false;
+            boolean result = false;
             Connection c = null;
             boolean err = false;
             try {
                 c = getConnection();
+                try (
                 Statement stmt = c.createStatement();
-                //ResultSet rs = stmt.executeQuery("SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                ResultSet rs = doExecuteQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                rslt = rs.next();
-                rs.close();
-                stmt.close();
+                ResultSet rs = executeQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ) {
+                    result = rs.next();
+                    rs.close();
+                    stmt.close();
+                }
             } catch (SQLException x) {
                 Log.severe("Tile exists error - " + x.getMessage());
                 err = true;
             } finally {
                 releaseConnection(c, err);
             }
-            return rslt;
+            return result;
         }
 
         @Override
         public boolean matchesHashCode(long hash) {
             if (mapkey == null) return false;
-            boolean rslt = false;
+            boolean result = false;
             Connection c = null;
             boolean err = false;
             try {
                 c = getConnection();
+                try (
                 Statement stmt = c.createStatement();
-                //ResultSet rs = stmt.executeQuery("SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                ResultSet rs = doExecuteQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                if (rs.next()) {
-                    long v = rs.getLong("HashCode");
-                    rslt = (v == hash);
+                ResultSet rs = executeQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ) {
+                    if (rs.next()) {
+                        long actual = rs.getLong("HashCode");
+                        result = (actual == hash);
+                    }
+                    rs.close();
+                    stmt.close();
                 }
-                rs.close();
-                stmt.close();
             } catch (SQLException x) {
                 Log.severe("Tile matches hash error - " + x.getMessage());
                 err = true;
             } finally {
                 releaseConnection(c, err);
             }
-            return rslt;
+            return result;
         }
 
         @Override
@@ -110,25 +114,25 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             boolean err = false;
             try {
                 c = getConnection();
+                try (
                 Statement stmt = c.createStatement();
-                //ResultSet rs = stmt.executeQuery("SELECT HashCode,LastUpdate,Format,Image FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                ResultSet rs = doExecuteQuery(stmt, "SELECT HashCode,LastUpdate,Format,Image,ImageLen FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
-                if (rs.next()) {
-                    rslt = new TileRead();
-                    rslt.hashCode = rs.getLong("HashCode");
-                    rslt.lastModified = rs.getLong("LastUpdate");
-                    rslt.format = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
-                    byte[] img = rs.getBytes("Image");
-                    int len = rs.getInt("ImageLen");
-                    if (len <= 0) {
-                        len = img.length;
-                        // Trim trailing zeros from padding by BLOB field
-                        while((len > 0) && (img[len-1] == '\0')) len--;
+                ResultSet rs = executeQuery(stmt, "SELECT HashCode,LastUpdate,Format,Image,ImageLen FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ) {
+                    if (rs.next()) {
+                        rslt = new TileRead();
+                        rslt.hashCode = rs.getLong("HashCode");
+                        rslt.lastModified = rs.getLong("LastUpdate");
+                        rslt.format = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
+                        byte[] img = rs.getBytes("Image");
+                        int len = rs.getInt("ImageLen");
+                        if (len <= 0) {
+                            len = img.length;
+                            // Trim trailing zeros from padding by BLOB field
+                            while ((len > 0) && (img[len - 1] == '\0')) len--;
+                        }
+                        rslt.image = new BufferInputStream(img, len);
                     }
-                    rslt.image = new BufferInputStream(img, len);
                 }
-                rs.close();
-                stmt.close();
             } catch (SQLException x) {
                 Log.severe("Tile read error - " + x.getMessage());
                 err = true;
@@ -149,41 +153,41 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
 
             try {
                 c = getConnection();
-                PreparedStatement stmt;
                 if (encImage == null) { // If delete
-                    stmt = c.prepareStatement("DELETE FROM Tiles WHERE MapID=? AND x=? and y=? AND zoom=?;");
-                    stmt.setInt(1, mapkey);
-                    stmt.setInt(2, x);
-                    stmt.setInt(3, y);
-                    stmt.setInt(4, zoom);
+                    try (PreparedStatement stmt = c.prepareStatement("DELETE FROM Tiles WHERE MapID=? AND x=? and y=? AND zoom=?;")) {
+                        stmt.setInt(1, mapkey);
+                        stmt.setInt(2, x);
+                        stmt.setInt(3, y);
+                        stmt.setInt(4, zoom);
+                        executeUpdate(stmt);
+                    }
+                } else if (exists) {
+                    try (PreparedStatement stmt = c.prepareStatement("UPDATE Tiles SET HashCode=?, LastUpdate=?, Format=?, Image=?, ImageLen=? WHERE MapID=? AND x=? and y=? AND zoom=?;")) {
+                        stmt.setLong(1, hash);
+                        stmt.setLong(2, System.currentTimeMillis());
+                        stmt.setInt(3, map.getImageFormat().getEncoding().ordinal());
+                        stmt.setBytes(4, encImage.buf);
+                        stmt.setInt(5, encImage.len);
+                        stmt.setInt(6, mapkey);
+                        stmt.setInt(7, x);
+                        stmt.setInt(8, y);
+                        stmt.setInt(9, zoom);
+                        executeUpdate(stmt);
+                    }
+                } else {
+                    try (PreparedStatement stmt = c.prepareStatement("INSERT INTO Tiles (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image,ImageLen) VALUES (?,?,?,?,?,?,?,?,?);")) {
+                        stmt.setInt(1, mapkey);
+                        stmt.setInt(2, x);
+                        stmt.setInt(3, y);
+                        stmt.setInt(4, zoom);
+                        stmt.setLong(5, hash);
+                        stmt.setLong(6, System.currentTimeMillis());
+                        stmt.setInt(7, map.getImageFormat().getEncoding().ordinal());
+                        stmt.setBytes(8, encImage.buf);
+                        stmt.setInt(9, encImage.len);
+                        executeUpdate(stmt);
+                    }
                 }
-                else if (exists) {
-                    stmt = c.prepareStatement("UPDATE Tiles SET HashCode=?, LastUpdate=?, Format=?, Image=?, ImageLen=? WHERE MapID=? AND x=? and y=? AND zoom=?;");
-                    stmt.setLong(1, hash);
-                    stmt.setLong(2, System.currentTimeMillis());
-                    stmt.setInt(3, map.getImageFormat().getEncoding().ordinal());
-                    stmt.setBytes(4, encImage.buf);
-                    stmt.setInt(5, encImage.len);
-                    stmt.setInt(6, mapkey);
-                    stmt.setInt(7, x);
-                    stmt.setInt(8, y);
-                    stmt.setInt(9, zoom);
-                }
-                else {
-                    stmt = c.prepareStatement("INSERT INTO Tiles (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image,ImageLen) VALUES (?,?,?,?,?,?,?,?,?);");
-                    stmt.setInt(1, mapkey);
-                    stmt.setInt(2, x);
-                    stmt.setInt(3, y);
-                    stmt.setInt(4, zoom);
-                    stmt.setLong(5, hash);
-                    stmt.setLong(6, System.currentTimeMillis());
-                    stmt.setInt(7, map.getImageFormat().getEncoding().ordinal());
-                    stmt.setBytes(8, encImage.buf);
-                    stmt.setInt(9, encImage.len);
-                }
-                //stmt.executeUpdate();
-                doExecuteUpdate(stmt);
-                stmt.close();
                 // Signal update for zoom out
                 if (zoom == 0) {
                     world.enqueueZoomOutUpdate(this);
@@ -288,14 +292,16 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         Connection c = null;
         try {
             c = getConnection();    // Get connection (create DB if needed)
+            try (
             Statement stmt = c.createStatement();
-            //ResultSet rs = stmt.executeQuery( "SELECT level FROM SchemaVersion;");
-            ResultSet rs = doExecuteQuery(stmt, "SELECT level FROM SchemaVersion;");
-            if (rs.next()) {
-                ver = rs.getInt("level");
+            ResultSet rs = executeQuery(stmt, "SELECT level FROM SchemaVersion;");
+            ) {
+                if (rs.next()) {
+                    ver = rs.getInt("level");
+                }
+                rs.close();
+                stmt.close();
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             err = true;
         } finally {
@@ -306,8 +312,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
 
     private void doUpdate(Connection c, String sql) throws SQLException {
         Statement stmt = c.createStatement();
-        //stmt.executeUpdate(sql);
-        doExecuteUpdate(stmt, sql);
+        executeUpdate(stmt, sql);
         stmt.close();
     }
 
@@ -321,18 +326,18 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         // Read the maps table - cache results
         try {
             c = getConnection();
+            try (
             Statement stmt = c.createStatement();
-            //ResultSet rs = stmt.executeQuery("SELECT * from Maps;");
-            ResultSet rs = doExecuteQuery(stmt, "SELECT * from Maps;");
-            while (rs.next()) {
-                int key = rs.getInt("ID");
-                String worldID = rs.getString("WorldID");
-                String mapID = rs.getString("MapID");
-                String variant = rs.getString("Variant");
-                mapKey.put(worldID + ":" + mapID + ":" + variant, key);
+            ResultSet rs = executeQuery(stmt, "SELECT * from Maps;");
+            ) {
+                while (rs.next()) {
+                    int key = rs.getInt("ID");
+                    String worldID = rs.getString("WorldID");
+                    String mapID = rs.getString("MapID");
+                    String variant = rs.getString("Variant");
+                    mapKey.put(worldID + ":" + mapID + ":" + variant, key);
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Error loading map table - " + x.getMessage());
             err = true;
@@ -351,26 +356,26 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 try {
                     c = getConnection();
                     // Insert row
-                    PreparedStatement stmt = c.prepareStatement("INSERT INTO Maps (WorldID,MapID,Variant) VALUES (?, ?, ?);");
-                    stmt.setString(1, w.getName());
-                    stmt.setString(2, mt.getPrefix());
-                    stmt.setString(3, var.toString());
-                    //stmt.executeUpdate();
-                    doExecuteUpdate(stmt);
-                    stmt.close();
-                    //  Query key assigned
-                    stmt = c.prepareStatement("SELECT ID FROM Maps WHERE WorldID = ? AND MapID = ? AND Variant = ?;");
-                    stmt.setString(1, w.getName());
-                    stmt.setString(2, mt.getPrefix());
-                    stmt.setString(3, var.toString());
-                    //ResultSet rs = stmt.executeQuery();
-                    ResultSet rs = doExecuteQuery(stmt);
-                    if (rs.next()) {
-                        k = rs.getInt("ID");
-                        mapKey.put(id, k);
+                    try (PreparedStatement stmt = c.prepareStatement("INSERT INTO Maps (WorldID,MapID,Variant) VALUES (?, ?, ?);")) {
+                        stmt.setString(1, w.getName());
+                        stmt.setString(2, mt.getPrefix());
+                        stmt.setString(3, var.toString());
+                        executeUpdate(stmt);
+                        stmt.close();
                     }
-                    rs.close();
-                    stmt.close();
+                    //  Query key assigned
+                    try (PreparedStatement stmt = c.prepareStatement("SELECT ID FROM Maps WHERE WorldID = ? AND MapID = ? AND Variant = ?;")) {
+                        stmt.setString(1, w.getName());
+                        stmt.setString(2, mt.getPrefix());
+                        stmt.setString(3, var.toString());
+
+                        try (ResultSet rs = executeQuery(stmt)) {
+                            if (rs.next()) {
+                                k = rs.getInt("ID");
+                                mapKey.put(id, k);
+                            }
+                        }
+                    }
                 } catch (SQLException x) {
                     Log.severe("Error updating Maps table - " + x.getMessage());
                     err = true;
@@ -452,7 +457,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                         try {
                             connectionPool.wait();
                         } catch (InterruptedException e) {
-                            throw new SQLException("Interruped");
+                            throw new SQLException("Interrupted");
                         }
                     }
                 }
@@ -462,9 +467,9 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
     }
 
     private static Connection configureConnection(Connection conn) throws SQLException {
-        final Statement statement = conn.createStatement();
-        statement.execute("PRAGMA journal_mode = WAL;");
-        statement.close();
+        try (Statement statement = conn.createStatement()) {
+            statement.execute("PRAGMA journal_mode = WAL;");
+        }
         return conn;
     }
 
@@ -522,18 +527,12 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         if (coord.length < 3) { // 3 or 4
             return null;
         }
-        int zoom = 0;
-        int x, y;
         try {
-            if (coord[0].charAt(0) == 'z') {
-                zoom = coord[0].length();
-                x = Integer.parseInt(coord[1]);
-                y = Integer.parseInt(coord[2]);
-            }
-            else {
-                x = Integer.parseInt(coord[0]);
-                y = Integer.parseInt(coord[1]);
-            }
+            // [zoom]? <x> <y>
+            boolean isZoomed = coord[0].charAt(0) == 'z';
+            int zoom = isZoomed ? coord[0].length() : 0;
+            int x = isZoomed ? Integer.parseInt(coord[1]) : Integer.parseInt(coord[0]);
+            int y = isZoomed ? Integer.parseInt(coord[2]) : Integer.parseInt(coord[1]);
             return getTile(world, mt, x, y, zoom, imgvar);
         } catch (NumberFormatException nfx) {
             return null;
@@ -575,22 +574,22 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         try {
             c = getConnection();
             // Query tiles for given mapkey
+            try (
             Statement stmt = c.createStatement();
-            //ResultSet rs = stmt.executeQuery("SELECT x,y,zoom,Format FROM Tiles WHERE MapID=" + mapkey + ";");
-            ResultSet rs = doExecuteQuery(stmt, "SELECT x,y,zoom,Format FROM Tiles WHERE MapID=" + mapkey + ";");
-            while (rs.next()) {
-                SQLiteMapStorageBase.StorageTile st = new SQLiteMapStorageBase.StorageTile(world, map, rs.getInt("x"), rs.getInt("y"), rs.getInt("zoom"), var);
-                final MapType.ImageEncoding encoding = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
-                if(cb != null)
-                    cb.tileFound(st, encoding);
-                if(cbBase != null && st.zoom == 0)
-                    cbBase.tileFound(st, encoding);
-                st.cleanup();
+            ResultSet rs = executeQuery(stmt, "SELECT x,y,zoom,Format FROM Tiles WHERE MapID=" + mapkey + ";");
+            ) {
+                while (rs.next()) {
+                    SQLiteMapStorageBase.StorageTile st = new SQLiteMapStorageBase.StorageTile(world, map, rs.getInt("x"), rs.getInt("y"), rs.getInt("zoom"), var);
+                    final MapType.ImageEncoding encoding = MapType.ImageEncoding.fromOrd(rs.getInt("Format"));
+                    if (cb != null)
+                        cb.tileFound(st, encoding);
+                    if (cbBase != null && st.zoom == 0)
+                        cbBase.tileFound(st, encoding);
+                    st.cleanup();
+                }
+                if (cbEnd != null)
+                    cbEnd.searchEnded();
             }
-            if(cbEnd != null)
-                cbEnd.searchEnded();
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Tile enum error - " + x.getMessage());
             err = true;
@@ -610,17 +609,16 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         });
     }
     private void processPurgeMapTiles(DynmapWorld world, MapType map, MapType.ImageVariant var) {
-        Connection c = null;
-        boolean err = false;
         Integer mapkey = getMapKey(world, map, var);
         if (mapkey == null) return;
+        boolean err = false;
+        Connection c = null;
         try {
             c = getConnection();
             // Query tiles for given mapkey
-            Statement stmt = c.createStatement();
-            //stmt.executeUpdate("DELETE FROM Tiles WHERE MapID=" + mapkey + ";");
-            doExecuteUpdate(stmt, "DELETE FROM Tiles WHERE MapID=" + mapkey + ";");
-            stmt.close();
+            try (Statement stmt = c.createStatement()) {
+                executeUpdate(stmt, "DELETE FROM Tiles WHERE MapID=" + mapkey + ";");
+            }
         } catch (SQLException x) {
             Log.severe("Tile purge error - " + x.getMessage());
             err = true;
@@ -632,12 +630,12 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
     @Override
     public boolean setPlayerFaceImage(String playername, PlayerFaces.FaceType facetype,
                                       BufferOutputStream encImage) {
-        Connection c = null;
-        boolean err = false;
         boolean exists = hasPlayerFaceImage(playername, facetype);
         // If delete, and doesn't exist, quit
         if ((encImage == null) && (!exists)) return false;
 
+        Connection c = null;
+        boolean err = false;
         try {
             c = getConnection();
             PreparedStatement stmt;
@@ -645,23 +643,20 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 stmt = c.prepareStatement("DELETE FROM Faces WHERE PlayerName=? AND TypeIDx=?;");
                 stmt.setString(1, playername);
                 stmt.setInt(2, facetype.typeID);
-            }
-            else if (exists) {
+            } else if (exists) {
                 stmt = c.prepareStatement("UPDATE Faces SET Image=?,ImageLen=? WHERE PlayerName=? AND TypeID=?;");
                 stmt.setBytes(1, encImage.buf);
                 stmt.setInt(2, encImage.len);
                 stmt.setString(3, playername);
                 stmt.setInt(4, facetype.typeID);
-            }
-            else {
+            } else {
                 stmt = c.prepareStatement("INSERT INTO Faces (PlayerName,TypeID,Image,ImageLen) VALUES (?,?,?,?);");
                 stmt.setString(1, playername);
                 stmt.setInt(2, facetype.typeID);
                 stmt.setBytes(3, encImage.buf);
                 stmt.setInt(4, encImage.len);
             }
-            //stmt.executeUpdate();
-            doExecuteUpdate(stmt);
+            executeUpdate(stmt);
             stmt.close();
         } catch (SQLException x) {
             Log.severe("Face write error - " + x.getMessage());
@@ -680,23 +675,25 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         BufferInputStream image = null;
         try {
             c = getConnection();
+            try (
             PreparedStatement stmt = c.prepareStatement("SELECT Image,ImageLen FROM Faces WHERE PlayerName=? AND TypeID=?;");
-            stmt.setString(1, playername);
-            stmt.setInt(2, facetype.typeID);
-            //ResultSet rs = stmt.executeQuery();
-            ResultSet rs = doExecuteQuery(stmt);
-            if (rs.next()) {
-                byte[] img = rs.getBytes("Image");
-                int len = rs.getInt("imageLen");
-                if (len <= 0) {
-                    len = img.length;
-                    // Trim trailing zeros from padding by BLOB field
-                    while((len > 0) && (img[len-1] == '\0')) len--;
+            ) {
+                stmt.setString(1, playername);
+                stmt.setInt(2, facetype.typeID);
+
+                try (ResultSet rs = executeQuery(stmt)) {
+                    if (rs.next()) {
+                        byte[] img = rs.getBytes("Image");
+                        int len = rs.getInt("imageLen");
+                        if (len <= 0) {
+                            len = img.length;
+                            // Trim trailing zeros from padding by BLOB field
+                            while ((len > 0) && (img[len - 1] == '\0')) len--;
+                        }
+                        image = new BufferInputStream(img, len);
+                    }
                 }
-                image = new BufferInputStream(img, len);
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Face read error - " + x.getMessage());
             err = true;
@@ -713,16 +710,15 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         boolean exists = false;
         try {
             c = getConnection();
+            try (
             PreparedStatement stmt = c.prepareStatement("SELECT TypeID FROM Faces WHERE PlayerName=? AND TypeID=?;");
-            stmt.setString(1, playername);
-            stmt.setInt(2, facetype.typeID);
-            //ResultSet rs = stmt.executeQuery();
-            ResultSet rs = doExecuteQuery(stmt);
-            if (rs.next()) {
-                exists = true;
+            ) {
+                stmt.setString(1, playername);
+                stmt.setInt(2, facetype.typeID);
+                try (ResultSet rs = executeQuery(stmt)) {
+                    exists = rs.next();
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Face exists error - " + x.getMessage());
             err = true;
@@ -736,50 +732,51 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
     public boolean setMarkerImage(String markerid, BufferOutputStream encImage) {
         Connection c = null;
         boolean err = false;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
             c = getConnection();
             boolean exists = false;
-            stmt = c.prepareStatement("SELECT IconName FROM MarkerIcons WHERE IconName=?;");
-            stmt.setString(1, markerid);
-            rs = doExecuteQuery(stmt);
-            if (rs.next()) {
-                exists = true;
+            try (
+            PreparedStatement stmt = c.prepareStatement("SELECT IconName FROM MarkerIcons WHERE IconName=?;");
+            ) {
+                stmt.setString(1, markerid);
+                try (ResultSet rs = executeQuery(stmt)) {
+                    exists = rs.next();
+                }
             }
-            rs.close();
-            rs = null;
-            stmt.close();
-            stmt = null;
             if (encImage == null) { // If delete
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
-                stmt = c.prepareStatement("DELETE FROM MarkerIcons WHERE IconName=?;");
-                stmt.setString(1, markerid);
-                //stmt.executeUpdate();
-                doExecuteUpdate(stmt);
+                try (
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM MarkerIcons WHERE IconName=?;");
+                ) {
+                    stmt.setString(1, markerid);
+                    executeUpdate(stmt);
+                }
             }
             else if (exists) {
-                stmt = c.prepareStatement("UPDATE MarkerIcons SET Image=?,ImageLen=? WHERE IconName=?;");
-                stmt.setBytes(1, encImage.buf);
-                stmt.setInt(2, encImage.len);
-                stmt.setString(3, markerid);
+                try (
+                PreparedStatement stmt = c.prepareStatement("UPDATE MarkerIcons SET Image=?,ImageLen=? WHERE IconName=?;");
+                ) {
+                    stmt.setBytes(1, encImage.buf);
+                    stmt.setInt(2, encImage.len);
+                    stmt.setString(3, markerid);
+                    executeUpdate(stmt);
+                }
             }
             else {
-                stmt = c.prepareStatement("INSERT INTO MarkerIcons (IconName,Image,ImageLen) VALUES (?,?,?);");
-                stmt.setString(1, markerid);
-                stmt.setBytes(2, encImage.buf);
-                stmt.setInt(3, encImage.len);
+                try (
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO MarkerIcons (IconName,Image,ImageLen) VALUES (?,?,?);");
+                ) {
+                    stmt.setString(1, markerid);
+                    stmt.setBytes(2, encImage.buf);
+                    stmt.setInt(3, encImage.len);
+                    executeUpdate(stmt);
+                }
             }
-            doExecuteUpdate(stmt);
-            stmt.close();
-            stmt = null;
         } catch (SQLException x) {
             Log.severe("Marker write error - " + x.getMessage());
             err = true;
         } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException sx) {} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException sx) {} }
             releaseConnection(c, err);
         }
         return !err;
@@ -792,22 +789,23 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         BufferInputStream image = null;
         try {
             c = getConnection();
+            try (
             PreparedStatement stmt = c.prepareStatement("SELECT Image,ImageLen FROM MarkerIcons WHERE IconName=?;");
-            stmt.setString(1, markerid);
-            //ResultSet rs = stmt.executeQuery();
-            ResultSet rs = doExecuteQuery(stmt);
-            if (rs.next()) {
-                byte[] img = rs.getBytes("Image");
-                int len = rs.getInt("ImageLen");
-                if (len <= 0) {
-                    len = img.length;
-                    // Trim trailing zeros from padding by BLOB field
-                    while((len > 0) && (img[len-1] == '\0')) len--;
+            ) {
+                stmt.setString(1, markerid);
+                try (ResultSet rs = executeQuery(stmt)) {
+                    if (rs.next()) {
+                        byte[] img = rs.getBytes("Image");
+                        int len = rs.getInt("ImageLen");
+                        if (len <= 0) {
+                            len = img.length;
+                            // Trim trailing zeros from padding by BLOB field
+                            while ((len > 0) && (img[len - 1] == '\0')) len--;
+                        }
+                        image = new BufferInputStream(img);
+                    }
                 }
-                image = new BufferInputStream(img);
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Marker read error - " + x.getMessage());
             err = true;
@@ -821,46 +819,47 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
     public boolean setMarkerFile(String world, String content) {
         Connection c = null;
         boolean err = false;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         try {
             c = getConnection();
-            boolean exists = false;
-            stmt = c.prepareStatement("SELECT FileName FROM MarkerFiles WHERE FileName=?;");
-            stmt.setString(1, world);
-            rs = doExecuteQuery(stmt);
-            if (rs.next()) {
-                exists = true;
+            boolean exists;
+            try (
+            PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM MarkerFiles WHERE FileName=?;");
+            ) {
+                stmt.setString(1, world);
+                try (ResultSet rs = executeQuery(stmt);) {
+                    exists = rs.next();
+                }
             }
-            rs.close();
-            rs = null;
-            stmt.close();
-            stmt = null;
             if (content == null) { // If delete
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
-                stmt = c.prepareStatement("DELETE FROM MarkerFiles WHERE FileName=?;");
-                stmt.setString(1, world);
-                doExecuteUpdate(stmt);
+                try (
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM MarkerFiles WHERE FileName=?;");
+                ) {
+                    stmt.setString(1, world);
+                    executeUpdate(stmt);
+                }
+            } else if (exists) {
+                try (
+                PreparedStatement stmt = c.prepareStatement("UPDATE MarkerFiles SET Content=? WHERE FileName=?;");
+                ) {
+                    stmt.setBytes(1, content.getBytes(CHARSET));
+                    stmt.setString(2, world);
+                    executeUpdate(stmt);
+                }
+            } else {
+                try (
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO MarkerFiles (FileName,Content) VALUES (?,?);");
+                ) {
+                    stmt.setString(1, world);
+                    stmt.setBytes(2, content.getBytes(CHARSET));
+                    executeUpdate(stmt);
+                }
             }
-            else if (exists) {
-                stmt = c.prepareStatement("UPDATE MarkerFiles SET Content=? WHERE FileName=?;");
-                stmt.setBytes(1, content.getBytes(UTF8));
-                stmt.setString(2, world);
-            }
-            else {
-                stmt = c.prepareStatement("INSERT INTO MarkerFiles (FileName,Content) VALUES (?,?);");
-                stmt.setString(1, world);
-                stmt.setBytes(2, content.getBytes(UTF8));
-            }
-            //stmt.executeUpdate();
-            doExecuteUpdate(stmt);
         } catch (SQLException x) {
             Log.severe("Marker file write error - " + x.getMessage());
             err = true;
         } finally {
-            if (rs != null) { try { rs.close(); } catch (SQLException sx) {} }
-            if (stmt != null) { try { stmt.close(); } catch (SQLException sx) {} }
             releaseConnection(c, err);
         }
         return !err;
@@ -873,16 +872,18 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         String content = null;
         try {
             c = getConnection();
+            try (
             PreparedStatement stmt = c.prepareStatement("SELECT Content FROM MarkerFiles WHERE FileName=?;");
-            stmt.setString(1, world);
-            //ResultSet rs = stmt.executeQuery();
-            ResultSet rs = doExecuteQuery(stmt);
-            if (rs.next()) {
-                byte[] img = rs.getBytes("Content");
-                content = new String(img, UTF8);
+            ) {
+                stmt.setString(1, world);
+
+                try (ResultSet rs = executeQuery(stmt);) {
+                    if (rs.next()) {
+                        byte[] img = rs.getBytes("Content");
+                        content = new String(img, CHARSET);
+                    }
+                }
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Marker file read error - " + x.getMessage());
             err = true;
@@ -912,7 +913,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         super.addPaths(sb, core);
     }
 
-    private ResultSet doExecuteQuery(PreparedStatement statement) throws SQLException {
+    private ResultSet executeQuery(PreparedStatement statement) throws SQLException {
         while (true) {
             try {
                 return statement.executeQuery();
@@ -923,7 +924,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             }
         }
     }
-    private ResultSet doExecuteQuery(Statement statement, String sql) throws SQLException {
+    private ResultSet executeQuery(Statement statement, String sql) throws SQLException {
         while (true) {
             try {
                 return statement.executeQuery(sql);
@@ -934,7 +935,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             }
         }
     }
-    private int doExecuteUpdate(PreparedStatement statement) throws SQLException {
+    private int executeUpdate(PreparedStatement statement) throws SQLException {
         while (true) {
             try {
                 return statement.executeUpdate();
@@ -945,7 +946,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             }
         }
     }
-    private int doExecuteUpdate(Statement statement, String sql) throws SQLException {
+    private int executeUpdate(Statement statement, String sql) throws SQLException {
         while (true) {
             try {
                 return statement.executeUpdate(sql);
