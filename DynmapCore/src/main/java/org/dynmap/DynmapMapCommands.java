@@ -139,86 +139,86 @@ public class DynmapMapCommands {
         
         boolean did_update = false;
         for(int i = 2; i < args.length; i++) {
-            String[] tok = args[i].split(":");  /* Split at colon */
-            if(tok.length != 2) {
+            String[] token = args[i].split(":");  /* Split at colon */
+            if(token.length != 2) {
                 sender.sendMessage("Syntax error: " + args[i]);
                 return false;
             }
-            if(tok[0].equalsIgnoreCase("enabled")) {
-                did_update |= core.setWorldEnable(wname, !tok[1].equalsIgnoreCase("false"));
+            if(token[0].equalsIgnoreCase("enabled")) {
+                did_update |= core.setWorldEnable(wname, !token[1].equalsIgnoreCase("false"));
             }
-            else if(tok[0].equalsIgnoreCase("title")) {
+            else if(token[0].equalsIgnoreCase("title")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set extrazoomout on disabled or undefined world");
                     return true;
                 }
-                w.setTitle(tok[1]);
+                w.setTitle(token[1]);
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("sendposition")) {
+            else if(token[0].equalsIgnoreCase("sendposition")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set sendposition on disabled or undefined world");
                     return true;
                 }
-                w.sendposition = tok[1].equals("true");
+                w.sendposition = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("sendhealth")) {
+            else if(token[0].equalsIgnoreCase("sendhealth")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set sendhealth on disabled or undefined world");
                     return true;
                 }
-                w.sendhealth = tok[1].equals("true");
+                w.sendhealth = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("showborder")) {
+            else if(token[0].equalsIgnoreCase("showborder")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set sendworldborder on disabled or undefined world");
                     return true;
                 }
-                w.showborder = tok[1].equals("true");
+                w.showborder = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("protected")) {
+            else if(token[0].equalsIgnoreCase("protected")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set protected on disabled or undefined world");
                     return true;
                 }
-                w.is_protected = tok[1].equals("true");
+                w.is_protected = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("extrazoomout")) {  /* Extrazoomout setting */
+            else if(token[0].equalsIgnoreCase("extrazoomout")) {  /* Extrazoomout setting */
                 if(w == null) {
                     sender.sendMessage("Cannot set extrazoomout on disabled or undefined world");
                     return true;
                 }
                 int exo = -1;
                 try {
-                    exo = Integer.parseInt(tok[1]);
+                    exo = Integer.parseInt(token[1]);
                 } catch (NumberFormatException nfx) {}
                 if((exo < 0) || (exo > 32)) {
-                    sender.sendMessage("Invalid value for extrazoomout: " + tok[1]);
+                    sender.sendMessage("Invalid value for extrazoomout: " + token[1]);
                     return true;
                 }
                 did_update |= core.setWorldZoomOut(wname, exo);
             }
-            else if(tok[0].equalsIgnoreCase("tileupdatedelay")) {  /* tileupdatedelay setting */
+            else if(token[0].equalsIgnoreCase("tileupdatedelay")) {  /* tileupdatedelay setting */
                 if(w == null) {
                     sender.sendMessage("Cannot set tileupdatedelay on disabled or undefined world");
                     return true;
                 }
                 int tud = -1;
                 try {
-                    tud = Integer.parseInt(tok[1]);
+                    tud = Integer.parseInt(token[1]);
                 } catch (NumberFormatException nfx) {}
                 did_update |= core.setWorldTileUpdateDelay(wname, tud);
             }
-            else if(tok[0].equalsIgnoreCase("center")) {    /* Center */
+            else if(token[0].equalsIgnoreCase("center")) {    /* Center */
                 if(w == null) {
                     sender.sendMessage("Cannot set center on disabled or undefined world");
                     return true;
@@ -226,19 +226,18 @@ public class DynmapMapCommands {
                 boolean good = false;
                 DynmapLocation loc = null;
                 try {
-                    String[] toks = tok[1].split("/");
+                    String[] toks = token[1].split("/");
                     if(toks.length == 3) {
-                        double x, y, z;
-                        x = Double.parseDouble(toks[0]);
-                        y = Double.parseDouble(toks[1]);
-                        z = Double.parseDouble(toks[2]);
+                        double x = Double.parseDouble(toks[0]);
+                        double y = Double.parseDouble(toks[1]);
+                        double z = Double.parseDouble(toks[2]);
                         loc = new DynmapLocation(wname, x, y, z);
                        good = true;
                     }
-                    else if(tok[1].equalsIgnoreCase("default")) {
+                    else if(token[1].equalsIgnoreCase("default")) {
                         good = true;
                     }
-                    else if(tok[1].equalsIgnoreCase("here")) {
+                    else if(token[1].equalsIgnoreCase("here")) {
                         if(sender instanceof DynmapPlayer) {
                             loc = ((DynmapPlayer)sender).getLocation();
                             good = true;
@@ -255,14 +254,14 @@ public class DynmapMapCommands {
                 }
                 did_update |= core.setWorldCenter(wname, loc);
             }
-            else if(tok[0].equalsIgnoreCase("order")) {
+            else if(token[0].equalsIgnoreCase("order")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set order on disabled or undefined world");
                     return true;
                 }
                 int order = -1;
                 try {
-                    order = Integer.parseInt(tok[1]);
+                    order = Integer.parseInt(token[1]);
                 } catch (NumberFormatException nfx) {}
                 if(order < 1) {
                     sender.sendMessage("Order value must be number from 1 to number of worlds");
@@ -422,7 +421,6 @@ public class DynmapMapCommands {
                 .filter(map -> map.getName().equals(mname))
                 .findFirst()
                 .orElse(null);
-        /* Find the map */
         /* If new, make default map instance */
         if(isnew) {
             if(mt != null) {
