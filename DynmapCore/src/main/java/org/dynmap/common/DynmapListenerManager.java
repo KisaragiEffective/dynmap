@@ -135,8 +135,7 @@ public class DynmapListenerManager {
     }
     /* Clean up registered listeners */
     public void cleanup() {
-        for(List<EventListener> l : listeners.values())
-            l.clear();
+        listeners.values().forEach(List::clear);
         listeners.clear();
     }
 }

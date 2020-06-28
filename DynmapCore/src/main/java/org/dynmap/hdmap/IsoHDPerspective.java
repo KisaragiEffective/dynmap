@@ -1247,9 +1247,8 @@ public class IsoHDPerspective implements HDPerspective {
                 ps.direction.set(ps.bottom);
                 ps.direction.subtract(ps.top);
                 ps.py = y / sizescale;
-                for (HDShaderState hdShaderState : shaderstate) {
-                    hdShaderState.reset(ps);
-                }
+                Arrays.stream(shaderstate)
+                        .forEachOrdered(hdShaderState -> hdShaderState.reset(ps));
                 try {
                     ps.raytrace(cache, shaderstate, shaderdone);
                 } catch (Exception ex) {

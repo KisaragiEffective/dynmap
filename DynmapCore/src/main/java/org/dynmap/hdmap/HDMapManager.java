@@ -32,21 +32,21 @@ public class HDMapManager {
         }
         ConfigurationNode shadercfg = new ConfigurationNode(f);
         shadercfg.load();
-        
-        for(HDShader shader : shadercfg.<HDShader>createInstances("shaders", new Class<?>[] { DynmapCore.class }, new Object[] { core })) {
-            if(shader.getName() == null) continue;
-            shaders.put(shader.getName(), shader);
-        }
+
+        shadercfg.<HDShader>createInstances("shaders", new Class<?>[]{DynmapCore.class}, new Object[]{core})
+                .stream()
+                .filter(shader -> shader.getName() != null)
+                .forEachOrdered(shader -> shaders.put(shader.getName(), shader));
         /* Load custom shaders, if file is defined - or create empty one if not */
         f = new File(core.getDataFolder(), "custom-shaders.txt");
         core.createDefaultFileFromResource("/custom-shaders.txt", f);
         if(f.exists()) {
             ConfigurationNode customshadercfg = new ConfigurationNode(f);
             customshadercfg.load();
-            for(HDShader shader : customshadercfg.<HDShader>createInstances("shaders", new Class<?>[] { DynmapCore.class }, new Object[] { core })) {
-                if(shader.getName() == null) continue;
-                shaders.put(shader.getName(), shader);
-            }
+            customshadercfg.<HDShader>createInstances("shaders", new Class<?>[]{DynmapCore.class}, new Object[]{core})
+                    .stream()
+                    .filter(shader -> shader.getName() != null)
+                    .forEachOrdered(shader -> shaders.put(shader.getName(), shader));
         }
         Log.info("Loaded " + shaders.size() + " shaders.");
     }
@@ -62,20 +62,20 @@ public class HDMapManager {
         }
         ConfigurationNode perspectivecfg = new ConfigurationNode(f);
         perspectivecfg.load();
-        for(HDPerspective perspective : perspectivecfg.<HDPerspective>createInstances("perspectives", new Class<?>[] { DynmapCore.class }, new Object[] { core })) {
-            if(perspective.getName() == null) continue;
-            perspectives.put(perspective.getName(), perspective);
-        }
+        perspectivecfg.<HDPerspective>createInstances("perspectives", new Class<?>[]{DynmapCore.class}, new Object[]{core})
+                .stream()
+                .filter(perspective -> perspective.getName() != null)
+                .forEachOrdered(perspective -> perspectives.put(perspective.getName(), perspective));
         /* Load custom perspectives, if file is defined - or create empty one if not */
         f = new File(core.getDataFolder(), "custom-perspectives.txt");
         core.createDefaultFileFromResource("/custom-perspectives.txt", f);
         if(f.exists()) {
             perspectivecfg = new ConfigurationNode(f);
             perspectivecfg.load();
-            for(HDPerspective perspective : perspectivecfg.<HDPerspective>createInstances("perspectives", new Class<?>[] { DynmapCore.class }, new Object[] { core })) {
-                if(perspective.getName() == null) continue;
-                perspectives.put(perspective.getName(), perspective);
-            }
+            perspectivecfg.<HDPerspective>createInstances("perspectives", new Class<?>[]{DynmapCore.class}, new Object[]{core})
+                    .stream()
+                    .filter(perspective -> perspective.getName() != null)
+                    .forEachOrdered(perspective -> perspectives.put(perspective.getName(), perspective));
         }
         Log.info("Loaded " + perspectives.size() + " perspectives.");
     }
@@ -89,20 +89,20 @@ public class HDMapManager {
         ConfigurationNode lightingcfg = new ConfigurationNode(f);
         lightingcfg.load();
 
-        for(HDLighting lighting : lightingcfg.<HDLighting>createInstances("lightings", new Class<?>[] { DynmapCore.class }, new Object[] { core })) {
-            if(lighting.getName() == null) continue;
-            lightings.put(lighting.getName(), lighting);
-        }
+        lightingcfg.<HDLighting>createInstances("lightings", new Class<?>[]{DynmapCore.class}, new Object[]{core})
+                .stream()
+                .filter(lighting -> lighting.getName() != null)
+                .forEachOrdered(lighting -> lightings.put(lighting.getName(), lighting));
         /* Load custom lightings, if file is defined - or create empty one if not */
         f = new File(core.getDataFolder(), "custom-lightings.txt");
         core.createDefaultFileFromResource("/custom-lightings.txt", f);
         if(f.exists()) {
             lightingcfg = new ConfigurationNode(f);
             lightingcfg.load();
-            for(HDLighting lighting : lightingcfg.<HDLighting>createInstances("lightings", new Class<?>[] { DynmapCore.class }, new Object[] { core })) {
-                if(lighting.getName() == null) continue;
-                lightings.put(lighting.getName(), lighting);
-            }
+            lightingcfg.<HDLighting>createInstances("lightings", new Class<?>[]{DynmapCore.class}, new Object[]{core})
+                    .stream()
+                    .filter(lighting -> lighting.getName() != null)
+                    .forEachOrdered(lighting -> lightings.put(lighting.getName(), lighting));
         }
         Log.info("Loaded " + lightings.size() + " lightings.");
     }

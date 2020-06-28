@@ -27,9 +27,9 @@ public class TileFlags {
             long v1 = ent.getKey();
             sb.append(String.format("%x/%x", ((v1>>32)&0xFFFFFFFFL), (v1 & 0xFFFFFFFFL) ));
             long[] val = ent.getValue();
-            for(long vv : val) {
-                sb.append(String.format(":%x/%x", ((vv>>32) & 0xFFFFFFFFL), (vv & 0xFFFFFFFFL)));
-            }
+            Arrays.stream(val)
+                    .mapToObj(vv -> String.format(":%x/%x", ((vv >> 32) & 0xFFFFFFFFL), (vv & 0xFFFFFFFFL)))
+                    .forEachOrdered(sb::append);
             v.add(sb.toString());
             sb.setLength(0);
         }

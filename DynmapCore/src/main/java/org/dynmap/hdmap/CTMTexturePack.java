@@ -597,9 +597,8 @@ public class CTMTexturePack {
             int[] md = parseInts(p, "metadata");
             if (md != null) {
                 this.metadata = 0;
-                for(int m : md) {
-                    this.metadata |= (1 << m);
-                }
+                Arrays.stream(md)
+                        .forEachOrdered(m -> this.metadata |= (1 << m));
             }
             this.minY = parseInt(p, "minHeight", -1);
             this.maxY = parseInt(p, "maxHeight", Integer.MAX_VALUE);

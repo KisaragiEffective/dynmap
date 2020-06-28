@@ -4,13 +4,22 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.function.BinaryOperator;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.bstats.bukkit.Metrics;
@@ -837,11 +846,9 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         registerPlayerLoginListener();
 
         /* Build default permissions from our plugin */
-        Map<String, Boolean> perdefs = new HashMap<>();
         List<Permission> pd = plugin.getDescription().getPermissions();
-        for(Permission p : pd) {
-            perdefs.put(p.getName(), p.getDefault() == PermissionDefault.TRUE);
-        }
+        Map<String, Boolean> perdefs = pd.stream()
+                .collect(Collectors.toMap(Permission::getName, p -> p.getDefault() == PermissionDefault.TRUE, (a, b) -> b));
 
         //noinspection OptionalGetWithoutIsPresent
         permissions = Arrays.stream(new PermissionProvider[] {

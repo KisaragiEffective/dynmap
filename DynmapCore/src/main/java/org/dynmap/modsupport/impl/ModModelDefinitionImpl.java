@@ -261,9 +261,8 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
                     case BOTH:
                         break;
                 }
-                if (line != null) {
-                    fw.write(line + "\n");
-                }
+                // line always isn't null
+                fw.write(line + "\n");
             }
             // Loop through block texture records
             for (BlockModelImpl btr : blkModel) {

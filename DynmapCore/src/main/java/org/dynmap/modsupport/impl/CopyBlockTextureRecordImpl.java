@@ -50,11 +50,9 @@ public class CopyBlockTextureRecordImpl implements CopyBlockTextureRecord {
     @Override
     public void addBlockID(int blockID) {
         if (blockID > 0) {
-            for (int id : ids) {
-                if (id == blockID) {
-                    return;
-                }
-            }
+            boolean found = Arrays.stream(ids).anyMatch(id -> id == blockID);
+
+            if (found) return;
             ids = Arrays.copyOf(ids, ids.length+1);
             ids[ids.length-1] = blockID;
         }
@@ -66,11 +64,8 @@ public class CopyBlockTextureRecordImpl implements CopyBlockTextureRecord {
      */
     @Override
     public void addBlockName(String blockname) {
-        for (String name : names) {
-            if (name.equals(blockname)) {
-                return;
-            }
-        }
+        boolean found = Arrays.asList(names).contains(blockname);
+        if (found) return;
         names = Arrays.copyOf(names, names.length+1);
         names[names.length-1] = blockname;
     }

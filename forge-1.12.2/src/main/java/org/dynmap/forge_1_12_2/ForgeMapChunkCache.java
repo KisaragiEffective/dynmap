@@ -1248,16 +1248,14 @@ public class ForgeMapChunkCache extends MapChunkCache
             String[] te_fields = HDBlockModels.getTileEntityFieldsNeeded(blk);
             if(te_fields != null) {
                 vals.clear();
-                for(String id: te_fields) {
+                Arrays.stream(te_fields).forEachOrdered(id -> {
                     NBTBase v = tc.getTag(id);  /* Get field */
-                    if(v != null) {
-                        Object val = getNBTValue(v);
-                        if(val != null) {
-                            vals.add(id);
-                            vals.add(val);
-                        }
+                    Object val = getNBTValue(v);
+                    if (val != null) {
+                        vals.add(id);
+                        vals.add(val);
                     }
-                }
+                });
                 if(vals.size() > 0) {
                     Object[] vlist = vals.toArray(new Object[0]);
                     tileData.put(getIndexInChunk(cx, ty, cz), vlist);
@@ -1283,9 +1281,8 @@ public class ForgeMapChunkCache extends MapChunkCache
             unloadChunks();
             return 0;
         }
-        for (DynmapChunk dynmapChunk : chunks) {
+        for (DynmapChunk chunk : chunks) {
             long startTime = System.nanoTime();
-            DynmapChunk chunk = dynmapChunk;
             int chunkindex = (chunk.x - x_min) + (chunk.z - z_min) * x_dim;
             if (snaparray[chunkindex] != null) continue;    // Skip if already processed
 

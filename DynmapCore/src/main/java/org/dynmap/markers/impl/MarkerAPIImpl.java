@@ -352,9 +352,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
                 }
                 /* Process any dirty worlds */
                 if(!dirty_worlds.isEmpty()) {
-                    for(String world : dirty_worlds) {
-                        writeMarkersFile(world);
-                    }
+                    dirty_worlds.forEach(MarkerAPIImpl.this::writeMarkersFile);
                     dirty_worlds.clear();
                 }
             } finally {
@@ -398,22 +396,19 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
         return api;
     }
     /**
-     * Singleton initializer complete (after rendder pool available
-     * @param core - core object
+     * Singleton initializer complete (after render pool available)
      * @return API object
      */
     public static void completeInitializeMarkerAPI(MarkerAPIImpl api) {
         MapManager.scheduleDelayedJob(() -> {
-/* Now publish marker files to the tiles directory */
-for(MarkerIcon ico : api.getMarkerIcons()) {
-api.publishMarkerIcon(ico);
-}
-/* Freshen files */
-api.freshenMarkerFiles();
-/* Add listener so we update marker files for other worlds as they become active */
-api.core.events.addListener("worldactivated", api);
+            /* Now publish marker files to the tiles directory */
+            api.getMarkerIcons().forEach(api::publishMarkerIcon);
+            /* Freshen files */
+            api.freshenMarkerFiles();
+            /* Add listener so we update marker files for other worlds as they become active */
+            api.core.events.addListener("worldactivated", api);
 
-api.scheduleWriteJob(); /* Start write job */
+            api.scheduleWriteJob(); /* Start write job */
 
             Log.info("Finish marker initialization");
         }, 0);
@@ -442,11 +437,9 @@ api.scheduleWriteJob(); /* Start write job */
         }
         lock.writeLock().lock();
         try {
-            for(MarkerIconImpl icn : markericons.values())
-                icn.cleanup();
+            markericons.values().forEach(MarkerIconImpl::cleanup);
             markericons.clear();
-            for(MarkerSetImpl set : markersets.values())
-                set.cleanup();
+            markersets.values().forEach(MarkerSetImpl::cleanup);
             markersets.clear();
         } finally {
             lock.writeLock().unlock();
@@ -634,37 +627,37 @@ api.scheduleWriteJob(); /* Start write job */
             final ConfigurationNode conf = new ConfigurationNode(api.markerpersist);  /* Make configuration object */
             /* First, save icon definitions */
             HashMap<String, Object> icons = new HashMap<>();
-            for(String id : api.markericons.keySet()) {
+            api.markericons.keySet().forEach(id -> {
                 MarkerIconImpl ico = api.markericons.get(id);
-                Map<String,Object> dat = ico.getPersistentData();
-                if(dat != null) {
+                Map<String, Object> dat = ico.getPersistentData();
+                if (dat != null) {
                     icons.put(id, dat);
                 }
-            }
+            });
             conf.put("icons", icons);
             /* Then, save persistent sets */
             HashMap<String, Object> sets = new HashMap<>();
-            for(String id : api.markersets.keySet()) {
+            api.markersets.keySet().forEach(id -> {
                 MarkerSetImpl set = api.markersets.get(id);
-                if(set.isMarkerSetPersistent()) {
+                if (set.isMarkerSetPersistent()) {
                     Map<String, Object> dat = set.getPersistentData();
-                    if(dat != null) {
+                    if (dat != null) {
                         sets.put(id, dat);
                     }
                 }
-            }
+            });
             conf.put("sets", sets);
             /* Then, save persistent player sets */
             HashMap<String, Object> psets = new HashMap<>();
-            for(String id : api.playersets.keySet()) {
+            api.playersets.keySet().forEach(id -> {
                 PlayerSetImpl set = api.playersets.get(id);
-                if(set.isPersistentSet()) {
+                if (set.isPersistentSet()) {
                     Map<String, Object> dat = set.getPersistentData();
-                    if(dat != null) {
+                    if (dat != null) {
                         psets.put(id, dat);
                     }
                 }
-            }
+            });
             conf.put("playersets", psets);
             
             MapManager.scheduleDelayedJob(() -> {
@@ -682,9 +675,11 @@ api.scheduleWriteJob(); /* Start write job */
 
     private void freshenMarkerFiles() {
         if(MapManager.mapman != null) {
-            for(DynmapWorld w : MapManager.mapman.worlds) {
-                dirty_worlds.add(w.getName());
-            }
+            MapManager.mapman
+                    .worlds
+                    .stream()
+                    .map(DynmapWorld::getName)
+                    .forEach(dirty_worlds::add);
         }
     }
     
@@ -699,31 +694,31 @@ api.scheduleWriteJob(); /* Start write job */
             /* Get icons */
             ConfigurationNode icons = conf.getNode("icons");
             if(icons == null) return false;
-            for(String id : icons.keySet()) {
+            icons.keySet().forEach(id -> {
                 MarkerIconImpl ico = new MarkerIconImpl(id);
-                if(ico.loadPersistentData(icons.getNode(id))) {
+                if (ico.loadPersistentData(icons.getNode(id))) {
                     markericons.put(id, ico);
                 }
-            }
+            });
             /* Get marker sets */
             ConfigurationNode sets = conf.getNode("sets");
             if(sets != null) {
-                for(String id: sets.keySet()) {
+                sets.keySet().forEach(id -> {
                     MarkerSetImpl set = new MarkerSetImpl(id);
-                    if(set.loadPersistentData(sets.getNode(id))) {
+                    if (set.loadPersistentData(sets.getNode(id))) {
                         markersets.put(id, set);
                     }
-                }
+                });
             }
             /* Get player sets */
             ConfigurationNode psets = conf.getNode("playersets");
             if(psets != null) {
-                for(String id: psets.keySet()) {
+                psets.keySet().forEach(id -> {
                     PlayerSetImpl set = new PlayerSetImpl(id);
-                    if(set.loadPersistentData(sets.getNode(id))) {
+                    if (set.loadPersistentData(sets.getNode(id))) {
                         playersets.put(id, set);
                     }
-                }
+                });
             }
         } finally {
             lock.writeLock().unlock();

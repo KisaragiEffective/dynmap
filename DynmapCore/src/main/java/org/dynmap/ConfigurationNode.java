@@ -257,21 +257,23 @@ public class ConfigurationNode implements Map<String, Object> {
         List<Object> o = getList(path);
 
         if(o == null)
-            return new ArrayList<>();
-        
-        ArrayList<ConfigurationNode> nodes = new ArrayList<>();
-        for(Object i : o) {
-            if (i instanceof Map<?, ?>) {
-                Map<String, Object> map;
-                try {
-                    map = (Map<String, Object>)i;
-                } catch(ClassCastException e) {
-                    continue;
-                }
-                nodes.add(new ConfigurationNode(map));
-            }
+            return new ArrayList<>(0);
+
+        return o.stream()
+                .filter(i -> i instanceof Map<?, ?>)
+                .<Map<String, Object>>map(this::tryCastOrNull)
+                .filter(Objects::nonNull)
+                .map(ConfigurationNode::new)
+                .collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T tryCastOrNull(Object into) {
+        try {
+            return (T) into;
+        } catch (ClassCastException e) {
+            return null;
         }
-        return nodes;
     }
     
     public void extend(Map<String, Object> other) {
@@ -335,8 +337,10 @@ public class ConfigurationNode implements Map<String, Object> {
     
     public <T> List<T> createInstances(String path, Class<?>[] constructorParameters, Object[] constructorArguments) {
         List<ConfigurationNode> nodes = getNodes(path);
-        List<T> instances = nodes.stream().map(node -> node.<T>createInstance(constructorParameters, constructorArguments)).filter(Objects::nonNull).collect(Collectors.toList());
-        return instances;
+        return nodes.stream()
+                .map(node -> node.<T>createInstance(constructorParameters, constructorArguments))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override

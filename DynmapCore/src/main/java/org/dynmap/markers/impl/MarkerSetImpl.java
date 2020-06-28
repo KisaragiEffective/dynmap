@@ -54,25 +54,20 @@ class MarkerSetImpl implements MarkerSet {
             label = id;
         if(iconlimit != null) {
             allowedicons = new ConcurrentHashMap<>();
-            for(MarkerIcon ico : iconlimit) {
-                if(ico instanceof MarkerIconImpl) {
-                    allowedicons.put(ico.getMarkerIconID(), (MarkerIconImpl)ico);
-                }
-            }
+            iconlimit.stream()
+                    .filter(MarkerIconImpl.class::isInstance)
+                    .map(MarkerIconImpl.class::cast)
+                    .forEachOrdered(ico -> allowedicons.put(ico.getMarkerIconID(), ico));
         }
         ispersistent = persistent;
         deficon = MarkerAPIImpl.getMarkerIconImpl(MarkerIcon.DEFAULT);
     }
-    
+
     void cleanup() {
-        for(MarkerImpl m : markers.values())
-            m.cleanup();
-        for(AreaMarkerImpl m : areamarkers.values())
-            m.cleanup();
-        for(PolyLineMarkerImpl m : linemarkers.values())
-            m.cleanup();
-        for(CircleMarkerImpl m : circlemarkers.values())
-            m.cleanup();
+        markers.values().forEach(MarkerImpl::cleanup);
+        areamarkers.values().forEach(AreaMarkerImpl::cleanup);
+        linemarkers.values().forEach(PolyLineMarkerImpl::cleanup);
+        circlemarkers.values().forEach(CircleMarkerImpl::cleanup);
         markers.clear();
         if (boostingareamarkers != null) {
             boostingareamarkers.clear();
@@ -220,13 +215,14 @@ class MarkerSetImpl implements MarkerSet {
     public Set<MarkerIcon> getMarkerIconsInUse() {
         HashSet<String> ids = new HashSet<>();
         HashSet<MarkerIcon> icons = new HashSet<>();
-        for(Marker m : markers.values()) {
-            MarkerIcon mi = m.getMarkerIcon();
-            if(!ids.contains(mi.getMarkerIconID())) {
-                ids.add(mi.getMarkerIconID());
-                icons.add(mi);
-            }
-        }
+        markers.values()
+                .stream()
+                .map(MarkerImpl::getMarkerIcon)
+                .filter(mi -> !ids.contains(mi.getMarkerIconID()))
+                .forEachOrdered(mi -> {
+                    ids.add(mi.getMarkerIconID());
+                    icons.add(mi);
+                });
         return icons;
     }
 
@@ -390,33 +386,33 @@ class MarkerSetImpl implements MarkerSet {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
         HashMap<String, Object> node = new HashMap<>();
-        for(String id : markers.keySet()) {
+        markers.keySet().forEach(id -> {
             MarkerImpl m = markers.get(id);
-            if(m.isPersistentMarker()) {
+            if (m.isPersistentMarker()) {
                 node.put(id, m.getPersistentData());
             }
-        }
+        });
         HashMap<String, Object> anode = new HashMap<>();
-        for(String id : areamarkers.keySet()) {
+        areamarkers.keySet().forEach(id -> {
             AreaMarkerImpl m = areamarkers.get(id);
-            if(m.isPersistentMarker()) {
+            if (m.isPersistentMarker()) {
                 anode.put(id, m.getPersistentData());
             }
-        }
+        });
         HashMap<String, Object> lnode = new HashMap<>();
-        for(String id : linemarkers.keySet()) {
+        linemarkers.keySet().forEach(id -> {
             PolyLineMarkerImpl m = linemarkers.get(id);
-            if(m.isPersistentMarker()) {
+            if (m.isPersistentMarker()) {
                 lnode.put(id, m.getPersistentData());
             }
-        }
+        });
         HashMap<String, Object> cnode = new HashMap<>();
-        for(String id : circlemarkers.keySet()) {
+        circlemarkers.keySet().forEach(id -> {
             CircleMarkerImpl m = circlemarkers.get(id);
-            if(m.isPersistentMarker()) {
+            if (m.isPersistentMarker()) {
                 cnode.put(id, m.getPersistentData());
             }
-        }
+        });
         /* Make top level node */
         HashMap<String, Object> setnode = new HashMap<>();
         setnode.put("label", label);
@@ -453,89 +449,86 @@ class MarkerSetImpl implements MarkerSet {
         label = node.getString("label", setid); /* Get label */
         ConfigurationNode markernode = node.getNode("markers");
         if(markernode != null) {
-            for(String id : markernode.keySet()) {
+            markernode.keySet().forEach(id -> {
                 MarkerImpl marker = new MarkerImpl(id, this);   /* Make and load marker */
-                if(marker.loadPersistentData(markernode.getNode(id))) {
+                if (marker.loadPersistentData(markernode.getNode(id))) {
                     markers.put(id, marker);
-                }
-                else {
+                } else {
                     Log.info("Error loading marker '" + id + "' for set '" + setid + "'");
                     marker.cleanup();
                 }
-            }
+            });
         }
         ConfigurationNode areamarkernode = node.getNode("areas");
         if(areamarkernode != null) {
-            for(String id : areamarkernode.keySet()) {
+            areamarkernode.keySet().forEach(id -> {
                 AreaMarkerImpl marker = new AreaMarkerImpl(id, this);   /* Make and load marker */
-                if(marker.loadPersistentData(areamarkernode.getNode(id))) {
+                if (marker.loadPersistentData(areamarkernode.getNode(id))) {
                     areamarkers.put(id, marker);
-                    if(marker.getBoostFlag()) {
-                        if(boostingareamarkers == null) {
+                    if (marker.getBoostFlag()) {
+                        if (boostingareamarkers == null) {
                             boostingareamarkers = new ConcurrentHashMap<>();
                         }
-                        boostingareamarkers.put(id,  marker);
+                        boostingareamarkers.put(id, marker);
                     }
                     if ((marker.getGreetingText() != null) || (marker.getFarewellText() != null)) {
                         if (enterexitmarkers == null) {
                             enterexitmarkers = new ConcurrentHashMap<>();
                         }
-                        enterexitmarkers.put(marker.getUniqueMarkerID(),  marker);
+                        enterexitmarkers.put(marker.getUniqueMarkerID(), marker);
                     }
-                }
-                else {
+                } else {
                     Log.info("Error loading area marker '" + id + "' for set '" + setid + "'");
                     marker.cleanup();
                 }
-            }
+            });
         }
         ConfigurationNode linemarkernode = node.getNode("lines");
         if(linemarkernode != null) {
-            for(String id : linemarkernode.keySet()) {
+            linemarkernode.keySet().forEach(id -> {
                 PolyLineMarkerImpl marker = new PolyLineMarkerImpl(id, this);   /* Make and load marker */
-                if(marker.loadPersistentData(linemarkernode.getNode(id))) {
+                if (marker.loadPersistentData(linemarkernode.getNode(id))) {
                     linemarkers.put(id, marker);
-                }
-                else {
+                } else {
                     Log.info("Error loading line marker '" + id + "' for set '" + setid + "'");
                     marker.cleanup();
                 }
-            }
+            });
         }
         ConfigurationNode circlemarkernode = node.getNode("circles");
         if(circlemarkernode != null) {
-            for(String id : circlemarkernode.keySet()) {
+            circlemarkernode.keySet().forEach(id -> {
                 CircleMarkerImpl marker = new CircleMarkerImpl(id, this);   /* Make and load marker */
-                if(marker.loadPersistentData(circlemarkernode.getNode(id))) {
+                if (marker.loadPersistentData(circlemarkernode.getNode(id))) {
                     circlemarkers.put(id, marker);
-                    if(marker.getBoostFlag()) {
-                        if(boostingcirclemarkers == null) {
+                    if (marker.getBoostFlag()) {
+                        if (boostingcirclemarkers == null) {
                             boostingcirclemarkers = new ConcurrentHashMap<>();
                         }
-                        boostingcirclemarkers.put(id,  marker);
+                        boostingcirclemarkers.put(id, marker);
                     }
                     if ((marker.getGreetingText() != null) || (marker.getFarewellText() != null)) {
                         if (enterexitmarkers == null) {
                             enterexitmarkers = new ConcurrentHashMap<>();
                         }
-                        enterexitmarkers.put(marker.getUniqueMarkerID(),  marker);
+                        enterexitmarkers.put(marker.getUniqueMarkerID(), marker);
                     }
-                }
-                else {
+                } else {
                     Log.info("Error loading circle marker '" + id + "' for set '" + setid + "'");
                     marker.cleanup();
                 }
-            }
+            });
         }
         List<String> allowed = node.getList("allowedicons");
         if(allowed != null) {
-            for(String id : allowed) {
+            allowed.forEach(id -> {
                 MarkerIconImpl icon = MarkerAPIImpl.getMarkerIconImpl(id);
-                if(icon != null)
+                if (icon != null) {
                     allowedicons.put(id, icon);
-                else
+                } else {
                     Log.info("Error loading allowed icon '" + id + "' for set '" + setid + "'");
-            }
+                }
+            });
         }
         hide_by_def = node.getBoolean("hide", false);
         prio = node.getInteger("layerprio", 0);

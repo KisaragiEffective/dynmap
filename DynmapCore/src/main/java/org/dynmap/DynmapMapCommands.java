@@ -295,22 +295,22 @@ public class DynmapMapCommands {
             return true;
         }
         List<MapType> maps = w.maps;
-        for(MapType mt : maps) {
-            if(mt instanceof HDMap) {
-                HDMap hdmt = (HDMap)mt;
-                StringBuilder sb = new StringBuilder();
-                sb.append("map ").append(mt.getName()).append(": prefix=").append(hdmt.getPrefix()).append(", title=").append(hdmt.getTitle());
-                sb.append(", perspective=").append(hdmt.getPerspective().getName()).append(", shader=").append(hdmt.getShader().getName());
-                sb.append(", lighting=").append(hdmt.getLighting().getName()).append(", mapzoomin=").append(hdmt.getMapZoomIn()).append(", mapzoomout=").append(hdmt.getMapZoomOutLevels());
-                sb.append(", img-format=").append(hdmt.getImageFormatSetting()).append(", icon=").append(hdmt.getIcon());
-                sb.append(", append-to-world=").append(hdmt.getAppendToWorld()).append(", boostzoom=").append(hdmt.getBoostZoom());
-                sb.append(", protected=").append(hdmt.isProtected());
-                if(hdmt.tileupdatedelay > 0) {
-                    sb.append(", tileupdatedelay=").append(hdmt.tileupdatedelay);
-                }
-                sender.sendMessage(sb.toString());
-            }
-        }
+        maps.stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .forEachOrdered(mt -> {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("map ").append(mt.getName()).append(": prefix=").append(mt.getPrefix()).append(", title=").append(mt.getTitle());
+                    sb.append(", perspective=").append(mt.getPerspective().getName()).append(", shader=").append(mt.getShader().getName());
+                    sb.append(", lighting=").append(mt.getLighting().getName()).append(", mapzoomin=").append(mt.getMapZoomIn()).append(", mapzoomout=").append(mt.getMapZoomOutLevels());
+                    sb.append(", img-format=").append(mt.getImageFormatSetting()).append(", icon=").append(mt.getIcon());
+                    sb.append(", append-to-world=").append(mt.getAppendToWorld()).append(", boostzoom=").append(mt.getBoostZoom());
+                    sb.append(", protected=").append(mt.isProtected());
+                    if (mt.tileupdatedelay > 0) {
+                        sb.append(", tileupdatedelay=").append(mt.tileupdatedelay);
+                    }
+                    sender.sendMessage(sb.toString());
+                });
         
         return true;
     }

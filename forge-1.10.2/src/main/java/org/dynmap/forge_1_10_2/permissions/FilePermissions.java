@@ -57,16 +57,14 @@ public class FilePermissions implements PermissionProvider {
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
         player = player.toLowerCase();
-        HashSet<String> rslt = new HashSet<>();
+        HashSet<String> rslt;
         if(DynmapPlugin.plugin.isOp(player)) {
-            rslt.addAll(perms);
-        }
-        else {
-            for(String p : perms) {
-                if(hasPerm(player, p)) {
-                    rslt.add(p);
-                }
-            }
+            rslt = new HashSet<>(perms);
+        } else {
+            final String fp = player;
+            rslt = perms.stream()
+                    .filter(p -> hasPerm(fp, p))
+                    .collect(Collectors.toCollection(HashSet::new));
         }
         return rslt;
     }

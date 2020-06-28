@@ -784,33 +784,23 @@ public class DynmapPlugin
             if(c == null) {
                 return null;
             }
-            if (w.visibility_limits != null)
-            {
-                for (VisibilityLimit limit: w.visibility_limits)
-                {
-                    c.setVisibleRange(limit);
-                }
+            if (w.visibility_limits != null) {
+                w.visibility_limits.forEach(c::setVisibleRange);
 
                 c.setHiddenFillStyle(w.hiddenchunkstyle);
             }
 
-            if (w.hidden_limits != null)
-            {
-                for (VisibilityLimit limit: w.hidden_limits)
-                {
-                    c.setHiddenRange(limit);
-                }
-
+            if (w.hidden_limits != null) {
+                w.hidden_limits.forEach(c::setHiddenRange);
                 c.setHiddenFillStyle(w.hiddenchunkstyle);
             }
 
-            if (!c.setChunkDataTypes(blockdata, biome, highesty, rawbiome))
-            {
+            if (!c.setChunkDataTypes(blockdata, biome, highesty, rawbiome)) {
                 Log.severe("CraftBukkit build does not support biome APIs");
             }
 
-            if (chunks.size() == 0)     /* No chunks to get? */
-            {
+            /* No chunks to get? */
+            if (chunks.size() == 0) {
                 c.loadChunks(0);
                 return c;
             }
@@ -1482,13 +1472,11 @@ public class DynmapPlugin
                 */
             }
         }
-        for(ForgeWorld w : worlds.values()) {
-            if (core.processWorldLoad(w)) {   /* Have core process load first - fire event listeners if good load after */
-                if(w.isLoaded()) {
-                    core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w);
-                }
-            }
-        }
+        worlds.values().stream()
+                /* Have core process load first - fire event listeners if good load after */
+                .filter(w -> core.processWorldLoad(w))
+                .filter(ForgeWorld::isLoaded)
+                .forEachOrdered(w -> core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w));
         core.updateConfigHashcode();
 
         /* Register our update trigger events */

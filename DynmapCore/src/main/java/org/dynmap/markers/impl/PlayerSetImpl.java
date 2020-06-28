@@ -75,9 +75,9 @@ class PlayerSetImpl implements PlayerSet {
         List<String> plist = node.getList("players");
         if(plist != null) {
             players.clear();
-            for(String id : plist) {
-                players.add(id.toLowerCase());
-            }
+            plist.stream()
+                    .map(String::toLowerCase)
+                    .forEach(players::add);
         }
         symmetric = node.getBoolean("symmetric", true);
         
@@ -114,9 +114,9 @@ class PlayerSetImpl implements PlayerSet {
                 return;
         }
         this.players.clear();
-        for(String id : players) {
-            this.players.add(id.toLowerCase());
-        }
+        players.stream()
+                .map(String::toLowerCase)
+                .forEach(this.players::add);
         MarkerAPIImpl.playerSetUpdated(this, MarkerUpdate.UPDATED);
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();

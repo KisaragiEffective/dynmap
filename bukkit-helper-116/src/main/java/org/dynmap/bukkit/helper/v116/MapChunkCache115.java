@@ -7,6 +7,7 @@ import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
@@ -193,13 +194,12 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
                         NBTTagCompound tc = plist.getCompound(pi);
                         String pname = tc.getString("Name");
                         if (tc.hasKey("Properties")) {
-                            StringBuilder statestr = new StringBuilder();
                             NBTTagCompound prop = tc.getCompound("Properties");
-                            for (String pid : prop.getKeys()) {
-                                if (statestr.length() > 0) statestr.append(',');
-                                statestr.append(pid).append('=').append(prop.get(pid).asString());
-                            }
-                            palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr.toString());
+                            String statestr = prop.getKeys()
+                                    .stream()
+                                    .map(pid -> pid + '=' + prop.get(pid).asString())
+                                    .collect(Collectors.joining(","));
+                            palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr);
                         }
                         if (palette[pi] == null) {
                             palette[pi] = DynmapBlockState.getBaseStateByName(pname);
@@ -387,20 +387,11 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
             DynmapChunk chunk = iterator.next();
             boolean vis = true;
             if(visible_limits != null) {
-                vis = false;
-                for(VisibilityLimit limit : visible_limits) {
-                    if (limit.doIntersectChunk(chunk.x, chunk.z)) {
-                        vis = true;
-                        break;
-                    }
-                }
+                vis = visible_limits.stream().anyMatch(limit -> limit.doIntersectChunk(chunk.x, chunk.z));
             }
             if(vis && (hidden_limits != null)) {
-                for(VisibilityLimit limit : hidden_limits) {
-                    if (limit.doIntersectChunk(chunk.x, chunk.z)) {
-                        vis = false;
-                        break;
-                    }
+                if (hidden_limits.stream().anyMatch(limit -> limit.doIntersectChunk(chunk.x, chunk.z))) {
+                    vis = false;
                 }
             }
             /* Check if cached chunk snapshot found */

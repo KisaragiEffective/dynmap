@@ -1432,13 +1432,12 @@ public class DynmapPlugin
                 */
             }
         }
-        for(ForgeWorld w : worlds.values()) {
-            if (core.processWorldLoad(w)) {   /* Have core process load first - fire event listeners if good load after */
-                if(w.isLoaded()) {
-                    core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w);
-                }
-            }
-        }
+        worlds.values()
+                .stream()
+                /* Have core process load first - fire event listeners if good load after */
+                .filter(w -> core.processWorldLoad(w))
+                .filter(ForgeWorld::isLoaded)
+                .forEachOrdered(w -> core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, w));
         core.updateConfigHashcode();
 
         /* Register our update trigger events */
@@ -1750,10 +1749,10 @@ public class DynmapPlugin
         for(ForgeWorld fw : worlds.values()) {
             if(fw.getRawName().equals(wname)) {
                 last_world = w;
-                   last_fworld = fw;
-                   if(!fw.isLoaded()) {
-                       fw.setWorldLoaded(w);
-                       // Add tracker
+                last_fworld = fw;
+                if(!fw.isLoaded()) {
+                    fw.setWorldLoaded(w);
+                    // Add tracker
                     addTracker(w, fw);
                 }
                 return fw;
@@ -1799,16 +1798,16 @@ public class DynmapPlugin
         File f = new File(core.getDataFolder(), "forgeworlds.yml");
         ConfigurationNode cn = new ConfigurationNode(f);
         List<Map<String,Object>> lst = new ArrayList<>();
-        for(DynmapWorld fw : core.mapManager.getWorlds()) {
+        core.mapManager.getWorlds().forEach(fw -> {
             HashMap<String, Object> vals = new HashMap<>();
             vals.put("name", fw.getRawName());
-            vals.put("height",  fw.worldheight);
+            vals.put("height", fw.worldheight);
             vals.put("sealevel", fw.sealevel);
-            vals.put("nether",  fw.isNether());
-            vals.put("the_end",  ((ForgeWorld)fw).isTheEnd());
+            vals.put("nether", fw.isNether());
+            vals.put("the_end", ((ForgeWorld) fw).isTheEnd());
             vals.put("title", fw.getTitle());
             lst.add(vals);
-        }
+        });
         cn.put("worlds", lst);
         cn.put("isMCPC", isMCPC);
         cn.put("useSaveFolderAsName", useSaveFolder);
