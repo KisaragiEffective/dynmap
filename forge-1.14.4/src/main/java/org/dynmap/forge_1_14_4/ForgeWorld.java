@@ -74,8 +74,8 @@ public class ForgeWorld extends DynmapWorld
     public ForgeWorld(IWorld w)
     {
         this(getWorldName(w), w.getWorld().getHeight(), w.getSeaLevel(), w.getDimension().isNether(),
-        		w.getDimension() instanceof EndDimension, 
-        		w.getWorldInfo().getWorldName() + "/" + w.getDimension().getType().getRegistryName().toString());
+                w.getDimension() instanceof EndDimension, 
+                w.getWorldInfo().getWorldName() + "/" + w.getDimension().getType().getRegistryName().toString());
         setWorldLoaded(w);
     }
     public ForgeWorld(String name, int height, int sealevel, boolean nether, boolean the_end, String deftitle)
@@ -115,40 +115,40 @@ public class ForgeWorld extends DynmapWorld
     @Override
     public DynmapLocation getSpawnLocation()
     {
-    	if(world != null) {
-    		spawnloc.x = world.getWorldInfo().getSpawnX();
-    		spawnloc.y = world.getWorldInfo().getSpawnY();
-    		spawnloc.z = world.getWorldInfo().getSpawnZ();
-    		spawnloc.world = this.getName();
-    	}
+        if(world != null) {
+            spawnloc.x = world.getWorldInfo().getSpawnX();
+            spawnloc.y = world.getWorldInfo().getSpawnY();
+            spawnloc.z = world.getWorldInfo().getSpawnZ();
+            spawnloc.world = this.getName();
+        }
         return spawnloc;
     }
     /* Get world time */
     @Override
     public long getTime()
     {
-    	if(world != null)
-    		return world.getWorld().getGameTime();
-    	else
-    		return -1;
+        if(world != null)
+            return world.getWorld().getGameTime();
+        else
+            return -1;
     }
     /* World is storming */
     @Override
     public boolean hasStorm()
     {
-    	if(world != null)
-    		return world.getWorld().isRaining();
-    	else
-    		return false;
+        if(world != null)
+            return world.getWorld().isRaining();
+        else
+            return false;
     }
     /* World is thundering */
     @Override
     public boolean isThundering()
     {
-    	if(world != null)
-    		return world.getWorld().isThundering();
-    	else
-    		return false;
+        if(world != null)
+            return world.getWorld().isThundering();
+        else
+            return false;
     }
     /* World is loaded */
     @Override
@@ -160,37 +160,37 @@ public class ForgeWorld extends DynmapWorld
     @Override
     public void setWorldUnloaded() 
     {
-    	getSpawnLocation();
-    	world = null;
+        getSpawnLocation();
+        world = null;
     }
     /* Set world to loaded */
     public void setWorldLoaded(IWorld w) {
-    	world = w;
-    	this.sealevel = w.getSeaLevel();   // Read actual current sealevel from world
-    	// Update lighting table
-    	float[] lt = w.getDimension().getLightBrightnessTable();
-    	for (int i = 0; i < 16; i++) {
-    	    this.setBrightnessTableEntry(i, lt[i]);
-    	}
+        world = w;
+        this.sealevel = w.getSeaLevel();   // Read actual current sealevel from world
+        // Update lighting table
+        float[] lt = w.getDimension().getLightBrightnessTable();
+        for (int i = 0; i < 16; i++) {
+            this.setBrightnessTableEntry(i, lt[i]);
+        }
     }
     /* Get light level of block */
     @Override
     public int getLightLevel(int x, int y, int z)
     {
-    	if(world != null)
-    		return world.getLight(new BlockPos(x,  y,  z));
-    	else
-    		return -1;
+        if(world != null)
+            return world.getLight(new BlockPos(x,  y,  z));
+        else
+            return -1;
     }
     /* Get highest Y coord of given location */
     @Override
     public int getHighestBlockYAt(int x, int z)
     {
-    	if(world != null) {
+        if(world != null) {
             return world.getWorld().getChunk(x >> 4, z >> 4).func_217303_b(Type.MOTION_BLOCKING).getHeight(x & 15, z & 15);
-    	}
-    	else
-    		return -1;
+        }
+        else
+            return -1;
     }
     /* Test if sky light level is requestable */
     @Override
@@ -202,11 +202,11 @@ public class ForgeWorld extends DynmapWorld
     @Override
     public int getSkyLightLevel(int x, int y, int z)
     {
-    	if(world != null) {
-    	    return world.getLightFor(LightType.SKY, new BlockPos(x, y, z));
-    	}
-    	else
-    		return -1;
+        if(world != null) {
+            return world.getLightFor(LightType.SKY, new BlockPos(x, y, z));
+        }
+        else
+            return -1;
     }
     /**
      * Get world environment ID (lower case - normal, the_end, nether)
@@ -222,12 +222,12 @@ public class ForgeWorld extends DynmapWorld
     @Override
     public MapChunkCache getChunkCache(List<DynmapChunk> chunks)
     {
-    	if(world != null) {
-    		ForgeMapChunkCache c = new ForgeMapChunkCache();
-    		c.setChunks(this, chunks);
-    		return c;
-    	}
-    	return null;
+        if(world != null) {
+            ForgeMapChunkCache c = new ForgeMapChunkCache();
+            c.setChunks(this, chunks);
+            return c;
+        }
+        return null;
     }
 
     public World getWorld()

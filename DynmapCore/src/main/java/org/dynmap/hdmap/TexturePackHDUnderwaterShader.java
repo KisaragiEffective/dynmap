@@ -27,12 +27,12 @@ public class TexturePackHDUnderwaterShader extends TexturePackHDShader {
          * @return true if ray is done, false if ray needs to continue
          */
         public boolean processBlock(HDPerspectiveState ps) {
-    		DynmapBlockState bs = ps.getBlockState();
-    		if (bs.isWater() || bs.isWaterlogged()) {
-    			ready = true;
-    			this.lastblk = full_water;
-    			this.lastblkhit = full_water;
-    		}
+            DynmapBlockState bs = ps.getBlockState();
+            if (bs.isWater() || bs.isWaterlogged()) {
+                ready = true;
+                this.lastblk = full_water;
+                this.lastblkhit = full_water;
+            }
             return ready && super.processBlock(ps);
         }
     }

@@ -52,36 +52,36 @@ public class PlayerFaces {
     
     private void copyLayersToTarget(BufferedImage srcimg, int layer1x, int layer1y, int layer2x, int layer2y, int w, int h, int[] dest, int destoff, int destscansize)
     {
-    	int[] l1 = new int[w * h];
-    	int[] l2 = new int[w * h];
-    	int imgh = srcimg.getHeight();
-    	// Read layer 1
-    	if (imgh >= (layer1y+h))
-    		srcimg.getRGB(layer1x, layer1y, w, h, l1, 0, w);
+        int[] l1 = new int[w * h];
+        int[] l2 = new int[w * h];
+        int imgh = srcimg.getHeight();
+        // Read layer 1
+        if (imgh >= (layer1y+h))
+            srcimg.getRGB(layer1x, layer1y, w, h, l1, 0, w);
         // Read layer 2
-    	if (imgh >= (layer2y+h))
-    		srcimg.getRGB(layer2x, layer2y, w, h, l2, 0, w);
+        if (imgh >= (layer2y+h))
+            srcimg.getRGB(layer2x, layer2y, w, h, l2, 0, w);
         // Apply layer1 to layer 1
         boolean transp = false;
         int v = l2[0];
         for (int i = 0; i < (w*h); i++) {
-        	if ((l2[i] & 0xFF000000) == 0) {
-        		transp = true;
-        		break;
-        	}
-        	/* If any different values, render face too */
-        	else if (l2[i] != v) {
-        	    transp = true;
-        	    break;
-        	}
+            if ((l2[i] & 0xFF000000) == 0) {
+                transp = true;
+                break;
+            }
+            /* If any different values, render face too */
+            else if (l2[i] != v) {
+                transp = true;
+                break;
+            }
         }
         if(transp) {
             for (int i = 0; i < (w*h); i++) {
-            	if ((l2[i] & 0xFF000000) != 0)
-            		l1[i] = l2[i];
+                if ((l2[i] & 0xFF000000) != 0)
+                    l1[i] = l2[i];
             }
         }
-    	// Write to dest
+        // Write to dest
         for (int y = 0; y < h; y++) {
             if (w >= 0) System.arraycopy(l1, (y * w) + 0, dest, destoff + (y * destscansize + x), w);
         }
@@ -283,7 +283,7 @@ public class PlayerFaces {
         skinurl = core.configuration.getString("skin-url", "");
         // These don't work anymore - Mojang retired them
         if (skinurl.equals("http://s3.amazonaws.com/MinecraftSkins/%player%.png") ||
-        		skinurl.equals("http://skins.minecraft.net/MinecraftSkins/%player%.png")) {
+                skinurl.equals("http://skins.minecraft.net/MinecraftSkins/%player%.png")) {
             skinurl = "";
         }
         core.listenerManager.addListener(EventType.PLAYER_JOIN, (PlayerEventListener) p -> {

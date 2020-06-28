@@ -151,33 +151,33 @@ public class ChunkSnapshot
             DynmapBlockState[] states = cursect.states;
             // JEI format
             if (sec.hasKey("Palette", 11)) {
-            	int[] p = sec.getIntArray("Palette");
+                int[] p = sec.getIntArray("Palette");
                 // Palette is list of state values, where Blocks=bit 11-4 of index, Data=bit 3-0
-            	byte[] msb_bytes = sec.getByteArray("Blocks");
-            	int mlen = msb_bytes.length / 2;
-            	byte[] lsb_bytes = sec.getByteArray("Data");
-            	int llen = BLOCKS_PER_SECTION / 2;
-            	if (llen > lsb_bytes.length) llen = lsb_bytes.length;
+                byte[] msb_bytes = sec.getByteArray("Blocks");
+                int mlen = msb_bytes.length / 2;
+                byte[] lsb_bytes = sec.getByteArray("Data");
+                int llen = BLOCKS_PER_SECTION / 2;
+                if (llen > lsb_bytes.length) llen = lsb_bytes.length;
                 for(int j = 0; j < llen; j++) {
-                	int idx = lsb_bytes[j] & 0xF;
-                	int idx2 = (lsb_bytes[j] & 0xF0) >>> 4;
-        			if (j < mlen) {
-        				idx += (255 & msb_bytes[2*j]) << 4;
-        				idx2 += (255 & msb_bytes[2*j+1]) << 4;
-        			}
-        			// Get even block id
-        			states[2*j] = DynmapPlugin.stateByID[(idx < p.length) ? p[idx] : 0];
-        			// Get odd block id
-        			states[2*j+1] = DynmapPlugin.stateByID[(idx2 < p.length) ? p[idx2] : 0];
+                    int idx = lsb_bytes[j] & 0xF;
+                    int idx2 = (lsb_bytes[j] & 0xF0) >>> 4;
+                    if (j < mlen) {
+                        idx += (255 & msb_bytes[2*j]) << 4;
+                        idx2 += (255 & msb_bytes[2*j+1]) << 4;
+                    }
+                    // Get even block id
+                    states[2*j] = DynmapPlugin.stateByID[(idx < p.length) ? p[idx] : 0];
+                    // Get odd block id
+                    states[2*j+1] = DynmapPlugin.stateByID[(idx2 < p.length) ? p[idx2] : 0];
                 }
             } else {
                 // Get block IDs
-            	byte[] lsb_bytes = sec.getByteArray("Blocks");
-            	if (lsb_bytes.length < BLOCKS_PER_SECTION) {
-            	    lsb_bytes = Arrays.copyOf(lsb_bytes, BLOCKS_PER_SECTION);
-            	}
-            	// Get any additional ID data
-            	byte[] addid = null;
+                byte[] lsb_bytes = sec.getByteArray("Blocks");
+                if (lsb_bytes.length < BLOCKS_PER_SECTION) {
+                    lsb_bytes = Arrays.copyOf(lsb_bytes, BLOCKS_PER_SECTION);
+                }
+                // Get any additional ID data
+                byte[] addid = null;
                 if (sec.hasKey("Add", 7)) {    /* If additional data, add it */
                     addid = sec.getByteArray("Add");
                     if (addid.length < (BLOCKS_PER_SECTION / 2)) {
@@ -202,11 +202,11 @@ public class ChunkSnapshot
                     }
                 }
                 // Traverse section
-            	for(int j = 0; j < BLOCKS_PER_SECTION; j += 2) {
-            	    // Start with block ID
-            	    int id = (0xFF & lsb_bytes[j]) << 4;
+                for(int j = 0; j < BLOCKS_PER_SECTION; j += 2) {
+                    // Start with block ID
+                    int id = (0xFF & lsb_bytes[j]) << 4;
                     int id2 = (0xFF & lsb_bytes[j+1]) << 4;
-            	    // Add in additional parts
+                    // Add in additional parts
                     if (addid != null) {
                         byte b = addid[j >> 1];
                         id += (0xF & b) << 12;
@@ -227,7 +227,7 @@ public class ChunkSnapshot
                     // Compute states
                     states[j] = DynmapPlugin.stateByID[id];
                     states[j+1] = DynmapPlugin.stateByID[id2];
-            	}
+                }
             }
             cursect.emitlight = sec.getByteArray("BlockLight");
             if (sec.hasKey("SkyLight")) {

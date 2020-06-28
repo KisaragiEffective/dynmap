@@ -99,16 +99,16 @@ public class MapStorageResourceHandler extends AbstractHandler {
         response.setHeader("Cache-Control", "max-age=0,must-revalidate");
         String etag;
         if (tr == null) {
-        	etag = "\"" + blankpnghash + "\"";
+            etag = "\"" + blankpnghash + "\"";
         }
         else {
-        	etag = "\"" + tr.hashCode + "\"";
+            etag = "\"" + tr.hashCode + "\"";
         }
         response.setHeader("ETag", etag);
         String ifnullmatch = request.getHeader("If-None-Match");
         if ((ifnullmatch != null) && ifnullmatch.equals(etag)) {
             response.sendError(HttpStatus.NOT_MODIFIED_304);
-        	return;
+            return;
         }
         if (tr == null) {
             response.setContentType("image/png");

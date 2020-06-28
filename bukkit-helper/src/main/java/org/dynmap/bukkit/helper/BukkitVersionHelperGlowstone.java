@@ -443,8 +443,8 @@ public class BukkitVersionHelperGlowstone extends BukkitVersionHelper {
     }
 
     @Override
-	public String getStateStringByCombinedId(int blkid, int meta) {
-		return "meta=" + meta;
-	}
+    public String getStateStringByCombinedId(int blkid, int meta) {
+        return "meta=" + meta;
+    }
 
 }

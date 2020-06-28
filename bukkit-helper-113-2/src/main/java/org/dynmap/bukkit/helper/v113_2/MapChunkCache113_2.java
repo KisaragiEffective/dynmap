@@ -18,70 +18,70 @@ import java.util.stream.IntStream;
 public class MapChunkCache113_2 extends AbstractMapChunkCache {
 
     public static class WrappedSnapshot implements Snapshot {
-    	private final ChunkSnapshot ss;
-    	private final DataPaletteBlock<?>[] blockids;
-    	private final int sectionmask;
-		public WrappedSnapshot(ChunkSnapshot ss) {
-    		this.ss = ss;
-    		blockids = (DataPaletteBlock<?>[]) BukkitVersionHelper.helper.getBlockIDFieldFromSnapshot(ss);
-    		int mask = IntStream.range(0, blockids.length).filter(ss::isSectionEmpty).map(i -> (1 << i)).reduce(0, (a, b) -> a | b);
+        private final ChunkSnapshot ss;
+        private final DataPaletteBlock<?>[] blockids;
+        private final int sectionmask;
+        public WrappedSnapshot(ChunkSnapshot ss) {
+            this.ss = ss;
+            blockids = (DataPaletteBlock<?>[]) BukkitVersionHelper.helper.getBlockIDFieldFromSnapshot(ss);
+            int mask = IntStream.range(0, blockids.length).filter(ss::isSectionEmpty).map(i -> (1 << i)).reduce(0, (a, b) -> a | b);
             sectionmask = mask;
-    	}
-		@Override
-    	public final DynmapBlockState getBlockType(int x, int y, int z) {
-    		if ((sectionmask & (1 << (y >> 4))) != 0)
-    			return DynmapBlockState.AIR;
-    		return BukkitVersionHelperSpigot113_2.dataToState.getOrDefault(blockids[y >> 4].a(x & 0xF, y & 0xF, z & 0xF), DynmapBlockState.AIR);
-    	}
-		@Override
+        }
+        @Override
+        public final DynmapBlockState getBlockType(int x, int y, int z) {
+            if ((sectionmask & (1 << (y >> 4))) != 0)
+                return DynmapBlockState.AIR;
+            return BukkitVersionHelperSpigot113_2.dataToState.getOrDefault(blockids[y >> 4].a(x & 0xF, y & 0xF, z & 0xF), DynmapBlockState.AIR);
+        }
+        @Override
         public final int getBlockSkyLight(int x, int y, int z) {
-        	return ss.getBlockSkyLight(x, y, z);
+            return ss.getBlockSkyLight(x, y, z);
         }
-		@Override
+        @Override
         public final int getBlockEmittedLight(int x, int y, int z) {
-        	return ss.getBlockEmittedLight(x, y, z);
+            return ss.getBlockEmittedLight(x, y, z);
         }
-		@Override
+        @Override
         public final int getHighestBlockYAt(int x, int z) {
-        	return ss.getHighestBlockYAt(x, z);
+            return ss.getHighestBlockYAt(x, z);
         }
-		@Override
+        @Override
         public final Biome getBiome(int x, int z) {
-        	return ss.getBiome(x, z);
+            return ss.getBiome(x, z);
         }
-		@Override
+        @Override
         public final boolean isSectionEmpty(int sy) {
-        	return (sectionmask & (1 << sy)) != 0;
+            return (sectionmask & (1 << sy)) != 0;
         }
-		@Override
+        @Override
         public final Object[] getBiomeBaseFromSnapshot() {
-        	return BukkitVersionHelper.helper.getBiomeBaseFromSnapshot(ss);
+            return BukkitVersionHelper.helper.getBiomeBaseFromSnapshot(ss);
         }
     }
 
-	@Override
-	public Snapshot wrapChunkSnapshot(ChunkSnapshot css) {
-		return new WrappedSnapshot(css);
-	}
-	@Override
+    @Override
+    public Snapshot wrapChunkSnapshot(ChunkSnapshot css) {
+        return new WrappedSnapshot(css);
+    }
+    @Override
     public boolean loadChunkNoGenerate(World w, int x, int z) {
-		boolean rslt = w.loadChunk(x,  z, false);
-		// Workaround for Spigot 1.13.2 bug - check if generated and do load-with-generate if so to drive migration of old chunks
-		if ((!rslt) && DynmapCore.migrateChunks()) {
-			boolean generated = true;
-			// Check one in each direction: see if all are generated
-			for (int xx = x-3; xx <= x+3; xx++) {
-				for (int zz = z-3; zz <= z+3; zz++) {
-					if (!w.isChunkGenerated(xx, zz)) {
-						generated = false;
-						break;
-					}
-				}
-			}
-			if (generated) {
-				rslt = w.loadChunk(x, z, true);
-			}
-		}
-		return rslt;
+        boolean rslt = w.loadChunk(x,  z, false);
+        // Workaround for Spigot 1.13.2 bug - check if generated and do load-with-generate if so to drive migration of old chunks
+        if ((!rslt) && DynmapCore.migrateChunks()) {
+            boolean generated = true;
+            // Check one in each direction: see if all are generated
+            for (int xx = x-3; xx <= x+3; xx++) {
+                for (int zz = z-3; zz <= z+3; zz++) {
+                    if (!w.isChunkGenerated(xx, zz)) {
+                        generated = false;
+                        break;
+                    }
+                }
+            }
+            if (generated) {
+                rslt = w.loadChunk(x, z, true);
+            }
+        }
+        return rslt;
     }
 }

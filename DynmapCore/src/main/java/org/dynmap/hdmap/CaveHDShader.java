@@ -40,10 +40,10 @@ public class CaveHDShader implements HDShader {
         iflit = configuration.getBoolean("onlyiflit", false);
         
         for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); i++) {
-        	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-        	if (bs.isAir() || bs.isWater()) {
-        		setHidden(bs);
-        	}
+            DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+            if (bs.isAir() || bs.isWater()) {
+                setHidden(bs);
+            }
         }
 
         List<Object> hidden = configuration.getList("hiddennames");
@@ -63,10 +63,10 @@ public class CaveHDShader implements HDShader {
             setHidden(DynmapBlockState.ICE_BLOCK);
             setHidden(DynmapBlockState.SNOW_LAYER_BLOCK);
             for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); i++) {
-            	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-            	if (bs.isLeaves() || bs.isSnow() || bs.isLog()) {
-            		setHidden(bs);
-            	}
+                DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+                if (bs.isLeaves() || bs.isSnow() || bs.isLog()) {
+                    setHidden(bs);
+                }
             }
         }
     }
@@ -179,9 +179,9 @@ public class CaveHDShader implements HDShader {
                 return false;
             }
             if (blocktype.isAir() && !air) {
-            	if(iflit && (ps.getMapIterator().getBlockEmittedLight() == 0)) {
-            		return false;
-            	}
+                if(iflit && (ps.getMapIterator().getBlockEmittedLight() == 0)) {
+                    return false;
+                }
                 int cr, cg, cb;
                 int mult;
 

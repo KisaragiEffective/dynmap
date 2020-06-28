@@ -96,7 +96,7 @@ public class DynmapBlockState {
      * @param material - material name string
      */
     public DynmapBlockState(DynmapBlockState base, int stateidx, String blkname, String statename, String material) {
-    	this(base, stateidx, blkname, statename, material, -1);
+        this(base, stateidx, blkname, statename, material, -1);
     }
     /**
      * Constructor for block state
@@ -139,7 +139,7 @@ public class DynmapBlockState {
         if (base == this) { 
             blocksByName.put(blkname, this);
             if (legacyBlockID >= 0) {
-            	blocksByLegacyID.put(legacyBlockID, this);
+                blocksByLegacyID.put(legacyBlockID, this);
             }
         }
         if (stateName.length() > 0) {
@@ -181,14 +181,14 @@ public class DynmapBlockState {
         DynmapBlockState blk = blocksByName.get(name);
         if ((blk == null) && (name.indexOf(':') == -1)) {
             blk = blocksByName.get("minecraft:" + name);
-            if (blk == null) {	// If still null, see if legacy ID number
-            	try {
-            		int v = Integer.parseInt(name);
-            		if (v >= 0) {
-            			blk = blocksByLegacyID.get(v);
-            		}
-            	} catch (NumberFormatException nfx) {
-            	}
+            if (blk == null) {    // If still null, see if legacy ID number
+                try {
+                    int v = Integer.parseInt(name);
+                    if (v >= 0) {
+                        blk = blocksByLegacyID.get(v);
+                    }
+                } catch (NumberFormatException nfx) {
+                }
             }
         }
         return (blk != null) ? blk : AIR;
@@ -221,7 +221,7 @@ public class DynmapBlockState {
      * @return block base state, or null if not found
      */
     public static DynmapBlockState getStateByLegacyBlockID(int legacyid) {
-    	return blocksByLegacyID.get(legacyid);
+        return blocksByLegacyID.get(legacyid);
     }
     /**
      * Find block state by name and state name
@@ -232,10 +232,10 @@ public class DynmapBlockState {
     public static DynmapBlockState getStateByNameAndState(String name, String statename) {
         DynmapBlockState blk = getBaseStateByName(name);
         if (blk != null) {
-        	if (blk.states != null) {
-        	    String[] statelist = statename.split(",");
-        		for (DynmapBlockState bb : blk.states) {
-        		    boolean match = true;
+            if (blk.states != null) {
+                String[] statelist = statename.split(",");
+                for (DynmapBlockState bb : blk.states) {
+                    boolean match = true;
                     for (String s : statelist) {
                         boolean valmatch = IntStream.range(0, bb.stateList.length).anyMatch(j -> s.equals(bb.stateList[j]));
                         if (!valmatch) {
@@ -243,12 +243,12 @@ public class DynmapBlockState {
                             break;
                         }
                     }
-        			if (match) {
-        				return bb;
-        			}
-        		}
-        	}
-        	blk = null;
+                    if (match) {
+                        return bb;
+                    }
+                }
+            }
+            blk = null;
         }
         return (blk != null) ? blk : AIR;
     }
@@ -277,7 +277,7 @@ public class DynmapBlockState {
      * Set to air
      */
     public final void setAir() {
-    	matchflags |= MATCH_AIR;
+        matchflags |= MATCH_AIR;
     }
     /**
      * Return number of states under base state
@@ -364,7 +364,7 @@ public class DynmapBlockState {
      * Set state to be waterlogged (block filled with water)
      */
     public final void setWaterlogged() {
-    	matchflags |= MATCH_WATERLOGGED;
+        matchflags |= MATCH_WATERLOGGED;
     }
     /**
      * Test if block is water OR waterlogged (block filled with water)
@@ -382,7 +382,7 @@ public class DynmapBlockState {
      * Set state to be leaves
      */
     public final void setLeaves() {
-    	matchflags |= MATCH_LEAVES;
+        matchflags |= MATCH_LEAVES;
     }
     /**
      * Test for matching blockname
@@ -409,13 +409,13 @@ public class DynmapBlockState {
      * Test if block is solid
      */
     public boolean isSolid() {
-    	return (matchflags & MATCH_SOLID) != 0;
+        return (matchflags & MATCH_SOLID) != 0;
     }
     /**
      * Set to solid
      */
     public void setSolid() {
-    	matchflags |= MATCH_SOLID;
+        matchflags |= MATCH_SOLID;
     }
     /**
      * To printable string

@@ -30,12 +30,12 @@ public class MarkerSignManager {
         @Override
         public void signChangeEvent(String material, String wname, int x, int y, int z, String[] lines, DynmapPlayer p) {
             if(mgr == null)
-                return;			
-			
+                return;            
+            
             if(!lines[0].equalsIgnoreCase("[dynmap]")) {  /* If not dynmap sign, quit */
                 return;
             }
-			
+            
             /* If allowed to do marker signs */
             if((p == null) || ((plugin != null) && (plugin.checkPlayerPermission(p, "marker.sign")))) {
                 String id = getSignMarkerID(wname, x, y, z);  /* Get marker ID */

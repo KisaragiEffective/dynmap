@@ -13,42 +13,42 @@ import java.util.stream.IntStream;
 public class MapChunkCacheClassic extends AbstractMapChunkCache {
 
     public static class WrappedSnapshot implements Snapshot {
-    	private final ChunkSnapshot ss;
-    	private final int sectionmask;
-		public WrappedSnapshot(ChunkSnapshot ss) {
-    		this.ss = ss;
-    		int mask = IntStream.range(0, 16).filter(ss::isSectionEmpty).map(i -> (1 << i)).reduce(0, (a, b) -> a | b);
+        private final ChunkSnapshot ss;
+        private final int sectionmask;
+        public WrappedSnapshot(ChunkSnapshot ss) {
+            this.ss = ss;
+            int mask = IntStream.range(0, 16).filter(ss::isSectionEmpty).map(i -> (1 << i)).reduce(0, (a, b) -> a | b);
             sectionmask = mask;
-    	}
-		@Override
-    	public final DynmapBlockState getBlockType(int x, int y, int z) {
-    		if ((sectionmask & (1 << (y >> 4))) != 0)
-    			return DynmapBlockState.AIR;
+        }
+        @Override
+        public final DynmapBlockState getBlockType(int x, int y, int z) {
+            if ((sectionmask & (1 << (y >> 4))) != 0)
+                return DynmapBlockState.AIR;
             return BukkitVersionHelper.stateByID[(ss.getBlockTypeId(x, y, z) << 4) | ss.getBlockData(x, y, z)];
-    	}
-		@Override
+        }
+        @Override
         public final int getBlockSkyLight(int x, int y, int z) {
-        	return ss.getBlockSkyLight(x, y, z);
+            return ss.getBlockSkyLight(x, y, z);
         }
-		@Override
+        @Override
         public final int getBlockEmittedLight(int x, int y, int z) {
-        	return ss.getBlockEmittedLight(x, y, z);
+            return ss.getBlockEmittedLight(x, y, z);
         }
-		@Override
+        @Override
         public final int getHighestBlockYAt(int x, int z) {
-        	return ss.getHighestBlockYAt(x, z);
+            return ss.getHighestBlockYAt(x, z);
         }
-		@Override
+        @Override
         public final Biome getBiome(int x, int z) {
-        	return ss.getBiome(x, z);
+            return ss.getBiome(x, z);
         }
-		@Override
+        @Override
         public final boolean isSectionEmpty(int sy) {
-        	return (sectionmask & (1 << sy)) != 0;
+            return (sectionmask & (1 << sy)) != 0;
         }
-		@Override
+        @Override
         public final Object[] getBiomeBaseFromSnapshot() {
-        	return BukkitVersionHelper.helper.getBiomeBaseFromSnapshot(ss);
+            return BukkitVersionHelper.helper.getBiomeBaseFromSnapshot(ss);
         }
     }
 
@@ -56,12 +56,12 @@ public class MapChunkCacheClassic extends AbstractMapChunkCache {
      * Construct empty cache
      */
     public MapChunkCacheClassic() {
-    	
+
     }
 
-	@Override
-	public Snapshot wrapChunkSnapshot(ChunkSnapshot css) {
-		return new WrappedSnapshot(css);
-	}
+    @Override
+    public Snapshot wrapChunkSnapshot(ChunkSnapshot css) {
+        return new WrappedSnapshot(css);
+    }
     
 }

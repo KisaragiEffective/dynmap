@@ -47,7 +47,7 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
             this.x = x; this.z = z;
         }
         public String toString() {
-        	return String.format("{%f,%f}",  x, z);
+            return String.format("{%f,%f}",  x, z);
         }
     }
     private static class BoundingBox {
@@ -134,8 +134,8 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
         normalized_world = DynmapWorld.normalizeWorldName(world);
         desc = node.getString("desc", null);
         lineweight = node.getInteger("strokeWeight", -1);
-        if(lineweight == -1) {	/* Handle typo-saved value */
-        	 lineweight = node.getInteger("stokeWeight", 3);
+        if(lineweight == -1) {    /* Handle typo-saved value */
+             lineweight = node.getInteger("stokeWeight", 3);
         }
         lineopacity = node.getDouble("strokeOpacity", 0.8);
         linecolor = node.getInteger("strokeColor", 0xFF0000);
@@ -147,16 +147,16 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
         String gt = node.getString("greeting", null);
         String gst = node.getString("greetingsub", null);
         if ((gt != null) || (gst != null)) {
-        	greeting = new EnterExitText();
-        	greeting.title = gt;
-        	greeting.subtitle = gst;
+            greeting = new EnterExitText();
+            greeting.title = gt;
+            greeting.subtitle = gst;
         }
         String ft = node.getString("farewell", null);
         String fst = node.getString("farewellsub", null);
         if ((ft != null) || (fst != null)) {
-        	farewell = new EnterExitText();
-        	farewell.title = ft;
-        	farewell.subtitle = fst;
+            farewell = new EnterExitText();
+            farewell.title = ft;
+            farewell.subtitle = fst;
         }
         
         ispersistent = true;    /* Loaded from config, so must be */
@@ -171,13 +171,13 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
     }
     
     @Override
-	public String getUniqueMarkerID() {
-    	if (markerset != null) {
-    		return markerset + ":area:" + markerid;
-    	}
-    	else {
-    		return null;
-    	}
+    public String getUniqueMarkerID() {
+        if (markerset != null) {
+            return markerset + ":area:" + markerid;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
@@ -260,20 +260,20 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
             node.put("maxzoom", maxzoom);
         }
         if (greeting != null) {
-        	if (greeting.title != null) {
-        		node.put("greeting", greeting.title);
-        	}
-        	if (greeting.subtitle != null) {
-        		node.put("greetingsub", greeting.subtitle);
-        	}        	
+            if (greeting.title != null) {
+                node.put("greeting", greeting.title);
+            }
+            if (greeting.subtitle != null) {
+                node.put("greetingsub", greeting.subtitle);
+            }            
         }
         if (farewell != null) {
-        	if (farewell.title != null) {
-        		node.put("farewell", farewell.title);        		
-        	}
-        	if (farewell.subtitle != null) {
-        		node.put("farewellsub", farewell.subtitle);        		
-        	}
+            if (farewell.title != null) {
+                node.put("farewell", farewell.title);                
+            }
+            if (farewell.subtitle != null) {
+                node.put("farewellsub", farewell.subtitle);                
+            }
         }
 
         return node;
@@ -571,78 +571,78 @@ class AreaMarkerImpl implements AreaMarker, EnterExitMarker {
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();
     }
-	@Override
-	public EnterExitText getGreetingText() {
-		return greeting;
-	}
-	@Override
-	public EnterExitText getFarewellText() {
-		return farewell;
-	}
-	@Override
-	public void setGreetingText(String title, String subtitle) {
-		if ((title != null) || (subtitle != null)) {
-			greeting = new EnterExitText();
-			greeting.title = title;
-			greeting.subtitle = subtitle;
-		}
-		else {
-			greeting = null;
-		}
+    @Override
+    public EnterExitText getGreetingText() {
+        return greeting;
+    }
+    @Override
+    public EnterExitText getFarewellText() {
+        return farewell;
+    }
+    @Override
+    public void setGreetingText(String title, String subtitle) {
+        if ((title != null) || (subtitle != null)) {
+            greeting = new EnterExitText();
+            greeting.title = title;
+            greeting.subtitle = subtitle;
+        }
+        else {
+            greeting = null;
+        }
         if (markerset != null) {
             setMarkerSet(markerset);
         }
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();
-	}
-	@Override
-	public void setFarewellText(String title, String subtitle) {
-		if ((title != null) || (subtitle != null)) {
-			farewell = new EnterExitText();
-			farewell.title = title;
-			farewell.subtitle = subtitle;
-		}
-		else {
-			farewell = null;
-		}
+    }
+    @Override
+    public void setFarewellText(String title, String subtitle) {
+        if ((title != null) || (subtitle != null)) {
+            farewell = new EnterExitText();
+            farewell.title = title;
+            farewell.subtitle = subtitle;
+        }
+        else {
+            farewell = null;
+        }
         if (markerset != null) {
             setMarkerSet(markerset);
         }
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();
-	}
-	@Override
-	public boolean testIfPointWithinMarker(String worldid, double x, double y, double z) {
-		// Wrong world
-		if (!worldid.equals(this.world)) {
-			return false;
-		}
-		// If Y is in range (if there is a range)
-		if ((ytop != ybottom) && ((y < ybottom) || (y > ytop))) {
-			return false;
-		}
-		// Test if inside polygon
+    }
+    @Override
+    public boolean testIfPointWithinMarker(String worldid, double x, double y, double z) {
+        // Wrong world
+        if (!worldid.equals(this.world)) {
+            return false;
+        }
+        // If Y is in range (if there is a range)
+        if ((ytop != ybottom) && ((y < ybottom) || (y > ytop))) {
+            return false;
+        }
+        // Test if inside polygon
         int nvert = corners.size();
         Coord v0, v1;
         boolean c = false;
-        if (nvert == 2) {	// Diagonal corners (simple rectangle
-    		v0 = corners.get(0);
-    		v1 = corners.get(1);
-    		if (((v0.x > x) != (v1.x > x)) &&
-    				((v0.z > z) != (v1.z > z))) {
-    			c = true;
-    		}
+        if (nvert == 2) {    // Diagonal corners (simple rectangle
+            v0 = corners.get(0);
+            v1 = corners.get(1);
+            if (((v0.x > x) != (v1.x > x)) &&
+                    ((v0.z > z) != (v1.z > z))) {
+                c = true;
+            }
         }
         else {
-        	for (int i = 0, j = nvert-1; i < nvert; j = i, i++) {
-        		v0 = corners.get(i);
-        		v1 = corners.get(j);
-        		if (((v0.z > z) != (v1.z > z)) &&
-        			(x < (v0.x + ((v1.x-v0.x)*(z-v0.z)/(v1.z-v0.z))))) {
-        			c = !c;
-        		}
-        	}
+            for (int i = 0, j = nvert-1; i < nvert; j = i, i++) {
+                v0 = corners.get(i);
+                v1 = corners.get(j);
+                if (((v0.z > z) != (v1.z > z)) &&
+                    (x < (v0.x + ((v1.x-v0.x)*(z-v0.z)/(v1.z-v0.z))))) {
+                    c = !c;
+                }
+            }
         }
         return c;
-	}
+    }
 }

@@ -411,7 +411,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 releaseConnection(c, err);
             }
         }
-        else if (version == 1) {	// Add ImageLen columns
+        else if (version == 1) {    // Add ImageLen columns
             try {
                 c = getConnection();
                 doUpdate(c, "ALTER TABLE Tiles ADD ImageLen INT");

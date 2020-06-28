@@ -189,7 +189,7 @@ public class TexturePackHDShader implements HDShader {
             }
             
             if (blocktype.isAir()) {
-            	lastblkhit = blocktype;
+                lastblkhit = blocktype;
                 return false;
             }
             
@@ -199,7 +199,7 @@ public class TexturePackHDShader implements HDShader {
             if (scaledtp != null) {
                 scaledtp.readColor(ps, mapiter, c, blocktype, lastblocktype, ShaderState.this);
             }
-        	lastblkhit = blocktype;
+            lastblkhit = blocktype;
 
             if (c.getAlpha() > 0) {
                 /* Scale brightness depending upon face */
@@ -272,13 +272,13 @@ public class TexturePackHDShader implements HDShader {
                     int alpha2 = tmpcolor[0].getAlpha() * (255-alpha) / 255;
                     int talpha = alpha + alpha2;
                     if(talpha > 0)
-                    	for(int i = 0; i < color.length; i++)
-                    		color[i].setRGBA((tmpcolor[i].getRed()*alpha2 + color[i].getRed()*alpha) / talpha,
+                        for(int i = 0; i < color.length; i++)
+                            color[i].setRGBA((tmpcolor[i].getRed()*alpha2 + color[i].getRed()*alpha) / talpha,
                                   (tmpcolor[i].getGreen()*alpha2 + color[i].getGreen()*alpha) / talpha,
                                   (tmpcolor[i].getBlue()*alpha2 + color[i].getBlue()*alpha) / talpha, talpha);
                     else
                         Arrays.stream(color).forEachOrdered(Color::setTransparent);
-                    	
+                        
                     return (talpha >= 254);   /* If only one short, no meaningful contribution left */
                 }
             }
@@ -324,7 +324,7 @@ public class TexturePackHDShader implements HDShader {
         }
         // Return last blockc with surface hit
         public DynmapBlockState getLastBlockHit() {
-        	return lastblkhit;
+            return lastblkhit;
         }
     }
 

@@ -45,7 +45,7 @@ public class WallHeadRenderer extends CustomRenderer {
     
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
-    	int idx = ctx.getBlockType().stateIndex;
+        int idx = ctx.getBlockType().stateIndex;
         while(idx < 0) idx += NUM_DIRECTIONS; // Normalize (bad values from some mods)
         if(idx < meshes.length) {
             if(meshes[idx] == null) {

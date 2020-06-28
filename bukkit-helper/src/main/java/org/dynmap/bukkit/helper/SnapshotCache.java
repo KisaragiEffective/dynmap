@@ -12,9 +12,9 @@ import org.dynmap.utils.DynIntHashMap;
 import org.dynmap.bukkit.helper.AbstractMapChunkCache.Snapshot;
 
 public class SnapshotCache {
-	
-	public static SnapshotCache sscache;
-	
+    
+    public static SnapshotCache sscache;
+    
     public static class SnapshotRec {
         public Snapshot ss;
         public long inhabitedTicks;

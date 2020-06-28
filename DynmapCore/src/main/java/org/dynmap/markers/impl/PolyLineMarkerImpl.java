@@ -101,8 +101,8 @@ class PolyLineMarkerImpl implements PolyLineMarker {
         normalized_world = DynmapWorld.normalizeWorldName(world);
         desc = node.getString("desc", null);
         lineweight = node.getInteger("strokeWeight", -1);
-        if(lineweight == -1) {	/* Handle typo-saved value */
-        	 lineweight = node.getInteger("stokeWeight", 3);
+        if(lineweight == -1) {    /* Handle typo-saved value */
+             lineweight = node.getInteger("stokeWeight", 3);
         }
         lineopacity = node.getDouble("strokeOpacity", 0.8);
         linecolor = node.getInteger("strokeColor", 0xFF0000);
@@ -119,13 +119,13 @@ class PolyLineMarkerImpl implements PolyLineMarker {
     }
     
     @Override
-	public String getUniqueMarkerID() {
-    	if (markerset != null) {
-    		return markerset + ":poly:" + markerid;
-    	}
-    	else {
-    		return null;
-    	}
+    public String getUniqueMarkerID() {
+        if (markerset != null) {
+            return markerset + ":poly:" + markerid;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override

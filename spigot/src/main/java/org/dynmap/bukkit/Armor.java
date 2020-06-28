@@ -23,21 +23,21 @@ public class Armor {
         itm[2] = inv.getChestplate();
         itm[3] = inv.getHelmet();
         for(int i = 0; i < 4; i++) {
-    		if(itm[i] == null) continue;
-        	int dur = itm[i].getDurability();
-        	int max = itm[i].getType().getMaxDurability();
-        	if(max <= 0) continue;
-        	if(i == 2)
-    			max = max + 1;	/* Always 1 too low for chestplate */
-        	else
-        		max = max - 3;	/* Always 3 too high, versus how client calculates it */
-        	baseDurability += max;
-        	currentDurability += max - dur;
-        	baseArmorPoints += armorPoints[i];
+            if(itm[i] == null) continue;
+            int dur = itm[i].getDurability();
+            int max = itm[i].getType().getMaxDurability();
+            if(max <= 0) continue;
+            if(i == 2)
+                max = max + 1;    /* Always 1 too low for chestplate */
+            else
+                max = max - 3;    /* Always 3 too high, versus how client calculates it */
+            baseDurability += max;
+            currentDurability += max - dur;
+            baseArmorPoints += armorPoints[i];
         }
         int ap = 0;
         if(baseDurability > 0)
-    		ap = ((baseArmorPoints - 1) * currentDurability) / baseDurability + 1;
+            ap = ((baseArmorPoints - 1) * currentDurability) / baseDurability + 1;
         return ap;
     }
 }

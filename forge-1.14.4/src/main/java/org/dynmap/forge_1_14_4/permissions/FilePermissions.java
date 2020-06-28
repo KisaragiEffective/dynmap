@@ -83,7 +83,7 @@ public class FilePermissions implements PermissionProvider {
     @Override
     public boolean has(PlayerEntity psender, String permission) {
         if(psender != null) {
-        	String n = psender.getName().getString().toLowerCase();
+            String n = psender.getName().getString().toLowerCase();
             return hasPerm(n, permission);
         }
         return true;

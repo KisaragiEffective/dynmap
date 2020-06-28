@@ -302,13 +302,13 @@ public class CTMTexturePack {
         }
         
         private void addBlockStateToIDSet(Set<Integer> list, DynmapBlockState bs) {
-    		list.add(bs.globalStateIndex);
+            list.add(bs.globalStateIndex);
         }
         private void addBaseBlockStateToIDSet(Set<Integer> list, DynmapBlockState bs) {
-        	bs = bs.baseState;
-        	for (int i = 0; i < bs.getStateCount(); i++) {
-        		list.add(bs.getStateByIndex(i).globalStateIndex);
-        	}
+            bs = bs.baseState;
+            for (int i = 0; i < bs.getStateCount(); i++) {
+                list.add(bs.getStateByIndex(i).globalStateIndex);
+            }
         }
         private int[] getIDList(Properties properties, String key, String type) {
             Set<Integer> list = new HashSet<>();
@@ -320,10 +320,10 @@ public class CTMTexturePack {
                         int id = Integer.parseInt(token);
                         DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
                         if (bs == null) {
-                        	Log.info("Unknown Legacy block ID in CTM: " + token);
+                            Log.info("Unknown Legacy block ID in CTM: " + token);
                         }
                         else {
-                        	addBaseBlockStateToIDSet(list, bs);
+                            addBaseBlockStateToIDSet(list, bs);
                         }
                     } catch (NumberFormatException e) {
                         Log.info("Bad ID token: " + token);
@@ -337,20 +337,20 @@ public class CTMTexturePack {
                     boolean addbase = false;
                     // If blockname:statename
                     if (toks.length > 2) {
-                    	bs = DynmapBlockState.getStateByNameAndState(toks[0] + ":" + toks[1], toks[2]);
+                        bs = DynmapBlockState.getStateByNameAndState(toks[0] + ":" + toks[1], toks[2]);
                     }
                     else {
                         bs = DynmapBlockState.getBaseStateByName(token);
                         addbase = true;
                     }
-                	if (bs == DynmapBlockState.AIR) {
-                		Log.info("Unknown block ID in CTM: " + token);
+                    if (bs == DynmapBlockState.AIR) {
+                        Log.info("Unknown block ID in CTM: " + token);
                     }
                     else if (addbase) {
-                		addBaseBlockStateToIDSet(list, bs);
+                        addBaseBlockStateToIDSet(list, bs);
                     }
                     else {
-                		addBlockStateToIDSet(list, bs);
+                        addBlockStateToIDSet(list, bs);
                     }
                 }
             }
@@ -361,10 +361,10 @@ public class CTMTexturePack {
                         int id = Integer.parseInt(m.group(1));
                         DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
                         if (bs == null) {
-                        	Log.info("Unknown Legacy block ID from filename in CTM: " + name);
+                            Log.info("Unknown Legacy block ID from filename in CTM: " + name);
                         }
                         else {
-                        	addBlockStateToIDSet(list, bs);
+                            addBlockStateToIDSet(list, bs);
                         }
                     } catch (NumberFormatException e) {
                         Log.info("Bad block number: " + name);
@@ -564,10 +564,10 @@ public class CTMTexturePack {
                     }
                 }
                 if (id >= 0) {
-                	DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
-                	if (bs != null) {
-                		this.matchBlocks = new int[] { bs.globalStateIndex };
-                	}
+                    DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
+                    if (bs != null) {
+                        this.matchBlocks = new int[] { bs.globalStateIndex };
+                    }
                 }
             }
         }
@@ -828,9 +828,9 @@ public class CTMTexturePack {
                 String ftn = tn;
                 String modname = "minecraft";
                 int colonindex = ftn.indexOf(':');
-                if (colonindex > 0) {	// Modname:resource?
-                	modname = ftn.substring(0, colonindex);
-                	ftn = ftn.substring(colonindex+1);
+                if (colonindex > 0) {    // Modname:resource?
+                    modname = ftn.substring(0, colonindex);
+                    ftn = ftn.substring(colonindex+1);
                 }
                 if (ftn.startsWith("./")) {
                     ftn = proppath + "/" + ftn.substring(2);
@@ -847,7 +847,7 @@ public class CTMTexturePack {
                     ftn = ftn + ".png"; // Add .png if needed
                 }
                 if (modname.equals("minecraft")) {
-                	modname = null;
+                    modname = null;
                 }
                 //Log.info(tn + ":registerTiles(" + modname + ":" + ftn + ")");
                 // Find file ID, add if needed
@@ -982,20 +982,20 @@ public class CTMTexturePack {
             }
         }
 //        for (int i = 0; i < bybaseblockstatelist.length; i++) {
-//        	CTMProps[] p = bybaseblockstatelist[i];
-//        	if (p != null) {
-//        		DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-//        		Log.info(bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
-//        		for (CTMProps pp : p) {
-//        			Log.info("  " + pp.name + ", faces=" + pp.faces + ",connect=" + pp.connect + ", meta=" + pp.metadata + ", method=" + pp.method);
-//        		}
-//        	}
+//            CTMProps[] p = bybaseblockstatelist[i];
+//            if (p != null) {
+//                DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+//                Log.info(bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
+//                for (CTMProps pp : p) {
+//                    Log.info("  " + pp.name + ", faces=" + pp.faces + ",connect=" + pp.connect + ", meta=" + pp.metadata + ", method=" + pp.method);
+//                }
+//            }
 //        }
 //        for (int i = 0; i < mappedblocks.length(); i++) {
-//        	if (mappedblocks.get(i)) {
-//        		DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-//        		Log.info("mapped:" + bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
-//        	}
+//            if (mappedblocks.get(i)) {
+//                DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+//                Log.info("mapped:" + bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
+//            }
 //        }
     }
 
@@ -1084,7 +1084,7 @@ public class CTMTexturePack {
             if (blk == neighbor)
                 return true;
             else 
-            	return blk.material.equals(neighbor.material);
+                return blk.material.equals(neighbor.material);
         }
     }
     

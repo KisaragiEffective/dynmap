@@ -376,7 +376,7 @@ public class HDBlockModels {
                                 cnt++;
                             }
                             else {
-                            	Log.severe("Invalid model block name " + bname + " at line " + rdr.getLineNumber());
+                                Log.severe("Invalid model block name " + bname + " at line " + rdr.getLineNumber());
                             }
                         }
                     } else {
@@ -415,8 +415,8 @@ public class HDBlockModels {
                     /* get old model to be rotated */
                     DynmapBlockState bs = DynmapBlockState.getStateByNameAndIndex(id, Math.max(data, 0));
                     if (bs.isAir()) {
-                    	Log.severe("Invalid rotate ID: " + id + " on line " + rdr.getLineNumber());
-                    	return;
+                        Log.severe("Invalid rotate ID: " + id + " on line " + rdr.getLineNumber());
+                        return;
                     }
                     HDBlockModel mod = models_by_id_data.get(bs.globalStateIndex);
                     if (modlist.isEmpty()) {
@@ -490,8 +490,8 @@ public class HDBlockModels {
                     /* get old model to be rotated */
                     DynmapBlockState bs = DynmapBlockState.getStateByNameAndIndex(id, Math.max(data, 0));
                     if (bs.isAir()) {
-                    	Log.severe("Invalid patchrotate id: " + id + " on line " + rdr.getLineNumber());
-                    	return;
+                        Log.severe("Invalid patchrotate id: " + id + " on line " + rdr.getLineNumber());
+                        return;
                     }
                     HDBlockModel mod = models_by_id_data.get(bs.globalStateIndex);
                     if(pmodlist.isEmpty()) {
@@ -539,18 +539,18 @@ public class HDBlockModels {
                         }
                     }
                     for (String nm : blknames) {
-                    	DynmapBlockState bbs = DynmapBlockState.getBaseStateByName(nm);
-                    	if (bbs.isNotAir()) {
-                    		for (int i = 0; i < bbs.getStateCount(); i++) {
-                    			DynmapBlockState bs = bbs.getState(i);
-                    			if (databits.isEmpty() || databits.get(i)) {
-                    				changeIgnoredBlocks.set(bs.globalStateIndex);
-                    			}
-                    		}
-                    	}
-                    	else {
-                        	Log.severe("Invalid update ignore block name " + nm + " at line " + rdr.getLineNumber());
-                    	}
+                        DynmapBlockState bbs = DynmapBlockState.getBaseStateByName(nm);
+                        if (bbs.isNotAir()) {
+                            for (int i = 0; i < bbs.getStateCount(); i++) {
+                                DynmapBlockState bs = bbs.getState(i);
+                                if (databits.isEmpty() || databits.get(i)) {
+                                    changeIgnoredBlocks.set(bs.globalStateIndex);
+                                }
+                            }
+                        }
+                        else {
+                            Log.severe("Invalid update ignore block name " + nm + " at line " + rdr.getLineNumber());
+                        }
                     }
                 } else if(line.startsWith("#") || line.startsWith(";")) {
                 } else if(line.startsWith("enabled:")) {  /* Test if texture file is enabled */
@@ -776,7 +776,7 @@ public class HDBlockModels {
                                 cnt++;
                             }
                             else {
-                            	Log.severe("Invalid patchmodel block name " + nm + " at line " + rdr.getLineNumber());
+                                Log.severe("Invalid patchmodel block name " + nm + " at line " + rdr.getLineNumber());
                             }
                         }
                     }
@@ -848,7 +848,7 @@ public class HDBlockModels {
                                 cnt++;
                             }
                             else {
-                            	Log.severe("Invalid boxmodel block name " + nm + " at line " + rdr.getLineNumber());
+                                Log.severe("Invalid boxmodel block name " + nm + " at line " + rdr.getLineNumber());
                             }
                         }
                     }
@@ -930,7 +930,7 @@ public class HDBlockModels {
                                 pmodlist.add(new HDBlockPatchModel(bs, databits, patches, blockset));
                                 cnt++;
                             } else {
-                            	Log.severe("Invalid boxlist block name " + nm + " at line " + rdr.getLineNumber());
+                                Log.severe("Invalid boxlist block name " + nm + " at line " + rdr.getLineNumber());
                             }
                         }
                     }
@@ -992,7 +992,7 @@ public class HDBlockModels {
                                 }
                                 cnt++;
                             } else {
-                            	Log.severe("Invalid custommodel block name " + nm + " at line " + rdr.getLineNumber());
+                                Log.severe("Invalid custommodel block name " + nm + " at line " + rdr.getLineNumber());
                             }
                         }
                     }

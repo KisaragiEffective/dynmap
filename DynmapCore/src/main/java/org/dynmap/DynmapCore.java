@@ -515,7 +515,7 @@ public class DynmapCore implements DynmapCommonAPI {
         mapManager.startRendering();
 
         if (markerapi != null) {
-        	MarkerAPIImpl.completeInitializeMarkerAPI(markerapi);
+            MarkerAPIImpl.completeInitializeMarkerAPI(markerapi);
         }
         
         playerfacemgr = new PlayerFaces(this);
@@ -567,14 +567,14 @@ public class DynmapCore implements DynmapCommonAPI {
 //        Log.info("Block Name dump");
 //        Log.info("---------------");
 //        for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); ) {
-//        	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-//        	if (bs != null) {
-//        		Log.info(String.format("%d,%s,%d", i, bs.blockName, bs.getStateCount()));
-//        		i += bs.getStateCount();
-//        	}
-//        	else {
-//        		i++;
-//        	}
+//            DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+//            if (bs != null) {
+//                Log.info(String.format("%d,%s,%d", i, bs.blockName, bs.getStateCount()));
+//                i += bs.getStateCount();
+//            }
+//            else {
+//                i++;
+//            }
 //        }
 //        Log.info("---------------");
         return true;
@@ -758,9 +758,9 @@ public class DynmapCore implements DynmapCommonAPI {
 
     private FileResource createFileResource(String path) {
         try {
-        	File f = new File(path);
-        	URI uri = f.toURI();
-        	URL url = uri.toURL();
+            File f = new File(path);
+            URI uri = f.toURI();
+            URL url = uri.toURL();
             return new FileResource(url);
         } catch(Exception e) {
             Log.info("Could not create file resource");
@@ -909,12 +909,12 @@ public class DynmapCore implements DynmapCommonAPI {
         if (webServer != null) {
             try {
                 webServer.stop();
-                for(int i = 0; i < 100; i++) {	/* Limit wait to 10 seconds */
-                	if(webServer.isStopping())
-                		Thread.sleep(100);
+                for(int i = 0; i < 100; i++) {    /* Limit wait to 10 seconds */
+                    if(webServer.isStopping())
+                        Thread.sleep(100);
                 }
                 if(webServer.isStopping()) {
-                	Log.warning("Graceful shutdown timed out - continuing to terminate");
+                    Log.warning("Graceful shutdown timed out - continuing to terminate");
                 }
             } catch (Exception e) {
                 Log.severe("Failed to stop WebServer!", e);

@@ -16,7 +16,7 @@ public class FenceWallBlockStateRenderer extends CustomRenderer {
     private static final int TEXTURE_BOTTOM = 2;
     private boolean check_yplus;
 
-    private static final int SIDE_XP = 0x1;	// East
+    private static final int SIDE_XP = 0x1;    // East
     private static final int SIDE_XN = 0x2; // West
     private static final int SIDE_X = SIDE_XN | SIDE_XP;
     private static final int SIDE_ZP = 0x4; // South
@@ -132,20 +132,20 @@ public class FenceWallBlockStateRenderer extends CustomRenderer {
     
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
-    	int idx = ctx.getBlockType().stateIndex;
-    	int off = 0;
-        if(check_yplus) {	// Wall?
-        	if ((idx & 0x20) == 0) off += SIDE_XP;	// East connected
-        	if ((idx & 0x10) == 0) off += SIDE_ZN;	// North connected
-        	if ((idx & 0x08) == 0) off += SIDE_ZP;	// South connected
-        	if ((idx & 0x04) == 0) off += SIDE_YP;	// Up connected
-        	if ((idx & 0x01) == 0) off += SIDE_XN;	// West connected
+        int idx = ctx.getBlockType().stateIndex;
+        int off = 0;
+        if(check_yplus) {    // Wall?
+            if ((idx & 0x20) == 0) off += SIDE_XP;    // East connected
+            if ((idx & 0x10) == 0) off += SIDE_ZN;    // North connected
+            if ((idx & 0x08) == 0) off += SIDE_ZP;    // South connected
+            if ((idx & 0x04) == 0) off += SIDE_YP;    // Up connected
+            if ((idx & 0x01) == 0) off += SIDE_XN;    // West connected
         }
-        else {	// Fence
-        	if ((idx & 0x10) == 0) off += SIDE_XP;	// East connected
-        	if ((idx & 0x08) == 0) off += SIDE_ZN;	// North connected
-        	if ((idx & 0x04) == 0) off += SIDE_ZP;	// South connected
-        	if ((idx & 0x01) == 0) off += SIDE_XN;	// West connected
+        else {    // Fence
+            if ((idx & 0x10) == 0) off += SIDE_XP;    // East connected
+            if ((idx & 0x08) == 0) off += SIDE_ZN;    // North connected
+            if ((idx & 0x04) == 0) off += SIDE_ZP;    // South connected
+            if ((idx & 0x01) == 0) off += SIDE_XN;    // West connected
         }
         return meshes[off];
     }    

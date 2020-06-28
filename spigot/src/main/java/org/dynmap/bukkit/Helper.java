@@ -14,7 +14,7 @@ public class Helper {
     
     public static BukkitVersionHelper getHelper() {
         if (BukkitVersionHelper.helper == null) {
-        	String v = Bukkit.getServer().getVersion();
+            String v = Bukkit.getServer().getVersion();
             Log.info("version=" + v);
             if (v.contains("MCPC")) {
                 Log.severe("*********************************************************************************");
@@ -48,7 +48,7 @@ public class Helper {
                 BukkitVersionHelper.helper = new BukkitVersionHelperSpigot113_2();
             }
             else {
-            	BukkitVersionHelper.helper = new BukkitVersionHelperCB();
+                BukkitVersionHelper.helper = new BukkitVersionHelperCB();
             }
         }
         return BukkitVersionHelper.helper;

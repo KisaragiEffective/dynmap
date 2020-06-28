@@ -728,13 +728,13 @@ public class ForgeMapChunkCache extends MapChunkCache
                 return 0;
             }
         }
-		@Override
-		public DynmapBlockState getBlockType() {
-			if (blk == null) {
-				blk = snap.getBlockType(bx, y, bz);
+        @Override
+        public DynmapBlockState getBlockType() {
+            if (blk == null) {
+                blk = snap.getBlockType(bx, y, bz);
             }
-			return blk;
-		}
+            return blk;
+        }
     }
 
     private class OurEndMapIterator extends OurMapIterator
@@ -872,8 +872,8 @@ public class ForgeMapChunkCache extends MapChunkCache
 
 
     public static void init() {
-    	if (!init)
-    	{
+        if (!init)
+        {
             {
 
                 Field[] fields = ServerWorld.class.getDeclaredFields();
@@ -897,12 +897,12 @@ public class ForgeMapChunkCache extends MapChunkCache
                             chunksToRemove.setAccessible(true);
                         });
             }
-			if (updateEntityTick == null) {
-				Log.severe("ERROR: cannot find updateEntityTick - dynmap cannot drive entity cleanup when no players are active");
-			}
+            if (updateEntityTick == null) {
+                Log.severe("ERROR: cannot find updateEntityTick - dynmap cannot drive entity cleanup when no players are active");
+            }
 
-    		init = true;
-    	}
+            init = true;
+        }
     }
 
     /**
@@ -910,7 +910,7 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     public ForgeMapChunkCache()
     {
-    	init();
+        init();
     }
     
     public void setChunks(ForgeWorld dw, List<DynmapChunk> chunks)
@@ -918,20 +918,20 @@ public class ForgeMapChunkCache extends MapChunkCache
         this.dw = dw;
         this.w = dw.getWorld();
         if(dw.isLoaded()) {
-        	/* Check if world's provider is ServerChunkProvider */
-        	AbstractChunkProvider cp = this.w.getChunkProvider();
+            /* Check if world's provider is ServerChunkProvider */
+            AbstractChunkProvider cp = this.w.getChunkProvider();
 
-        	if (cp instanceof ServerChunkProvider)
-        	{
+            if (cp instanceof ServerChunkProvider)
+            {
                 cps = (ServerChunkProvider)cp;
-        	}
-        	else
-        	{
-        		Log.severe("Error: world " + dw.getName() + " has unsupported chunk provider");
-        	}
+            }
+            else
+            {
+                Log.severe("Error: world " + dw.getName() + " has unsupported chunk provider");
+            }
         }
         else {
-        	chunks = new ArrayList<>();
+            chunks = new ArrayList<>();
         }
         nsect = dw.worldheight >> 4;
         this.chunks = chunks;
@@ -1225,9 +1225,9 @@ public class ForgeMapChunkCache extends MapChunkCache
     public int readChunks(int max_to_load)
     {
         if(!dw.isLoaded()) {
-        	isempty = true;
-        	unloadChunks();
-        	return 0;
+            isempty = true;
+            unloadChunks();
+            return 0;
         }
 
         int cnt = 0;
@@ -1318,9 +1318,9 @@ public class ForgeMapChunkCache extends MapChunkCache
      */
     public boolean isDoneLoading()
     {
-    	if(!dw.isLoaded()) {
-    		return true;
-    	}
+        if(!dw.isLoaded()) {
+            return true;
+        }
         if (iterator != null)
         {
             return !iterator.hasNext();
@@ -1444,8 +1444,8 @@ public class ForgeMapChunkCache extends MapChunkCache
 
         for (int i = 0; i < b.length; i++)
         {
-        	if(b[i] == null) continue;
-        	
+            if(b[i] == null) continue;
+            
             String bs = b[i].getTranslationKey();
 
             for (BiomeMap biomeMap : bm) {

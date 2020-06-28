@@ -65,13 +65,13 @@ public class MapManager {
     private boolean tpspausezoomout = false;
 
     // User enter/exit processing
-    private static final int DEFAULT_ENTEREXIT_PERIOD = 1000;	// 1 second
-    private static final int DEFAULT_TITLE_FADEIN = 10;	// 10 ticks = 1/2 second
-    private static final int DEFAULT_TITLE_STAY = 70;	// 70 ticks = 3 1/2 second
-    private static final int DEFAULT_TITLE_FADEOUT = 20;	// 20 ticks = 1 second    
+    private static final int DEFAULT_ENTEREXIT_PERIOD = 1000;    // 1 second
+    private static final int DEFAULT_TITLE_FADEIN = 10;    // 10 ticks = 1/2 second
+    private static final int DEFAULT_TITLE_STAY = 70;    // 70 ticks = 3 1/2 second
+    private static final int DEFAULT_TITLE_FADEOUT = 20;    // 20 ticks = 1 second
     private static final boolean DEFAULT_ENTEREXIT_USETITLE = true;
     private static final boolean DEFAULT_ENTEREPLACESEXITS = false;
-    private final int enterexitperiod;	// Enter/exit processing period
+    private final int enterexitperiod;    // Enter/exit processing period
     private final int titleFadeIn;
     private final int titleStay;
     private final int titleFadeOut;
@@ -81,20 +81,20 @@ public class MapManager {
     private HashMap<UUID, HashSet<EnterExitMarker>> entersetstate = new HashMap<>();
     
     private static class TextQueueRec {
-    	EnterExitText txt;
-    	boolean isEnter;
+        EnterExitText txt;
+        boolean isEnter;
     }
     private static class SendQueueRec {
-    	DynmapPlayer player;
-    	ArrayList<TextQueueRec> queue = new ArrayList<>();
-    	int tickdelay;    	
+        DynmapPlayer player;
+        ArrayList<TextQueueRec> queue = new ArrayList<>();
+        int tickdelay;
     }
 
     private final HashMap<UUID, SendQueueRec> entersetsendqueue = new HashMap<>();
 
     private boolean did_start = false;
     
-    private int zoomout_period;	/* Zoom-out tile processing period, in seconds */
+    private int zoomout_period;    /* Zoom-out tile processing period, in seconds */
     /* Which fullrenders are active */
     private final HashMap<String, FullWorldRenderState> active_renders = new HashMap<>();
 
@@ -464,7 +464,7 @@ public class MapManager {
                 }
             }
             else {
-                tileQueue.done(tile0);            	
+                tileQueue.done(tile0);
             }
         }
         
@@ -480,11 +480,11 @@ public class MapManager {
             List<MapTile> tileset = null;
             
             if(cancelled) {
-            	cleanup();
-            	if (!shutdown) {
-            	    saveRefresh();
-            	}
-            	return;
+                cleanup();
+                if (!shutdown) {
+                    saveRefresh();
+                }
+                return;
             }
             if(tile0 == null) {    /* Not single tile render */
                 if (saverestorepending && world.isLoaded() && (savependingperiod > 0) && ((lastPendingSaveTS + (1000 *savependingperiod))  < System.currentTimeMillis())) {
@@ -542,7 +542,7 @@ public class MapManager {
                                 }
                             }
                         }
-                    }                	
+                    }
                     found.clear();
                     rendered.clear();
                     rendercnt = 0;
@@ -750,8 +750,8 @@ public class MapManager {
                 }
             }
             else {
-        		/* Remove tile from tile queue, since we're processing it already */
-            	tileQueue.remove(tile);
+                /* Remove tile from tile queue, since we're processing it already */
+                tileQueue.remove(tile);
                 /* Switch to not checking if rendered tile is blank - breaks us on skylands, where tiles can be nominally blank - just work off chunk cache empty */
                 if (!cache.isEmpty()) {
                     boolean upd;
@@ -813,8 +813,8 @@ public class MapManager {
         }
         
         public void cancelRender() {
-        	cancelled = true;
-        	storedTileIds.clear();
+            cancelled = true;
+            storedTileIds.clear();
         }
 
         public void shutdownRender() {
@@ -841,7 +841,7 @@ public class MapManager {
     }
     
     private class CheckWorldTimes implements Runnable {
-    	final HashMap<String, Polygon> last_worldborder = new HashMap<>();
+        final HashMap<String, Polygon> last_worldborder = new HashMap<>();
         public void run() {
             Future<Integer> f = core.getServer().callSyncMethod(() -> {
                 long now_nsec = System.nanoTime();
@@ -859,7 +859,7 @@ public class MapManager {
                         Polygon wb = w.getWorldBorder();
                         Polygon oldwb = last_worldborder.get(w.getName());
                         if (((wb == null) && (oldwb == null)) ||
-                                wb.equals(oldwb)) {	// No change
+                                wb.equals(oldwb)) {    // No change
                         }
                         else {
                             core.listenerManager.processWorldEvent(EventType.WORLD_SPAWN_CHANGE, w);
@@ -920,7 +920,7 @@ public class MapManager {
     }
     
     private void sendPlayerEnterExit(DynmapPlayer player, EnterExitText txt) {
-		core.getServer().scheduleServerTask(() -> {
+        core.getServer().scheduleServerTask(() -> {
             if (enterexitUseTitle) {
                 player.sendTitleText(txt.title, txt.subtitle, titleFadeIn, titleStay, titleFadeOut);
             }
@@ -932,31 +932,31 @@ public class MapManager {
     }
     
     private void enqueueMessage(UUID uuid, DynmapPlayer player, EnterExitText txt, boolean isEnter) {
-    	SendQueueRec rec = entersetsendqueue.get(uuid);
-    	if (rec == null) {
-    		rec = new SendQueueRec();
-    		rec.player = player;
-    		rec.tickdelay = 0;
-    		entersetsendqueue.put(uuid, rec);
-    	}
-    	TextQueueRec txtrec = new TextQueueRec();
-    	txtrec.isEnter = isEnter;
-    	txtrec.txt = txt;
-    	rec.queue.add(txtrec);
-    	// If enter replaces exits, and we just added enter, purge exits
-    	if (enterReplacesExits && isEnter) {
+        SendQueueRec rec = entersetsendqueue.get(uuid);
+        if (rec == null) {
+            rec = new SendQueueRec();
+            rec.player = player;
+            rec.tickdelay = 0;
+            entersetsendqueue.put(uuid, rec);
+        }
+        TextQueueRec txtrec = new TextQueueRec();
+        txtrec.isEnter = isEnter;
+        txtrec.txt = txt;
+        rec.queue.add(txtrec);
+        // If enter replaces exits, and we just added enter, purge exits
+        if (enterReplacesExits && isEnter) {
             // Keep the enter records
             rec.queue = rec.queue
                     .stream()
                     .filter(r -> r.isEnter)
                     .collect(Collectors.toCollection(ArrayList::new));
-    	}
+        }
     }
     
     private class DoUserMoveProcessing implements Runnable {
         public void run() {
             HashMap<UUID, HashSet<EnterExitMarker>> newstate = new HashMap<>();
-        	DynmapPlayer[] pl = core.playerList.getOnlinePlayers();
+            DynmapPlayer[] pl = core.playerList.getOnlinePlayers();
             // See which we just left
             // See which we just entered
             Arrays.stream(pl).filter(Objects::nonNull).forEachOrdered(player -> {
@@ -983,10 +983,10 @@ public class MapManager {
                 });
                 newstate.put(puuid, newset);
             });
-        	entersetstate = newstate;	// Replace old with new
-        	
-        	// Go through queues - send pending messages
-        	List<UUID> keys = new ArrayList<>(entersetsendqueue.keySet());
+            entersetstate = newstate;    // Replace old with new
+
+            // Go through queues - send pending messages
+            List<UUID> keys = new ArrayList<>(entersetsendqueue.keySet());
             // Check delay - count down if needed
             // If something to send, send it
             keys.forEach(id -> {
@@ -1004,9 +1004,9 @@ public class MapManager {
                     entersetsendqueue.remove(id);
                 }
             });
-        	if (enterexitperiod > 0) {
-        		scheduleDelayedJob(this, enterexitperiod);
-        	}
+            if (enterexitperiod > 0) {
+                scheduleDelayedJob(this, enterexitperiod);
+            }
         }
     }
 
@@ -1183,28 +1183,28 @@ public class MapManager {
     }
 
     void cancelRender(String w, DynmapCommandSender sender) {
-    	synchronized(mutex) {
-    		if(w != null) {
-    			FullWorldRenderState rndr;
-    			rndr = active_renders.remove(w);
-    			if(rndr != null) {
-    				rndr.cancelRender();	/* Cancel render */
-    				if(sender != null) {
-    					sender.sendMessage("Cancelled render for '" + w + "'");
-    				}
-    			}
-    		}
-    		else {	/* Else, cancel all */
-    		    String[] wids = active_renders.keySet().toArray(new String[0]);
-    			for(String wid : wids) {
-    				FullWorldRenderState rnd = active_renders.remove(wid);
-					rnd.cancelRender();
-    				if(sender != null) {
-    					sender.sendMessage("Cancelled render for '" + wid + "'");
-    				}
-    			}
-    		}
-    	}
+        synchronized(mutex) {
+            if(w != null) {
+                FullWorldRenderState rndr;
+                rndr = active_renders.remove(w);
+                if(rndr != null) {
+                    rndr.cancelRender();    /* Cancel render */
+                    if(sender != null) {
+                        sender.sendMessage("Cancelled render for '" + w + "'");
+                    }
+                }
+            }
+            else {    /* Else, cancel all */
+                String[] wids = active_renders.keySet().toArray(new String[0]);
+                for(String wid : wids) {
+                    FullWorldRenderState rnd = active_renders.remove(wid);
+                    rnd.cancelRender();
+                    if(sender != null) {
+                        sender.sendMessage("Cancelled render for '" + wid + "'");
+                    }
+                }
+            }
+        }
     }
     
     void purgeQueue(DynmapCommandSender sender, String worldname) {
@@ -1309,17 +1309,17 @@ public class MapManager {
         }
         Integer worldIndex = indexLookup.get(worldname);
         if(worldIndex == null) {
-        	worlds.add(dynmapWorld);	/* Put at end if no world section */
+            worlds.add(dynmapWorld);    /* Put at end if no world section */
         }
         else {
-        	int insertIndex;
-        	for(insertIndex = 0; insertIndex < worlds.size(); insertIndex++) {
-        		Integer nextWorldIndex = indexLookup.get(worlds.get(insertIndex).getName());
-        		if (nextWorldIndex == null || worldIndex < nextWorldIndex) {
-        			break;
-       			}
-        	}
-        	worlds.add(insertIndex, dynmapWorld);
+            int insertIndex;
+            for(insertIndex = 0; insertIndex < worlds.size(); insertIndex++) {
+                Integer nextWorldIndex = indexLookup.get(worlds.get(insertIndex).getName());
+                if (nextWorldIndex == null || worldIndex < nextWorldIndex) {
+                    break;
+                   }
+            }
+            worlds.add(insertIndex, dynmapWorld);
         }
         worldsLookup.put(worldname, dynmapWorld);
         core.events.trigger("worldactivated", dynmapWorld);
@@ -1528,8 +1528,8 @@ public class MapManager {
         scheduleDelayedJob(new DoTouchProcessing(), 1000);
         // If enabled, start enter/exit processing
         if (enterexitperiod > 0) {
-        	Log.info("Starting enter/exit processing");
-        	scheduleDelayedJob(new DoUserMoveProcessing(), enterexitperiod);
+            Log.info("Starting enter/exit processing");
+            scheduleDelayedJob(new DoUserMoveProcessing(), enterexitperiod);
         }
         /* Resume pending jobs */
         for(FullWorldRenderState job : active_renders.values()) {
@@ -1642,7 +1642,7 @@ public class MapManager {
         sender.sendMessage(String.format("  Triggered update queue size: %d + %d", tileQueue.size(), invcnt));
         StringBuilder act = new StringBuilder();
         for(String wn : active_renders.keySet())
-        	act.append(wn).append(" ");
+            act.append(wn).append(" ");
         sender.sendMessage(String.format("  Active render jobs: %s", act.toString()));
         /* Chunk load stats */
         sender.sendMessage("Chunk Loading Statistics:");

@@ -127,7 +127,7 @@ public class PlayerList {
     }
 
     public DynmapPlayer[] getOnlinePlayers() {
-    	return Arrays.copyOf(online, online.length);
+        return Arrays.copyOf(online, online.length);
     }
 
     public List<DynmapPlayer> getVisiblePlayers(String worldName) {

@@ -219,7 +219,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             }
             return -1;
         }
-		
+
         @Override
         public int isSignAt(String wname, int x, int y, int z) {
             World w = getServer().getWorld(wname);
@@ -275,13 +275,13 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         private boolean noservername = false;
         @Override
         public String getServerName() {
-        	try {
-        		if (!noservername)
-        			return getServer().getServerName();
-        	} catch (NoSuchMethodError x) {	// Missing in 1.14 spigot - no idea why removed...
-        		noservername = true;
-        	}
-    		return getServer().getMotd();
+            try {
+                if (!noservername)
+                    return getServer().getServerName();
+            } catch (NoSuchMethodError x) {    // Missing in 1.14 spigot - no idea why removed...
+                noservername = true;
+            }
+            return getServer().getMotd();
         }
         @Override
         public boolean isPlayerBanned(String pid) {
@@ -566,10 +566,10 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             HashMap<Integer, String> map = new HashMap<>();
             for (int i = 0; i < bsn.length; i++) {
                 if (bsn[i] != null) {
-                	if (bsn[i].indexOf(':') < 0)
-                		map.put(i, "minecraft:" + bsn[i]);
-                	else
-                		map.put(i, bsn[i]);
+                    if (bsn[i].indexOf(':') < 0)
+                        map.put(i, "minecraft:" + bsn[i]);
+                    else
+                        map.put(i, bsn[i]);
                 }
             }
             return map;
@@ -647,7 +647,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         @Override
         public double getHealth() {
             if(player != null) {
-            	return Math.ceil(2.0 * player.getHealth() / player.getMaxHealth() * player.getHealthScale()) / 2.0;
+                return Math.ceil(2.0 * player.getHealth() / player.getMaxHealth() * player.getHealthScale()) / 2.0;
             }
             else
                 return 0;
@@ -699,21 +699,21 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         }
         @Override
         public String getSkinURL() {
-        	return skinurl;
+            return skinurl;
         }
         @Override
         public UUID getUUID() {
-        	return uuid;
+            return uuid;
         }
         /**
          * Send title and subtitle text (called from server thread)
          */
         @Override
         public void sendTitleText(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTIcks) {
-        	if (player != null) {
-        		helper.sendTitleText(player, title, subtitle, fadeInTicks, stayTicks, fadeOutTIcks);
-        	}
-    	}
+            if (player != null) {
+                helper.sendTitleText(player, title, subtitle, fadeInTicks, stayTicks, fadeOutTIcks);
+            }
+        }
     }
     /* Handler for generic console command sender */
     public class BukkitCommandSender implements DynmapCommandSender {
@@ -971,8 +971,8 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         core.disableCore();
 
         if(SnapshotCache.sscache != null) {
-        	SnapshotCache.sscache.cleanup();
-        	SnapshotCache.sscache = null; 
+            SnapshotCache.sscache.cleanup();
+            SnapshotCache.sscache = null;
         }
         Log.info("Disabled");
     }
@@ -1019,13 +1019,13 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     @Override
     public final int triggerRenderOfVolume(String wid, int minx, int miny, int minz,
             int maxx, int maxy, int maxz) {
-    	SnapshotCache.sscache.invalidateSnapshot(wid, minx, miny, minz, maxx, maxy, maxz);
+        SnapshotCache.sscache.invalidateSnapshot(wid, minx, miny, minz, maxx, maxy, maxz);
         return core.triggerRenderOfVolume(wid, minx, miny, minz, maxx, maxy, maxz);
     }
 
     @Override
     public final int triggerRenderOfBlock(String wid, int x, int y, int z) {
-    	SnapshotCache.sscache.invalidateSnapshot(wid, x, y, z);
+        SnapshotCache.sscache.invalidateSnapshot(wid, x, y, z);
         return core.triggerRenderOfBlock(wid, x, y, z);
     }
 

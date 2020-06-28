@@ -902,17 +902,17 @@ api.scheduleWriteJob(); /* Start write job */
             val = parms.get(ARG_GREETING);
             val2 = parms.get(ARG_GREETINGSUB);
             if ((val != null) || (val2 != null)) {
-            	String title = (val != null) ? ((val.length() > 0) ? val : null) : ((greet != null) ? greet.title : null);
-            	String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((greet != null) ? greet.subtitle : null);
-            	marker.setGreetingText(title, subtitle);
+                String title = (val != null) ? ((val.length() > 0) ? val : null) : ((greet != null) ? greet.title : null);
+                String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((greet != null) ? greet.subtitle : null);
+                marker.setGreetingText(title, subtitle);
             }
             // Handle farewell
             val = parms.get(ARG_FAREWELL);
             val2 = parms.get(ARG_FAREWELLSUB);
             if ((val != null) || (val2 != null)) {
-            	String title = (val != null) ? ((val.length() > 0) ? val : null) : ((farew != null) ? farew.title : null);
-            	String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((farew != null) ? farew.subtitle : null);
-            	marker.setFarewellText(title, subtitle);
+                String title = (val != null) ? ((val.length() > 0) ? val : null) : ((farew != null) ? farew.title : null);
+                String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((farew != null) ? farew.subtitle : null);
+                marker.setFarewellText(title, subtitle);
             }
         } catch (NumberFormatException nfx) {
             sender.sendMessage("Invalid parameter format: " + val);
@@ -1040,17 +1040,17 @@ api.scheduleWriteJob(); /* Start write job */
             val = parms.get(ARG_GREETING);
             val2 = parms.get(ARG_GREETINGSUB);
             if ((val != null) || (val2 != null)) {
-            	String title = (val != null) ? ((val.length() > 0) ? val : null) : ((greet != null) ? greet.title : null);
-            	String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((greet != null) ? greet.subtitle : null);
-            	marker.setGreetingText(title, subtitle);
+                String title = (val != null) ? ((val.length() > 0) ? val : null) : ((greet != null) ? greet.title : null);
+                String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((greet != null) ? greet.subtitle : null);
+                marker.setGreetingText(title, subtitle);
             }
             // Handle farewell
             val = parms.get(ARG_FAREWELL);
             val2 = parms.get(ARG_FAREWELLSUB);
             if ((val != null) || (val2 != null)) {
-            	String title = (val != null) ? ((val.length() > 0) ? val : null) : ((farew != null) ? farew.title : null);
-            	String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((farew != null) ? farew.subtitle : null);
-            	marker.setFarewellText(title, subtitle);
+                String title = (val != null) ? ((val.length() > 0) ? val : null) : ((farew != null) ? farew.title : null);
+                String subtitle = (val2 != null) ? ((val2.length() > 0) ? val2 : null) : ((farew != null) ? farew.subtitle : null);
+                marker.setFarewellText(title, subtitle);
             }
             
         } catch (NumberFormatException nfx) {
@@ -2226,15 +2226,15 @@ api.scheduleWriteJob(); /* Start write job */
             if (m.getMaxZoom() >= 0) {
                 msg += ", maxzoom:" + m.getMaxZoom();
             }
-        	EnterExitText t = m.getGreetingText();
+            EnterExitText t = m.getGreetingText();
             if (t != null) {
-            	if (t.title != null) msg += ", greeting:\"" + t.title + "\"";
-            	if (t.subtitle != null) msg += ", greetingsub:\"" + t.subtitle + "\"";
+                if (t.title != null) msg += ", greeting:\"" + t.title + "\"";
+                if (t.subtitle != null) msg += ", greetingsub:\"" + t.subtitle + "\"";
             }
-        	t = m.getFarewellText();
+            t = m.getFarewellText();
             if (t != null) {
-            	if (t.title != null) msg += ", farewell:\"" + t.title + "\"";
-            	if (t.subtitle != null) msg += ", farewellsub:\"" + t.subtitle + "\"";
+                if (t.title != null) msg += ", farewell:\"" + t.title + "\"";
+                if (t.subtitle != null) msg += ", farewellsub:\"" + t.subtitle + "\"";
             }
             sender.sendMessage(msg);
         }
@@ -2639,15 +2639,15 @@ api.scheduleWriteJob(); /* Start write job */
             if (m.getMaxZoom() >= 0) {
                 msg += ", maxzoom:" + m.getMaxZoom();
             }
-        	EnterExitText t = m.getGreetingText();
+            EnterExitText t = m.getGreetingText();
             if (t != null) {
-            	if (t.title != null) msg += ", greeting:\"" + t.title + "\"";
-            	if (t.subtitle != null) msg += ", greetingsub:\"" + t.subtitle + "\"";
+                if (t.title != null) msg += ", greeting:\"" + t.title + "\"";
+                if (t.subtitle != null) msg += ", greetingsub:\"" + t.subtitle + "\"";
             }
-        	t = m.getFarewellText();
+            t = m.getFarewellText();
             if (t != null) {
-            	if (t.title != null) msg += ", farewell:\"" + t.title + "\"";
-            	if (t.subtitle != null) msg += ", farewellsub:\"" + t.subtitle + "\"";
+                if (t.title != null) msg += ", farewell:\"" + t.title + "\"";
+                if (t.subtitle != null) msg += ", farewellsub:\"" + t.subtitle + "\"";
             }            
             sender.sendMessage(msg);
         }

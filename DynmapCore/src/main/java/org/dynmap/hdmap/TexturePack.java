@@ -218,7 +218,7 @@ public class TexturePack {
         CUSTOM,
         TILESET,
         BIOME,
-        BED	// 1.13 bed texture
+        BED    // 1.13 bed texture
     }
 
     // Material type: used for setting advanced rendering/export characteristics for image in given file
@@ -319,12 +319,12 @@ public class TexturePack {
         int srcx, srcy, width, height, targetx, targety;
         public CustomTileRec() {}
         public CustomTileRec(int srcx, int srcy, int width, int height, int targetx, int targety) {
-        	this.srcx = srcx; this.srcy = srcy;
-        	this.width = width; this.height = height;
-        	this.targetx = targetx; this.targety = targety;
+            this.srcx = srcx; this.srcy = srcy;
+            this.width = width; this.height = height;
+            this.targetx = targetx; this.targety = targety;
         }
         public CustomTileRec(int srcx, int srcy, int width, int height) {
-        	this(srcx, srcy, width, height, 0, 0);
+            this(srcx, srcy, width, height, 0, 0);
         }
     }
     
@@ -406,7 +406,7 @@ public class TexturePack {
         int trivial_color;
         boolean isLoaded;
         @SuppressWarnings("unused")
-		String fname, modid;
+        String fname, modid;
     }    
     
     private int[][] tileARGB;
@@ -1069,8 +1069,8 @@ public class TexturePack {
     }
 
     private static final List<CustomTileRec> bed_patches =
-		Arrays.asList(
-		        // TILEINDEX_BED_HEAD_TOP
+        Arrays.asList(
+                // TILEINDEX_BED_HEAD_TOP
                 new CustomTileRec(6, 6, 16, 16),
                 // TILEINDEX_BED_HEAD_BOTTOM
                 new CustomTileRec(28, 6, 16, 16),
@@ -2669,7 +2669,7 @@ public class TexturePack {
         
         /* If clear-inside op, get out early */
         if((textop == COLORMOD_CLEARINSIDE) || (textop == COLORMOD_MULTTONED_CLEARINSIDE)) {
-        	DynmapBlockState lasthit = ss.getLastBlockHit(); // Last surface hit, vs last visited
+            DynmapBlockState lasthit = ss.getLastBlockHit(); // Last surface hit, vs last visited
             /* Check if previous block is same block type as we are: surface is transparent if it is */
             if (blk.matchingBaseState(lasthit) || ((blk.isWaterFilled() && lasthit.isWaterFilled()) && ps.isOnFace())) {
                 result.setTransparent();

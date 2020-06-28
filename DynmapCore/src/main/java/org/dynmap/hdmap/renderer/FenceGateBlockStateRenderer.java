@@ -46,10 +46,10 @@ public class FenceGateBlockStateRenderer extends CustomRenderer {
             addBox(rpf, list, xmin, xmax, ymin, ymax, zmin, zmax, patchlist);
         }
         private void rotateModel(RenderPatchFactory rpf, int srcidx, int destidx, int rot) {
-        	meshes[destidx] = new RenderPatch[meshes[srcidx].length];
-        	for (int i = 0; i < meshes[destidx].length; i++) {
-        		meshes[destidx][i] = rpf.getRotatedPatch(meshes[srcidx][i], 0, rot, 0, patchlist[i%6]);
-        	}
+            meshes[destidx] = new RenderPatch[meshes[srcidx].length];
+            for (int i = 0; i < meshes[destidx].length; i++) {
+                meshes[destidx][i] = rpf.getRotatedPatch(meshes[srcidx][i], 0, rot, 0, patchlist[i%6]);
+            }
         }
         private void buildMeshes(RenderPatchFactory rpf) {
             ArrayList<RenderPatch> list = new ArrayList<>();

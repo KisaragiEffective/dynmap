@@ -32,213 +32,213 @@ import net.minecraft.server.v1_15_R1.NBTTagList;
  */
 public class MapChunkCache115 extends AbstractMapChunkCache {
 
-	public static class NBTSnapshot implements Snapshot {
-	    private interface Section {
-	        DynmapBlockState getBlockType(int x, int y, int z);
-	        int getBlockSkyLight(int x, int y, int z);
-	        int getBlockEmittedLight(int x, int y, int z);
-	        boolean isEmpty();
-	    }
-	    private final int x, z;
-	    private final Section[] section;
-	    private final int[] hmap; // Height map
-	    private final int[] biome;
-	    private final Object[] biomebase;
-	    private final long captureFulltime;
-	    private final int sectionCnt;
-	    private final long inhabitedTicks;
+    public static class NBTSnapshot implements Snapshot {
+        private interface Section {
+            DynmapBlockState getBlockType(int x, int y, int z);
+            int getBlockSkyLight(int x, int y, int z);
+            int getBlockEmittedLight(int x, int y, int z);
+            boolean isEmpty();
+        }
+        private final int x, z;
+        private final Section[] section;
+        private final int[] hmap; // Height map
+        private final int[] biome;
+        private final Object[] biomebase;
+        private final long captureFulltime;
+        private final int sectionCnt;
+        private final long inhabitedTicks;
 
-	    private static final int BLOCKS_PER_SECTION = 16 * 16 * 16;
-	    private static final int COLUMNS_PER_CHUNK = 16 * 16;
+        private static final int BLOCKS_PER_SECTION = 16 * 16 * 16;
+        private static final int COLUMNS_PER_CHUNK = 16 * 16;
         private static final int V1_15_BIOME_PER_CHUNK = 4 * 4 * 64;
-	    private static final byte[] emptyData = new byte[BLOCKS_PER_SECTION / 2];
-	    private static final byte[] fullData = new byte[BLOCKS_PER_SECTION / 2];
+        private static final byte[] emptyData = new byte[BLOCKS_PER_SECTION / 2];
+        private static final byte[] fullData = new byte[BLOCKS_PER_SECTION / 2];
 
-	    static
-	    {
-	        Arrays.fill(fullData, (byte)0xFF);
-	    }
-	    
-	    private static byte[] dataCopy(byte[] v) {
-	    	if (Arrays.equals(v, emptyData))
-	    		return emptyData;
-	    	else if (Arrays.equals(v, fullData))
-	    		return fullData;
-	    	else
-	    		return v.clone();
-	    }
+        static
+        {
+            Arrays.fill(fullData, (byte)0xFF);
+        }
+        
+        private static byte[] dataCopy(byte[] v) {
+            if (Arrays.equals(v, emptyData))
+                return emptyData;
+            else if (Arrays.equals(v, fullData))
+                return fullData;
+            else
+                return v.clone();
+        }
 
-	    private static class EmptySection implements Section {
-	        @Override
-	        public DynmapBlockState getBlockType(int x, int y, int z) {
-	            return DynmapBlockState.AIR;
-	        }
-	        @Override
-	        public int getBlockSkyLight(int x, int y, int z) {
-	            return 15;
-	        }
-	        @Override
-	        public int getBlockEmittedLight(int x, int y, int z) {
-	            return 0;
-	        }
-	        @Override
-	        public boolean isEmpty() {
-	            return true;
-	        }
-	    }
-	    
-	    private static final EmptySection empty_section = new EmptySection();
-	    
-	    private static class StdSection implements Section {
-	        final DynmapBlockState[] states;
-	        byte[] skylight;
-	        byte[] emitlight;
+        private static class EmptySection implements Section {
+            @Override
+            public DynmapBlockState getBlockType(int x, int y, int z) {
+                return DynmapBlockState.AIR;
+            }
+            @Override
+            public int getBlockSkyLight(int x, int y, int z) {
+                return 15;
+            }
+            @Override
+            public int getBlockEmittedLight(int x, int y, int z) {
+                return 0;
+            }
+            @Override
+            public boolean isEmpty() {
+                return true;
+            }
+        }
+        
+        private static final EmptySection empty_section = new EmptySection();
+        
+        private static class StdSection implements Section {
+            final DynmapBlockState[] states;
+            byte[] skylight;
+            byte[] emitlight;
 
-	        public StdSection() {
-	            states = new DynmapBlockState[BLOCKS_PER_SECTION];
-	            Arrays.fill(states,  DynmapBlockState.AIR);
-	            skylight = emptyData;
-	            emitlight = emptyData;
-	        }
-	        @Override
-	        public DynmapBlockState getBlockType(int x, int y, int z) {
-	            return states[((y & 0xF) << 8) | (z << 4) | x];
-	        }
-	        @Override
-	        public int getBlockSkyLight(int x, int y, int z) {
-	            int off = ((y & 0xF) << 7) | (z << 3) | (x >> 1);
-	            return (skylight[off] >> (4 * (x & 1))) & 0xF;
-	        }
-	        @Override
-	        public int getBlockEmittedLight(int x, int y, int z)
-	        {
-	            int off = ((y & 0xF) << 7) | (z << 3) | (x >> 1);
-	            return (emitlight[off] >> (4 * (x & 1))) & 0xF;
-	        }
-	        @Override
-	        public boolean isEmpty() {
-	            return false;
-	        }
-	    }
-	    /**
-	     * Construct empty chunk snapshot
-	     *
-	     * @param x
-	     * @param z
-	     */
-	    public NBTSnapshot(int worldheight, int x, int z, long captime, long inhabitedTime)
-	    {
-	        this.x = x;
-	        this.z = z;
-	        this.captureFulltime = captime;
-	        this.biome = new int[COLUMNS_PER_CHUNK];
-	        this.biomebase = new Object[COLUMNS_PER_CHUNK];
-	        this.sectionCnt = worldheight / 16;
-	        /* Allocate arrays indexed by section */
-	        this.section = new Section[this.sectionCnt];
+            public StdSection() {
+                states = new DynmapBlockState[BLOCKS_PER_SECTION];
+                Arrays.fill(states,  DynmapBlockState.AIR);
+                skylight = emptyData;
+                emitlight = emptyData;
+            }
+            @Override
+            public DynmapBlockState getBlockType(int x, int y, int z) {
+                return states[((y & 0xF) << 8) | (z << 4) | x];
+            }
+            @Override
+            public int getBlockSkyLight(int x, int y, int z) {
+                int off = ((y & 0xF) << 7) | (z << 3) | (x >> 1);
+                return (skylight[off] >> (4 * (x & 1))) & 0xF;
+            }
+            @Override
+            public int getBlockEmittedLight(int x, int y, int z)
+            {
+                int off = ((y & 0xF) << 7) | (z << 3) | (x >> 1);
+                return (emitlight[off] >> (4 * (x & 1))) & 0xF;
+            }
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+        }
+        /**
+         * Construct empty chunk snapshot
+         *
+         * @param x
+         * @param z
+         */
+        public NBTSnapshot(int worldheight, int x, int z, long captime, long inhabitedTime)
+        {
+            this.x = x;
+            this.z = z;
+            this.captureFulltime = captime;
+            this.biome = new int[COLUMNS_PER_CHUNK];
+            this.biomebase = new Object[COLUMNS_PER_CHUNK];
+            this.sectionCnt = worldheight / 16;
+            /* Allocate arrays indexed by section */
+            this.section = new Section[this.sectionCnt];
 
-	        /* Fill with empty data */
-	        for (int i = 0; i < this.sectionCnt; i++) {
-	            this.section[i] = empty_section;
-	        }
+            /* Fill with empty data */
+            for (int i = 0; i < this.sectionCnt; i++) {
+                this.section[i] = empty_section;
+            }
 
-	        /* Create empty height map */
-	        this.hmap = new int[16 * 16];
-	        
-	        this.inhabitedTicks = inhabitedTime;
-	    }
+            /* Create empty height map */
+            this.hmap = new int[16 * 16];
+            
+            this.inhabitedTicks = inhabitedTime;
+        }
 
-	    public NBTSnapshot(NBTTagCompound nbt, int worldheight) {
-	        this.x = nbt.getInt("xPos");
-	        this.z = nbt.getInt("zPos");
-	        this.captureFulltime = 0;
-	        this.hmap = nbt.getIntArray("HeightMap");
-	        this.sectionCnt = worldheight / 16;
-	        if (nbt.hasKey("InhabitedTime")) {
-	            this.inhabitedTicks = nbt.getLong("InhabitedTime");
-	        }
-	        else {
-	            this.inhabitedTicks = 0;
-	        }
-	        /* Allocate arrays indexed by section */
-	        this.section = new Section[this.sectionCnt];
-	        /* Fill with empty data */
-	        for (int i = 0; i < this.sectionCnt; i++) {
-	            this.section[i] = empty_section;
-	        }
-	        /* Get sections */
-	        NBTTagList sect = nbt.getList("Sections", 10);
-	        for (int i = 0; i < sect.size(); i++) {
-	            NBTTagCompound sec = sect.getCompound(i);
-	            int secnum = sec.getByte("Y");
-	            if (secnum >= this.sectionCnt) {
-	                //Log.info("Section " + (int) secnum + " above world height " + worldheight);
-	                continue;
-	            }
-	            if (secnum < 0)
-	            	continue;
-	            //System.out.println("section(" + secnum + ")=" + sec.asString());
-	            // Create normal section to initialize
-	            StdSection cursect = new StdSection();
-	            this.section[secnum] = cursect;
-	            DynmapBlockState[] states = cursect.states;
-	            DynmapBlockState[] palette;
-	            // If we've got palette and block states list, process non-empty section
-	            if (sec.hasKeyOfType("Palette", 9) && sec.hasKeyOfType("BlockStates", 12)) {
-	            	NBTTagList plist = sec.getList("Palette", 10);
-	            	long[] statelist = sec.getLongArray("BlockStates");
-	            	palette = new DynmapBlockState[plist.size()];
-	            	for (int pi = 0; pi < plist.size(); pi++) {
-	            		NBTTagCompound tc = plist.getCompound(pi);
-	            		String pname = tc.getString("Name");
+        public NBTSnapshot(NBTTagCompound nbt, int worldheight) {
+            this.x = nbt.getInt("xPos");
+            this.z = nbt.getInt("zPos");
+            this.captureFulltime = 0;
+            this.hmap = nbt.getIntArray("HeightMap");
+            this.sectionCnt = worldheight / 16;
+            if (nbt.hasKey("InhabitedTime")) {
+                this.inhabitedTicks = nbt.getLong("InhabitedTime");
+            }
+            else {
+                this.inhabitedTicks = 0;
+            }
+            /* Allocate arrays indexed by section */
+            this.section = new Section[this.sectionCnt];
+            /* Fill with empty data */
+            for (int i = 0; i < this.sectionCnt; i++) {
+                this.section[i] = empty_section;
+            }
+            /* Get sections */
+            NBTTagList sect = nbt.getList("Sections", 10);
+            for (int i = 0; i < sect.size(); i++) {
+                NBTTagCompound sec = sect.getCompound(i);
+                int secnum = sec.getByte("Y");
+                if (secnum >= this.sectionCnt) {
+                    //Log.info("Section " + (int) secnum + " above world height " + worldheight);
+                    continue;
+                }
+                if (secnum < 0)
+                    continue;
+                //System.out.println("section(" + secnum + ")=" + sec.asString());
+                // Create normal section to initialize
+                StdSection cursect = new StdSection();
+                this.section[secnum] = cursect;
+                DynmapBlockState[] states = cursect.states;
+                DynmapBlockState[] palette;
+                // If we've got palette and block states list, process non-empty section
+                if (sec.hasKeyOfType("Palette", 9) && sec.hasKeyOfType("BlockStates", 12)) {
+                    NBTTagList plist = sec.getList("Palette", 10);
+                    long[] statelist = sec.getLongArray("BlockStates");
+                    palette = new DynmapBlockState[plist.size()];
+                    for (int pi = 0; pi < plist.size(); pi++) {
+                        NBTTagCompound tc = plist.getCompound(pi);
+                        String pname = tc.getString("Name");
                         if (tc.hasKey("Properties")) {
                             String statestr;
                             NBTTagCompound prop = tc.getCompound("Properties");
                             statestr = prop.getKeys()
-									.stream()
-									.map(pid -> pid + '=' + prop.get(pid).asString())
-									.collect(Collectors.joining(","));
-	            			palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr);
-	            		}
-	            		if (palette[pi] == null) {
-	            			palette[pi] = DynmapBlockState.getBaseStateByName(pname);
-	            		}
-	            		if (palette[pi] == null) {
-	            			palette[pi] = DynmapBlockState.AIR;
-	            		}
-	            	}
-	            	int recsperblock = (4096 + statelist.length - 1) / statelist.length;
-	            	int bitsperblock = 64 / recsperblock;
-	            	DataBits db = new DataBits(bitsperblock, 4096, statelist);
-	            	if (bitsperblock > 8) {	// Not palette
-	            		for (int j = 0; j < 4096; j++) {
-	            			states[j] = DynmapBlockState.getStateByGlobalIndex(db.a(j));
-	            		}
-	            	}
-	            	else {
-	            		for (int j = 0; j < 4096; j++) {
-	            			int v = db.a(j);
-	            			states[j] = (v < palette.length) ? palette[v] : DynmapBlockState.AIR;
-	            		}
-	            	}
-				}
-	            if (sec.hasKey("BlockLight")) {
-					cursect.emitlight = dataCopy(sec.getByteArray("BlockLight"));
-	            }
-				if (sec.hasKey("SkyLight")) {
-					cursect.skylight = dataCopy(sec.getByteArray("SkyLight"));
-				}
-	        }
-	        /* Get biome data */
-	        this.biome = new int[COLUMNS_PER_CHUNK];
-	        this.biomebase = new Object[COLUMNS_PER_CHUNK];
-	        Object[] bbl = BukkitVersionHelper.helper.getBiomeBaseList();
-	        if (nbt.hasKey("Biomes")) {
-            	int[] bb = nbt.getIntArray("Biomes");
-            	if (bb != null) {
-            	    // If v1.15+ format
-            	    if (bb.length > COLUMNS_PER_CHUNK) {
-            	        // For now, just pad the grid with the first 16
+                                    .stream()
+                                    .map(pid -> pid + '=' + prop.get(pid).asString())
+                                    .collect(Collectors.joining(","));
+                            palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr);
+                        }
+                        if (palette[pi] == null) {
+                            palette[pi] = DynmapBlockState.getBaseStateByName(pname);
+                        }
+                        if (palette[pi] == null) {
+                            palette[pi] = DynmapBlockState.AIR;
+                        }
+                    }
+                    int recsperblock = (4096 + statelist.length - 1) / statelist.length;
+                    int bitsperblock = 64 / recsperblock;
+                    DataBits db = new DataBits(bitsperblock, 4096, statelist);
+                    if (bitsperblock > 8) {    // Not palette
+                        for (int j = 0; j < 4096; j++) {
+                            states[j] = DynmapBlockState.getStateByGlobalIndex(db.a(j));
+                        }
+                    }
+                    else {
+                        for (int j = 0; j < 4096; j++) {
+                            int v = db.a(j);
+                            states[j] = (v < palette.length) ? palette[v] : DynmapBlockState.AIR;
+                        }
+                    }
+                }
+                if (sec.hasKey("BlockLight")) {
+                    cursect.emitlight = dataCopy(sec.getByteArray("BlockLight"));
+                }
+                if (sec.hasKey("SkyLight")) {
+                    cursect.skylight = dataCopy(sec.getByteArray("SkyLight"));
+                }
+            }
+            /* Get biome data */
+            this.biome = new int[COLUMNS_PER_CHUNK];
+            this.biomebase = new Object[COLUMNS_PER_CHUNK];
+            Object[] bbl = BukkitVersionHelper.helper.getBiomeBaseList();
+            if (nbt.hasKey("Biomes")) {
+                int[] bb = nbt.getIntArray("Biomes");
+                if (bb != null) {
+                    // If v1.15+ format
+                    if (bb.length > COLUMNS_PER_CHUNK) {
+                        // For now, just pad the grid with the first 16
                         for (int i = 0; i < COLUMNS_PER_CHUNK; i++) {
                             int off = ((i >> 4) & 0xC) + ((i >> 2) & 0x3);
                             int bv = bb[off + 64];   // Offset to y=64
@@ -246,74 +246,74 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
                             this.biome[i] = bv;
                             this.biomebase[i] = bbl[bv];
                         }
-            	    }
-            	    else { // Else, older chunks
-            	        for (int i = 0; i < bb.length; i++) {
-            	            int bv = bb[i];
-            	            if (bv < 0) bv = 0;
-            	            this.biome[i] = bv;
-            	            this.biomebase[i] = bbl[bv];
-            	        }
-            	    }
-	            }
-	        }
-	    }
-	    
-	    public int getX()
-	    {
-	        return x;
-	    }
+                    }
+                    else { // Else, older chunks
+                        for (int i = 0; i < bb.length; i++) {
+                            int bv = bb[i];
+                            if (bv < 0) bv = 0;
+                            this.biome[i] = bv;
+                            this.biomebase[i] = bbl[bv];
+                        }
+                    }
+                }
+            }
+        }
+        
+        public int getX()
+        {
+            return x;
+        }
 
-	    public int getZ()
-	    {
-	        return z;
-	    }
-	    
-	    public DynmapBlockState getBlockType(int x, int y, int z)
-	    {
-	        return section[y >> 4].getBlockType(x, y, z);
-	    }
+        public int getZ()
+        {
+            return z;
+        }
+        
+        public DynmapBlockState getBlockType(int x, int y, int z)
+        {
+            return section[y >> 4].getBlockType(x, y, z);
+        }
 
-	    public int getBlockSkyLight(int x, int y, int z)
-	    {
-	        return section[y >> 4].getBlockSkyLight(x, y, z);
-	    }
+        public int getBlockSkyLight(int x, int y, int z)
+        {
+            return section[y >> 4].getBlockSkyLight(x, y, z);
+        }
 
-	    public int getBlockEmittedLight(int x, int y, int z)
-	    {
-	        return section[y >> 4].getBlockEmittedLight(x, y, z);
-	    }
+        public int getBlockEmittedLight(int x, int y, int z)
+        {
+            return section[y >> 4].getBlockEmittedLight(x, y, z);
+        }
 
-	    public int getHighestBlockYAt(int x, int z)
-	    {
-	        return hmap[z << 4 | x];
-	    }
+        public int getHighestBlockYAt(int x, int z)
+        {
+            return hmap[z << 4 | x];
+        }
 
-	    public final long getCaptureFullTime()
-	    {
-	        return captureFulltime;
-	    }
+        public final long getCaptureFullTime()
+        {
+            return captureFulltime;
+        }
 
-	    public boolean isSectionEmpty(int sy)
-	    {
-	        return section[sy].isEmpty();
-	    }
-	    
-	    public long getInhabitedTicks() {
-	        return inhabitedTicks;
-	    }
+        public boolean isSectionEmpty(int sy)
+        {
+            return section[sy].isEmpty();
+        }
+        
+        public long getInhabitedTicks() {
+            return inhabitedTicks;
+        }
 
-		@Override
-		public Biome getBiome(int x, int z) {
-	        return AbstractMapChunkCache.getBiomeByID(biome[z << 4 | x]);
-		}
+        @Override
+        public Biome getBiome(int x, int z) {
+            return AbstractMapChunkCache.getBiomeByID(biome[z << 4 | x]);
+        }
 
-		@Override
-		public Object[] getBiomeBaseFromSnapshot() {
-			return this.biomebase;
-		}
-	}
-	
+        @Override
+        public Object[] getBiomeBaseFromSnapshot() {
+            return this.biomebase;
+        }
+    }
+    
     private NBTTagCompound fetchLoadedChunkNBT(World w, int x, int z) {
         CraftWorld cw = (CraftWorld) w;
         NBTTagCompound nbt = null;
@@ -327,7 +327,7 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
             nbt = nbt.getCompound("Level");
             if (nbt != null) {
                 String stat = nbt.getString("Status");
-				ChunkStatus cs = ChunkStatus.a(stat);
+                ChunkStatus cs = ChunkStatus.a(stat);
                 if ((stat == null) || (!cs.b(ChunkStatus.LIGHT))) {
                     nbt = null;
                 }
@@ -347,8 +347,8 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
         if (nbt != null) {
             nbt = nbt.getCompound("Level");
             if (nbt != null) {
-            	String stat = nbt.getString("Status");
-            	if ((stat == null) || (!stat.equals("full"))) {
+                String stat = nbt.getString("Status");
+                if ((stat == null) || (!stat.equals("full"))) {
                     nbt = null;
                     if ((stat == null) || stat.equals("") && DynmapCore.migrateChunks()) {
                         Chunk c = cw.getHandle().getChunkAt(x, z);
@@ -357,7 +357,7 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
                             cw.getHandle().unloadChunk(c);
                         }
                     }
-            	}
+                }
             }
         }
         return nbt;

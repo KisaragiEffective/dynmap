@@ -280,7 +280,7 @@ File f = new File(baseStandaloneDir, "config.js");
     protected void writeUpdates() {
         if(core.mapManager == null) return;
         //Handles Updates
-        List<DynmapWorld> copyOfWorlds = new ArrayList<>(core.mapManager.getWorlds());	// Grab copy of world list
+        List<DynmapWorld> copyOfWorlds = new ArrayList<>(core.mapManager.getWorlds());    // Grab copy of world list
         for (DynmapWorld dynmapWorld : copyOfWorlds) {
             JSONObject update = new JSONObject();
             update.put("timestamp", currentTimestamp);
@@ -343,94 +343,94 @@ File f = new File(baseStandaloneDir, "config.js");
     }
 
     private void processWebChat(JSONArray jsonMsgs) {
-    	Iterator<?> iter = jsonMsgs.iterator();
-		boolean init_skip = (lastChatTimestamp == 0);
-		while (iter.hasNext()) {
-			boolean ok = true;
-			JSONObject o = (JSONObject) iter.next();
-			String ts = String.valueOf(o.get("timestamp"));
-			if(ts.equals("null")) ts = "0";
-			long cts;
-			try {
-				cts = Long.parseLong(ts);
-			} catch (NumberFormatException nfx) {
-				try {
-					cts = (long) Double.parseDouble(ts);
-				} catch (NumberFormatException nfx2) {
-					cts = 0;
-				}
-			}
-			if (cts > lastChatTimestamp) {
-				String name = String.valueOf(o.get("name"));
-				String ip = String.valueOf(o.get("ip"));
-				String uid = null;
-				Object usr = o.get("userid");
-				if(usr != null) {
-					uid = String.valueOf(usr);
-				}
-				boolean isip = true;
-				lastChatTimestamp = cts;
-				if(init_skip)
-					continue;
-				if(uid == null) {
-					if((!trust_client_name) || (name == null) || (name.equals(""))) {
-						if(ip != null)
-							name = ip;
-					}
-					if(useplayerloginip) {  /* Try to match using IPs of player logins */
-						List<String> ids = core.getIDsForIP(name);
-						if(ids != null && !ids.isEmpty()) {
-							name = ids.get(0);
-							isip = false;
-							if(checkuserban) {
-								if(core.getServer().isPlayerBanned(name)) {
-									Log.info("Ignore message from '" + ip + "' - banned player (" + name + ")");
-									ok = false;
-								}
-							}
-							if(chat_perms && !core.getServer().checkPlayerPermission(name, "webchat")) {
-								Log.info("Rejected web chat from " + ip + ": not permitted (" + name + ")");
-								ok = false;
-							}
-						}
-						else if(requireplayerloginip) {
-							Log.info("Ignore message from '" + name + "' - no matching player login recorded");
-							ok = false;
-						}
-					}
-					if(hidewebchatip && isip) {
-						String n = useralias.get(name);
-						if(n == null) { /* Make ID */
-							n = String.format("web-%03d", aliasindex);
-							aliasindex++;
-							useralias.put(name, n);
-						}
-						name = n;
-					}
-				}
-				else {
-					if(core.getServer().isPlayerBanned(uid)) {
-						Log.info("Ignore message from '" + uid + "' - banned user");
-						ok = false;
-					}
-					if(chat_perms && !core.getServer().checkPlayerPermission(uid, "webchat")) {
-						Log.info("Rejected web chat from " + uid + ": not permitted");
-						ok = false;
-					}
-					name = uid;
-				}
-				if(ok) {
-					String message = String.valueOf(o.get("message"));
-					if((lengthlimit > 0) && (message.length() > lengthlimit))
-						message = message.substring(0, lengthlimit);
-					core.webChat(name, message);
-				}
-			}
-		}    	
+        Iterator<?> iter = jsonMsgs.iterator();
+        boolean init_skip = (lastChatTimestamp == 0);
+        while (iter.hasNext()) {
+            boolean ok = true;
+            JSONObject o = (JSONObject) iter.next();
+            String ts = String.valueOf(o.get("timestamp"));
+            if(ts.equals("null")) ts = "0";
+            long cts;
+            try {
+                cts = Long.parseLong(ts);
+            } catch (NumberFormatException nfx) {
+                try {
+                    cts = (long) Double.parseDouble(ts);
+                } catch (NumberFormatException nfx2) {
+                    cts = 0;
+                }
+            }
+            if (cts > lastChatTimestamp) {
+                String name = String.valueOf(o.get("name"));
+                String ip = String.valueOf(o.get("ip"));
+                String uid = null;
+                Object usr = o.get("userid");
+                if(usr != null) {
+                    uid = String.valueOf(usr);
+                }
+                boolean isip = true;
+                lastChatTimestamp = cts;
+                if(init_skip)
+                    continue;
+                if(uid == null) {
+                    if((!trust_client_name) || (name == null) || (name.equals(""))) {
+                        if(ip != null)
+                            name = ip;
+                    }
+                    if(useplayerloginip) {  /* Try to match using IPs of player logins */
+                        List<String> ids = core.getIDsForIP(name);
+                        if(ids != null && !ids.isEmpty()) {
+                            name = ids.get(0);
+                            isip = false;
+                            if(checkuserban) {
+                                if(core.getServer().isPlayerBanned(name)) {
+                                    Log.info("Ignore message from '" + ip + "' - banned player (" + name + ")");
+                                    ok = false;
+                                }
+                            }
+                            if(chat_perms && !core.getServer().checkPlayerPermission(name, "webchat")) {
+                                Log.info("Rejected web chat from " + ip + ": not permitted (" + name + ")");
+                                ok = false;
+                            }
+                        }
+                        else if(requireplayerloginip) {
+                            Log.info("Ignore message from '" + name + "' - no matching player login recorded");
+                            ok = false;
+                        }
+                    }
+                    if(hidewebchatip && isip) {
+                        String n = useralias.get(name);
+                        if(n == null) { /* Make ID */
+                            n = String.format("web-%03d", aliasindex);
+                            aliasindex++;
+                            useralias.put(name, n);
+                        }
+                        name = n;
+                    }
+                }
+                else {
+                    if(core.getServer().isPlayerBanned(uid)) {
+                        Log.info("Ignore message from '" + uid + "' - banned user");
+                        ok = false;
+                    }
+                    if(chat_perms && !core.getServer().checkPlayerPermission(uid, "webchat")) {
+                        Log.info("Rejected web chat from " + uid + ": not permitted");
+                        ok = false;
+                    }
+                    name = uid;
+                }
+                if(ok) {
+                    String message = String.valueOf(o.get("message"));
+                    if((lengthlimit > 0) && (message.length() > lengthlimit))
+                        message = message.substring(0, lengthlimit);
+                    core.webChat(name, message);
+                }
+            }
+        }        
     }
     
     protected void handleWebChat() {
-    	MapManager.scheduleDelayedJob(() -> {
+        MapManager.scheduleDelayedJob(() -> {
             BufferInputStream bis = storage.getStandaloneFile("dynmap_webchat.json");
             if (bis != null && lastTimestamp != 0) {
                 JSONArray jsonMsgs = null;

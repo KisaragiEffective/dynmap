@@ -55,20 +55,20 @@ public class FileResourceHandler extends ResourceHandler {
         if (file == null) {
             return;
         }
-    	if(!target.equals(normalizedTarget)){
-    		baseRequest.setURIPathQuery(normalizedTarget);
-    		baseRequest.setPathInfo(normalizedTarget);
-    		try{
-    			Class<?> requestClass = request.getClass();
-    			Field field = requestClass.getDeclaredField("_pathInfo");
-    			field.setAccessible(true);
-    			field.set(request, normalizedTarget);
-    		} catch (Exception ignore) {
-    			//It's unsafe to continue since these lines will be triggered by only malicious requests.
-    			ignore.printStackTrace();
-    			return;
-    		}
-    	}
-    	super.handle(normalizedTarget, baseRequest, request, response);
+        if(!target.equals(normalizedTarget)){
+            baseRequest.setURIPathQuery(normalizedTarget);
+            baseRequest.setPathInfo(normalizedTarget);
+            try{
+                Class<?> requestClass = request.getClass();
+                Field field = requestClass.getDeclaredField("_pathInfo");
+                field.setAccessible(true);
+                field.set(request, normalizedTarget);
+            } catch (Exception ignore) {
+                //It's unsafe to continue since these lines will be triggered by only malicious requests.
+                ignore.printStackTrace();
+                return;
+            }
+        }
+        super.handle(normalizedTarget, baseRequest, request, response);
     }
 }

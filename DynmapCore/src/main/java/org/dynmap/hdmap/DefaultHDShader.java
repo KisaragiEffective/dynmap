@@ -173,9 +173,9 @@ public class DefaultHDShader implements HDShader {
                         seq = 0;
                         break;
                     default:
-                    	//if(subalpha >= 0)	/* We hit a block in a model */
-                    	//	seq = 4;	/* Use smooth top */
-                    	//else 
+                        //if(subalpha >= 0)    /* We hit a block in a model */
+                        //    seq = 4;    /* Use smooth top */
+                        //else 
                         if(((pixelodd + mapiter.getY()) & 0x03) == 0)
                             seq = 3;
                         else

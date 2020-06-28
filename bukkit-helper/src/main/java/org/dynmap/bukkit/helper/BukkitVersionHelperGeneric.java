@@ -155,8 +155,8 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
         cmaprofile_getproperties = getMethod(cma_gameprofile, new String[] { "getProperties" }, new Class[0]);
         // Property
         cma_property = getOBCClass("com.mojang.authlib.properties.Property");
-	    cmaproperty_getvalue = getMethod(cma_property, new String[] { "getValue" }, new Class[0]);
-        		
+        cmaproperty_getvalue = getMethod(cma_property, new String[] { "getValue" }, new Class[0]);
+
         /* Get NMS classes and fields */
         if(!failed)
             loadNMS();
@@ -552,32 +552,32 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
      * @param player
      */
     public String getSkinURL(Player player) {
-    	String url = null;
+        String url = null;
         Object profile = callMethod(player, obcplayer_getprofile, nullargs, null);
-    	if (profile != null) {
-    		Object propmap = callMethod(profile, cmaprofile_getproperties, nullargs, null);
-    		if ((propmap != null) && (propmap instanceof ForwardingMultimap)) {
-    			ForwardingMultimap<String, Object> fmm = (ForwardingMultimap<String, Object>) propmap;
-    			Collection<Object> txt = fmm.get("textures");
-    	        Object textureProperty = Iterables.getFirst(fmm.get("textures"), null);
-    	        if (textureProperty != null) {
-    				String val = (String) callMethod(textureProperty, cmaproperty_getvalue, nullargs, null);
-    				if (val != null) {
-    					TexturesPayload result = null;
-    					try {
-    						String json = new String(Base64Coder.decode(val), Charsets.UTF_8);
-    						result = gson.fromJson(json, TexturesPayload.class);
-    					} catch (JsonParseException e) {
-    					}
-    					if ((result != null) && (result.textures != null) && (result.textures.containsKey("SKIN"))) {
-    						url = result.textures.get("SKIN").url;
-    					}
-    				}
-    			}
-    		}
-    	}
-    	
-    	return url;
+        if (profile != null) {
+            Object propmap = callMethod(profile, cmaprofile_getproperties, nullargs, null);
+            if ((propmap != null) && (propmap instanceof ForwardingMultimap)) {
+                ForwardingMultimap<String, Object> fmm = (ForwardingMultimap<String, Object>) propmap;
+                Collection<Object> txt = fmm.get("textures");
+                Object textureProperty = Iterables.getFirst(fmm.get("textures"), null);
+                if (textureProperty != null) {
+                    String val = (String) callMethod(textureProperty, cmaproperty_getvalue, nullargs, null);
+                    if (val != null) {
+                        TexturesPayload result = null;
+                        try {
+                            String json = new String(Base64Coder.decode(val), Charsets.UTF_8);
+                            result = gson.fromJson(json, TexturesPayload.class);
+                        } catch (JsonParseException e) {
+                        }
+                        if ((result != null) && (result.textures != null) && (result.textures.containsKey("SKIN"))) {
+                            url = result.textures.get("SKIN").url;
+                        }
+                    }
+                }
+            }
+        }
+
+        return url;
     }
 
 }

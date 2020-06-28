@@ -99,13 +99,13 @@ class MarkerImpl implements Marker {
     }
     
     @Override
-	public String getUniqueMarkerID() {
-    	if (markerset != null) {
-    		return markerset + ":marker:" + markerid;
-    	}
-    	else {
-    		return null;
-    	}
+    public String getUniqueMarkerID() {
+        if (markerset != null) {
+            return markerset + ":marker:" + markerid;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override

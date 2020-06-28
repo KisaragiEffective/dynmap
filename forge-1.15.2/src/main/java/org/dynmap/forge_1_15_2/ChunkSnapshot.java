@@ -178,10 +178,10 @@ public class ChunkSnapshot
                         palette[pi] = DynmapBlockState.AIR;
                     }
                 }
-            	int recsperblock = (4096 + statelist.length - 1) / statelist.length;
-            	int bitsperblock = 64 / recsperblock;
+                int recsperblock = (4096 + statelist.length - 1) / statelist.length;
+                int bitsperblock = 64 / recsperblock;
                 BitArray db = new BitArray(bitsperblock, 4096, statelist);
-                if (bitsperblock > 8) {	// Not palette
+                if (bitsperblock > 8) {    // Not palette
                     for (int j = 0; j < 4096; j++) {
                         states[j] = DynmapBlockState.getStateByGlobalIndex(db.getAt(j));
                     }
@@ -204,24 +204,24 @@ public class ChunkSnapshot
         this.biome = new int[COLUMNS_PER_CHUNK];
         if (nbt.contains("Biomes")) {
             int[] bb = nbt.getIntArray("Biomes");
-        	if (bb != null) {
-        		// If v1.15+ format
-        		if (bb.length > COLUMNS_PER_CHUNK) {
-        	        // For now, just pad the grid with the first 16
+            if (bb != null) {
+                // If v1.15+ format
+                if (bb.length > COLUMNS_PER_CHUNK) {
+                    // For now, just pad the grid with the first 16
                     for (int i = 0; i < COLUMNS_PER_CHUNK; i++) {
                         int off = ((i >> 4) & 0xC) + ((i >> 2) & 0x3);
                         int bv = bb[off + 64];   // Offset to y=64
                         if (bv < 0) bv = 0;
                         this.biome[i] = bv;
                     }
-        	    }
-        	    else { // Else, older chunks
-        	        for (int i = 0; i < bb.length; i++) {
-        	            int bv = bb[i];
-        	            if (bv < 0) bv = 0;
-        	            this.biome[i] = bv;
-        	        }
-        	    }
+                }
+                else { // Else, older chunks
+                    for (int i = 0; i < bb.length; i++) {
+                        int bv = bb[i];
+                        if (bv < 0) bv = 0;
+                        this.biome[i] = bv;
+                    }
+                }
             }
         }
     }

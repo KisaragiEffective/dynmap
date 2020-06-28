@@ -98,8 +98,8 @@ public interface DynmapPlayer extends DynmapCommandSender {
      * Send title and subtitle text (called from server thread)
      */
     default void sendTitleText(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTIcks) {
-    	// Fallback if not implemented
-    	if (title != null) this.sendMessage(title);
+        // Fallback if not implemented
+        if (title != null) this.sendMessage(title);
         if (subtitle != null) this.sendMessage(subtitle);
-	}
+    }
 }

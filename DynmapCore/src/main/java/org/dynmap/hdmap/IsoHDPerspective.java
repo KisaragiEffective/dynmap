@@ -161,7 +161,7 @@ public class IsoHDPerspective implements HDPerspective {
         }
         
         private void updateSemitransparentLight(LightLevels ll) {
-        	int emitted = 0, sky = 0;
+            int emitted = 0, sky = 0;
             for (BlockStep s : semi_steps) {
                 mapiter.stepPosition(s);
                 int v = mapiter.getBlockEmittedLight();
@@ -170,8 +170,8 @@ public class IsoHDPerspective implements HDPerspective {
                 if (v > sky) sky = v;
                 mapiter.unstepPosition(s);
             }
-        	ll.sky = sky;
-        	ll.emitted = emitted;
+            ll.sky = sky;
+            ll.emitted = emitted;
         }
         /**
          * Update sky and emitted light 
@@ -180,32 +180,32 @@ public class IsoHDPerspective implements HDPerspective {
             /* Look up transparency for current block */
             BlockTransparency bt = HDBlockStateTextureMap.getTransparency(blk);
             switch(bt) {
-            	case TRANSPARENT:
-            		ll.sky = mapiter.getBlockSkyLight();
-            		ll.emitted = mapiter.getBlockEmittedLight();
-            		break;
-            	case OPAQUE:
-        			if(HDBlockStateTextureMap.getTransparency(lastblocktype) != BlockTransparency.SEMITRANSPARENT) {
-                		mapiter.unstepPosition(laststep);  /* Back up to block we entered on */
-                		if(mapiter.getY() < worldheight) {
-                		    ll.sky = mapiter.getBlockSkyLight();
-                		    ll.emitted = mapiter.getBlockEmittedLight();
-                		} else {
-                		    ll.sky = 15;
-                		    ll.emitted = 0;
-                		}
-                		mapiter.stepPosition(laststep);
-        			}
-        			else {
-                		mapiter.unstepPosition(laststep);  /* Back up to block we entered on */
-                		updateSemitransparentLight(ll);
-                		mapiter.stepPosition(laststep);
-        			}
-        			break;
-            	case SEMITRANSPARENT:
-            		updateSemitransparentLight(ll);
-            		break;
-        		default:
+                case TRANSPARENT:
+                    ll.sky = mapiter.getBlockSkyLight();
+                    ll.emitted = mapiter.getBlockEmittedLight();
+                    break;
+                case OPAQUE:
+                    if(HDBlockStateTextureMap.getTransparency(lastblocktype) != BlockTransparency.SEMITRANSPARENT) {
+                        mapiter.unstepPosition(laststep);  /* Back up to block we entered on */
+                        if(mapiter.getY() < worldheight) {
+                            ll.sky = mapiter.getBlockSkyLight();
+                            ll.emitted = mapiter.getBlockEmittedLight();
+                        } else {
+                            ll.sky = 15;
+                            ll.emitted = 0;
+                        }
+                        mapiter.stepPosition(laststep);
+                    }
+                    else {
+                        mapiter.unstepPosition(laststep);  /* Back up to block we entered on */
+                        updateSemitransparentLight(ll);
+                        mapiter.stepPosition(laststep);
+                    }
+                    break;
+                case SEMITRANSPARENT:
+                    updateSemitransparentLight(ll);
+                    break;
+                default:
                     ll.sky = mapiter.getBlockSkyLight();
                     ll.emitted = mapiter.getBlockEmittedLight();
                     break;
@@ -585,9 +585,9 @@ public class IsoHDPerspective implements HDPerspective {
         private boolean visit_block(HDShaderState[] shaderstate, boolean[] shaderdone) {
             lastblocktype = blocktype;
             blocktype = mapiter.getBlockType();
-            if (skiptoair) {	/* If skipping until we see air */
-                if (blocktype.isAir()) {	/* If air, we're done */
-                	skiptoair = false;
+            if (skiptoair) {    /* If skipping until we see air */
+                if (blocktype.isAir()) {    /* If air, we're done */
+                    skiptoair = false;
                 }
             }
             else if(nonairhit || blocktype.isNotAir()) {
@@ -607,7 +607,7 @@ public class IsoHDPerspective implements HDPerspective {
                     return handleSubModel(model, shaderstate, shaderdone);
                 }
                 else {
-                	boolean done = true;
+                    boolean done = true;
                     subalpha = -1;
                     for(int i = 0; i < shaderstate.length; i++) {
                         if(!shaderdone[i]) {
@@ -618,7 +618,7 @@ public class IsoHDPerspective implements HDPerspective {
                         done = done && shaderdone[i];
                     }
                     if (done)
-                    	return true;
+                        return true;
                     nonairhit = true;
                 }
             }
@@ -707,12 +707,12 @@ public class IsoHDPerspective implements HDPerspective {
             mapiter.initialize(x, y, z);
             
             for (; n > 0; --n) {
-        		if (visit_block(shaderstate, shaderdone)) {
+                if (visit_block(shaderstate, shaderdone)) {
                     return;
                 }
-        		if (!raytraceStepIterator()) {
-        		    return;
-        		}
+                if (!raytraceStepIterator()) {
+                    return;
+                }
             }
         }
 
@@ -762,51 +762,51 @@ public class IsoHDPerspective implements HDPerspective {
 
         private boolean raytraceSubblock(short[] model, boolean firsttime) {
             if(firsttime) {
-            	mt = t + 0.00000001;
-            	xx = top.x + mt * direction.x;  
-            	yy = top.y + mt * direction.y;  
-            	zz = top.z + mt * direction.z;
-            	mx = (int)((xx - fastFloor(xx)) * modscale);
-            	my = (int)((yy - fastFloor(yy)) * modscale);
-            	mz = (int)((zz - fastFloor(zz)) * modscale);
-            	mdt_dx = dt_dx / modscale;
-            	mdt_dy = dt_dy / modscale;
-            	mdt_dz = dt_dz / modscale;
-            	mt_next_x = t_next_x;
-            	mt_next_y = t_next_y;
-            	mt_next_z = t_next_z;
-            	if(mt_next_x != Double.MAX_VALUE) {
-            		togo = ((t_next_x - t) / mdt_dx);
-            		mt_next_x = mt + (togo - fastFloor(togo)) * mdt_dx;
-            	}
-            	if(mt_next_y != Double.MAX_VALUE) {
-            		togo = ((t_next_y - t) / mdt_dy);
-            		mt_next_y = mt + (togo - fastFloor(togo)) * mdt_dy;
-            	}
-            	if(mt_next_z != Double.MAX_VALUE) {
-            		togo = ((t_next_z - t) / mdt_dz);
-            		mt_next_z = mt + (togo - fastFloor(togo)) * mdt_dz;
-            	}
-            	mtend = Math.min(t_next_x, Math.min(t_next_y, t_next_z));
+                mt = t + 0.00000001;
+                xx = top.x + mt * direction.x;  
+                yy = top.y + mt * direction.y;  
+                zz = top.z + mt * direction.z;
+                mx = (int)((xx - fastFloor(xx)) * modscale);
+                my = (int)((yy - fastFloor(yy)) * modscale);
+                mz = (int)((zz - fastFloor(zz)) * modscale);
+                mdt_dx = dt_dx / modscale;
+                mdt_dy = dt_dy / modscale;
+                mdt_dz = dt_dz / modscale;
+                mt_next_x = t_next_x;
+                mt_next_y = t_next_y;
+                mt_next_z = t_next_z;
+                if(mt_next_x != Double.MAX_VALUE) {
+                    togo = ((t_next_x - t) / mdt_dx);
+                    mt_next_x = mt + (togo - fastFloor(togo)) * mdt_dx;
+                }
+                if(mt_next_y != Double.MAX_VALUE) {
+                    togo = ((t_next_y - t) / mdt_dy);
+                    mt_next_y = mt + (togo - fastFloor(togo)) * mdt_dy;
+                }
+                if(mt_next_z != Double.MAX_VALUE) {
+                    togo = ((t_next_z - t) / mdt_dz);
+                    mt_next_z = mt + (togo - fastFloor(togo)) * mdt_dz;
+                }
+                mtend = Math.min(t_next_x, Math.min(t_next_y, t_next_z));
             }
             subalpha = -1;
-            boolean skip = !firsttime;	/* Skip first block on continue */
+            boolean skip = !firsttime;    /* Skip first block on continue */
             while(mt <= mtend) {
-            	if(!skip) {
-            		try {
-            			int blkalpha = model[modscale*modscale*my + modscale*mz + mx];
-            			if(blkalpha > 0) {
-            				subalpha = blkalpha;
-            				return false;
-            			}
-            		} catch (ArrayIndexOutOfBoundsException aioobx) {	/* We're outside the model, so miss */
-            			return true;
-            		}
-            	}
-            	else {
-            		skip = false;
-            	}
-        		
+                if(!skip) {
+                    try {
+                        int blkalpha = model[modscale*modscale*my + modscale*mz + mx];
+                        if(blkalpha > 0) {
+                            subalpha = blkalpha;
+                            return false;
+                        }
+                    } catch (ArrayIndexOutOfBoundsException aioobx) {    /* We're outside the model, so miss */
+                        return true;
+                    }
+                }
+                else {
+                    skip = false;
+                }
+                
                 /* If X step is next best */
                 if((mt_next_x <= mt_next_y) && (mt_next_x <= mt_next_z)) {
                     mx += x_inc;

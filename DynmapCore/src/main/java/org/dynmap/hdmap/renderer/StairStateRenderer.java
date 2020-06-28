@@ -133,30 +133,30 @@ public class StairStateRenderer extends CustomRenderer {
     private static final int[] midx_by_facing_left = { 1, 0, 2, 3 };
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
-    	int idx = ctx.getBlockType().stateIndex;
-    	// Parse index
-    	int shape = (idx >> 1) % 5; // 0=straight, 1=inner left, 2 = inner right, 3=outer left, 4=outer right
-    	int half = (idx / 10) % 2;	// 0=top, 1=bottom
-    	int facing = (idx / 20) % 4;	// 0=north, 1=south, 2=west, 3=east
-    	// Compute model index
-    	RenderPatch[] rp = null;
-    	switch (shape) {
-    		case 0:	// Straight
-    			rp = stepmeshes[midx_by_facing[facing] + ((1-half) * 4)];
-    			break;
-    		case 1: // inner left
-    			rp = step_3_4_meshes[midx_by_facing_left[facing] + ((1-half) * 4)];
-    			break;
-    		case 2: // inner right
-    			rp = step_3_4_meshes[midx_by_facing[facing] + ((1-half) * 4)];
-    			break;
-    		case 3:	// Outer left
-    			rp = step_1_4_meshes[midx_by_facing_left[facing] + ((1-half) * 4)];
-    			break;
-    		case 4: // Outer right
-    			rp = step_1_4_meshes[midx_by_facing[facing] + ((1-half) * 4)];
-    			break;
-    	}
-    	return rp;
+        int idx = ctx.getBlockType().stateIndex;
+        // Parse index
+        int shape = (idx >> 1) % 5; // 0=straight, 1=inner left, 2 = inner right, 3=outer left, 4=outer right
+        int half = (idx / 10) % 2;    // 0=top, 1=bottom
+        int facing = (idx / 20) % 4;    // 0=north, 1=south, 2=west, 3=east
+        // Compute model index
+        RenderPatch[] rp = null;
+        switch (shape) {
+            case 0:    // Straight
+                rp = stepmeshes[midx_by_facing[facing] + ((1-half) * 4)];
+                break;
+            case 1: // inner left
+                rp = step_3_4_meshes[midx_by_facing_left[facing] + ((1-half) * 4)];
+                break;
+            case 2: // inner right
+                rp = step_3_4_meshes[midx_by_facing[facing] + ((1-half) * 4)];
+                break;
+            case 3:    // Outer left
+                rp = step_1_4_meshes[midx_by_facing_left[facing] + ((1-half) * 4)];
+                break;
+            case 4: // Outer right
+                rp = step_1_4_meshes[midx_by_facing[facing] + ((1-half) * 4)];
+                break;
+        }
+        return rp;
     }    
 }

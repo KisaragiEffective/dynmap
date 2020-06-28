@@ -55,7 +55,7 @@ public class AsynchronousQueue<T> {
         synchronized (lock) {
             if (set.remove(t)) {
                 queue.remove(t);
-            	return true;
+                return true;
             }
         }
         return false;
@@ -110,22 +110,22 @@ public class AsynchronousQueue<T> {
     private void running() {
         try {
             while (Thread.currentThread() == thread) {
-            	synchronized(lock) {
-            		while(pendingcnt >= pendinglimit) {
-            			try {
-            				lock.wait(accelDequeueTime);
-            			} catch (InterruptedException ix) {
-            				if(Thread.currentThread() != thread)
-            					return;
-            				throw ix;
-            			}
-            		}
-            	}
+                synchronized(lock) {
+                    while(pendingcnt >= pendinglimit) {
+                        try {
+                            lock.wait(accelDequeueTime);
+                        } catch (InterruptedException ix) {
+                            if(Thread.currentThread() != thread)
+                                return;
+                            throw ix;
+                        }
+                    }
+                }
                 T t = pop();
                 if (t != null) {
-                	synchronized(lock) {
-                		pendingcnt++;
-                	}
+                    synchronized(lock) {
+                        pendingcnt++;
+                    }
                     handler.handle(t);
                 }
                 if(set.size() >= accelDequeueThresh)
@@ -150,8 +150,8 @@ public class AsynchronousQueue<T> {
     
     public void done(T t) {
         synchronized (lock) {
-        	if(pendingcnt > 0) pendingcnt--;
-        	lock.notifyAll();
+            if(pendingcnt > 0) pendingcnt--;
+            lock.notifyAll();
         }
     }
 }
