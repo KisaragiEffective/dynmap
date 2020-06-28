@@ -415,9 +415,11 @@ public class DynmapMapCommands {
             sender.sendMessage("Cannot update maps from disabled or unloaded world: " + wname);
             return true;
         }
-        HDMap mt = (HDMap) w.maps
+        /* Find the map */
+        HDMap mt = w.maps
                 .stream()
                 .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
                 .filter(map -> map.getName().equals(mname))
                 .findFirst()
                 .orElse(null);
