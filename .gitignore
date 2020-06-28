@@ -27,3 +27,6 @@
 /dependency-reduced-pom.xml
 
 /.gradle
+
+jquery-1.11.0.js
+.idea
