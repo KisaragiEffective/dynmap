@@ -140,14 +140,14 @@ public class ChunkSnapshot
         NBTTagList sect = nbt.getTagList("Sections", 10);
         for (int i = 0; i < sect.tagCount(); i++) {
             NBTTagCompound sec = sect.getCompoundTagAt(i);
-            byte secnum = sec.getByte("Y");
-            if (secnum >= this.sectionCnt) {
-                Log.info("Section " + (int) secnum + " above world height " + worldheight);
+            byte thatY = sec.getByte("Y");
+            if (thatY >= this.sectionCnt) {
+                Log.info("Section " + (int) thatY + " above world height " + worldheight);
                 continue;
             }
             // Create normal section to initialize
             StdSection cursect = new StdSection();
-            this.section[secnum] = cursect;
+            this.section[thatY] = cursect;
             DynmapBlockState[] states = cursect.states;
             // JEI format
             if (sec.hasKey("Palette", 11)) {
@@ -170,8 +170,7 @@ public class ChunkSnapshot
         			// Get odd block id
         			states[2*j+1] = DynmapPlugin.stateByID[(idx2 < p.length) ? p[idx2] : 0];
                 }
-            }
-            else {
+            } else {
                 // Get block IDs
             	byte[] lsb_bytes = sec.getByteArray("Blocks");
             	if (lsb_bytes.length < BLOCKS_PER_SECTION) {
@@ -195,7 +194,8 @@ public class ChunkSnapshot
                 }
                 // Get meta nibble data
                 byte[] bd = null;
-                if (sec.hasKey("Data", 7)) {
+                if (!sec.hasKey("Data", 7)) {
+                } else {
                     bd = sec.getByteArray("Data");
                     if (bd.length < (BLOCKS_PER_SECTION / 2)) {
                         bd = Arrays.copyOf(bd, (BLOCKS_PER_SECTION / 2));
@@ -238,20 +238,11 @@ public class ChunkSnapshot
         this.biome = new int[COLUMNS_PER_CHUNK];
         if (nbt.hasKey("Biomes")) {
             byte[] b = nbt.getByteArray("Biomes");
-            if (b != null) {
-            	for (int i = 0; i < b.length; i++) {
-            		int bv = 255 & b[i];
-            		this.biome[i] = (bv == 255) ? 0 : bv;
-            	}
-            }
-            else {	// Check JEI biomes
-            	int[] bb = nbt.getIntArray("Biomes");
-            	if (bb != null) {
-                	for (int i = 0; i < bb.length; i++) {
-                		int bv = bb[i];
-                		this.biome[i] = (bv < 0) ? 0 : bv;
-                	}
-            	}
+            // b always isn't null
+            assert b != null;
+            for (int i = 0; i < b.length; i++) {
+                int bv = 255 & b[i];
+                this.biome[i] = (bv == 255) ? 0 : bv;
             }
         }
     }
