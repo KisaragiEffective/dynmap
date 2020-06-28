@@ -145,12 +145,12 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         @Override
         public boolean write(long hash, BufferOutputStream encImage) {
             if (mapkey == null) return false;
-            Connection c = null;
-            boolean err = false;
             boolean exists = exists();
             // If delete, and doesn't exist, quit
             if ((encImage == null) && (!exists)) return false;
 
+            boolean err = false;
+            Connection c = null;
             try {
                 c = getConnection();
                 if (encImage == null) { // If delete
@@ -237,13 +237,13 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
 
         @Override
         public MapStorageTile getZoomOutTile() {
-            int xx, yy;
+            int xx;
             int step = 1 << zoom;
             if(x >= 0)
                 xx = x - (x % (2*step));
             else
                 xx = x + (x % (2*step));
-            yy = -y;
+            int yy = -y;
             if(yy >= 0)
                 yy = yy - (yy % (2*step));
             else
@@ -319,11 +319,11 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
     private final HashMap<String, Integer> mapKey = new HashMap<>();
 
     private void doLoadMaps() {
-        Connection c = null;
-        boolean err = false;
 
         mapKey.clear();
         // Read the maps table - cache results
+        boolean err = false;
+        Connection c = null;
         try {
             c = getConnection();
             try (
@@ -563,14 +563,14 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
     }
 
     private void processEnumMapTiles(DynmapWorld world, MapType map, MapType.ImageVariant var, MapStorageTileEnumCB cb, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
-        Connection c = null;
-        boolean err = false;
         Integer mapkey = getMapKey(world, map, var);
         if (mapkey == null) {
             if(cbEnd != null)
                 cbEnd.searchEnded();
             return;
         }
+        boolean err = false;
+        Connection c = null;
         try {
             c = getConnection();
             // Query tiles for given mapkey
@@ -638,26 +638,29 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         boolean err = false;
         try {
             c = getConnection();
-            PreparedStatement stmt;
             if (encImage == null) { // If delete
-                stmt = c.prepareStatement("DELETE FROM Faces WHERE PlayerName=? AND TypeIDx=?;");
-                stmt.setString(1, playername);
-                stmt.setInt(2, facetype.typeID);
+                try (PreparedStatement stmt = c.prepareStatement("DELETE FROM Faces WHERE PlayerName=? AND TypeIDx=?;")) {
+                    stmt.setString(1, playername);
+                    stmt.setInt(2, facetype.typeID);
+                    executeUpdate(stmt);
+                }
             } else if (exists) {
-                stmt = c.prepareStatement("UPDATE Faces SET Image=?,ImageLen=? WHERE PlayerName=? AND TypeID=?;");
-                stmt.setBytes(1, encImage.buf);
-                stmt.setInt(2, encImage.len);
-                stmt.setString(3, playername);
-                stmt.setInt(4, facetype.typeID);
+                try (PreparedStatement stmt = c.prepareStatement("UPDATE Faces SET Image=?,ImageLen=? WHERE PlayerName=? AND TypeID=?;")) {
+                    stmt.setBytes(1, encImage.buf);
+                    stmt.setInt(2, encImage.len);
+                    stmt.setString(3, playername);
+                    stmt.setInt(4, facetype.typeID);
+                    executeUpdate(stmt);
+                }
             } else {
-                stmt = c.prepareStatement("INSERT INTO Faces (PlayerName,TypeID,Image,ImageLen) VALUES (?,?,?,?);");
-                stmt.setString(1, playername);
-                stmt.setInt(2, facetype.typeID);
-                stmt.setBytes(3, encImage.buf);
-                stmt.setInt(4, encImage.len);
+                try (PreparedStatement stmt = c.prepareStatement("INSERT INTO Faces (PlayerName,TypeID,Image,ImageLen) VALUES (?,?,?,?);")) {
+                    stmt.setString(1, playername);
+                    stmt.setInt(2, facetype.typeID);
+                    stmt.setBytes(3, encImage.buf);
+                    stmt.setInt(4, encImage.len);
+                    executeUpdate(stmt);
+                }
             }
-            executeUpdate(stmt);
-            stmt.close();
         } catch (SQLException x) {
             Log.severe("Face write error - " + x.getMessage());
             err = true;
