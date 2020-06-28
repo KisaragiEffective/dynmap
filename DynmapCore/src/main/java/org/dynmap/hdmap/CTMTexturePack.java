@@ -211,33 +211,36 @@ public class CTMTexturePack {
             this.faces = 0;
             String[] tok = v.split("\\s+");
             for(String t : tok) {
-                if (t.equals("bottom")) {
-                    this.faces |= FACE_BOTTOM;
-                }
-                else if (t.equals("top")) {
-                    this.faces |= FACE_TOP;
-                }
-                else if (t.equals("north")) {
-                    this.faces |= FACE_NORTH;
-                }
-                else if (t.equals("south")) {
-                    this.faces |= FACE_SOUTH;
-                }
-                else if (t.equals("east")) {
-                    this.faces |= FACE_EAST;
-                }
-                else if (t.equals("west")) {
-                    this.faces |= FACE_WEST;
-                }
-                else if (t.equals("sides") || t.equals("side")) {
-                    this.faces |= FACE_SIDES;
-                }
-                else if (t.equals("all")) {
-                    this.faces |= FACE_ALL;
-                }
-                else {
-                    Log.info("Unknown face in CTM file: " + t);
-                    this.faces |= FACE_UNKNOWN;
+                switch (t) {
+                    case "bottom":
+                        this.faces |= FACE_BOTTOM;
+                        break;
+                    case "top":
+                        this.faces |= FACE_TOP;
+                        break;
+                    case "north":
+                        this.faces |= FACE_NORTH;
+                        break;
+                    case "south":
+                        this.faces |= FACE_SOUTH;
+                        break;
+                    case "east":
+                        this.faces |= FACE_EAST;
+                        break;
+                    case "west":
+                        this.faces |= FACE_WEST;
+                        break;
+                    case "sides":
+                    case "side":
+                        this.faces |= FACE_SIDES;
+                        break;
+                    case "all":
+                        this.faces |= FACE_ALL;
+                        break;
+                    default:
+                        Log.info("Unknown face in CTM file: " + t);
+                        this.faces |= FACE_UNKNOWN;
+                        break;
                 }
             }
         }
