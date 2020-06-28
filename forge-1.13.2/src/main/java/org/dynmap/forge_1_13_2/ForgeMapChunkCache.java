@@ -1467,10 +1467,7 @@ public class ForgeMapChunkCache extends MapChunkCache
     {
         if (snaparray != null)
         {
-            for (int i = 0; i < snaparray.length; i++)
-            {
-                snaparray[i] = null;
-            }
+            Arrays.fill(snaparray, null);
 
             snaparray = null;
         }
@@ -1562,10 +1559,7 @@ public class ForgeMapChunkCache extends MapChunkCache
         BiomeMap[] bm = BiomeMap.values();
         biome_to_bmap = new BiomeMap[256];
 
-        for (int i = 0; i < biome_to_bmap.length; i++)
-        {
-            biome_to_bmap[i] = BiomeMap.NULL;
-        }
+        Arrays.fill(biome_to_bmap, BiomeMap.NULL);
 
         for (int i = 0; i < b.length; i++)
         {

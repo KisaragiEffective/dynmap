@@ -946,9 +946,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
      */
     public void unloadChunks() {
         if(snaparray != null) {
-            for(int i = 0; i < snaparray.length; i++) {
-                snaparray[i] = null;
-            }
+            Arrays.fill(snaparray, null);
             snaparray = null;
             inhabitedTicks = null;
         }
@@ -1035,9 +1033,7 @@ public abstract class AbstractMapChunkCache extends MapChunkCache {
         biome_to_bmap = new BiomeMap[1024];
         biome_by_id = new Biome[1024];
         Arrays.fill(biome_by_id,  Biome.PLAINS);
-        for(int i = 0; i < biome_to_bmap.length; i++) {
-            biome_to_bmap[i] = BiomeMap.NULL;
-        }
+        Arrays.fill(biome_to_bmap, BiomeMap.NULL);
         for (Biome value : b) {
             String bs = value.toString();
             for (int j = 0; j < bm.length; j++) {
