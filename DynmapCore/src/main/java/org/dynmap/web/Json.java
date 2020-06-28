@@ -85,6 +85,7 @@ public class Json {
             List<?> l = (List<?>) o;
             sb.append("[");
             int count = 0;
+            // TODO: no side-effect functions needed
             for (Object value : l) {
                 if (count++ > 0) sb.append(",");
                 appendJson(value, sb);
@@ -111,9 +112,7 @@ public class Json {
                 Object fieldValue;
                 try {
                      fieldValue = field.get(o);
-                } catch (IllegalArgumentException e) {
-                    continue;
-                } catch (IllegalAccessException e) {
+                } catch (IllegalArgumentException | IllegalAccessException e) {
                     continue;
                 }
 
