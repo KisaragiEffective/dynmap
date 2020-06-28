@@ -1007,6 +1007,7 @@ public class DynmapPlugin
                     }
                 }
             }
+            //noinspection IOResourceOpenedButNotSafelyClosed
             return Loader.instance()
                     .getModList()
                     .stream()
