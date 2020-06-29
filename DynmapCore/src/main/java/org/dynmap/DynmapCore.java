@@ -1167,7 +1167,7 @@ public class DynmapCore implements DynmapCommonAPI {
     
     public void printCommandHelp(DynmapCommandSender sender, String cmd, String subcmd) {
         boolean matched = false;
-        if((subcmd != null) && (!subcmd.equals(""))) {
+        if((subcmd != null) && (!subcmd.isEmpty())) {
             for(CommandInfo ci : commandinfo) {
                 if(ci.matches(cmd, subcmd)) {
                     sender.sendMessage(String.format("/%s %s %s - %s", ci.cmd, ci.subcmd, ci.args, ci.helptext));

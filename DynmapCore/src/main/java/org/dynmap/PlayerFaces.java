@@ -118,7 +118,7 @@ public class PlayerFaces {
                     URL url = null;
 
                     if (mSkinUrlProvider == null) {
-                        if (!skinurl.equals("")) {
+                        if (!skinurl.isEmpty()) {
                             url = new URL(skinurl.replace("%player%", URLEncoder.encode(playername, "UTF-8")));
                         } else if (playerskinurl != null) {
                             url = new URL(playerskinurl);

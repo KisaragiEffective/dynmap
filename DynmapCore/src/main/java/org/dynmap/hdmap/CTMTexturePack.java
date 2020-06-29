@@ -317,7 +317,7 @@ public class CTMTexturePack {
             Set<Integer> list = new HashSet<>();
             String property = properties.getProperty(key, "");
             for (String token : property.split("\\s+")) {
-                if (token.equals("")) {
+                if (token.isEmpty()) {
                 } else if (token.matches("\\d+")) {
                     try {
                         int id = Integer.parseInt(token);
@@ -443,7 +443,7 @@ public class CTMTexturePack {
         }
         private void getBiomes(Properties p, CTMTexturePack tp) {
             String v = p.getProperty("biomes", "").trim().toLowerCase();
-            if (!v.equals("")) {
+            if (!v.isEmpty()) {
                 ArrayList<Integer> ids = new ArrayList<>();
                 String[] biomenames = tp.biomenames;
                 for(String s : v.split("\\s+")) {

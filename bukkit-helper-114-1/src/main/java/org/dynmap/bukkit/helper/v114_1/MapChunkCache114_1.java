@@ -326,7 +326,7 @@ public class MapChunkCache114_1 extends AbstractMapChunkCache {
                 String stat = nbt.getString("Status");
                 if ((stat == null) || (!stat.equals("full"))) {
                     nbt = null;
-                    if ((stat == null) || stat.equals("") && DynmapCore.migrateChunks()) {
+                    if ((stat == null) || stat.isEmpty() && DynmapCore.migrateChunks()) {
                         Chunk c = cw.getHandle().getChunkAt(x, z);
                         if (c != null) {
                             nbt = fetchLoadedChunkNBT(w, x, z);

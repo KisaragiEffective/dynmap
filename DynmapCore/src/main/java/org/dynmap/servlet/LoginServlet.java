@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
         if(uri.equals("/up/login")) {  /* Process login form */
             uid = req.getParameter("j_username");
             String pwd = req.getParameter("j_password");
-            if((uid == null) || (uid.equals("")))
+            if((uid == null) || (uid.isEmpty()))
                 uid = USERID_GUEST;
             if(core.checkLogin(uid, pwd)) {
                 sess.setAttribute(USERID_ATTRIB, uid);

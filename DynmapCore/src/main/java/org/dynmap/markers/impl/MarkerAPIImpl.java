@@ -1820,7 +1820,7 @@ public class MarkerAPIImpl implements MarkerAPI, Event.Listener<DynmapWorld> {
             }
             if(deficon != null) {
                 MarkerIcon mi = null;
-                if(!deficon.equals("")) {
+                if(!deficon.isEmpty()) {
                     mi = MarkerAPIImpl.getMarkerIconImpl(deficon);
                     if(mi == null) {
                         sender.sendMessage("Error: invalid marker icon - " + deficon);

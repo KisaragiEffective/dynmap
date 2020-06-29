@@ -373,7 +373,7 @@ File f = new File(baseStandaloneDir, "config.js");
                 if(init_skip)
                     continue;
                 if(uid == null) {
-                    if((!trust_client_name) || (name == null) || (name.equals(""))) {
+                    if((!trust_client_name) || (name == null) || (name.isEmpty())) {
                         if(ip != null)
                             name = ip;
                     }

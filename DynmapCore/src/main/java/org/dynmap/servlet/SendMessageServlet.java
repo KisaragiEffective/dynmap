@@ -89,7 +89,7 @@ public class SendMessageServlet extends HttpServlet {
                     message.name = String.valueOf(o.get("name"));
                 }
                 boolean isip = true;
-                if ((message.name == null) || message.name.equals("")) {
+                if ((message.name == null) || message.name.isEmpty()) {
                     /* If from trusted proxy, check for client */
                     String rmtaddr = request.getRemoteAddr(); 
                     if (this.proxyaddress.contains(rmtaddr)) {

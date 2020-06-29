@@ -86,7 +86,7 @@ public class ColorScheme {
             ) {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
-                    if (line.startsWith("#") || line.equals("")) {
+                    if (line.startsWith("#") || line.isEmpty()) {
                         continue;
                     }
                     /* Make parser less pedantic - tabs or spaces should be fine */

@@ -75,7 +75,7 @@ public class ForgeConfigFile {
                                     instr = intok = false;
                                     break;
                                 case '{':
-                                    if (!tok.equals("")) {
+                                    if (!tok.isEmpty()) {
                                         section.add(tok);
                                         tok = "";
                                         instr = intok = false;
