@@ -347,7 +347,7 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
             nbt = nbt.getCompound("Level");
             if (nbt != null) {
                 String stat = nbt.getString("Status");
-                if ((stat == null) || (stat.equals("full") == false)) {
+                if ((stat == null) || (!stat.equals("full"))) {
                     nbt = null;
                     if ((stat == null) || stat.isEmpty() && DynmapCore.migrateChunks()) {
                         Chunk c = cw.getHandle().getChunkAt(x, z);
@@ -371,7 +371,7 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
     // Load chunk snapshots
     @Override
     public int loadChunks(int max_to_load) {
-        if(dw.isLoaded() == false)
+        if(!dw.isLoaded())
             return 0;        
         int cnt = 0;
         if(iterator == null)
@@ -459,7 +459,7 @@ public class MapChunkCache115 extends AbstractMapChunkCache {
         }
         DynmapCore.setIgnoreChunkLoads(false);
 
-        if(iterator.hasNext() == false) {   /* If we're done */
+        if(!iterator.hasNext()) {   /* If we're done */
             isempty = true;
             /* Fill missing chunks with empty dummy chunk */
             for(int i = 0; i < snaparray.length; i++) {
