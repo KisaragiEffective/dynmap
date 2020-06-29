@@ -38,7 +38,7 @@ public class BukkitVersionHelperSpigot116 extends BukkitVersionHelperGeneric {
     private Field watercolorfield;
     
     public BukkitVersionHelperSpigot116() {
-        Class biomebase =  getNMSClass("net.minecraft.server.BiomeBase");
+        Class<?> biomebase =  getNMSClass("net.minecraft.server.BiomeBase");
         watercolorfield = getPrivateField(biomebase, new String[] { "t" }, int.class);
     }
     
