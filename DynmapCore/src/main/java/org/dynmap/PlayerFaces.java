@@ -3,7 +3,6 @@ package org.dynmap;
 import org.dynmap.MapType.ImageFormat;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.common.DynmapListenerManager.PlayerEventListener;
-import org.dynmap.common.DynmapPlayer;
 import org.dynmap.debug.Debug;
 import org.dynmap.storage.MapStorage;
 import org.dynmap.utils.BufferOutputStream;

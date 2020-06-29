@@ -1,16 +1,13 @@
 package org.dynmap.bukkit.helper.v116;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -19,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.dynmap.DynmapChunk;
 import org.dynmap.Log;
 import org.dynmap.bukkit.helper.BukkitMaterial;
-import org.dynmap.bukkit.helper.BukkitVersionHelperCB;
 import org.dynmap.bukkit.helper.BukkitVersionHelperGeneric;
 import org.dynmap.bukkit.helper.BukkitWorld;
 import org.dynmap.bukkit.helper.v116.MapChunkCache115;

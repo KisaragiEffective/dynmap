@@ -1,8 +1,5 @@
 package org.dynmap;
 
-import static org.dynmap.JSONUtils.a;
-import static org.dynmap.JSONUtils.s;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

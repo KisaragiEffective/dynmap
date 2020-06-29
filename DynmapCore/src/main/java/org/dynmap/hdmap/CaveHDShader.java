@@ -1,7 +1,5 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;

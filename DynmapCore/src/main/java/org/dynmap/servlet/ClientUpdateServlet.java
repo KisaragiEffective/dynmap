@@ -1,8 +1,5 @@
 package org.dynmap.servlet;
 
-import static org.dynmap.JSONUtils.s;
-import static org.dynmap.JSONUtils.g;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

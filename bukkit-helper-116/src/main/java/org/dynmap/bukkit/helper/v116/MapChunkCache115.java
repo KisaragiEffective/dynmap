@@ -1,8 +1,6 @@
 package org.dynmap.bukkit.helper.v116;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 
 import java.io.IOException;
@@ -19,7 +17,6 @@ import org.dynmap.bukkit.helper.SnapshotCache;
 import org.dynmap.bukkit.helper.SnapshotCache.SnapshotRec;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.DynIntHashMap;
-import org.dynmap.utils.VisibilityLimit;
 
 import net.minecraft.server.v1_16_R1.Chunk;
 import net.minecraft.server.v1_16_R1.ChunkCoordIntPair;

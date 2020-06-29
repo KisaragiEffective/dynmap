@@ -1,16 +1,11 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.a;
-import static org.dynmap.JSONUtils.s;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.dynmap.*;
 import org.dynmap.storage.MapStorage;
-import org.dynmap.storage.MapStorageTile;
-import org.dynmap.storage.MapStorageTileEnumCB;
 import org.dynmap.utils.TileFlags;
 import org.json.simple.JSONObject;
 

@@ -11,7 +11,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.dynmap.Log;
 import org.dynmap.bukkit.DynmapPlugin;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 

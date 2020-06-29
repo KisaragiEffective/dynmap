@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
 
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;

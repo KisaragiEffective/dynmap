@@ -1,8 +1,6 @@
 package org.dynmap.utils;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Indexed list of Vector3D values: used for managing Vector3D sets for OBJ export

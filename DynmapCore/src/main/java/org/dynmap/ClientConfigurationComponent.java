@@ -1,8 +1,5 @@
 package org.dynmap;
 
-import static org.dynmap.JSONUtils.a;
-import static org.dynmap.JSONUtils.s;
-import org.dynmap.Event.Listener;
 import org.json.simple.JSONObject;
 
 public class ClientConfigurationComponent extends Component {

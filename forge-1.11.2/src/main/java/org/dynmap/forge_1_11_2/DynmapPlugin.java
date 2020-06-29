@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -90,7 +89,6 @@ import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.DynmapLogger;
 import org.dynmap.utils.MapChunkCache;
-import org.dynmap.utils.VisibilityLimit;
 
 import com.google.common.collect.Iterables;
 import com.google.gson.Gson;

@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.util.*;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.dynmap.ConfigurationNode;

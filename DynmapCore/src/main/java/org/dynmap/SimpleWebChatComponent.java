@@ -1,11 +1,8 @@
 package org.dynmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import org.dynmap.common.DynmapListenerManager;
 import org.dynmap.common.DynmapListenerManager.ChatEventListener;
 import org.dynmap.common.DynmapListenerManager.EventType;
-import org.dynmap.common.DynmapPlayer;
 import org.json.simple.JSONObject;
 
 public class SimpleWebChatComponent extends Component {

@@ -17,8 +17,6 @@ import org.dynmap.InternalClientUpdateComponent;
 import org.dynmap.JSONUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
-import static org.dynmap.JSONUtils.s;
-import static org.dynmap.JSONUtils.g;
 
 public class ClientConfigurationServlet extends HttpServlet {
     private static final long serialVersionUID = 9106801553080522469L;
