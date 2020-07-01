@@ -1,13 +1,13 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.dynmap.Color;
 import org.dynmap.ColorScheme;
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
 import org.dynmap.MapManager;
 import org.dynmap.common.BiomeMap;
 import org.dynmap.common.DynmapCommandSender;
@@ -20,14 +20,14 @@ import org.dynmap.utils.MapIterator;
 import org.json.simple.JSONObject;
 
 public class DefaultHDShader implements HDShader {
-    private String name;
-    protected ColorScheme colorScheme;
+    private final String name;
+    protected final ColorScheme colorScheme;
 
-    protected boolean transparency; /* Is transparency support active? */
+    protected final boolean transparency; /* Is transparency support active? */
     public enum BiomeColorOption {
         NONE, BIOME, TEMPERATURE, RAINFALL
     }
-    protected BiomeColorOption biomecolored = BiomeColorOption.NONE; /* Use biome for coloring */
+    protected final BiomeColorOption biomecolored; /* Use biome for coloring */
     
     public DefaultHDShader(DynmapCore core, ConfigurationNode configuration) {
         name = (String) configuration.get("name");
@@ -84,12 +84,12 @@ public class DefaultHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color[];
-        protected MapIterator mapiter;
-        protected HDMap map;
-        private Color tmpcolor[];
+        private final Color[] color;
+        protected final MapIterator mapiter;
+        protected final HDMap map;
+        private final Color[] tmpcolor;
         private int pixelodd;
-        private HDLighting lighting;
+        private final HDLighting lighting;
         final int[] lightingTable;
         
         private OurShaderState(MapIterator mapiter, HDMap map, MapChunkCache cache) {
@@ -134,8 +134,7 @@ public class DefaultHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for(int i = 0; i < color.length; i++) 
-                color[i].setTransparent();
+            Arrays.stream(color).forEachOrdered(Color::setTransparent);
             pixelodd = (ps.getPixelX() & 0x3) + (ps.getPixelY()<<1);
         }
         
@@ -174,9 +173,9 @@ public class DefaultHDShader implements HDShader {
                         seq = 0;
                         break;
                     default:
-                    	//if(subalpha >= 0)	/* We hit a block in a model */
-                    	//	seq = 4;	/* Use smooth top */
-                    	//else 
+                        //if(subalpha >= 0)    /* We hit a block in a model */
+                        //    seq = 4;    /* Use smooth top */
+                        //else 
                         if(((pixelodd + mapiter.getY()) & 0x03) == 0)
                             seq = 3;
                         else
@@ -189,8 +188,7 @@ public class DefaultHDShader implements HDShader {
                     lighting.applyLighting(ps, this, c, tmpcolor);
                     /* If we got alpha from subblock model, use it instead */
                     if(subalpha >= 0) {
-                        for(int j = 0; j < tmpcolor.length; j++)
-                           tmpcolor[j].setAlpha(Math.max(subalpha,tmpcolor[j].getAlpha()));
+                        Arrays.stream(tmpcolor).forEachOrdered(value -> value.setAlpha(Math.max(subalpha, value.getAlpha())));
                     }
                     /* Blend color with accumulated color (weighted by alpha) */
                     if(!transparency) {  /* No transparency support */
@@ -307,7 +305,7 @@ public class DefaultHDShader implements HDShader {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "shader", name);
+        JSONUtils.setValue(mapObject, "shader", name);
     }
     @Override
     public void exportAsMaterialLibrary(DynmapCommandSender sender, OBJExport out) throws IOException {

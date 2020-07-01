@@ -7,12 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -35,7 +32,7 @@ public class ConfigurationNode implements Map<String, Object> {
     private Yaml yaml;
     
     public ConfigurationNode() {
-        entries = new LinkedHashMap<String, Object>();
+        entries = new LinkedHashMap<>();
     }
 
     private void initparse() {
@@ -53,7 +50,7 @@ public class ConfigurationNode implements Map<String, Object> {
 
     public ConfigurationNode(File f) {
         this.f = f;
-        entries = new LinkedHashMap<String, Object>();
+        entries = new LinkedHashMap<>();
     }
     
     public ConfigurationNode(Map<String, Object> map) {
@@ -81,24 +78,17 @@ public class ConfigurationNode implements Map<String, Object> {
     public boolean load() {
         initparse();
 
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(f);
+        try (FileInputStream fis = new FileInputStream(f)) {
             Object o = yaml.load(new UnicodeReader(fis));
-            if((o != null) && (o instanceof Map))
-                entries = (Map<String, Object>)o;
+            if ((o != null) && (o instanceof Map))
+                entries = (Map<String, Object>) o;
             fis.close();
-        }
-        catch (YAMLException e) {
-            Log.severe("Error parsing " + f.getPath() + ". Use http://yamllint.com to debug the YAML syntax." );
+        } catch (YAMLException e) {
+            Log.severe("Error parsing " + f.getPath() + ". Use http://yamllint.com to debug the YAML syntax.");
             throw e;
-        } catch(IOException iox) {
+        } catch (IOException iox) {
             Log.severe("Error reading " + f.getPath());
             return false;
-        } finally {
-            if(fis != null) {
-                try { fis.close(); } catch (IOException x) {}
-            }
         }
         return (entries != null);
     }
@@ -110,7 +100,6 @@ public class ConfigurationNode implements Map<String, Object> {
     public boolean save(File file) {
         initparse();
 
-        FileOutputStream stream = null;
 
         File parent = file.getParentFile();
 
@@ -118,18 +107,11 @@ public class ConfigurationNode implements Map<String, Object> {
             parent.mkdirs();
         }
 
-        try {
-            stream = new FileOutputStream(file);
-            OutputStreamWriter writer = new OutputStreamWriter(stream, "UTF-8");
+        try (FileOutputStream stream = new FileOutputStream(file)){
+            OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
             yaml.dump(entries, writer);
             return true;
         } catch (IOException e) {
-        } finally {
-            try {
-                if (stream != null) {
-                    stream.close();
-                }
-            } catch (IOException e) {}
         }
         return false;
     }
@@ -202,14 +184,12 @@ public class ConfigurationNode implements Map<String, Object> {
     
     public List<String> getStrings(String path, List<String> def) {
         Object o = getObject(path);
-        if (!(o instanceof List<?>)) {
+        if (!(o instanceof List)) {
             return def;
         }
-        ArrayList<String> strings = new ArrayList<String>();
-        for(Object i : (List<?>)o) {
-            strings.add(i.toString());
-        }
-        return strings;
+        return ((List<?>) o).stream()
+                .map(Object::toString)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     
     public String getString(String path, String def) {
@@ -241,13 +221,13 @@ public class ConfigurationNode implements Map<String, Object> {
             try {
                 T o = (T)getObject(path, null);
                 if (o == null) {
-                    return new ArrayList<T>();
+                    return new ArrayList<>();
                 }
-                ArrayList<T> al = new ArrayList<T>();
+                ArrayList<T> al = new ArrayList<>();
                 al.add(o);
                 return al;
             } catch (ClassCastException e2) {
-                return new ArrayList<T>();
+                return new ArrayList<>();
             }
         }
     }
@@ -264,26 +244,27 @@ public class ConfigurationNode implements Map<String, Object> {
         return new ConfigurationNode(v);
     }
     
-    @SuppressWarnings("unchecked")
     public List<ConfigurationNode> getNodes(String path) {
         List<Object> o = getList(path);
 
         if(o == null)
-            return new ArrayList<ConfigurationNode>();
-        
-        ArrayList<ConfigurationNode> nodes = new ArrayList<ConfigurationNode>();
-        for(Object i : (List<?>)o) {
-            if (i instanceof Map<?, ?>) {
-                Map<String, Object> map;
-                try {
-                    map = (Map<String, Object>)i;
-                } catch(ClassCastException e) {
-                    continue;
-                }
-                nodes.add(new ConfigurationNode(map));
-            }
+            return new ArrayList<>(0);
+
+        return o.stream()
+                .filter(i -> i instanceof Map<?, ?>)
+                .<Map<String, Object>>map(this::tryCastOrNull)
+                .filter(Objects::nonNull)
+                .map(ConfigurationNode::new)
+                .collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T tryCastOrNull(Object into) {
+        try {
+            return (T) into;
+        } catch (ClassCastException e) {
+            return null;
         }
-        return nodes;
     }
     
     public void extend(Map<String, Object> other) {
@@ -291,37 +272,26 @@ public class ConfigurationNode implements Map<String, Object> {
             extendMap(this, other);
     }
     
-    private final static Object copyValue(Object v) {
+    private static Object copyValue(Object v) {
         if(v instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, Object> mv = (Map<String, Object>)v;
-            LinkedHashMap<String, Object> newv = new LinkedHashMap<String,Object>();
-            for(Map.Entry<String, Object> me : mv.entrySet()) {
-                newv.put(me.getKey(), copyValue(me.getValue()));
-            }
-            return newv;
-        }
-        else if(v instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<Object> lv = (List<Object>)v;
-            ArrayList<Object> newv = new ArrayList<Object>();
-            for(int i = 0; i < lv.size(); i++) {
-                newv.add(copyValue(lv.get(i)));
-            }
-            return newv;
-        }
-        else {
+            return mv.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Entry::getKey, me -> copyValue(me.getValue()), (a, b) -> b, LinkedHashMap::new));
+        } else if(v instanceof List) {
+            List<?> lv = (List<?>)v;
+            return lv.stream()
+                    .map(ConfigurationNode::copyValue)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } else {
             return v;
         }
     }
 
-    private final static void extendMap(Map<String, Object> left, Map<String, Object> right) {
+    private static void extendMap(Map<String, Object> left, Map<String, Object> right) {
         ConfigurationNode original = new ConfigurationNode(left);
-        for(Map.Entry<String, Object> entry : right.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            original.put(key, copyValue(value));
-        }
+        right.forEach((key, value) -> original.put(key, copyValue(value)));
     }
     
     public <T> T createInstance(Class<?>[] constructorParameters, Object[] constructorArguments) {
@@ -330,11 +300,11 @@ public class ConfigurationNode implements Map<String, Object> {
             Class<?> mapTypeClass = Class.forName(typeName);
         
             Class<?>[] constructorParameterWithConfiguration = new Class<?>[constructorParameters.length+1];
-            for(int i = 0; i < constructorParameters.length; i++) { constructorParameterWithConfiguration[i] = constructorParameters[i]; }
+            System.arraycopy(constructorParameters, 0, constructorParameterWithConfiguration, 0, constructorParameters.length);
             constructorParameterWithConfiguration[constructorParameterWithConfiguration.length-1] = ConfigurationNode.class;
             
             Object[] constructorArgumentsWithConfiguration = new Object[constructorArguments.length+1];
-            for(int i = 0; i < constructorArguments.length; i++) { constructorArgumentsWithConfiguration[i] = constructorArguments[i]; }
+            System.arraycopy(constructorArguments, 0, constructorArgumentsWithConfiguration, 0, constructorArguments.length);
             constructorArgumentsWithConfiguration[constructorArgumentsWithConfiguration.length-1] = this;
             Constructor<?> constructor = mapTypeClass.getConstructor(constructorParameterWithConfiguration);
             @SuppressWarnings("unchecked")
@@ -350,14 +320,10 @@ public class ConfigurationNode implements Map<String, Object> {
     
     public <T> List<T> createInstances(String path, Class<?>[] constructorParameters, Object[] constructorArguments) {
         List<ConfigurationNode> nodes = getNodes(path);
-        List<T> instances = new ArrayList<T>();
-        for(ConfigurationNode node : nodes) {
-            T instance = node.<T>createInstance(constructorParameters, constructorArguments);
-            if (instance != null) {
-                instances.add(instance);
-            }
-        }
-        return instances;
+        return nodes.stream()
+                .map(node -> node.<T>createInstance(constructorParameters, constructorArguments))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Override

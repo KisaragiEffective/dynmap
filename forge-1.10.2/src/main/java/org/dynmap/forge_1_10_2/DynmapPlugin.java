@@ -5,18 +5,8 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.PriorityQueue;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,10 +14,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -92,18 +82,11 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.debug.Debug;
-import org.dynmap.forge_1_10_2.DmapCommand;
-import org.dynmap.forge_1_10_2.DmarkerCommand;
-import org.dynmap.forge_1_10_2.DynmapCommand;
-import org.dynmap.forge_1_10_2.DynmapMod;
 import org.dynmap.forge_1_10_2.permissions.FilePermissions;
 import org.dynmap.forge_1_10_2.permissions.OpPermissions;
 import org.dynmap.forge_1_10_2.permissions.PermissionProvider;
-import org.dynmap.forge_1_10_2.ForgeWorld;
-import org.dynmap.forge_1_10_2.DynmapPlugin.WorldUpdateTracker;
 import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
-import org.dynmap.utils.DynIntHashMap;
 import org.dynmap.utils.DynmapLogger;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.VisibilityLimit;
@@ -123,19 +106,19 @@ public class DynmapPlugin
     public SnapshotCache sscache;
     public PlayerList playerList;
     private MapManager mapManager;
-    private net.minecraft.server.MinecraftServer server;
+    private final net.minecraft.server.MinecraftServer server;
     public static DynmapPlugin plugin;
     private ChatHandler chathandler;
-    private HashMap<String, Integer> sortWeights = new HashMap<String, Integer>(); 
+    private final HashMap<String, Integer> sortWeights = new HashMap<>();
     // Drop world load ticket after 30 seconds
-    private long worldIdleTimeoutNS = 30 * 1000000000L;
-    private HashMap<String, ForgeWorld> worlds = new HashMap<String, ForgeWorld>();
+    private final long worldIdleTimeoutNS = 30 * 1000000000L;
+    private final HashMap<String, ForgeWorld> worlds = new HashMap<>();
     private World last_world;
     private ForgeWorld last_fworld;
-    private Map<String, ForgePlayer> players = new HashMap<String, ForgePlayer>();
+    private final Map<String, ForgePlayer> players = new HashMap<>();
     //TODO private ForgeMetrics metrics;
-    private HashSet<String> modsused = new HashSet<String>();
-    private ForgeServer fserver = new ForgeServer();
+    private final HashSet<String> modsused = new HashSet<>();
+    private final ForgeServer fserver = new ForgeServer();
     private boolean tickregistered = false;
     // TPS calculator
     private double tps;
@@ -145,8 +128,8 @@ public class DynmapPlugin
     private long perTickLimit = (50000000); // 50 ms
     private boolean isMCPC = false;
     private boolean useSaveFolder = true;
-    private Field displayName = null; // MCPC+ display name
-	
+    private Field displayName; // MCPC+ display name
+
     private static final int SIGNPOST_ID = 63;
     private static final int WALLSIGN_ID = 68;
 
@@ -155,11 +138,11 @@ public class DynmapPlugin
     private static final Pattern patternControlCode = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 
     public static class BlockUpdateRec {
-    	World w;
-    	String wid;
-    	int x, y, z;
+        World w;
+        String wid;
+        int x, y, z;
     }
-    ConcurrentLinkedQueue<BlockUpdateRec> blockupdatequeue = new ConcurrentLinkedQueue<BlockUpdateRec>();
+    final ConcurrentLinkedQueue<BlockUpdateRec> blockupdatequeue = new ConcurrentLinkedQueue<>();
 
     public static DynmapBlockState[] stateByID;
     
@@ -167,17 +150,17 @@ public class DynmapPlugin
      * Initialize block states (org.dynmap.blockstate.DynmapBlockState)
      */
     public void initializeBlockStates() {
-    	stateByID = new DynmapBlockState[512*16];	// Simple meta+id map
-    	Arrays.fill(stateByID, DynmapBlockState.AIR); // Default to air
-    	
-    	for (Block b : Block.REGISTRY) {
+        stateByID = new DynmapBlockState[512*16];    // Simple meta+id map
+        Arrays.fill(stateByID, DynmapBlockState.AIR); // Default to air
+
+        for (Block b : Block.REGISTRY) {
             if (b == null) continue;
             int i = Block.getIdFromBlock(b);
-    		if (i >= (stateByID.length >> 4)) {
-    			int plen = stateByID.length;
-    			stateByID = Arrays.copyOf(stateByID, (i+1) << 4);
-    			Arrays.fill(stateByID, plen, stateByID.length, DynmapBlockState.AIR);
-    		}
+            if (i >= (stateByID.length >> 4)) {
+                int plen = stateByID.length;
+                stateByID = Arrays.copyOf(stateByID, (i+1) << 4);
+                Arrays.fill(stateByID, plen, stateByID.length, DynmapBlockState.AIR);
+            }
             ResourceLocation ui = null;
             try {
                 ui = Block.REGISTRY.getNameForObject(b);
@@ -185,7 +168,7 @@ public class DynmapPlugin
                 Log.warning("Exception caught reading unique ID for block " + i);
             }
             if (ui != null) {
-            	String bn = ui.getResourceDomain() + ":" + ui.getResourcePath();
+                String bn = ui.getResourceDomain() + ":" + ui.getResourcePath();
                 // Only do defined names, and not "air"
                 if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                     DynmapBlockState basebs = null;
@@ -200,16 +183,11 @@ public class DynmapPlugin
                         String statename = "meta=" + m;
                         if (blkstate != null) {
                             mat = blkstate.getMaterial();
-                            String pstate = null;
-                            for(Entry<IProperty<?>, Comparable<?>> p : blkstate.getProperties().entrySet()) {
-                            	if (pstate == null)
-                            		pstate = "";
-                            	else 
-                            		pstate += ",";
-                            	pstate += p.getKey().getName() + "=" + p.getValue().toString();
-                            }
-                            if (pstate != null)
-                            	statename = pstate;
+                            statename = blkstate.getProperties()
+                                    .entrySet()
+                                    .stream()
+                                    .map(x -> x.getKey().getName() + "=" + x.getValue().toString())
+                                    .collect(Collectors.joining(","));
                         }
                         DynmapBlockState bs = new DynmapBlockState(basebs, m, bn, statename, mat.toString(), i);
                         if (basebs == null) basebs = bs;
@@ -231,22 +209,22 @@ public class DynmapPlugin
             }
         }
         //for (int gidx = 0; gidx < DynmapBlockState.getGlobalIndexMax(); gidx++) {
-       // 	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
-       // 	Log.verboseinfo(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
+       //     DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
+       //     Log.verboseinfo(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
         //}
     }
 
-    public static final int getBlockID(World w, int x, int y, int z) {
+    public static int getBlockID(World w, int x, int y, int z) {
         // Block.getIdFromBlock(w.getBlockType(x,y,z))
         return Block.getIdFromBlock(w.getBlockState(new BlockPos(x,  y,  z)).getBlock());
     }
-    public static final Block getBlockByID(int id) {
+    public static Block getBlockByID(int id) {
         return Block.getBlockById(id);
     }
-    public static final Item getItemByID(int id) {
+    public static Item getItemByID(int id) {
         return Item.getItemById(id);
     }
-    public static final String getBlockUnlocalizedName(Block b) {
+    public static String getBlockUnlocalizedName(Block b) {
         String s = b.getUnlocalizedName();
         if (s.startsWith("tile.")) {
             s = s.substring(5);
@@ -256,7 +234,7 @@ public class DynmapPlugin
     
     private static Biome[] biomelist = null;
     
-    public static final Biome[] getBiomeList() {
+    public static Biome[] getBiomeList() {
         if (biomelist == null) {
             biomelist = new Biome[256];
             for (int i = 0; i < biomelist.length; i++) {
@@ -265,21 +243,21 @@ public class DynmapPlugin
         }
         return biomelist;
     }
-    public static final NetworkManager getNetworkManager(NetHandlerPlayServer nh) {
+    public static NetworkManager getNetworkManager(NetHandlerPlayServer nh) {
         return nh.netManager;
     }
     
     private ForgePlayer getOrAddPlayer(EntityPlayer p) {
         String name = p.getCommandSenderEntity().getName();
-    	ForgePlayer fp = players.get(name);
-    	if(fp != null) {
-    		fp.player = p;
-    	}
-    	else {
-    		fp = new ForgePlayer(p);
-    		players.put(name, fp);
-    	}
-    	return fp;
+        ForgePlayer fp = players.get(name);
+        if(fp != null) {
+            fp.player = p;
+        }
+        else {
+            fp = new ForgePlayer(p);
+            players.put(name, fp);
+        }
+        return fp;
     }
     
     private static class TaskRecord implements Comparable<Object>
@@ -300,45 +278,34 @@ public class DynmapPlugin
             {
                 return 1;
             }
-            else if (this.id < tr.id)
-            {
-                return -1;
-            }
-            else if (this.id > tr.id)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            else return Long.compare(this.id, tr.id);
         }
     }
 
     private class ChatMessage {
-    	String message;
-    	EntityPlayer sender;
+        String message;
+        EntityPlayer sender;
     }
-    private ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<ChatMessage>();
+    private final ConcurrentLinkedQueue<ChatMessage> msgqueue = new ConcurrentLinkedQueue<>();
     
     public class ChatHandler {
-		@SubscribeEvent
-		public void handleChat(ServerChatEvent event) {
-		    String msg = event.getMessage();
+        @SubscribeEvent
+        public void handleChat(ServerChatEvent event) {
+            String msg = event.getMessage();
             if(!msg.startsWith("/")) {
                 ChatMessage cm = new ChatMessage();
                 cm.message = msg;
                 cm.sender = event.getPlayer();
                 msgqueue.add(cm);
             }
-		}
+        }
     }
     
     private static class WorldBusyRecord {
         long last_ts;
         Ticket ticket;
     }
-    private static HashMap<Integer, WorldBusyRecord> busy_worlds = new HashMap<Integer, WorldBusyRecord>();
+    private static final HashMap<Integer, WorldBusyRecord> busy_worlds = new HashMap<>();
     
     private void setBusy(World w) {
         setBusy(w, null);
@@ -380,7 +347,7 @@ public class DynmapPlugin
     }
     
     public static class OurLog implements DynmapLogger {
-        Logger log;
+        final Logger log;
         public static final String DM = "[Dynmap] ";
         OurLog() {
             log = LogManager.getLogger("Dynmap");
@@ -435,9 +402,9 @@ public class DynmapPlugin
     }
 
     public boolean isOp(String player) {
-    	player = player.toLowerCase();
-    	return (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player) != null) ||
-    			(server.isSinglePlayer() && player.equalsIgnoreCase(server.getServerOwner()));
+        player = player.toLowerCase();
+        return (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player) != null) ||
+                (server.isSinglePlayer() && player.equalsIgnoreCase(server.getServerOwner()));
     }
     
     private boolean hasPerm(ICommandSender sender, String permission) {
@@ -468,7 +435,7 @@ public class DynmapPlugin
         }
         Set<String> rslt2 = hasOfflinePermissions(player, perms);
         if((rslt != null) && (rslt2 != null)) {
-            Set<String> newrslt = new HashSet<String>(rslt);
+            Set<String> newrslt = new HashSet<>(rslt);
             newrslt.addAll(rslt2);
             rslt = newrslt;
         }
@@ -493,46 +460,46 @@ public class DynmapPlugin
     public class ForgeServer extends DynmapServerInterface
     {
         /* Server thread scheduler */
-        private Object schedlock = new Object();
+        private final Object schedlock = new Object();
         private long cur_tick;
         private long next_id;
         private long cur_tick_starttime;
-        private PriorityQueue<TaskRecord> runqueue = new PriorityQueue<TaskRecord>();
+        private final PriorityQueue<TaskRecord> runqueue = new PriorityQueue<>();
 
         public ForgeServer() {
         }
         
         @Override
         public int getBlockIDAt(String wname, int x, int y, int z) {
-        	DynmapWorld dw = this.getWorldByName(wname);
-        	if (dw != null) {
-        		World w = ((ForgeWorld)dw).getWorld();
-        		if((w != null) && w.isBlockLoaded(new BlockPos(x, y, z))) {
-        			return getBlockID(w, x, y, z);
-        		}
-        	}
+            DynmapWorld dw = this.getWorldByName(wname);
+            if (dw != null) {
+                World w = ((ForgeWorld)dw).getWorld();
+                if((w != null) && w.isBlockLoaded(new BlockPos(x, y, z))) {
+                    return getBlockID(w, x, y, z);
+                }
+            }
             return -1;
         }
-		
-		@Override
-		public int isSignAt(String wname, int x, int y, int z) {
-			int blkid = getBlockIDAt(wname, x, y, z);
-			
-			if (blkid == -1)
-				return -1;
-			
+
+        @Override
+        public int isSignAt(String wname, int x, int y, int z) {
+            int blkid = getBlockIDAt(wname, x, y, z);
+
+            if (blkid == -1)
+                return -1;
+
             if((blkid == WALLSIGN_ID) || (blkid == SIGNPOST_ID)) {
-				return 1;
+                return 1;
             } else {
-            	return 0;
+                return 0;
             }
-		}
+        }
 
         @Override
         public void scheduleServerTask(Runnable run, long delay)
         {
             TaskRecord tr = new TaskRecord();
-            tr.future = new FutureTask<Object>(run, null);
+            tr.future = new FutureTask<>(run, null);
 
             /* Add task record to queue */
             synchronized (schedlock)
@@ -547,17 +514,12 @@ public class DynmapPlugin
         {
             if(server.getPlayerList() == null)
                 return new DynmapPlayer[0];
-            List<?> playlist = server.getPlayerList().getPlayerList();
-            int pcnt = playlist.size();
-            DynmapPlayer[] dplay = new DynmapPlayer[pcnt];
 
-            for (int i = 0; i < pcnt; i++)
-            {
-                EntityPlayer p = (EntityPlayer)playlist.get(i);
-                dplay[i] = getOrAddPlayer(p);
-            }
-
-            return dplay;
+            return server.getPlayerList()
+                    .getPlayerList()
+                    .stream()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .toArray(DynmapPlayer[]::new);
         }
         @Override
         public void reload()
@@ -569,40 +531,33 @@ public class DynmapPlugin
         @Override
         public DynmapPlayer getPlayer(String name)
         {
-            List<?> players = server.getPlayerList().getPlayerList();
+            List<? extends EntityPlayer> players = server.getPlayerList().getPlayerList();
 
-            for (Object o : players)
-            {
-                EntityPlayer p = (EntityPlayer)o;
+            return players.stream()
+                    .filter(p -> p.getCommandSenderEntity().getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .map(DynmapPlugin.this::getOrAddPlayer)
+                    .orElse(null);
 
-                if (p.getCommandSenderEntity().getName().equalsIgnoreCase(name))
-                {
-                    return getOrAddPlayer(p);
-                }
-            }
-
-            return null;
         }
         @Override
         public Set<String> getIPBans()
         {
             UserListIPBans bl = server.getPlayerList().getBannedIPs();
-            Set<String> ips = new HashSet<String>();
+            Set<String> ips = new HashSet<>();
 
-            for (String s : bl.getKeys()) {
-                ips.add(s);
-            }
+            Collections.addAll(ips, bl.getKeys());
             
             return ips;
         }
         @Override
         public <T> Future<T> callSyncMethod(Callable<T> task) {
-        	return callSyncMethod(task, 0);
+            return callSyncMethod(task, 0);
         }
         public <T> Future<T> callSyncMethod(Callable<T> task, long delay)
         {
             TaskRecord tr = new TaskRecord();
-            FutureTask<T> ft = new FutureTask<T>(task);
+            FutureTask<T> ft = new FutureTask<>(task);
             tr.future = ft;
 
             /* Add task record to queue */
@@ -623,8 +578,8 @@ public class DynmapPlugin
                 sn = "Integrated";
             else
                 sn = server.getServerHostname();
-        	if(sn == null) sn = "Unknown Server";
-        	return sn;
+            if(sn == null) sn = "Unknown Server";
+            return sn;
         }
         @Override
         public boolean isPlayerBanned(String pid)
@@ -638,7 +593,7 @@ public class DynmapPlugin
         {
             return patternControlCode.matcher(s).replaceAll("");
         }
-        private Set<EventType> registered = new HashSet<EventType>();
+        private final Set<EventType> registered = new HashSet<>();
         @Override
         public boolean requestEventNotification(EventType type)
         {
@@ -684,10 +639,10 @@ public class DynmapPlugin
                     break;
 
                 case PLAYER_CHAT:
-                	if (chathandler == null) {
-                		chathandler = new ChatHandler();
-                		MinecraftForge.EVENT_BUS.register(chathandler);
-                	}
+                    if (chathandler == null) {
+                        chathandler = new ChatHandler();
+                        MinecraftForge.EVENT_BUS.register(chathandler);
+                    }
                     break;
 
                 case BLOCK_BREAK:
@@ -749,12 +704,7 @@ public class DynmapPlugin
         public String[] getBiomeIDs()
         {
             BiomeMap[] b = BiomeMap.values();
-            String[] bname = new String[b.length];
-
-            for (int i = 0; i < bname.length; i++)
-            {
-                bname[i] = b[i].toString();
-            }
+            String[] bname = Arrays.stream(b).map(BiomeMap::toString).toArray(String[]::new);
 
             return bname;
         }
@@ -774,7 +724,7 @@ public class DynmapPlugin
         @Override
         public DynmapWorld getWorldByName(String wname)
         {
-        	return DynmapPlugin.this.getWorldByName(wname);
+            return DynmapPlugin.this.getWorldByName(wname);
         }
         @Override
         public DynmapPlayer getOfflinePlayer(String name)
@@ -799,7 +749,7 @@ public class DynmapPlugin
             }
             Set<String> rslt = hasOfflinePermissions(player, perms);
             if (rslt == null) {
-                rslt = new HashSet<String>();
+                rslt = new HashSet<>();
                 if(plugin.isOp(player)) {
                     rslt.addAll(perms);
                 }
@@ -827,7 +777,7 @@ public class DynmapPlugin
         {
             ForgeMapChunkCache c = (ForgeMapChunkCache) w.getChunkCache(chunks);
             if(c == null) {
-            	return null;
+                return null;
             }
             if (w.visibility_limits != null)
             {
@@ -849,7 +799,7 @@ public class DynmapPlugin
                 c.setHiddenFillStyle(w.hiddenchunkstyle);
             }
 
-            if (c.setChunkDataTypes(blockdata, biome, highesty, rawbiome) == false)
+            if (!c.setChunkDataTypes(blockdata, biome, highesty, rawbiome))
             {
                 Log.severe("CraftBukkit build does not support biome APIs");
             }
@@ -862,14 +812,12 @@ public class DynmapPlugin
             
             //Now handle any chunks in server thread that are already loaded (on server thread)
             final ForgeMapChunkCache cc = c;
-            Future<Boolean> f = this.callSyncMethod(new Callable<Boolean>() {
-                public Boolean call() throws Exception {
-                    // Update busy state on world
-                    ForgeWorld fw = (ForgeWorld)cc.getWorld();
-                    setBusy(fw.getWorld());
-                    cc.getLoadedChunks();
-                    return true;
-                }
+            Future<Boolean> f = this.callSyncMethod(() -> {
+                // Update busy state on world
+                ForgeWorld fw = (ForgeWorld)cc.getWorld();
+                setBusy(fw.getWorld());
+                cc.getLoadedChunks();
+                return true;
             }, 0);
             try {
                 f.get();
@@ -885,8 +833,8 @@ public class DynmapPlugin
                 Log.severe(ix);
                 return null;
             }
-            if(w.isLoaded() == false) {
-            	return null;
+            if(!w.isLoaded()) {
+                return null;
             }
             // Now, do rest of chunk reading from calling thread
             c.readChunks(chunks.size());
@@ -905,7 +853,7 @@ public class DynmapPlugin
         }
 
         @SubscribeEvent
-		public void tickEvent(TickEvent.ServerTickEvent event)  {
+        public void tickEvent(TickEvent.ServerTickEvent event)  {
             if (event.phase == TickEvent.Phase.START) {
                 return;
             }
@@ -913,14 +861,14 @@ public class DynmapPlugin
             long elapsed = cur_tick_starttime - lasttick;
             lasttick = cur_tick_starttime;
             avgticklen = ((avgticklen * 99) / 100) + (elapsed / 100);
-            tps = (double)1E9 / (double)avgticklen;
+            tps = 1E9 / (double)avgticklen;
             // Tick core
             if (core != null) {
                 core.serverTick(tps);
             }
 
             boolean done = false;
-            TaskRecord tr = null;
+            TaskRecord tr;
 
             while(!blockupdatequeue.isEmpty()) {
                 BlockUpdateRec r = blockupdatequeue.remove();
@@ -970,7 +918,7 @@ public class DynmapPlugin
             }
             while(!msgqueue.isEmpty()) {
                 ChatMessage cm = msgqueue.poll();
-                DynmapPlayer dp = null;
+                DynmapPlayer dp;
                 if(cm.sender != null)
                     dp = getOrAddPlayer(cm.sender);
                 else
@@ -982,31 +930,30 @@ public class DynmapPlugin
             if((cur_tick % 20) == 0) {
                 doIdleOutOfWorlds();
             }
-		}
+        }
 
-		@Override
-		public boolean isModLoaded(String name) {
-			boolean loaded = Loader.isModLoaded(name);
-			if (loaded) {
+        @Override
+        public boolean isModLoaded(String name) {
+            boolean loaded = Loader.isModLoaded(name);
+            if (loaded) {
                 modsused.add(name);
-			}
-			return loaded;
-		}
-		@Override
-		public String getModVersion(String name) {
-		    Map<String, ModContainer> list = Loader.instance().getIndexedModList();
-		    ModContainer mod = list.get(name);    // Try case sensitive lookup
-		    if (mod == null) {
-		        for (Entry<String, ModContainer> ent : list.entrySet()) {
-		            if (ent.getKey().equalsIgnoreCase(name)) {
-		                mod = ent.getValue();
-		                break;
-		            }
-		        }
-		    }
-		    if (mod == null) return null;
-		    return mod.getVersion();
-		}
+            }
+            return loaded;
+        }
+        @Override
+        public String getModVersion(String name) {
+            Map<String, ModContainer> list = Loader.instance().getIndexedModList();
+            ModContainer mod = list.get(name);    // Try case sensitive lookup
+            if (mod == null) {
+                mod = list.entrySet()
+                        .stream()
+                        .filter(ent -> ent.getKey().equalsIgnoreCase(name))
+                        .findFirst()
+                        .map(Entry::getValue)
+                        .orElse(null);
+            }
+            return mod == null ? null : mod.getVersion();
+        }
         @Override
         public double getServerTPS() {
             return tps;
@@ -1027,12 +974,12 @@ public class DynmapPlugin
         }
         @Override
         public List<String> getModList() {
-            return new ArrayList<String>(Loader.instance().getIndexedModList().keySet());
+            return new ArrayList<>(Loader.instance().getIndexedModList().keySet());
         }
 
         @Override
         public Map<Integer, String> getBlockIDMap() {
-            Map<Integer, String> map = new HashMap<Integer, String>();
+            Map<Integer, String> map = new HashMap<>();
             for (int i = 0; i < 4096; i++) {
                 Block b = getBlockByID(i);
                 if (b == null) continue;
@@ -1056,23 +1003,22 @@ public class DynmapPlugin
                     }
                 }
             }
-            List<ModContainer> mcl = Loader.instance().getModList();
-            for (ModContainer mc : mcl) {
-                Object mod = mc.getMod();
-                if (mod == null) continue;
-                InputStream is = mod.getClass().getClassLoader().getResourceAsStream(rname);
-                if (is != null) {
-                    return is;
-                }
-            }
-            return null;
+            return Loader.instance()
+                    .getModList()
+                    .stream()
+                    .map(ModContainer::getMod)
+                    .filter(Objects::nonNull)
+                    .map(mod -> mod.getClass().getClassLoader().getResourceAsStream(rname))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
         }
         /**
          * Get block unique ID map (module:blockid)
          */
         @Override
         public Map<String, Integer> getBlockUniqueIDMap() {
-            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            HashMap<String, Integer> map = new HashMap<>();
             for (int i = 0; i < 4096; i++) {
                 Block b = getBlockByID(i);
                 if (b == null) continue;
@@ -1093,7 +1039,7 @@ public class DynmapPlugin
          */
         @Override
         public Map<String, Integer> getItemUniqueIDMap() {
-            HashMap<String, Integer> map = new HashMap<String, Integer>();
+            HashMap<String, Integer> map = new HashMap<>();
             for (int i = 0; i < 32000; i++) {
                 Item itm = getItemByID(i);
                 if (itm == null) continue;
@@ -1139,29 +1085,29 @@ public class DynmapPlugin
         {
             player = p;
             String url = null;
-        	if (player != null) {
-        		uuid = player.getUniqueID();
-        		GameProfile prof = player.getGameProfile();
-        		if (prof != null) {
-        	        Property textureProperty = Iterables.getFirst(prof.getProperties().get("textures"), null);
+            if (player != null) {
+                uuid = player.getUniqueID();
+                GameProfile prof = player.getGameProfile();
+                if (prof != null) {
+                    Property textureProperty = Iterables.getFirst(prof.getProperties().get("textures"), null);
 
-        	        if (textureProperty != null) {
-        	        	TexturesPayload result = null;
-        	        	try {
-        	        		String json = new String(Base64.decodeBase64(textureProperty.getValue()), Charsets.UTF_8);
-        	        		result = gson.fromJson(json, TexturesPayload.class);
-        	        	} catch (JsonParseException e) {
-        	        	}
-        	        	if ((result != null) && (result.textures != null) && (result.textures.containsKey("SKIN"))) {
-        	        		url = result.textures.get("SKIN").url;
-        	        	}
-        			}
-        		}
-        	}
-        	else {
-        		uuid = null;
-        	}
-        	skinurl = url;
+                    if (textureProperty != null) {
+                        TexturesPayload result = null;
+                        try {
+                            String json = new String(Base64.decodeBase64(textureProperty.getValue()), Charsets.UTF_8);
+                            result = gson.fromJson(json, TexturesPayload.class);
+                        } catch (JsonParseException e) {
+                        }
+                        if ((result != null) && (result.textures != null) && (result.textures.containsKey("SKIN"))) {
+                            url = result.textures.get("SKIN").url;
+                        }
+                    }
+                }
+            }
+            else {
+                uuid = null;
+            }
+            skinurl = url;
         }
         @Override
         public boolean isConnected()
@@ -1171,26 +1117,26 @@ public class DynmapPlugin
         @Override
         public String getName()
         {
-        	if(player != null)
-        		return player.getCommandSenderEntity().getName();
-        	else
-        		return "[Server]";
+            if(player != null)
+                return player.getCommandSenderEntity().getName();
+            else
+                return "[Server]";
         }
         @Override
         public String getDisplayName()
         {
-        	if(player != null) {
-        	    if (displayName != null) {
-        	        try {
+            if(player != null) {
+                if (displayName != null) {
+                    try {
                         return (String) displayName.get(player);
                     } catch (IllegalArgumentException e) {
                     } catch (IllegalAccessException e) {
                     }
-        	    }
-        		return player.getDisplayName().getUnformattedText();
-        	}
-        	else
-        		return "[Server]";
+                }
+                return player.getDisplayName().getUnformattedText();
+            }
+            else
+                return "[Server]";
         }
         @Override
         public boolean isOnline()
@@ -1226,13 +1172,13 @@ public class DynmapPlugin
         public InetSocketAddress getAddress()
         {
             if((player != null) && (player instanceof EntityPlayerMP)) {
-            	NetHandlerPlayServer nsh = ((EntityPlayerMP)player).connection;
-            	if((nsh != null) && (getNetworkManager(nsh) != null)) {
-            		SocketAddress sa = getNetworkManager(nsh).getRemoteAddress();
-            		if(sa instanceof InetSocketAddress) {
-            			return (InetSocketAddress)sa;
-            		}
-            	}
+                NetHandlerPlayServer nsh = ((EntityPlayerMP)player).connection;
+                if((nsh != null) && (getNetworkManager(nsh) != null)) {
+                    SocketAddress sa = getNetworkManager(nsh).getRemoteAddress();
+                    if(sa instanceof InetSocketAddress) {
+                        return (InetSocketAddress)sa;
+                    }
+                }
             }
             return null;
         }
@@ -1297,8 +1243,8 @@ public class DynmapPlugin
         @Override
         public boolean isOp()
         {
-        	return DynmapPlugin.this.isOp(player.getCommandSenderEntity().getName());
-    	}
+            return DynmapPlugin.this.isOp(player.getCommandSenderEntity().getName());
+        }
         @Override
         public void sendMessage(String msg)
         {
@@ -1307,10 +1253,10 @@ public class DynmapPlugin
         }
         @Override
         public boolean isInvisible() {
-        	if(player != null) {
-        		return player.isInvisible();
-        	}
-        	return false;
+            if(player != null) {
+                return player.isInvisible();
+            }
+            return false;
         }
         @Override
         public int getSortWeight() {
@@ -1336,40 +1282,40 @@ public class DynmapPlugin
         }
         @Override
         public String getSkinURL() {
-        	return skinurl;
+            return skinurl;
         }
         @Override
         public UUID getUUID() {
-        	return uuid;
+            return uuid;
         }
         /**
          * Send title and subtitle text (called from server thread)
          */
         @Override
         public void sendTitleText(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        	if (player instanceof EntityPlayerMP) {
-        		EntityPlayerMP mp = (EntityPlayerMP) player;
-        		SPacketTitle times = new SPacketTitle(fadeInTicks, stayTicks, fadeOutTicks);
-        		mp.connection.sendPacket(times);
+            if (player instanceof EntityPlayerMP) {
+                EntityPlayerMP mp = (EntityPlayerMP) player;
+                SPacketTitle times = new SPacketTitle(fadeInTicks, stayTicks, fadeOutTicks);
+                mp.connection.sendPacket(times);
                 if (title != null) {
-            		SPacketTitle titlepkt = new SPacketTitle(SPacketTitle.Type.TITLE, new TextComponentString(title));
-            		mp.connection.sendPacket(titlepkt);
+                    SPacketTitle titlepkt = new SPacketTitle(SPacketTitle.Type.TITLE, new TextComponentString(title));
+                    mp.connection.sendPacket(titlepkt);
                 }
 
                 if (subtitle != null) {
-            		SPacketTitle subtitlepkt = new SPacketTitle(SPacketTitle.Type.SUBTITLE, new TextComponentString(subtitle));
-            		mp.connection.sendPacket(subtitlepkt);
+                    SPacketTitle subtitlepkt = new SPacketTitle(SPacketTitle.Type.SUBTITLE, new TextComponentString(subtitle));
+                    mp.connection.sendPacket(subtitlepkt);
                 }
-        	}
-    	}
+            }
+        }
     }
     /* Handler for generic console command sender */
     public class ForgeCommandSender implements DynmapCommandSender
     {
-        private ICommandSender sender;
+        private final ICommandSender sender;
 
         protected ForgeCommandSender() {
-        	sender = null;
+            sender = null;
         }
 
         public ForgeCommandSender(ICommandSender send)
@@ -1380,16 +1326,16 @@ public class DynmapPlugin
         @Override
         public boolean hasPrivilege(String privid)
         {
-        	return true;
+            return true;
         }
 
         @Override
         public void sendMessage(String msg)
         {
-        	if(sender != null) {
+            if(sender != null) {
                 ITextComponent ichatcomponent = new TextComponentString(msg);
-        	    sender.addChatMessage(ichatcomponent);
-        	}
+                sender.addChatMessage(ichatcomponent);
+            }
         }
 
         @Override
@@ -1409,11 +1355,11 @@ public class DynmapPlugin
     }
 
     public void loadExtraBiomes(String mcver) {
-    	int cnt = 0;
+        int cnt = 0;
         BiomeMap.loadWellKnownByVersion(mcver);
 
-    	Biome[] list = getBiomeList();
-    	
+        Biome[] list = getBiomeList();
+
         for(int i = 0; i < list.length; i++) {
             Biome bb = list[i];
             if(bb != null) {
@@ -1432,7 +1378,7 @@ public class DynmapPlugin
             }
         }
         if(cnt > 0)
-        	Log.info("Added " + cnt + " custom biome mappings");
+            Log.info("Added " + cnt + " custom biome mappings");
     }
 
     private String[] getBiomeNames() {
@@ -1464,7 +1410,7 @@ public class DynmapPlugin
         /* Get and initialize data folder */
         File dataDirectory = new File("dynmap");
 
-        if (dataDirectory.exists() == false)
+        if (!dataDirectory.exists())
         {
             dataDirectory.mkdirs();
         }
@@ -1487,13 +1433,13 @@ public class DynmapPlugin
 
         if(!core.initConfiguration(null))
         {
-        	return;
+            return;
         }
         DynmapCommonAPIListener.apiInitialized(core);
     }
     
     public void onStart() {
-    	initializeBlockStates();
+        initializeBlockStates();
         /* Enable core */
         if (!core.enableCore(null))
         {
@@ -1548,7 +1494,7 @@ public class DynmapPlugin
         ICommandManager cm = server.getCommandManager();
 
         if(cm instanceof CommandHandler) {
-        	CommandHandler scm = (CommandHandler)cm;
+            CommandHandler scm = (CommandHandler)cm;
             scm.registerCommand(new DynmapCommand(this));
             scm.registerCommand(new DmapCommand(this));
             scm.registerCommand(new DmarkerCommand(this));
@@ -1567,11 +1513,11 @@ public class DynmapPlugin
     {
         DynmapCommonAPIListener.apiTerminated();
 
-    	//if (metrics != null) {
-    	//	metrics.stop();
-    	//	metrics = null;
-    	//}
-    	/* Save worlds */
+        //if (metrics != null) {
+        //    metrics.stop();
+        //    metrics = null;
+        //}
+        /* Save worlds */
         saveWorlds();
 
         /* Purge tick queue */
@@ -1612,79 +1558,69 @@ public class DynmapPlugin
     }
 
     public class PlayerTracker {
-		@SubscribeEvent
-		public void onPlayerLogin(PlayerLoggedInEvent event) {			
-			if(!core_enabled) return;
+        @SubscribeEvent
+        public void onPlayerLogin(PlayerLoggedInEvent event) {
+            if(!core_enabled) return;
             final DynmapPlayer dp = getOrAddPlayer(event.player);
             /* This event can be called from off server thread, so push processing there */
-            core.getServer().scheduleServerTask(new Runnable() {
-                public void run() {
-                    core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp);
-                }
-            }, 2);
-		}
+            core.getServer().scheduleServerTask(() -> core.listenerManager.processPlayerEvent(EventType.PLAYER_JOIN, dp), 2);
+        }
         @SubscribeEvent
-		public void onPlayerLogout(PlayerLoggedOutEvent event) {
-			if(!core_enabled) return;
+        public void onPlayerLogout(PlayerLoggedOutEvent event) {
+            if(!core_enabled) return;
             final DynmapPlayer dp = getOrAddPlayer(event.player);
             final String name = event.player.getCommandSenderEntity().getName();
             /* This event can be called from off server thread, so push processing there */
-            core.getServer().scheduleServerTask(new Runnable() {
-                public void run() {
-                    core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, dp);
-                    players.remove(name);
-                }
+            core.getServer().scheduleServerTask(() -> {
+                core.listenerManager.processPlayerEvent(EventType.PLAYER_QUIT, dp);
+                players.remove(name);
             }, 0);
-		}
+        }
         @SubscribeEvent
-		public void onPlayerChangedDimension(PlayerChangedDimensionEvent event) {
+        public void onPlayerChangedDimension(PlayerChangedDimensionEvent event) {
             if(!core_enabled) return;
-            getOrAddPlayer(event.player);	// Freshen player object reference
-		}
+            getOrAddPlayer(event.player);    // Freshen player object reference
+        }
         @SubscribeEvent
-		public void onPlayerRespawn(PlayerRespawnEvent event) {
+        public void onPlayerRespawn(PlayerRespawnEvent event) {
             if(!core_enabled) return;
-            getOrAddPlayer(event.player);	// Freshen player object reference
-		}
+            getOrAddPlayer(event.player);    // Freshen player object reference
+        }
     }
     private PlayerTracker playerTracker = null;
     
     private void registerPlayerLoginListener()
     {
-    	if (playerTracker == null) {
-    		playerTracker = new PlayerTracker();
-    		MinecraftForge.EVENT_BUS.register(playerTracker);
-    	}
+        if (playerTracker == null) {
+            playerTracker = new PlayerTracker();
+            MinecraftForge.EVENT_BUS.register(playerTracker);
+        }
     }
 
     public class WorldTracker {
-    	@SubscribeEvent
-    	public void handleWorldLoad(WorldEvent.Load event) {
-			if(!core_enabled) return;
-			World w = event.getWorld();
-			if(!(w instanceof WorldServer)) return;
+        @SubscribeEvent
+        public void handleWorldLoad(WorldEvent.Load event) {
+            if(!core_enabled) return;
+            World w = event.getWorld();
+            if(!(w instanceof WorldServer)) return;
             final ForgeWorld fw = getWorld(w);
             // This event can be called from off server thread, so push processing there
-            core.getServer().scheduleServerTask(new Runnable() {
-            	public void run() {
-            		if(core.processWorldLoad(fw))    // Have core process load first - fire event listeners if good load after
-            			core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, fw);
-            	}
+            core.getServer().scheduleServerTask(() -> {
+                if(core.processWorldLoad(fw))    // Have core process load first - fire event listeners if good load after
+                    core.listenerManager.processWorldEvent(EventType.WORLD_LOAD, fw);
             }, 0);
-    	}
+        }
         @SubscribeEvent
-    	public void handleWorldUnload(WorldEvent.Unload event) {
-			if(!core_enabled) return;
-			World w = event.getWorld();
+        public void handleWorldUnload(WorldEvent.Unload event) {
+            if(!core_enabled) return;
+            World w = event.getWorld();
             if(!(w instanceof WorldServer)) return;
             final ForgeWorld fw = getWorld(w);
             if(fw != null) {
                 // This event can be called from off server thread, so push processing there
-                core.getServer().scheduleServerTask(new Runnable() {
-                	public void run() {
-                		core.listenerManager.processWorldEvent(EventType.WORLD_UNLOAD, fw);
-                		core.processWorldUnload(fw);
-                	}
+                core.getServer().scheduleServerTask(() -> {
+                    core.listenerManager.processWorldEvent(EventType.WORLD_UNLOAD, fw);
+                    core.processWorldUnload(fw);
                 }, 0);
                 // Set world unloaded (needs to be immediate, since it may be invalid after event)
                 fw.setWorldUnloaded();
@@ -1695,56 +1631,56 @@ public class DynmapPlugin
         }
         
         @SubscribeEvent
-    	public void handleChunkLoad(ChunkEvent.Load event) {
-			if(!core_enabled) return;
-			if(!onchunkgenerate) return;
-			World w = event.getWorld();
+        public void handleChunkLoad(ChunkEvent.Load event) {
+            if(!core_enabled) return;
+            if(!onchunkgenerate) return;
+            World w = event.getWorld();
             if(!(w instanceof WorldServer)) return;
-			Chunk c = event.getChunk();
-			if((c != null) && (!c.isTerrainPopulated())) {	// If new chunk?
-				ForgeWorld fw = getWorld(w, false);
-				if(fw == null) {
-					return;
-				}
-				int ymax = 0;
-				ExtendedBlockStorage[] sections = c.getBlockStorageArray();
-				for(int i = 0; i < sections.length; i++) {
-					if((sections[i] != null) && (sections[i].isEmpty() == false)) {
-						ymax = 16*(i+1);
-					}
-				}
-				int x = c.xPosition << 4;
-				int z = c.zPosition << 4;
-				if(ymax > 0) {
-					mapManager.touchVolume(fw.getName(), x, 0, z, x+15, ymax, z+16, "chunkgenerate");
-				}
-			}
-    	}
+            Chunk c = event.getChunk();
+            if((c != null) && (!c.isTerrainPopulated())) {    // If new chunk?
+                ForgeWorld fw = getWorld(w, false);
+                if(fw == null) {
+                    return;
+                }
+                int ymax = 0;
+                ExtendedBlockStorage[] sections = c.getBlockStorageArray();
+                for(int i = 0; i < sections.length; i++) {
+                    if((sections[i] != null) && (!sections[i].isEmpty())) {
+                        ymax = 16*(i+1);
+                    }
+                }
+                int x = c.xPosition << 4;
+                int z = c.zPosition << 4;
+                if(ymax > 0) {
+                    mapManager.touchVolume(fw.getName(), x, 0, z, x+15, ymax, z+16, "chunkgenerate");
+                }
+            }
+        }
 
         @SubscribeEvent
-    	public void handleChunkPopulate(PopulateChunkEvent.Post event) {
-			if(!core_enabled) return;
-			if(!onchunkpopulate) return;
-			World w = event.getWorld();
+        public void handleChunkPopulate(PopulateChunkEvent.Post event) {
+            if(!core_enabled) return;
+            if(!onchunkpopulate) return;
+            World w = event.getWorld();
             if(!(w instanceof WorldServer)) return;
             Chunk c = w.getChunkFromChunkCoords(event.getChunkX(), event.getChunkZ());
-			int ymin = 0, ymax = 0;
-			if(c != null) {
+            int ymin = 0, ymax = 0;
+            if(c != null) {
                 ForgeWorld fw = getWorld(event.getWorld(), false);
                 if (fw == null) return;
 
                 ExtendedBlockStorage[] sections = c.getBlockStorageArray();
-				for(int i = 0; i < sections.length; i++) {
-					if((sections[i] != null) && (sections[i].isEmpty() == false)) {
-						ymax = 16*(i+1);
-					}
-				}
-				int x = c.xPosition << 4;
-				int z = c.zPosition << 4;
-				if(ymax > 0)
-					mapManager.touchVolume(fw.getName(), x, ymin, z, x+15, ymax, z+16, "chunkpopulate");
-			}
-    	}        
+                for(int i = 0; i < sections.length; i++) {
+                    if((sections[i] != null) && (!sections[i].isEmpty())) {
+                        ymax = 16*(i+1);
+                    }
+                }
+                int x = c.xPosition << 4;
+                int z = c.zPosition << 4;
+                if(ymax > 0)
+                    mapManager.touchVolume(fw.getName(), x, ymin, z, x+15, ymax, z+16, "chunkpopulate");
+            }
+        }
     }
     
     private boolean onblockchange = false;
@@ -1755,19 +1691,19 @@ public class DynmapPlugin
     
     
     public class WorldUpdateTracker implements IWorldEventListener {
-    	String worldid;
-    	World world;
+        String worldid;
+        World world;
         @Override
         public void notifyLightSet(BlockPos pos) {
             if(sscache != null)
                 sscache.invalidateSnapshot(worldid, pos.getX(), pos.getY(), pos.getZ());
             if(onlightingchange) {
-            	mapManager.touch(worldid, pos.getX(), pos.getY(), pos.getZ(), "lightingchange");
+                mapManager.touch(worldid, pos.getX(), pos.getY(), pos.getZ(), "lightingchange");
             }
-		}
-		@Override
+        }
+        @Override
         public void markBlockRangeForRenderUpdate(int x1, int y1, int z1, int x2, int y2, int z2) {
-		}
+        }
         @Override
         public void onEntityAdded(Entity entityIn) {
         }
@@ -1814,14 +1750,14 @@ public class DynmapPlugin
     }
     
     private WorldTracker worldTracker = null;
-    private HashMap<String, WorldUpdateTracker> updateTrackers = new HashMap<String, WorldUpdateTracker>();
+    private final HashMap<String, WorldUpdateTracker> updateTrackers = new HashMap<>();
     
     private void registerEvents()
     {
-    	if(worldTracker == null) {
-    		worldTracker = new WorldTracker();
-    		MinecraftForge.EVENT_BUS.register(worldTracker);
-    	}
+        if(worldTracker == null) {
+            worldTracker = new WorldTracker();
+            MinecraftForge.EVENT_BUS.register(worldTracker);
+        }
         // To trigger rendering.
         onblockchange = core.isTrigger("blockupdate");
         onlightingchange = core.isTrigger("lightingupdate");
@@ -1829,74 +1765,74 @@ public class DynmapPlugin
         onchunkgenerate = core.isTrigger("chunkgenerate");
         onblockchange_with_id = core.isTrigger("blockupdate-with-id");
         if(onblockchange_with_id)
-        	onblockchange = true;
+            onblockchange = true;
     }
 
     private ForgeWorld getWorldByName(String name) {
-    	return worlds.get(name);
+        return worlds.get(name);
     }
     
     private ForgeWorld getWorld(World w) {
-    	return getWorld(w, true);
+        return getWorld(w, true);
     }
     
     private ForgeWorld getWorld(World w, boolean add_if_not_found) {
-    	if(last_world == w) {
-    		return last_fworld;
-    	}
-    	String wname = ForgeWorld.getWorldName(w);
-    	
-    	for(ForgeWorld fw : worlds.values()) {
-			if(fw.getRawName().equals(wname)) {
-				last_world = w;
-	           	last_fworld = fw;
-           		if(fw.isLoaded() == false) {
-       				fw.setWorldLoaded(w);
-       				// Add tracker
-       	    		WorldUpdateTracker wit = new WorldUpdateTracker();
-       	    		wit.worldid = fw.getName();
-       	    		wit.world = w;
-       	    		updateTrackers.put(fw.getName(), wit);
-       	    		w.addEventListener(wit);
-           		}
-    			return fw;
-    		}
-    	}
-    	ForgeWorld fw = null;
-    	if(add_if_not_found) {
-    		/* Add to list if not found */
-    		fw = new ForgeWorld(w);
-    		worlds.put(fw.getName(), fw);
-    		// Add tracker
-    		WorldUpdateTracker wit = new WorldUpdateTracker();
-    		wit.worldid = fw.getName();
-    		wit.world = w;
-    		updateTrackers.put(fw.getName(), wit);
-    		w.addEventListener(wit);
-    	}
-		last_world = w;
-		last_fworld = fw;
-    	return fw;
+        if(last_world == w) {
+            return last_fworld;
+        }
+        String wname = ForgeWorld.getWorldName(w);
+
+        for(ForgeWorld fw : worlds.values()) {
+            if(fw.getRawName().equals(wname)) {
+                last_world = w;
+                   last_fworld = fw;
+                   if(!fw.isLoaded()) {
+                       fw.setWorldLoaded(w);
+                       // Add tracker
+                       WorldUpdateTracker wit = new WorldUpdateTracker();
+                       wit.worldid = fw.getName();
+                       wit.world = w;
+                       updateTrackers.put(fw.getName(), wit);
+                       w.addEventListener(wit);
+                   }
+                return fw;
+            }
+        }
+        ForgeWorld fw = null;
+        if(add_if_not_found) {
+            /* Add to list if not found */
+            fw = new ForgeWorld(w);
+            worlds.put(fw.getName(), fw);
+            // Add tracker
+            WorldUpdateTracker wit = new WorldUpdateTracker();
+            wit.worldid = fw.getName();
+            wit.world = w;
+            updateTrackers.put(fw.getName(), wit);
+            w.addEventListener(wit);
+        }
+        last_world = w;
+        last_fworld = fw;
+        return fw;
     }
 
     /*
     private void removeWorld(ForgeWorld fw) {
-    	WorldUpdateTracker wit = updateTrackers.remove(fw.getName());
-    	if(wit != null) {
-    		//fw.getWorld().removeWorldAccess(wit);
-    	}
-    	worlds.remove(fw.getName());
-    	if(last_fworld == fw) {
-			last_world = null;
-			last_fworld = null;
-    	}
+        WorldUpdateTracker wit = updateTrackers.remove(fw.getName());
+        if(wit != null) {
+            //fw.getWorld().removeWorldAccess(wit);
+        }
+        worlds.remove(fw.getName());
+        if(last_fworld == fw) {
+            last_world = null;
+            last_fworld = null;
+        }
     }
     */
 
     private void initMetrics() {
         /*
         try {
-        	Mod m = DynmapMod.class.getAnnotation(Mod.class);
+            Mod m = DynmapMod.class.getAnnotation(Mod.class);
             metrics = new ForgeMetrics(m.name(), m.version());
             ;
             ForgeMetrics.Graph features = metrics.createGraph("Features Used");
@@ -1982,9 +1918,9 @@ public class DynmapPlugin
     private void saveWorlds() {
         File f = new File(core.getDataFolder(), "forgeworlds.yml");
         ConfigurationNode cn = new ConfigurationNode(f);
-        ArrayList<HashMap<String,Object>> lst = new ArrayList<HashMap<String,Object>>();
+        ArrayList<HashMap<String,Object>> lst = new ArrayList<>();
         for(DynmapWorld fw : core.mapManager.getWorlds()) {
-            HashMap<String, Object> vals = new HashMap<String, Object>();
+            HashMap<String, Object> vals = new HashMap<>();
             vals.put("name", fw.getRawName());
             vals.put("height",  fw.worldheight);
             vals.put("sealevel", fw.sealevel);
@@ -2003,7 +1939,7 @@ public class DynmapPlugin
     private void loadWorlds() {
         isMCPC = server.getServerModName().contains("mcpc");
         File f = new File(core.getDataFolder(), "forgeworlds.yml");
-        if(f.canRead() == false) {
+        if(!f.canRead()) {
             useSaveFolder = true;
             if (isMCPC) {
                 ForgeWorld.setMCPCMapping();
@@ -2070,8 +2006,8 @@ public class DynmapPlugin
 
 class DynmapCommandHandler extends CommandBase
 {
-    private String cmd;
-    private DynmapPlugin plugin;
+    private final String cmd;
+    private final DynmapPlugin plugin;
 
     public DynmapCommandHandler(String cmd, DynmapPlugin p)
     {

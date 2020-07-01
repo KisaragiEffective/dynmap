@@ -3,6 +3,7 @@ package org.dynmap.markers.impl;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapWorld;
@@ -15,7 +16,7 @@ import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 import org.dynmap.utils.Vector3D;
 
 class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
-    private String markerid;
+    private final String markerid;
     private String label;
     private boolean markup;
     private String desc;
@@ -34,16 +35,16 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     private double fillopacity = 0.35;
     private int fillcolor = 0xFF0000;
     private boolean boostflag = false;
-    private int minzoom = -1;
-    private int maxzoom = -1;
+    private int minzoom;
+    private int maxzoom;
     private EnterExitText greeting;
     private EnterExitText farewell;
 
     private static class BoundingBox {
         double xmin, xmax;
         double ymin, ymax;
-        double xp[];
-        double yp[];
+        double[] xp;
+        double[] yp;
     }
     private Map<String, BoundingBox> bb_cache = null;
 
@@ -112,8 +113,8 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
         zr = node.getDouble("zr", 0);
         desc = node.getString("desc", null);
         lineweight = node.getInteger("strokeWeight", -1);
-        if(lineweight == -1) {	/* Handle typo-saved value */
-        	 lineweight = node.getInteger("stokeWeight", 3);
+        if(lineweight == -1) {    /* Handle typo-saved value */
+             lineweight = node.getInteger("stokeWeight", 3);
         }
         lineopacity = node.getDouble("strokeOpacity", 0.8);
         linecolor = node.getInteger("strokeColor", 0xFF0000);
@@ -125,16 +126,16 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
         String gt = node.getString("greeting", null);
         String gst = node.getString("greetingsub", null);
         if ((gt != null) || (gst != null)) {
-        	greeting = new EnterExitText();
-        	greeting.title = gt;
-        	greeting.subtitle = gst;
+            greeting = new EnterExitText();
+            greeting.title = gt;
+            greeting.subtitle = gst;
         }
         String ft = node.getString("farewell", null);
         String fst = node.getString("farewellsub", null);
         if ((ft != null) || (fst != null)) {
-        	farewell = new EnterExitText();
-        	farewell.title = ft;
-        	farewell.subtitle = fst;
+            farewell = new EnterExitText();
+            farewell.title = ft;
+            farewell.subtitle = fst;
         }
 
         ispersistent = true;    /* Loaded from config, so must be */
@@ -148,13 +149,13 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     }
     
     @Override
-	public String getUniqueMarkerID() {
-    	if (markerset != null) {
-    		return markerset + ":circle:" + markerid;
-    	}
-    	else {
-    		return null;
-    	}
+    public String getUniqueMarkerID() {
+        if (markerset != null) {
+            return markerset + ":circle:" + markerid;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
@@ -205,7 +206,7 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     Map<String, Object> getPersistentData() {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
         node.put("markup", markup);
         node.put("x", x);
@@ -231,20 +232,20 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
             node.put("maxzoom", maxzoom);
         }
         if (greeting != null) {
-        	if (greeting.title != null) {
-        		node.put("greeting", greeting.title);
-        	}
-        	if (greeting.subtitle != null) {
-        		node.put("greetingsub", greeting.subtitle);
-        	}        	
+            if (greeting.title != null) {
+                node.put("greeting", greeting.title);
+            }
+            if (greeting.subtitle != null) {
+                node.put("greetingsub", greeting.subtitle);
+            }            
         }
         if (farewell != null) {
-        	if (farewell.title != null) {
-        		node.put("farewell", farewell.title);        		
-        	}
-        	if (farewell.subtitle != null) {
-        		node.put("farewellsub", farewell.subtitle);        		
-        	}
+            if (farewell.title != null) {
+                node.put("farewell", farewell.title);                
+            }
+            if (farewell.subtitle != null) {
+                node.put("farewellsub", farewell.subtitle);                
+            }
         }        
         return node;
     }
@@ -262,7 +263,7 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     }
     @Override
     public void setDescription(String desc) {
-        if((this.desc == null) || (this.desc.equals(desc) == false)) {
+        if((this.desc == null) || (!this.desc.equals(desc))) {
             this.desc = desc;
             MarkerAPIImpl.circleMarkerUpdated(this, MarkerUpdate.UPDATED);
             if(ispersistent)
@@ -402,7 +403,7 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
     final boolean testTileForBoostMarkers(DynmapWorld w, HDPerspective perspective, double tile_x, double tile_y, double tile_dim) {
         Map<String, BoundingBox> bbc = bb_cache;
         if(bbc == null) {
-            bbc = new ConcurrentHashMap<String, BoundingBox>();
+            bbc = new ConcurrentHashMap<>();
         }
         BoundingBox bb = bbc.get(perspective.getName());
         if (bb == null) { // No cached bounding box, so generate it
@@ -455,18 +456,14 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
             return true; // If tile corner inside, we intersect
         }
         /* Test if any polygon corners are inside square */
-        for(int i = 0; i < cnt; i++) { 
-            if((px[i] >= tile_x) && (px[i] <= tile_x2) && (py[i] >= tile_y) && (py[i] <= tile_y2)) {
-                return true; // If poly corner inside tile, we intersect
-            }
-        }
+        // If poly corner inside tile, we intersect
         // Otherwise, only intersects if at least one edge crosses
         //for (int i = 0, j = cnt-1; i < cnt; j = i++) {
         //    // Test for X=tile_x side
         //    if ((px[i] < tile_x) && (px[j] >= tile_x) && ()
         // }
         //System.out.println("tile: " + tile_x + " / " + tile_y + " - hit");
-        return false;
+        return IntStream.range(0, cnt).anyMatch(i -> (px[i] >= tile_x) && (px[i] <= tile_x2) && (py[i] >= tile_y) && (py[i] <= tile_y2));
     }
     @Override
     public int getMinZoom() {
@@ -494,55 +491,55 @@ class CircleMarkerImpl implements CircleMarker, EnterExitMarker {
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();
     }
-	@Override
-	public EnterExitText getGreetingText() {
-		return greeting;
-	}
-	@Override
-	public EnterExitText getFarewellText() {
-		return farewell;
-	}
-	@Override
-	public void setGreetingText(String title, String subtitle) {
-		if ((title != null) || (subtitle != null)) {
-			greeting = new EnterExitText();
-			greeting.title = title;
-			greeting.subtitle = subtitle;
-		}
-		else {
-			greeting = null;
-		}
+    @Override
+    public EnterExitText getGreetingText() {
+        return greeting;
+    }
+    @Override
+    public EnterExitText getFarewellText() {
+        return farewell;
+    }
+    @Override
+    public void setGreetingText(String title, String subtitle) {
+        if ((title != null) || (subtitle != null)) {
+            greeting = new EnterExitText();
+            greeting.title = title;
+            greeting.subtitle = subtitle;
+        }
+        else {
+            greeting = null;
+        }
         if (markerset != null) {
             setMarkerSet(markerset);
         }
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();
-	}
-	@Override
-	public void setFarewellText(String title, String subtitle) {
-		if ((title != null) || (subtitle != null)) {
-			farewell = new EnterExitText();
-			farewell.title = title;
-			farewell.subtitle = subtitle;
-		}
-		else {
-			farewell = null;
-		}
+    }
+    @Override
+    public void setFarewellText(String title, String subtitle) {
+        if ((title != null) || (subtitle != null)) {
+            farewell = new EnterExitText();
+            farewell.title = title;
+            farewell.subtitle = subtitle;
+        }
+        else {
+            farewell = null;
+        }
         if (markerset != null) {
             setMarkerSet(markerset);
         }
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();
-	}
-	@Override
-	public boolean testIfPointWithinMarker(String worldid, double x, double y, double z) {
-		// Wrong world
-		if (!worldid.equals(this.world)) {
-			return false;
-		}
-		// Test if inside ellipse
-		double dx = ((x - this.x) * (x - this.x)) / (xr * xr);
-		double dz = ((z - this.z) * (z - this.z)) / (zr * zr);
-		return (dx + dz) <= 1.0;
-	}
+    }
+    @Override
+    public boolean testIfPointWithinMarker(String worldid, double x, double y, double z) {
+        // Wrong world
+        if (!worldid.equals(this.world)) {
+            return false;
+        }
+        // Test if inside ellipse
+        double dx = ((x - this.x) * (x - this.x)) / (xr * xr);
+        double dz = ((z - this.z) * (z - this.z)) / (zr * zr);
+        return (dx + dz) <= 1.0;
+    }
 }

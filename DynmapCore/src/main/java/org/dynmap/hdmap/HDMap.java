@@ -1,23 +1,11 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.a;
-import static org.dynmap.JSONUtils.s;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.dynmap.Client;
-import org.dynmap.ConfigurationNode;
-import org.dynmap.DynmapChunk;
-import org.dynmap.DynmapCore;
-import org.dynmap.DynmapWorld;
-import org.dynmap.Log;
-import org.dynmap.MapManager;
-import org.dynmap.MapTile;
-import org.dynmap.MapType;
+import org.dynmap.*;
 import org.dynmap.storage.MapStorage;
-import org.dynmap.storage.MapStorageTile;
-import org.dynmap.storage.MapStorageTileEnumCB;
 import org.dynmap.utils.TileFlags;
 import org.json.simple.JSONObject;
 
@@ -42,7 +30,7 @@ public class HDMap extends MapType {
     private String append_to_world;
     private int mapzoomin;
     private int boostzoom;
-    public DynmapCore core;
+    public final DynmapCore core;
 
     public static final String IMGFORMAT_PNG = "png";
     public static final String IMGFORMAT_JPG = "jpg";
@@ -223,33 +211,27 @@ public class HDMap extends MapType {
 
     /* Get maps rendered concurrently with this map in this world */
     public List<MapType> getMapsSharingRender(DynmapWorld w) {
-        ArrayList<MapType> maps = new ArrayList<MapType>();
-        for(MapType mt : w.maps) {
-            if(mt instanceof HDMap) {
-                HDMap hdmt = (HDMap)mt;
-                if((hdmt.perspective == this.perspective) && (hdmt.boostzoom == this.boostzoom)) {  /* Same perspective */
-                    maps.add(hdmt);
-                }
-            }
-        }
-        return maps;
+        /* Same perspective */
+        return w.maps
+                .stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .filter(hdmt -> (hdmt.perspective == this.perspective))
+                .filter(hdmt -> (hdmt.boostzoom == this.boostzoom))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     
     /* Get names of maps rendered concurrently with this map type in this world */
     public List<String> getMapNamesSharingRender(DynmapWorld w) {
-        ArrayList<String> lst = new ArrayList<String>();
-        for(MapType mt : w.maps) {
-            if(mt instanceof HDMap) {
-                HDMap hdmt = (HDMap)mt;
-                if((hdmt.perspective == this.perspective)  && (hdmt.boostzoom == this.boostzoom)) {  /* Same perspective */
-                    if(hdmt.lighting.isNightAndDayEnabled())
-                        lst.add(hdmt.getName() + "(night/day)");
-                    else
-                        lst.add(hdmt.getName());
-                }
-            }
-        }
-        return lst;
+        /* Same perspective */
+        return w.maps
+                .stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .filter(hdmt -> (hdmt.perspective == this.perspective))
+                .filter(hdmt -> (hdmt.boostzoom == this.boostzoom))
+                .map(hdmt -> hdmt.lighting.isNightAndDayEnabled() ? hdmt.getName() + "(night/day)" : hdmt.getName())
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
@@ -258,27 +240,27 @@ public class HDMap extends MapType {
     @Override
     public void buildClientConfiguration(JSONObject worldObject, DynmapWorld world) {
         JSONObject o = new JSONObject();
-        s(o, "type", "HDMapType");
-        s(o, "name", name);
-        s(o, "title", title);
-        s(o, "icon", icon);
-        s(o, "prefix", prefix);
-        s(o, "background", bg_cfg);
-        s(o, "backgroundday", bg_day_cfg);
-        s(o, "backgroundnight", bg_night_cfg);
-        s(o, "bigmap", true);
-        s(o, "mapzoomout", (world.getExtraZoomOutLevels()+mapzoomout));
-        s(o, "mapzoomin", mapzoomin);
-        s(o, "boostzoom", boostzoom);
-        s(o, "protected", isProtected());
-        s(o, "image-format", imgformat.getFileExt());
+        JSONUtils.setValue(o, "type", "HDMapType");
+        JSONUtils.setValue(o, "name", name);
+        JSONUtils.setValue(o, "title", title);
+        JSONUtils.setValue(o, "icon", icon);
+        JSONUtils.setValue(o, "prefix", prefix);
+        JSONUtils.setValue(o, "background", bg_cfg);
+        JSONUtils.setValue(o, "backgroundday", bg_day_cfg);
+        JSONUtils.setValue(o, "backgroundnight", bg_night_cfg);
+        JSONUtils.setValue(o, "bigmap", true);
+        JSONUtils.setValue(o, "mapzoomout", (world.getExtraZoomOutLevels() + mapzoomout));
+        JSONUtils.setValue(o, "mapzoomin", mapzoomin);
+        JSONUtils.setValue(o, "boostzoom", boostzoom);
+        JSONUtils.setValue(o, "protected", isProtected());
+        JSONUtils.setValue(o, "image-format", imgformat.getFileExt());
         if(append_to_world.length() > 0)
-            s(o, "append_to_world", append_to_world);
+            JSONUtils.setValue(o, "append_to_world", append_to_world);
         perspective.addClientConfiguration(o);
         shader.addClientConfiguration(o);
         lighting.addClientConfiguration(o);
         
-        a(worldObject, "maps", o);
+        JSONUtils.array(worldObject, "maps", o);
 
     }
     
@@ -317,31 +299,28 @@ public class HDMap extends MapType {
     
     public void purgeOldTiles(final DynmapWorld world, final TileFlags rendered) {
         final MapStorage ms = world.getMapStorage();
-        ms.enumMapTiles(world, this, new MapStorageTileEnumCB() {
-            @Override
-            public void tileFound(MapStorageTile tile, ImageEncoding fmt) {
-                if (fmt != getImageFormat().getEncoding()) { // Wrong format?  toss it
-                    /* Otherwise, delete tile */
-                    tile.delete();
+        ms.enumMapTiles(world, this, (tile, fmt) -> {
+            if (fmt != getImageFormat().getEncoding()) { // Wrong format?  toss it
+                /* Otherwise, delete tile */
+                tile.delete();
+            }
+            else if (tile.zoom == 1) {   // First tier zoom?  sensitive to newly rendered tiles
+                // If any were rendered, already triggered (and still needed
+                if (rendered.getFlag(tile.x, tile.y) || rendered.getFlag(tile.x+1, tile.y) ||
+                    rendered.getFlag(tile.x, tile.y-1) || rendered.getFlag(tile.x+1, tile.y-1)) {
+                    return;
                 }
-                else if (tile.zoom == 1) {   // First tier zoom?  sensitive to newly rendered tiles
-                    // If any were rendered, already triggered (and still needed
-                    if (rendered.getFlag(tile.x, tile.y) || rendered.getFlag(tile.x+1, tile.y) ||
-                        rendered.getFlag(tile.x, tile.y-1) || rendered.getFlag(tile.x+1, tile.y-1)) {
-                        return;
-                    }
-                    tile.enqueueZoomOutUpdate();
+                tile.enqueueZoomOutUpdate();
+            }
+            else if (tile.zoom == 0) {
+                if (rendered.getFlag(tile.x, tile.y)) {  /* If we rendered this tile, its good */
+                    return;
                 }
-                else if (tile.zoom == 0) {
-                    if (rendered.getFlag(tile.x, tile.y)) {  /* If we rendered this tile, its good */
-                        return;
-                    }
-                    /* Otherwise, delete tile */
-                    tile.delete();
-                    /* Push updates, clear hash code, and signal zoom tile update */
-                    MapManager.mapman.pushUpdate(world, new Client.Tile(tile.getURI()));
-                    tile.enqueueZoomOutUpdate();
-                }
+                /* Otherwise, delete tile */
+                tile.delete();
+                /* Push updates, clear hash code, and signal zoom tile update */
+                MapManager.mapman.pushUpdate(world, new Client.Tile(tile.getURI()));
+                tile.enqueueZoomOutUpdate();
             }
         });
     }
@@ -425,7 +404,7 @@ public class HDMap extends MapType {
         return false;
     }
     public boolean setImageFormatSetting(String f) {
-        if(imgfmtstring.equals(f) == false) {
+        if(!imgfmtstring.equals(f)) {
             MapType.ImageFormat newfmt;
             if(f.equals("default"))
                 newfmt = MapType.ImageFormat.fromID(core.getDefImageFormat());

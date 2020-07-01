@@ -27,10 +27,10 @@ import org.dynmap.utils.PatchDefinitionFactory;
 public class ModModelDefinitionImpl implements ModModelDefinition {
     private final ModTextureDefinitionImpl txtDef;
     private boolean published = false;
-    private ArrayList<BlockModelImpl> blkModel = new ArrayList<BlockModelImpl>();
-    private ArrayList<PatchDefinition> blkPatch = new ArrayList<PatchDefinition>();
-    private HashMap<String, PatchDefinition> blkPatchMap = new HashMap<String, PatchDefinition>();
-    private PatchDefinitionFactory pdf;
+    private final ArrayList<BlockModelImpl> blkModel = new ArrayList<>();
+    private final ArrayList<PatchDefinition> blkPatch = new ArrayList<>();
+    private final HashMap<String, PatchDefinition> blkPatchMap = new HashMap<>();
+    private final PatchDefinitionFactory pdf;
     
     public ModModelDefinitionImpl(ModTextureDefinitionImpl txtDef) {
         this.txtDef = txtDef;
@@ -238,9 +238,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
             return;
         }
         File f = new File(destdir, this.txtDef.getModID() + "-models.txt");
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(f);
+        try (FileWriter fw = new FileWriter(f)) {
             // Write modname line
             String s = "modname:" + this.txtDef.getModID();
             fw.write(s + "\n\n");
@@ -263,9 +261,8 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
                     case BOTH:
                         break;
                 }
-                if (line != null) {
-                    fw.write(line + "\n");
-                }
+                // line always isn't null
+                fw.write(line + "\n");
             }
             // Loop through block texture records
             for (BlockModelImpl btr : blkModel) {
@@ -274,10 +271,6 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
                     fw.write(line + "\n");
                 }
             }
-        } finally {
-            if (fw != null) {
-                fw.close(); 
-            }
-        }        
+        }
     }
 }

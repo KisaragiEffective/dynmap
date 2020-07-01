@@ -17,9 +17,9 @@ public class DynmapBufferedImage {
     public int height;
     
     /* BufferedImage cache - we use the same things a lot... */
-    private static Object lock = new Object();
-    private static HashMap<Long, LinkedList<DynmapBufferedImage>> imgcache = 
-        new HashMap<Long, LinkedList<DynmapBufferedImage>>(); /* Indexed by resolution - X<<32+Y */
+    private static final Object lock = new Object();
+    private static final HashMap<Long, LinkedList<DynmapBufferedImage>> imgcache =
+            new HashMap<>(); /* Indexed by resolution - X<<32+Y */
     private static final int CACHE_LIMIT = 10;
 
     /**
@@ -61,12 +61,11 @@ public class DynmapBufferedImage {
             long k = (img.width<<16) + img.height;
             LinkedList<DynmapBufferedImage> ll = imgcache.get(k);
             if(ll == null) {
-                ll = new LinkedList<DynmapBufferedImage>();
+                ll = new LinkedList<>();
                 imgcache.put(k, ll);
             }
             if(ll.size() < CACHE_LIMIT) {
                 ll.add(img);
-                img = null;
             }
         }
     }    

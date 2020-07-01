@@ -1,7 +1,9 @@
 package org.dynmap.bukkit.permissions;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -14,8 +16,8 @@ import ru.tehkode.permissions.PermissionUser;
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class PEXPermissions implements PermissionProvider {
-    String name;
-    PermissionManager pm;
+    final String name;
+    final PermissionManager pm;
 
     public static PEXPermissions create(Server server, String name) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("PermissionsEx");
@@ -29,7 +31,7 @@ public class PEXPermissions implements PermissionProvider {
         }
 
         server.getPluginManager().enablePlugin(permissionsPlugin);
-        if(permissionsPlugin.isEnabled() == false)
+        if(!permissionsPlugin.isEnabled())
             return null;
 
         //Broken in new dev builds, apparently
@@ -47,19 +49,19 @@ public class PEXPermissions implements PermissionProvider {
     @Override
     public boolean has(CommandSender sender, String permission) {
         Player player = sender instanceof Player ? (Player) sender : null;
-        return (player != null) ? pm.has(player, name + "." + permission) : true;
+        return (player == null) || pm.has(player, name + "." + permission);
     }
     
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> hasperms = new HashSet<String>();
+        Set<String> hasperms;
         PermissionUser pu = pm.getUser(player);
         if(pu != null) {
-            for (String pp : perms) {
-                if (pu.has(name + "." + pp)) {
-                    hasperms.add(pp);
-                }
-            }
+            hasperms = perms.stream()
+                    .filter(pp -> pu.has(name + "." + pp))
+                    .collect(Collectors.toCollection(HashSet::new));
+        } else {
+            hasperms = Collections.emptySet();
         }
         return hasperms;
     }

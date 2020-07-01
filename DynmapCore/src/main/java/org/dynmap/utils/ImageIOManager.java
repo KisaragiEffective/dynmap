@@ -25,7 +25,7 @@ import org.dynmap.debug.Debug;
 public class ImageIOManager {
     public static String preUpdateCommand = null;
     public static String postUpdateCommand = null;
-    private static Object imageioLock = new Object();
+    private static final Object imageioLock = new Object();
     
     public static BufferOutputStream imageIOEncode(BufferedImage img, ImageFormat fmt) {
         BufferOutputStream bos = new BufferOutputStream();
@@ -79,8 +79,8 @@ public class ImageIOManager {
     
     private static final int MAX_WRITE_RETRIES = 6;
     
-    private static LinkedList<BufferOutputStream> baoslist = new LinkedList<BufferOutputStream>();
-    private static Object baos_lock = new Object();
+    private static final LinkedList<BufferOutputStream> baoslist = new LinkedList<>();
+    private static final Object baos_lock = new Object();
     /**
      * Wrapper for IOImage.write - implements retries for busy files
      * @param img - buffered image to write
@@ -224,7 +224,6 @@ public class ImageIOManager {
             } finally {
                 if(fis != null) {
                     try { fis.close(); } catch (IOException io) {}
-                    fis = null;
                 }
             }
             if(!done) {

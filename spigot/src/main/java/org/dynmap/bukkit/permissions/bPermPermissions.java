@@ -12,14 +12,14 @@ import de.bananaco.bpermissions.api.User;
 import de.bananaco.bpermissions.api.WorldManager;
 
 public class bPermPermissions extends BukkitPermissions {
-    WorldManager wm;
+    final WorldManager wm;
 
     public static bPermPermissions create(Server server, String name, Map<String,Boolean> pd) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("bPermissions");
         if (permissionsPlugin == null)
             return null;
         server.getPluginManager().enablePlugin(permissionsPlugin);
-        if(permissionsPlugin.isEnabled() == false)
+        if(!permissionsPlugin.isEnabled())
             return null;
         
         Log.info("Using bPermissions " + permissionsPlugin.getDescription().getVersion() + " for access control");
@@ -33,7 +33,7 @@ public class bPermPermissions extends BukkitPermissions {
 
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> hasperms = new HashSet<String>();
+        HashSet<String> hasperms = new HashSet<>();
         User usr = wm.getDefaultWorld().getUser(player);
         if(usr != null) {
             try { usr.calculateEffectivePermissions(); } catch (Exception x) {}
@@ -42,12 +42,12 @@ public class bPermPermissions extends BukkitPermissions {
                 String permval = name + "." + pp;
                 Boolean v = p.get(permval);
                 if (v != null) {
-                    if(v.booleanValue())
+                    if(v)
                         hasperms.add(permval);
                 }
                 else {
                     v = pd.get(permval);
-                    if((v != null) && v.booleanValue())
+                    if((v != null) && v)
                         hasperms.add(permval);
                 }
             }

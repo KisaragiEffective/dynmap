@@ -107,7 +107,7 @@ public class ImmibisMicroRenderer extends CustomRenderer {
     private static final int NUM_TEXTURES = 102;
 
     /* Texture index = material index in RP */
-    private static final int materialTextureMap[][] = {
+    private static final int[][] materialTextureMap = {
         { 0 }, // 0 = ?
         { 0 }, // 1 = Stone (stone:0)
         { 0 }, // 2 = N/A
@@ -221,24 +221,24 @@ public class ImmibisMicroRenderer extends CustomRenderer {
     
     @Override
     public RenderPatch[] getRenderPatchList(MapDataContext ctx) {
-        Object v = ctx.getBlockTileEntityField("ICMP");
+        Object icmp = ctx.getBlockTileEntityField("ICMP");
 
         /* Build patch list */
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
-        if ((v != null) && (v instanceof List)) {
-            List<?> lv = (List<?>) v;
-            for (Object lval : lv) {
-                if (lval instanceof Map) {
-                    Map<?, ?> mv = (Map<?,?>) lval;
-                    Integer type = (Integer)mv.get("type");
-                    Byte pos = (Byte)mv.get("pos");
-                    if ((type != null) && (pos != null)) {
-                        addPatchesFor(ctx.getPatchFactory(), list, type, pos);
-                    }
-                }
-            }
+        ArrayList<RenderPatch> list = new ArrayList<>();
+        if ((icmp instanceof List)) {
+            List<?> icmpEntries = (List<?>) icmp;
+            icmpEntries.stream()
+                    .filter(Map.class::isInstance)
+                    .map(icmpEntry -> (Map<?, ?>) icmpEntry)
+                    .forEachOrdered(mv -> {
+                        Integer type = (Integer) mv.get("type");
+                        Byte pos = (Byte) mv.get("pos");
+                        if ((type != null) && (pos != null)) {
+                            addPatchesFor(ctx.getPatchFactory(), list, type, pos);
+                        }
+                    });
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
     
     private boolean isHollow(int shape, int thickness) {
@@ -253,9 +253,9 @@ public class ImmibisMicroRenderer extends CustomRenderer {
         NEGATIVE,
         POSITIVE,
         SPAN
-    };
-    
-    private static final AxisPos axes_by_pos[][] = {
+    }
+
+    private static final AxisPos[][] axes_by_pos = {
         { AxisPos.CENTER, AxisPos.CENTER, AxisPos.CENTER }, // Centre
         { AxisPos.NEGATIVE, AxisPos.SPAN, AxisPos.SPAN }, // FaceNX
         { AxisPos.POSITIVE, AxisPos.SPAN, AxisPos.SPAN }, // FacePX

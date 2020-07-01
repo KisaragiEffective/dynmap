@@ -11,11 +11,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class BanIPFilter implements Filter {
-    private DynmapCore core;
+    private final DynmapCore core;
     private Set<String> banned_ips = null;
-    private HashSet<String> banned_ips_notified = new HashSet<String>();
+    private final HashSet<String> banned_ips_notified = new HashSet<>();
     private long last_loaded = 0;
-    private static final long BANNED_RELOAD_INTERVAL = 15000;	/* Every 15 seconds */
+    private static final long BANNED_RELOAD_INTERVAL = 15000;    /* Every 15 seconds */
 
     public BanIPFilter(DynmapCore core) {
         this.core = core;

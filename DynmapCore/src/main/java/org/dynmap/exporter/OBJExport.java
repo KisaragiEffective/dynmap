@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,9 +29,9 @@ import org.dynmap.hdmap.TexturePack.BlockTransparency;
 import org.dynmap.renderer.CustomRenderer;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.renderer.RenderPatch;
+import org.dynmap.renderer.RenderPatchFactory;
 import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 import org.dynmap.utils.BlockStep;
-import org.dynmap.utils.IndexedVector3D;
 import org.dynmap.utils.IndexedVector3DList;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
@@ -45,20 +46,20 @@ public class OBJExport {
     private final String basename;
     private int minX, minY, minZ;       // Minimum world coordinates to be rendered
     private int maxX, maxY, maxZ;       // Maximum world coordinates to be rendered
-    private static Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     private ZipOutputStream zos;        // Output stream ZIP for result
     private double originX, originY, originZ;   // Origin for exported model
     private double scale = 1.0;         // Scale for exported model
     private boolean centerOrigin = true;    // Center at origin
-    private PatchDefinition[] defaultPathces;   // Default patches for solid block, indexed by BlockStep.ordinal()
-    private HashSet<String> matIDs = new HashSet<String>();     // Set of defined material ids for RP
+    private final PatchDefinition[] defaultPathces;   // Default patches for solid block, indexed by BlockStep.ordinal()
+    private final HashSet<String> matIDs = new HashSet<>();     // Set of defined material ids for RP
     
     private static class Face {
         String groupLine;
         String faceLine;
     }
     
-    private HashMap<String, List<Face>> facesByTexture = new HashMap<String, List<Face>>();
+    private final HashMap<String, List<Face>> facesByTexture = new HashMap<>();
     private static final int MODELSCALE = 16;
     private static final double BLKSIZE = 1.0 / (double) MODELSCALE;
     
@@ -68,16 +69,16 @@ public class OBJExport {
     public static final int GROUP_BLOCKID = 2;
     public static final int GROUP_BLOCKIDMETA = 3;
     public static final int GROUP_COUNT = 4;
-    private String[] group = new String[GROUP_COUNT];
-    private boolean[] enabledGroups = new boolean[GROUP_COUNT];
+    private final String[] group = new String[GROUP_COUNT];
+    private final boolean[] enabledGroups = new boolean[GROUP_COUNT];
     private String groupline = null;
     
     // Vertex set
-    private IndexedVector3DList vertices;
+    private final IndexedVector3DList vertices;
     // UV set
-    private IndexedVector3DList uvs;
+    private final IndexedVector3DList uvs;
     // Scaled models
-    private HDScaledBlockModels models;
+    private final HDScaledBlockModels models;
     
     public static final int ROT0 = 0;
     public static final int ROT90 = 1;
@@ -110,32 +111,26 @@ public class OBJExport {
         this.basename = basename;
         this.defaultPathces = new PatchDefinition[6];
         PatchDefinitionFactory fact = HDBlockModels.getPatchDefinitionFactory();
-        for (BlockStep s : BlockStep.values()) {
+        Arrays.stream(BlockStep.values()).forEachOrdered(s -> {
             double[] p = pp[s.getFaceEntered()];
             int ord = s.ordinal();
-            defaultPathces[ord] = fact.getPatch(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], 0, 1, 0, 0, 1, 1, SideVisible.TOP, ord);
-        }
-        vertices = new IndexedVector3DList(new IndexedVector3DList.ListCallback() {
-            @Override
-            public void elementAdded(IndexedVector3DList list, IndexedVector3D newElement) {
-                try {
-                    /* Minecraft XYZ maps to OBJ YZX */
-                    addStringToExportedFile(String.format(Locale.US, "v %.4f %.4f %.4f\n", 
-                            (newElement.x - originX) * scale,
-                            (newElement.y - originY) * scale,
-                            (newElement.z - originZ) * scale
-                            ));
-                } catch (IOException iox) {
-                }
+            defaultPathces[ord] = fact.getPatch(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], 0, 1, 0, 0, 1, 1, RenderPatchFactory.SideVisible.TOP, ord);
+        });
+        vertices = new IndexedVector3DList((list, newElement) -> {
+            try {
+                /* Minecraft XYZ maps to OBJ YZX */
+                addStringToExportedFile(String.format(Locale.US, "v %.4f %.4f %.4f\n",
+                        (newElement.x - originX) * scale,
+                        (newElement.y - originY) * scale,
+                        (newElement.z - originZ) * scale
+                        ));
+            } catch (IOException iox) {
             }
         });
-        uvs = new IndexedVector3DList(new IndexedVector3DList.ListCallback() {
-            @Override
-            public void elementAdded(IndexedVector3DList list, IndexedVector3D newElement) {
-                try {
-                    addStringToExportedFile(String.format(Locale.US, "vt %.4f %.4f\n", newElement.x, newElement.y));
-                } catch (IOException iox) {
-                }
+        uvs = new IndexedVector3DList((list, newElement) -> {
+            try {
+                addStringToExportedFile(String.format(Locale.US, "vt %.4f %.4f\n", newElement.x, newElement.y));
+            } catch (IOException iox) {
             }
         });
         // Get models
@@ -209,7 +204,7 @@ public class OBJExport {
             // Open ZIP file destination
             zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destZipFile)));
             
-            List<DynmapChunk> requiredChunks = new ArrayList<DynmapChunk>();
+            List<DynmapChunk> requiredChunks = new ArrayList<>();
             int mincx = (minX >> 4);
             int maxcx = (maxX + 15) >> 4;
             int mincz = (minZ >> 4);
@@ -499,19 +494,19 @@ public class OBJExport {
     private void addPatchToFile(int[] v, int[] uv, SideVisible sv, String material, int rot) throws IOException {
         List<Face> faces = facesByTexture.get(material);
         if (faces == null) {
-            faces = new ArrayList<Face>();
+            faces = new ArrayList<>();
             facesByTexture.put(material, faces);
         }
         // If needed, rotate the UV sequence
         if (rot == HFLIP) { // Flip horizonntal
-            int newuv[] = new int[uv.length];
+            int[] newuv = new int[uv.length];
             for (int i = 0; i < uv.length; i++) {
                 newuv[i] = uv[i ^ 1];
             }
             uv = newuv;
         }
         else if (rot != ROT0) {
-            int newuv[] = new int[uv.length];
+            int[] newuv = new int[uv.length];
             for (int i = 0; i < uv.length; i++) {
                 newuv[i] = uv[(i+4-rot) % uv.length];
             }
@@ -542,7 +537,7 @@ public class OBJExport {
         return matIDs;
     }
     
-    private static final boolean getSubblock(short[] mod, int x, int y, int z) {
+    private static boolean getSubblock(short[] mod, int x, int y, int z) {
         if ((x >= 0) && (x < MODELSCALE) && (y >= 0) && (y < MODELSCALE) && (z >= 0) && (z < MODELSCALE)) {
             return mod[MODELSCALE*MODELSCALE*y + MODELSCALE*z + x] != 0;
         }
@@ -593,22 +588,20 @@ public class OBJExport {
         }
     }
     private PatchDefinition[] getScaledModelAsPatches(short[] mod) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        List<RenderPatch> patches = new ArrayList<>();
         short[] tmod = Arrays.copyOf(mod, mod.length);  // Make copy
         for (int y = 0; y < MODELSCALE; y++) {
             for (int z = 0; z < MODELSCALE; z++) {
                 for (int x = 0; x < MODELSCALE; x++) {
                     if (getSubblock(tmod, x, y, z)) {   // If occupied, try to add to list
-                        addSubblock(tmod, x, y, z, list);
+                        addSubblock(tmod, x, y, z, patches);
                     }
                 }
             }
         }
-        PatchDefinition[] pd = new PatchDefinition[list.size()];
-        for (int i = 0; i < pd.length; i++) {
-            pd[i] = (PatchDefinition) list.get(i);
-        }
-        return pd;
+        return patches.stream()
+                .map(renderPatch -> (PatchDefinition) renderPatch)
+                .toArray(PatchDefinition[]::new);
     }
     
     private String updateGroup(int grpIndex, String newgroup) {

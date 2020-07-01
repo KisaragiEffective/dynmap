@@ -4,7 +4,7 @@ package org.dynmap.modsupport;
  * API interface for mods to publish block rendering details to Dynmap
  */
 public abstract class ModSupportAPI {
-    protected static ModSupportAPI api = null;
+    protected static final ModSupportAPI api = null;
     /**
      * Get access to mod support API
      * Call and use before postInit()

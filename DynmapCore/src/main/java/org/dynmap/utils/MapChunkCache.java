@@ -7,7 +7,8 @@ public abstract class MapChunkCache {
         FILL_AIR,
         FILL_STONE_PLAIN,
         FILL_OCEAN
-    };
+    }
+
     public enum ChunkStats {
         CACHED_SNAPSHOT_HIT("Cached"),          // Stats for cached snapshot hits
         LOADED_CHUNKS("Already Loaded"),        // Stats for snapshotting already loaded chunks
@@ -18,10 +19,10 @@ public abstract class MapChunkCache {
             label = lbl;
         }
         public String getLabel() { return label; }
-    };
-    
-    private long timeTotal[] = new long[ChunkStats.values().length];
-    private int cntTotal[] = new int[ChunkStats.values().length];
+    }
+
+    private final long[] timeTotal = new long[ChunkStats.values().length];
+    private final int[] cntTotal = new int[ChunkStats.values().length];
 
     /**
      * Set chunk data type needed

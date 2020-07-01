@@ -8,13 +8,13 @@ package org.dynmap.modsupport;
  * patch2 - the texture to be used for the bottom of the block
  */
 public interface WallFenceBlockModel extends BlockModel {
-    public static final int PATCH_SIDES = 0;
-    public static final int PATCH_TOP = 1;
-    public static final int PATCH_BOTTOM = 2;
+    int PATCH_SIDES = 0;
+    int PATCH_TOP = 1;
+    int PATCH_BOTTOM = 2;
     /**
      * Type wall/fence
      */
-    public enum FenceType {
+    enum FenceType {
         FENCE,  // Standard fence
         WALL    // Standard wall
     }
@@ -22,15 +22,15 @@ public interface WallFenceBlockModel extends BlockModel {
      * Get fence type
      * return fence type
      */
-    public FenceType getFenceType();
+    FenceType getFenceType();
     /**
      * Add block IDs linked with (beyond normal self and opaque blocks)
      * @param blkid - block ID to link to
      */
-    public void addLinkedBlockID(int blkid);
+    void addLinkedBlockID(int blkid);
     /**
      * Get linked block IDs
      * @return linked block ids
      */
-    public int[] getLinkedBlockIDs();
+    int[] getLinkedBlockIDs();
 }

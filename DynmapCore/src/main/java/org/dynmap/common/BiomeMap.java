@@ -2,9 +2,12 @@ package org.dynmap.common;
 
 import org.dynmap.hdmap.HDBlockModels;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /* Generic biome mapping */
 public class BiomeMap {
-    private static BiomeMap[] biome_by_index = new BiomeMap[1025];
+    private static final BiomeMap[] biome_by_index = new BiomeMap[1025];
     public static final BiomeMap NULL = new BiomeMap(-1, "NULL", 0.5, 0.5, 0xFFFFFF, 0, 0);
 
     public static final BiomeMap OCEAN = new BiomeMap(0, "OCEAN");
@@ -121,12 +124,7 @@ public class BiomeMap {
     }
 
     private static boolean isUniqueID(String id) {
-        for(int i = 0; i < biome_by_index.length; i++) {
-            if(biome_by_index[i] == null) continue;
-            if(biome_by_index[i].id.equals(id))
-                return false;
-        }
-        return true;
+        return Arrays.stream(biome_by_index).filter(Objects::nonNull).noneMatch(biomeByIndex -> biomeByIndex.id.equals(id));
     }
     private BiomeMap(int idx, String id, double tmp, double rain, int waterColorMultiplier, int grassmult, int foliagemult) {
         /* Clamp values : we use raw values from MC code, which are clamped during color mapping only */
@@ -138,7 +136,7 @@ public class BiomeMap {
         // Handle null biome
         if (id == null) { id = "biome_" + idx; }
         id = id.toUpperCase().replace(' ', '_');
-        if(isUniqueID(id) == false) {
+        if(!isUniqueID(id)) {
             id = id + "_" + idx;
         }
         this.id = id;
@@ -156,7 +154,7 @@ public class BiomeMap {
         this(idx, id, tmp, rain, 0xFFFFFF, 0, 0);
     }
     
-    private final int biomeLookup(int width) {
+    private int biomeLookup(int width) {
         int w = width-1;
         int t = (int)((1.0-tmp)*w);
         int h = (int)((1.0 - (tmp*rain))*w);
@@ -190,7 +188,7 @@ public class BiomeMap {
     public final int ordinal() {
         return index;
     }
-    public static final BiomeMap byBiomeID(int idx) {
+    public static BiomeMap byBiomeID(int idx) {
         idx++;
         if((idx >= 0) && (idx < biome_by_index.length))
             return biome_by_index[idx];
@@ -203,7 +201,7 @@ public class BiomeMap {
     public final String toString() {
         return id;
     }
-    public static final BiomeMap[] values() {
+    public static BiomeMap[] values() {
         return biome_by_index;
     }
     public void setWaterColorMultiplier(int watercolormult) {

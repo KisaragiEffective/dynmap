@@ -1,8 +1,9 @@
 package org.dynmap.utils;
 
 public class RoundVisibilityLimit implements VisibilityLimit {
-    public int x_center, z_center;
-    public double radius; //Using squared_radius instead of radius for tiny optimization
+    public final int x_center;
+    public final int z_center;
+    public final double radius; //Using squared_radius instead of radius for tiny optimization
 
     public RoundVisibilityLimit(int x_center, int z_center, double radius) {
         this.x_center = x_center;

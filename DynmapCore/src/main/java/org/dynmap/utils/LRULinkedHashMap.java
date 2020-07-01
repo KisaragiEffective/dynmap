@@ -5,7 +5,7 @@ import java.util.Map;
 
 @SuppressWarnings("serial")
 public class LRULinkedHashMap<T, K> extends LinkedHashMap<T, K> {
-    private int limit;
+    private final int limit;
     public LRULinkedHashMap(int lim) {
         super(16, (float)0.75, true);
         limit = lim;

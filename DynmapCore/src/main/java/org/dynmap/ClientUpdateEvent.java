@@ -3,9 +3,9 @@ package org.dynmap;
 import org.json.simple.JSONObject;
 
 public class ClientUpdateEvent {
-    public long timestamp;
-    public DynmapWorld world;
-    public JSONObject update;
+    public final long timestamp;
+    public final DynmapWorld world;
+    public final JSONObject update;
     public String user;
     public boolean include_all_users;
     

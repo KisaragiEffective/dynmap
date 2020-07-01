@@ -9,17 +9,17 @@ public interface BoxBlockModel extends BlockModel {
      * @param xmin - x minimum
      * @param xmax - x maximum
      */
-    public void setXRange(double xmin, double xmax);
+    void setXRange(double xmin, double xmax);
     /**
      * Set y range
      * @param ymin - y minimum
      * @param ymax - y maximum
      */
-    public void setYRange(double ymin, double ymax);
+    void setYRange(double ymin, double ymax);
     /**
      * Set z range
      * @param zmin - z minimum
      * @param zmax - z maximum
      */
-    public void setZRange(double zmin, double zmax);
+    void setZRange(double zmin, double zmax);
 }

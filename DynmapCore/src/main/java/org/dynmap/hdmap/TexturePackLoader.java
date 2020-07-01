@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -14,31 +14,30 @@ import java.util.zip.ZipFile;
 import org.dynmap.DynmapCore;
 import org.dynmap.Log;
 import org.dynmap.common.DynmapServerInterface;
+import org.dynmap.utils.EnumerationIntoIterator;
 
 public class TexturePackLoader {
-    private ZipFile zf;
-    private File tpdir;
-    private DynmapServerInterface dsi;
+    private ZipFile zipFile;
+    private File packDirectory;
+    private final DynmapServerInterface dsi;
     private static final String RESOURCEPATH = "texturepacks/standard";
     
     private static class ModSource {
         ZipFile zf;
         File directory;
     }
-    private HashMap<String, ModSource> src_by_mod = new HashMap<String, ModSource>();
+    private final HashMap<String, ModSource> src_by_mod = new HashMap<>();
     
     public TexturePackLoader(File tp, DynmapCore core) {        
         if (tp.isFile() && tp.canRead()) {
             try {
-                zf = new ZipFile(tp);
+                zipFile = new ZipFile(tp);
             } catch (IOException e) {
                 Log.severe("Error opening texture pack - " + tp.getPath());
             }
-        }
-        else if (tp.isDirectory() && tp.canRead()) {
-            tpdir = tp;
-        }
-        else {
+        } else if (tp.isDirectory() && tp.canRead()) {
+            packDirectory = tp;
+        } else {
             Log.info("Texture pack not found - " + tp.getPath());
         }
         dsi = core.getServer();
@@ -58,14 +57,13 @@ public class TexturePackLoader {
     
     public InputStream openModTPResource(String rname, String modname) {
         try {
-            if (zf != null) {
-                ZipEntry ze = zf.getEntry(rname);
+            if (zipFile != null) {
+                ZipEntry ze = zipFile.getEntry(rname);
                 if ((ze != null) && (!ze.isDirectory())) {
-                    return zf.getInputStream(ze);
+                    return zipFile.getInputStream(ze);
                 }
-            }
-            else if (tpdir != null) {
-                File f = new File(tpdir, rname);
+            } else if (packDirectory != null) {
+                File f = new File(packDirectory, rname);
                 if (f.isFile() && f.canRead()) {
                     return new FileInputStream(f);
                 }
@@ -101,8 +99,7 @@ public class TexturePackLoader {
                     if ((ze != null) && (!ze.isDirectory())) {
                         is = ms.zf.getInputStream(ze);
                     }
-                }
-                else if (ms.directory != null) {
+                } else if (ms.directory != null) {
                     File f = new File(ms.directory, rname);
                     if (f.isFile() && f.canRead()) {
                         is = new FileInputStream(f);
@@ -121,15 +118,20 @@ public class TexturePackLoader {
         return is;
     }
     public void close() {
-        if(zf != null) {
-            try { zf.close(); } catch (IOException iox) {}
-            zf = null;
+        if(zipFile != null) {
+            try { zipFile.close(); } catch (IOException iox) {}
+            zipFile = null;
         }
-        for (ModSource ms : src_by_mod.values()) {
-            if (ms.zf != null) {
-                try { ms.zf.close(); } catch (IOException iox) {}
-            }
-        }
+        src_by_mod.values()
+                .stream()
+                .map(ms -> ms.zf)
+                .filter(Objects::nonNull)
+                .forEachOrdered(zf -> {
+                    try {
+                        zf.close();
+                    } catch (IOException iox) {
+                    }
+                });
         src_by_mod.clear();
     }
     public void closeResource(InputStream is) {
@@ -140,32 +142,29 @@ public class TexturePackLoader {
         }
     }
     public Set<String> getEntries() {
-        HashSet<String> rslt = new HashSet<String>();
-        if (zf != null) {
-            Enumeration<? extends ZipEntry> lst = zf.entries();
-            while(lst.hasMoreElements()) {
-                rslt.add(lst.nextElement().getName());
-            }
+        HashSet<String> result = new HashSet<>();
+        if (zipFile != null) {
+            new EnumerationIntoIterator<>(zipFile.entries())
+                    .forEachRemaining(x -> result.add(x.getName()));
+
         }
-        if (tpdir != null) {
-            addFiles(rslt, tpdir, "");
+        if (packDirectory != null) {
+            addFiles(result, packDirectory, "");
         }
-        return rslt;
+        return result;
     }
     
-    private void addFiles(HashSet<String> files, File dir, String path) {
-        File[] listfiles = dir.listFiles();
-        if(listfiles == null) return;
-        for(File f : listfiles) {
+    private void addFiles(/* Destination */HashSet<String> files, File dir, String path) {
+        File[] childFiles = dir.listFiles();
+        if(childFiles == null) return;
+        for(File f : childFiles) {
             String fn = f.getName();
             if(fn.equals(".") || (fn.equals(".."))) continue;
             if(f.isFile()) {
                 files.add(path + "/" + fn);
-            }
-            else if(f.isDirectory()) {
+            } else if(f.isDirectory()) {
                 addFiles(files, f, path + "/" + f.getName());
             }
         }
     }
-
 }

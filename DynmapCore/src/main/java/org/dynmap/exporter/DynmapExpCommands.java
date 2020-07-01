@@ -15,7 +15,7 @@ import org.dynmap.hdmap.HDShader;
  * Handler for export commands (/dynmapexp)
  */
 public class DynmapExpCommands {
-    private HashMap<String, ExportContext> sessions = new HashMap<String, ExportContext>();
+    private final HashMap<String, ExportContext> sessions = new HashMap<>();
 
     private static class ExportContext {
         public String shader = "stdtexture";
@@ -167,7 +167,7 @@ public class DynmapExpCommands {
     }
 
     private boolean handleRadius(DynmapCommandSender sender, String[] args, ExportContext ctx, DynmapCore core) {
-        if ((sender instanceof DynmapPlayer) == false) {    // Not a player
+        if (!(sender instanceof DynmapPlayer)) {    // Not a player
             sender.sendMessage("Only usable by player");
             return true;
         }
@@ -205,7 +205,7 @@ public class DynmapExpCommands {
     }
 
     private boolean handlePosN(DynmapCommandSender sender, String[] args, ExportContext ctx, DynmapCore core, int n) {
-        if ((sender instanceof DynmapPlayer) == false) {    // Not a player
+        if (!(sender instanceof DynmapPlayer)) {    // Not a player
             sender.sendMessage("Only usable by player");
             return true;
         }

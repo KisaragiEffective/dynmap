@@ -4,14 +4,15 @@ import java.util.ArrayList;
 
 public class Polygon {
     public static class Point2D {
-        public double x, y;
+        public final double x;
+        public final double y;
         public Point2D(double x, double y) {
             this.x = x;
             this.y = y;
         }
     }
     
-    private ArrayList<Point2D> v = new ArrayList<Point2D>();
+    private ArrayList<Point2D> v = new ArrayList<>();
     
     public void addVertex(Point2D p) {
         v.add(p);
@@ -31,8 +32,8 @@ public class Polygon {
        
     // Sutherland-Hodgman polygon clipping:
     public Polygon clip(double xmin, double ymin, double xmax, double ymax) {
-        ArrayList<Point2D> newpoly = new ArrayList<Point2D>(v); // Make copy
-        ArrayList<Point2D> poly = new ArrayList<Point2D>();
+        ArrayList<Point2D> newpoly = new ArrayList<>(v); // Make copy
+        ArrayList<Point2D> poly = new ArrayList<>();
         ArrayList<Point2D> wrkpoly;
         int n;
         Point2D a, b;
@@ -120,8 +121,7 @@ public class Polygon {
                                 poly.add(b);
                             }
                         }
-                        wrkpoly = newpoly;
-                        newpoly = poly; 
+                        newpoly = poly;
                     }
                 }
             }

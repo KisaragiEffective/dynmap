@@ -8,12 +8,12 @@ import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.MapIterator;
 
 public class TexturePackHDCaveShader extends TexturePackHDShader {
-    private int maxskylevel;
-    private int minemittedlevel;
+    private final int maxskylevel;
+    private final int minemittedlevel;
     
     class CaveShaderState extends TexturePackHDShader.ShaderState {
         private boolean ready;
-        private LightLevels ll = new LightLevels();
+        private final LightLevels ll = new LightLevels();
         
         protected CaveShaderState(MapIterator mapiter, HDMap map, MapChunkCache cache, int scale) {
             super(mapiter, map, cache, scale);

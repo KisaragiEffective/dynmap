@@ -3,13 +3,12 @@ package org.dynmap;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class Event<T> {
-    private List<Listener<T>> listeners = new LinkedList<Listener<T>>();
-    private Object lock = new Object();
+    private final List<Listener<T>> listeners = new LinkedList<>();
+    private final Object lock = new Object();
 
     public void addListener(Listener<T> l) {
         synchronized(lock) {
@@ -25,23 +24,18 @@ public class Event<T> {
     
     /* Only use from main thread */
     public void trigger(T t) {
-        ArrayList<Listener<T>> iterlist;
+        List<Listener<T>> iterlist;
         synchronized(lock) {
-            iterlist = new ArrayList<Listener<T>>(listeners);
+            iterlist = new ArrayList<>(listeners);
         }
-        for (Listener<T> l : iterlist) {
-            l.triggered(t);
-        }
+        iterlist.forEach(l -> l.triggered(t));
     }
     
     /* Trigger on main thread */
     public boolean triggerSync(DynmapCore core, final T t) {
-        Future<T> future = core.getServer().callSyncMethod(new Callable<T>() {
-            @Override
-            public T call() throws Exception {
-                trigger(t);
-                return t;
-            }            
+        Future<T> future = core.getServer().callSyncMethod(() -> {
+            trigger(t);
+            return t;
         });
         boolean success = false;
         try {

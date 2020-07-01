@@ -24,17 +24,17 @@ public interface HDPerspective {
     /* Render given tile */
     boolean render(MapChunkCache cache, HDMapTile tile, String mapname);
     
-    public boolean isBiomeDataNeeded();
-    public boolean isHightestBlockYDataNeeded();
-    public boolean isRawBiomeDataNeeded();
-    public boolean isBlockTypeDataNeeded();
+    boolean isBiomeDataNeeded();
+    boolean isHightestBlockYDataNeeded();
+    boolean isRawBiomeDataNeeded();
+    boolean isBlockTypeDataNeeded();
     
     double getScale();
     int getModelScale();
 
-    public void addClientConfiguration(JSONObject mapObject);
+    void addClientConfiguration(JSONObject mapObject);
     
-    public void transformWorldToMapCoord(Vector3D input, Vector3D rslt);
+    void transformWorldToMapCoord(Vector3D input, Vector3D rslt);
 
-    public int hashCode();
+    int hashCode();
 }

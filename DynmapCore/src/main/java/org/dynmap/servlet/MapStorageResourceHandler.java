@@ -28,7 +28,7 @@ public class MapStorageResourceHandler extends AbstractHandler {
 
     private DynmapCore core;
     private byte[] blankpng;
-    private long blankpnghash = 0x12345678;
+    private final long blankpnghash = 0x12345678;
     
     public MapStorageResourceHandler() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -99,16 +99,16 @@ public class MapStorageResourceHandler extends AbstractHandler {
         response.setHeader("Cache-Control", "max-age=0,must-revalidate");
         String etag;
         if (tr == null) {
-        	etag = "\"" + blankpnghash + "\"";
+            etag = "\"" + blankpnghash + "\"";
         }
         else {
-        	etag = "\"" + tr.hashCode + "\"";
+            etag = "\"" + tr.hashCode + "\"";
         }
         response.setHeader("ETag", etag);
         String ifnullmatch = request.getHeader("If-None-Match");
         if ((ifnullmatch != null) && ifnullmatch.equals(etag)) {
             response.sendError(HttpStatus.NOT_MODIFIED_304);
-        	return;
+            return;
         }
         if (tr == null) {
             response.setContentType("image/png");
@@ -133,7 +133,7 @@ public class MapStorageResourceHandler extends AbstractHandler {
     }
 
     private void handleFace(HttpServletResponse response, String uri) throws IOException, ServletException {
-        String[] suri = uri.split("[/\\.]");
+        String[] suri = uri.split("[/.]");
         if (suri.length < 3) {  // 3 parts : face ID, player name, png
             response.sendError(HttpStatus.NOT_FOUND_404);
             return;

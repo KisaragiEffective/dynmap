@@ -1,12 +1,9 @@
 package org.dynmap.servlet;
 
-import static org.dynmap.JSONUtils.s;
-import static org.dynmap.JSONUtils.g;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,24 +13,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.dynmap.Client;
-import org.dynmap.DynmapCore;
-import org.dynmap.DynmapWorld;
-import org.dynmap.InternalClientUpdateComponent;
+import org.dynmap.*;
 import org.dynmap.web.HttpField;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 @SuppressWarnings("serial")
 public class ClientUpdateServlet extends HttpServlet {
-    private DynmapCore core;
-    private Charset cs_utf8 = Charset.forName("UTF-8");
+    private final DynmapCore core;
+    private final Charset cs_utf8 = StandardCharsets.UTF_8;
     
     public ClientUpdateServlet(DynmapCore plugin) {
         this.core = plugin;
     }
 
-    Pattern updatePathPattern = Pattern.compile("/([^/]+)/([0-9]*)");
+    final Pattern updatePathPattern = Pattern.compile("/([^/]+)/([0-9]*)");
     @SuppressWarnings("unchecked")
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -44,7 +38,7 @@ public class ClientUpdateServlet extends HttpServlet {
         boolean guest = user.equals(LoginServlet.USERID_GUEST);
         if(core.getLoginRequired() && guest) {
             JSONObject json = new JSONObject();
-            s(json, "error", "login-required");
+            JSONUtils.setValue(json, "error", "login-required");
             bytes = json.toJSONString().getBytes(cs_utf8);
         }
         else {
@@ -89,41 +83,38 @@ public class ClientUpdateServlet extends HttpServlet {
                 }
             }
             if(!see_all) {
-                JSONArray players = (JSONArray)g(u, "players");
+                JSONArray players = (JSONArray) JSONUtils.getValue(u, "players");
                 JSONArray newplayers = new JSONArray();
                 u.put("players",  newplayers);
                 if(players != null) {
-                    for(ListIterator<JSONObject> iter = players.listIterator(); iter.hasNext();) {
-                        JSONObject p = iter.next();
+                    for (JSONObject p : (Iterable<JSONObject>) players) {
                         JSONObject newp = new JSONObject();
                         newp.putAll(p);
                         newplayers.add(newp);
                         boolean hide;
-                        if(!guest) {
-                            hide = !core.testIfPlayerVisibleToPlayer(user, (String)newp.get("name"));
-                        }
-                        else {
+                        if (!guest) {
+                            hide = !core.testIfPlayerVisibleToPlayer(user, (String) newp.get("name"));
+                        } else {
                             hide = true;
                         }
-                        if(hide) {
-                            s(newp, "world", "-some-other-bogus-world-");
-                            s(newp, "x", 0.0);
-                            s(newp, "y", 64.0);
-                            s(newp, "z", 0.0);
-                            s(newp, "health", 0);
-                            s(newp, "armor", 0);
+                        if (hide) {
+                            JSONUtils.setValue(newp, "world", "-some-other-bogus-world-");
+                            JSONUtils.setValue(newp, "x", 0.0);
+                            JSONUtils.setValue(newp, "y", 64.0);
+                            JSONUtils.setValue(newp, "z", 0.0);
+                            JSONUtils.setValue(newp, "health", 0);
+                            JSONUtils.setValue(newp, "armor", 0);
                         }
                     }
                 }
             }
             JSONArray updates = (JSONArray)u.get("updates");
-            JSONArray newupdates = new JSONArray();
-            u.put("updates", newupdates);
+            JSONArray newUpdates = new JSONArray();
+            u.put("updates", newUpdates);
             if(updates != null) {
-                for(ListIterator<Client.Update> iter = updates.listIterator(); iter.hasNext();) {
-                    Client.Update update = iter.next();
-                    if(update.timestamp >= since) {
-                        newupdates.add(update);
+                for (Client.Update update : (Iterable<Client.Update>) updates) {
+                    if (update.timestamp >= since) {
+                        newUpdates.add(update);
                     }
                 }
             }

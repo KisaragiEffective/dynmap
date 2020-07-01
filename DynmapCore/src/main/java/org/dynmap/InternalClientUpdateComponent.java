@@ -9,12 +9,12 @@ import org.json.simple.JSONObject;
 import static org.dynmap.JSONUtils.*;
 
 public class InternalClientUpdateComponent extends ClientUpdateComponent {
-    protected long jsonInterval;
+    protected final long jsonInterval;
     protected long currentTimestamp = 0;
     protected long lastTimestamp = 0;
     protected long lastChatTimestamp = 0;
     private long last_confighash;
-    private ConcurrentHashMap<String, JSONObject> updates = new ConcurrentHashMap<String, JSONObject>();
+    private final ConcurrentHashMap<String, JSONObject> updates = new ConcurrentHashMap<>();
     private JSONObject clientConfiguration = null;
     private static InternalClientUpdateComponent singleton;
     
@@ -23,7 +23,7 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
         dcore.addServlet("/up/world/*", new ClientUpdateServlet(dcore));
 
         jsonInterval = (long)(configuration.getFloat("writeinterval", 1) * 1000);
-        final Boolean allowwebchat = configuration.getBoolean("allowwebchat", false);
+        final boolean allowwebchat = configuration.getBoolean("allowwebchat", false);
         final Boolean hidewebchatip = configuration.getBoolean("hidewebchatip", false);
         final Boolean trust_client_name = configuration.getBoolean("trustclientname", false);
         final float webchatInterval = configuration.getFloat("webchat-interval", 1);
@@ -36,14 +36,11 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
         final int length_limit = configuration.getInteger("chatlengthlimit", 256);
         final List<String> trustedproxy = dcore.configuration.getStrings("trusted-proxies", null);
 
-        dcore.events.addListener("buildclientconfiguration", new Event.Listener<JSONObject>() {
-            @Override
-            public void triggered(JSONObject t) {
-                s(t, "allowwebchat", allowwebchat);
-                s(t, "webchat-interval", webchatInterval);
-                s(t, "webchat-requires-login", req_login);
-                s(t, "chatlengthlimit", length_limit);
-            }
+        dcore.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> {
+            setValue(t, "allowwebchat", allowwebchat);
+            setValue(t, "webchat-interval", webchatInterval);
+            setValue(t, "webchat-requires-login", req_login);
+            setValue(t, "chatlengthlimit", length_limit);
         });
 
         if (allowwebchat) {
@@ -69,12 +66,7 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
                     this.proxyaddress.add("127.0.0.1");
                     this.proxyaddress.add("0:0:0:0:0:0:0:1");
                 }
-                onMessageReceived.addListener(new Event.Listener<Message> () {
-                    @Override
-                    public void triggered(Message t) {
-                        core.webChat(t.name, t.message);
-                    }
-                });
+                onMessageReceived.addListener(t -> core.webChat(t.name, t.message));
             }};
             dcore.addServlet("/up/sendmessage", messageHandler);
         }
@@ -95,19 +87,13 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
                 core.getServer().scheduleServerTask(this, jsonInterval/50);
             }}, jsonInterval/50);
         
-        core.events.addListener("initialized", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-            }
+        core.events.addListener("initialized", t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
         });
-        core.events.addListener("worldactivated", new Event.Listener<DynmapWorld>() {
-            @Override
-            public void triggered(DynmapWorld t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-            }
+        core.events.addListener("worldactivated", (Event.Listener<DynmapWorld>) t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
         });
 
         /* Initialize */
@@ -120,15 +106,14 @@ public class InternalClientUpdateComponent extends ClientUpdateComponent {
     protected void writeUpdates() {
         if(core.mapManager == null) return;
         //Handles Updates
-        for (DynmapWorld dynmapWorld : core.mapManager.getWorlds()) {
+        core.mapManager.getWorlds().forEach(dynmapWorld -> {
             JSONObject update = new JSONObject();
             update.put("timestamp", currentTimestamp);
             ClientUpdateEvent clientUpdate = new ClientUpdateEvent(currentTimestamp - 30000, dynmapWorld, update);
             clientUpdate.include_all_users = true;
             core.events.trigger("buildclientupdate", clientUpdate);
-
             updates.put(dynmapWorld.getName(), update);
-        }
+        });
     }
     protected void writeConfiguration() {
         JSONObject clientConfiguration = new JSONObject();

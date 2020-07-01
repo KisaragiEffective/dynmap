@@ -1,20 +1,18 @@
 package org.dynmap.utils;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
  * Indexed list of Vector3D values: used for managing Vector3D sets for OBJ export
  */
 public class IndexedVector3DList {
     private int nextIndex = 1;      // Next index value for list
-    private HashMap<Vector3D, IndexedVector3D> set = new HashMap<Vector3D, IndexedVector3D>();  // Set of values
+    private final HashMap<Vector3D, IndexedVector3D> set = new HashMap<>();  // Set of values
 
     public interface ListCallback {
-        public void elementAdded(IndexedVector3DList list, IndexedVector3D newElement);
+        void elementAdded(IndexedVector3DList list, IndexedVector3D newElement);
     }
-    private ListCallback callback;  // Callback for new elements added to list
+    private final ListCallback callback;  // Callback for new elements added to list
     
     public IndexedVector3DList(ListCallback cb) {
         callback = cb;
@@ -36,14 +34,7 @@ public class IndexedVector3DList {
      * @param maxz - maximum Z (exclusive)
      */
     public void resetSet(double minx, double miny, double minz, double maxx, double maxy, double maxz) {
-        Iterator<Map.Entry<Vector3D, IndexedVector3D>> iter = set.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<Vector3D, IndexedVector3D> ne = iter.next();
-            Vector3D n = ne.getKey();
-            if ((n.x >= minx) && (n.x < maxx) && (n.y >= miny) && (n.y < maxy) && (n.z >= minz) && (n.z < maxz)) {
-                iter.remove();
-            }
-        }
+        set.keySet().removeIf(n -> (n.x >= minx) && (n.x < maxx) && (n.y >= miny) && (n.y < maxy) && (n.z >= minz) && (n.z < maxz));
     }
     
     /**

@@ -1,14 +1,14 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
 import org.dynmap.Color;
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
 import org.dynmap.MapManager;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.exporter.OBJExport;
@@ -22,9 +22,9 @@ import org.json.simple.JSONObject;
 public class TopoHDShader implements HDShader {
     private final String name;
     private final Color linecolor;  /* Color for topo lines */
-    private final Color fillcolor[];  /* Color for nontopo surfaces */
+    private final Color[] fillcolor;  /* Color for nontopo surfaces */
     private final Color watercolor;
-    private BitSet hiddenids;
+    private final BitSet hiddenids;
     private final int linespacing;
     
     public TopoHDShader(DynmapCore core, ConfigurationNode configuration) {
@@ -65,11 +65,10 @@ public class TopoHDShader implements HDShader {
         setHidden(DynmapBlockState.AIR_BLOCK);  /* Air is hidden always */
         List<Object> hidden = configuration.getList("hiddennames");
         if(hidden != null) {
-            for(Object o : hidden) {
-                if(o instanceof String) {
-                    setHidden((String) o);
-                }
-            }
+            hidden.stream()
+                    .filter(o -> o instanceof String)
+                    .map(o -> (String) o)
+                    .forEachOrdered(this::setHidden);
         }
         linespacing = configuration.getInteger("linespacing", 1);
     }
@@ -118,13 +117,13 @@ public class TopoHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color[];
-        private Color tmpcolor[];
-        private Color c;
-        protected MapIterator mapiter;
-        protected HDMap map;
-        private HDLighting lighting;
-        private int scale;
+        private final Color[] color;
+        private final Color[] tmpcolor;
+        private final Color c;
+        protected final MapIterator mapiter;
+        protected final HDMap map;
+        private final HDLighting lighting;
+        private final int scale;
         private int heightshift;    /* Divide to keep in 0-127 range of colors */
         private boolean inWater;
         final int[] lightingTable;
@@ -183,12 +182,11 @@ public class TopoHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for(int i = 0; i < color.length; i++)
-                color[i].setTransparent();
+            Arrays.stream(color).forEachOrdered(Color::setTransparent);
             inWater = false;
         }
         
-        private final boolean isHidden(DynmapBlockState blk) {
+        private boolean isHidden(DynmapBlockState blk) {
             return hiddenids.get(blk.globalStateIndex);
         }
         
@@ -273,8 +271,7 @@ public class TopoHDShader implements HDShader {
                               (tmpcolor[i].getGreen()*alpha2 + color[i].getGreen()*alpha) / talpha,
                               (tmpcolor[i].getBlue()*alpha2 + color[i].getBlue()*alpha) / talpha, talpha);
                 else
-                    for(int i = 0; i < color.length; i++)
-                        color[i].setTransparent();
+                    Arrays.stream(color).forEachOrdered(Color::setTransparent);
                     
                 return (talpha >= 254);   /* If only one short, no meaningful contribution left */
             }
@@ -325,7 +322,7 @@ public class TopoHDShader implements HDShader {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "shader", name);
+        JSONUtils.setValue(mapObject, "shader", name);
     }
     @Override
     public void exportAsMaterialLibrary(DynmapCommandSender sender, OBJExport out) throws IOException {

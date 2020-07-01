@@ -1,8 +1,7 @@
 package org.dynmap.servlet;
 
-import static org.dynmap.JSONUtils.s;
-
 import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
 import org.json.simple.JSONObject;
 
 import javax.servlet.*;
@@ -13,16 +12,17 @@ import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private DynmapCore core;
+    private final DynmapCore core;
     public static final String USERID_GUEST = "_guest_";
     public static final String USERID_ATTRIB = "userid";
     public static final String LOGIN_PAGE = "../login.html";
     public static final String LOGIN_POST = "/up/login";
-    private Charset cs_utf8 = Charset.forName("UTF-8");
+    private final Charset cs_utf8 = StandardCharsets.UTF_8;
     
     public LoginServlet(DynmapCore core) {
         this.core = core;
@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
     
     private void sendResponse(HttpServletResponse resp, String rslt) throws ServletException, IOException {
         JSONObject json = new JSONObject();
-        s(json, "result", rslt);
+        JSONUtils.setValue(json, "result", rslt);
         byte[] b = json.toJSONString().getBytes(cs_utf8);
         String dateStr = new Date().toString();
         resp.addHeader("Date", dateStr);
@@ -63,7 +63,7 @@ public class LoginServlet extends HttpServlet {
         if(uri.equals("/up/login")) {  /* Process login form */
             uid = req.getParameter("j_username");
             String pwd = req.getParameter("j_password");
-            if((uid == null) || (uid.equals("")))
+            if((uid == null) || (uid.isEmpty()))
                 uid = USERID_GUEST;
             if(core.checkLogin(uid, pwd)) {
                 sess.setAttribute(USERID_ATTRIB, uid);
@@ -78,7 +78,7 @@ public class LoginServlet extends HttpServlet {
             String pwd = req.getParameter("j_password");
             String vpwd = req.getParameter("j_verify_password");
             String passcode = req.getParameter("j_passcode");
-            if((pwd == null) || (vpwd == null) || (pwd.equals(vpwd) == false)) {
+            if((pwd == null) || (vpwd == null) || (!pwd.equals(vpwd))) {
                 resp.sendRedirect(LOGIN_PAGE + "?error=verifyfailed");
                 sendResponse(resp, "verifyfailed");
             }

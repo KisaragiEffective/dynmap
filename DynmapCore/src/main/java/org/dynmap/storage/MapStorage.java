@@ -19,9 +19,9 @@ import org.dynmap.utils.BufferOutputStream;
  * Generic interface for map data storage (image tiles, and associated hash codes)
  */
 public abstract class MapStorage {
-    private static Object lock = new Object();
-    private static HashMap<String, Integer> filelocks = new HashMap<String, Integer>();
-    private static final Integer WRITELOCK = new Integer(-1);
+    private static final Object lock = new Object();
+    private static final HashMap<String, Integer> filelocks = new HashMap<>();
+    private static final Integer WRITELOCK = -1;
     protected File baseStandaloneDir;
 
     protected long serverID;
@@ -31,7 +31,7 @@ public abstract class MapStorage {
     }
     
     // Proper modulo - versus the bogus Java behavior of negative modulo for negative numerators
-    protected static final int modulo(int x, int y) {
+    protected static int modulo(int x, int y) {
         return ((x % y) + y) % y;
     }
 
@@ -182,7 +182,6 @@ public abstract class MapStorage {
         }
         if (accum > 0) {    // Remainder?
             crc32.update(crcworkbuf, 0, accum);
-            accum = 0;
         }
         return crc32.getValue();
     }
@@ -242,9 +241,9 @@ public abstract class MapStorage {
         String p = wpath.getAbsolutePath();
         if(!p.endsWith("/"))
             p += "/";
-        sb.append("$webpath = \'");
+        sb.append("$webpath = '");
         sb.append(WebAuthManager.esc(p));
-        sb.append("\';\n");
+        sb.append("';\n");
     }
 
     private static final int RETRY_LIMIT = 4;
@@ -317,7 +316,7 @@ public abstract class MapStorage {
         File f = new File(baseStandaloneDir, fileid);
         if (getReadLock(fileid, 5000)) {
             int retrycnt = 0;
-            if (f.exists() == false) 
+            if (!f.exists())
                 done = true;
             while (!done) {
                 byte[] b = new byte[(int) f.length()];
@@ -396,11 +395,11 @@ public abstract class MapStorage {
             while(!got_lock) {
                 Integer lockcnt = filelocks.get(baseFilename);    /* Get lock count */
                 if(lockcnt == null) {
-                    filelocks.put(baseFilename, Integer.valueOf(1));  /* First lock */
+                    filelocks.put(baseFilename, 1);  /* First lock */
                     got_lock = true;
                 }
                 else if(!lockcnt.equals(WRITELOCK)) {   /* Other read locks */
-                    filelocks.put(baseFilename, Integer.valueOf(lockcnt+1));
+                    filelocks.put(baseFilename, lockcnt + 1);
                     got_lock = true;
                 }
                 else {  /* Write lock in place */
@@ -434,7 +433,7 @@ public abstract class MapStorage {
             else if(lockcnt.equals(WRITELOCK))
                 Log.severe("releaseReadLock(" + baseFilename + ") on write-locked file");
             else if(lockcnt > 1) {
-                filelocks.put(baseFilename, Integer.valueOf(lockcnt-1));
+                filelocks.put(baseFilename, lockcnt - 1);
             }
             else {
                 filelocks.remove(baseFilename);   /* Remove lock */

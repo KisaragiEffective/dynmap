@@ -1,9 +1,11 @@
 package org.dynmap.utils;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 
+/**
+ * @deprecated Duplicate with {@link java.io.BufferedOutputStream}. Use it instead.
+ */
 public class BufferOutputStream extends OutputStream {
     private static final int CHUNK_SIZE = 8192;
     
@@ -20,7 +22,7 @@ public class BufferOutputStream extends OutputStream {
     }
             
     @Override
-    public final void write(int v) throws IOException {
+    public final void write(int v) {
         if (len >= buf.length){
             buf = Arrays.copyOf(buf, buf.length + CHUNK_SIZE);
         }

@@ -1,8 +1,8 @@
 package org.dynmap.forge_1_13_2;
 
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
-import org.dynmap.Log;
 import org.dynmap.renderer.DynmapBlockState;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -15,11 +15,11 @@ import net.minecraft.util.BitArray;
  */
 public class ChunkSnapshot
 {
-    private static interface Section {
-        public DynmapBlockState getBlockType(int x, int y, int z);
-        public int getBlockSkyLight(int x, int y, int z);
-        public int getBlockEmittedLight(int x, int y, int z);
-        public boolean isEmpty();
+    private interface Section {
+        DynmapBlockState getBlockType(int x, int y, int z);
+        int getBlockSkyLight(int x, int y, int z);
+        int getBlockEmittedLight(int x, int y, int z);
+        boolean isEmpty();
     }
 
     private final int x, z;
@@ -62,7 +62,7 @@ public class ChunkSnapshot
     private static final EmptySection empty_section = new EmptySection();
     
     private static class StdSection implements Section {
-        DynmapBlockState[] states;
+        final DynmapBlockState[] states;
         byte[] skylight;
         byte[] emitlight;
 
@@ -153,7 +153,7 @@ public class ChunkSnapshot
             StdSection cursect = new StdSection();
             this.section[secnum] = cursect;
             DynmapBlockState[] states = cursect.states;
-            DynmapBlockState[] palette = null;
+            DynmapBlockState[] palette;
             // If we've got palette and block states list, process non-empty section
             if (sec.contains("Palette", 9) && sec.contains("BlockStates", 12)) {
                 NBTTagList plist = sec.getList("Palette", 10);
@@ -163,13 +163,13 @@ public class ChunkSnapshot
                     NBTTagCompound tc = plist.getCompound(pi);
                     String pname = tc.getString("Name");
                     if (tc.contains("Properties")) {
-                        StringBuilder statestr = new StringBuilder();
+                        String statestr;
                         NBTTagCompound prop = tc.getCompound("Properties");
-                        for (String pid : prop.keySet()) {
-                            if (statestr.length() > 0) statestr.append(',');
-                            statestr.append(pid).append('=').append(prop.get(pid).getString());
-                        }
-                        palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr.toString());
+                        statestr = prop.keySet()
+                                .stream()
+                                .map(pid -> pid + '=' + prop.get(pid).getString())
+                                .collect(Collectors.joining(","));
+                        palette[pi] = DynmapBlockState.getStateByNameAndState(pname, statestr);
                     }
                     if (palette[pi] == null) {
                         palette[pi] = DynmapBlockState.getBaseStateByName(pname);
@@ -178,10 +178,10 @@ public class ChunkSnapshot
                         palette[pi] = DynmapBlockState.AIR;
                     }
                 }
-            	int recsperblock = (4096 + statelist.length - 1) / statelist.length;
-            	int bitsperblock = 64 / recsperblock;
+                int recsperblock = (4096 + statelist.length - 1) / statelist.length;
+                int bitsperblock = 64 / recsperblock;
                 BitArray db = new BitArray(bitsperblock, 4096, statelist);
-                if (bitsperblock > 8) {	// Not palette
+                if (bitsperblock > 8) {    // Not palette
                     for (int j = 0; j < 4096; j++) {
                         states[j] = DynmapBlockState.getStateByGlobalIndex(db.getAt(j));
                     }

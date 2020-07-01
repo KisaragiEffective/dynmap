@@ -2,6 +2,7 @@ package org.dynmap.servlet;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -13,10 +14,10 @@ import org.dynmap.DynmapCore;
 
 public class ConfigJSServlet extends HttpServlet {
     private static final long serialVersionUID = 3543457384759837L;
-    private byte[] outputBytes;
+    private final byte[] outputBytes;
 
     public ConfigJSServlet(DynmapCore core) {
-        Charset cs_utf8 = Charset.forName("UTF-8");
+        Charset cs_utf8 = StandardCharsets.UTF_8;
         StringBuilder sb = new StringBuilder();
         sb.append("var config = {\n");
         sb.append(" url : {\n");

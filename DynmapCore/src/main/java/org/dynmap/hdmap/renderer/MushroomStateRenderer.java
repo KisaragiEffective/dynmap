@@ -17,7 +17,7 @@ public class MushroomStateRenderer extends CustomRenderer {
     private static final int TEXTURE_INSIDE = 1;
     
     // Meshes, indexed by state index (bit5=down, bit4=east, bit3=north, bit2=south, bit1=up, bit0=west)
-    protected RenderPatch[][] meshes = new RenderPatch[64][];
+    protected final RenderPatch[][] meshes = new RenderPatch[64][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
@@ -29,7 +29,7 @@ public class MushroomStateRenderer extends CustomRenderer {
 
     private void buildPatches(RenderPatchFactory rpf) {
         int[] faces = new int[6];
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for (int i = 0; i < 64; i++) {
             list.clear();
             faces[0] = ((i & 0x20) == 0) ? TEXTURE_OUTSIDE : TEXTURE_INSIDE;    // Down
@@ -39,7 +39,7 @@ public class MushroomStateRenderer extends CustomRenderer {
             faces[4] = ((i & 0x08) == 0) ? TEXTURE_OUTSIDE : TEXTURE_INSIDE;    // North
             faces[5] = ((i & 0x04) == 0) ? TEXTURE_OUTSIDE : TEXTURE_INSIDE;    // North
             CustomRenderer.addBox(rpf, list, 0, 1, 0, 1, 0, 1, faces);
-            meshes[i] = list.toArray(new RenderPatch[list.size()]);
+            meshes[i] = list.toArray(new RenderPatch[0]);
         }
     }
     @Override

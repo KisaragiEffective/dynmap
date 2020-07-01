@@ -1,14 +1,14 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.dynmap.Color;
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
 import org.dynmap.Log;
 import org.dynmap.MapManager;
 import org.dynmap.common.DynmapCommandSender;
@@ -22,8 +22,8 @@ import org.json.simple.JSONObject;
 
 public class InhabitedHDShader implements HDShader {
     private final String name;
-    private final long filllevel[]; /* Values for colors */
-    private final Color fillcolor[];
+    private final long[] filllevel; /* Values for colors */
+    private final Color[] fillcolor;
     
     private Color readColor(String id, ConfigurationNode cfg) {
         String lclr = cfg.getString(id, null);
@@ -39,18 +39,19 @@ public class InhabitedHDShader implements HDShader {
     }
     public InhabitedHDShader(DynmapCore core, ConfigurationNode configuration) {
         name = (String) configuration.get("name");
-        HashMap<Long, Color> map = new HashMap<Long, Color>();
-        for (String key : configuration.keySet()) {
-            if (key.startsWith("color")) {
-                try {
-                    long val = Long.parseLong(key.substring(5));
-                    Color clr = readColor(key, configuration);
-                    map.put(val, clr);
-                } catch (NumberFormatException nfx) {
-                }
-            }
-        }
-        TreeSet<Long> keys = new TreeSet<Long>(map.keySet());
+        HashMap<Long, Color> map = new HashMap<>();
+        configuration.keySet()
+                .stream()
+                .filter(key -> key.startsWith("color"))
+                .forEachOrdered(key -> {
+                    try {
+                        long val = Long.parseLong(key.substring(5));
+                        Color clr = readColor(key, configuration);
+                        map.put(val, clr);
+                    } catch (NumberFormatException nfx) {
+                    }
+                });
+        TreeSet<Long> keys = new TreeSet<>(map.keySet());
         filllevel = new long[keys.size()];
         fillcolor = new Color[keys.size()];
         int idx = 0;
@@ -97,10 +98,10 @@ public class InhabitedHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color[];
-        private Color c;
-        protected HDMap map;
-        private HDLighting lighting;
+        private final Color[] color;
+        private final Color c;
+        protected final HDMap map;
+        private final HDLighting lighting;
         final int[] lightingTable;
         
         private OurShaderState(MapIterator mapiter, HDMap map, MapChunkCache cache, int scale) {
@@ -145,8 +146,7 @@ public class InhabitedHDShader implements HDShader {
          * Reset renderer state for new ray
          */
         public void reset(HDPerspectiveState ps) {
-            for(int i = 0; i < color.length; i++)
-                color[i].setTransparent();
+            Arrays.stream(color).forEachOrdered(Color::setTransparent);
         }
         /**
          * Process next ray step - called for each block on route
@@ -230,7 +230,7 @@ public class InhabitedHDShader implements HDShader {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "shader", name);
+        JSONUtils.setValue(mapObject, "shader", name);
     }
     @Override
     public void exportAsMaterialLibrary(DynmapCommandSender sender, OBJExport out) throws IOException {

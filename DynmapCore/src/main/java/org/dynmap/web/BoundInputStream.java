@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 public class BoundInputStream extends InputStream {
     protected static final Logger log = Logger.getLogger("Minecraft");
     protected static final String LOG_PREFIX = "[dynmap] ";
-    private InputStream base;
+    private final InputStream base;
     private long bound;
 
     public BoundInputStream(InputStream base, long bound) {

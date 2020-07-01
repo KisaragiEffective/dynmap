@@ -11,11 +11,7 @@ import org.dynmap.Log;
 public class VersionCheck {
     private static final String VERSION_URL = "http://mikeprimm.com/dynmap/releases.php";
     public static void runCheck(final DynmapCore core) {
-        new Thread(new Runnable() {
-            public void run() {
-                doCheck(core);
-            }
-        }).start();
+        new Thread(() -> doCheck(core)).start();
     }
     
     private static int getReleaseVersion(String s) {
@@ -48,43 +44,43 @@ public class VersionCheck {
     }
     
     private static void doCheck(DynmapCore core) {
-        String pluginver = core.getDynmapPluginVersion();
+        String version = core.getDynmapPluginVersion();
         String platform = core.getDynmapPluginPlatform();
-        String platver = core.getDynmapPluginPlatformVersion();
-        if((pluginver == null) || (platform == null) || (platver == null))
+        String platformVersion = core.getDynmapPluginPlatformVersion();
+        if((version == null) || (platform == null) || (platformVersion == null))
             return;
         HttpURLConnection conn = null;
-        String loc = VERSION_URL;
-        int cur_ver = getReleaseVersion(pluginver);
-        int cur_bn = getBuildNumber(pluginver);
+        int cur_ver = getReleaseVersion(version);
+        int cur_bn = getBuildNumber(version);
         try {
+            String loc = VERSION_URL;
             while((loc != null) && (!loc.isEmpty())) {
                 URL url = new URL(loc);
                 conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent", "Dynmap (" + platform + "/" + platver + "/" + pluginver);
+                conn.setRequestProperty("User-Agent", "Dynmap (" + platform + "/" + platformVersion + "/" + version);
                 conn.connect();
                 loc = conn.getHeaderField("Location");
             }
-            BufferedReader rdr = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line = null;
-            while((line = rdr.readLine()) != null) {
-                String[] split = line.split(":");
-                if(split.length < 4) continue;
+            try (BufferedReader rdr = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                 /* If our platform and version, or wildcard platform version */
-                if(split[0].equals(platform) && (split[1].equals("*") || split[1].equals(platver))) {
-                    int recommended_ver = getReleaseVersion(split[2]);
-                    int recommended_bn = getBuildNumber(split[2]);
-                    if((recommended_ver > cur_ver) || ((recommended_ver == cur_ver) && (recommended_bn > cur_bn)))  { /* Newer recommended build */
-                        Log.info("Version obsolete: new recommended version " + split[2] + " is available.");
-                    }
-                    else if(cur_ver > recommended_ver) {    /* Running dev or prerelease? */
-                        int prerel_ver = getReleaseVersion(split[3]);
-                        int prerel_bn = getBuildNumber(split[3]);
-                        if((prerel_ver > cur_ver) || ((prerel_ver == cur_ver) && (prerel_bn > cur_bn))) {
-                            Log.info("Version obsolete: new prerelease version " + split[3] + " is available.");
-                        }
-                    }
-                }
+                rdr.lines()
+                        .map(line -> line.split(":"))
+                        .filter(split -> split.length >= 4)
+                        .filter(split -> split[0].equals(platform))
+                        .filter(split -> (split[1].equals("*") || split[1].equals(platformVersion)))
+                        .forEachOrdered(split -> {
+                            int recommended_ver = getReleaseVersion(split[2]);
+                            int recommended_bn = getBuildNumber(split[2]);
+                            if ((recommended_ver > cur_ver) || ((recommended_ver == cur_ver) && (recommended_bn > cur_bn))) { /* Newer recommended build */
+                                Log.info("Version obsolete: new recommended version " + split[2] + " is available.");
+                            } else if (cur_ver > recommended_ver) {    /* Running dev or prerelease? */
+                                int prerel_ver = getReleaseVersion(split[3]);
+                                int prerel_bn = getBuildNumber(split[3]);
+                                if ((prerel_ver > cur_ver) || ((prerel_ver == cur_ver) && (prerel_bn > cur_bn))) {
+                                    Log.info("Version obsolete: new prerelease version " + split[3] + " is available.");
+                                }
+                            }
+                        });
             }
         } catch (Exception x) {
             Log.info("Error checking for latest version");

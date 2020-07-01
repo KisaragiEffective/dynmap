@@ -21,12 +21,12 @@ public class CustomHeaderFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         if (custhttp != null) {
-            for (String k : custhttp.keySet()) {
+            custhttp.keySet().forEach(k -> {
                 String v = custhttp.getString(k);
                 if (v != null) {
                     resp.setHeader(k, v);
                 }
-            }
+            });
         }
 
         chain.doFilter(request, response);

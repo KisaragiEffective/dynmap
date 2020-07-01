@@ -1,8 +1,8 @@
 package org.dynmap.web;
 
 public final class HttpStatus {
-    private int code;
-    private String text;
+    private final int code;
+    private final String text;
 
     public int getCode() {
         return code;

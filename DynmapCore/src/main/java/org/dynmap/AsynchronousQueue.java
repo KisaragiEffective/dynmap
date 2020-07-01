@@ -7,17 +7,17 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class AsynchronousQueue<T> {
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private Thread thread;
-    private LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<T>();
-    private Set<T> set = new HashSet<T>();
-    private Handler<T> handler;
-    private int dequeueTime;
-    private int accelDequeueTime;
-    public int accelDequeueThresh;
+    private final LinkedBlockingQueue<T> queue = new LinkedBlockingQueue<>();
+    private final Set<T> set = new HashSet<>();
+    private final Handler<T> handler;
+    private final int dequeueTime;
+    private final int accelDequeueTime;
+    public final int accelDequeueThresh;
     private int pendingcnt;
-    private int pendinglimit;
-    private boolean normalprio;
+    private final int pendinglimit;
+    private final boolean normalprio;
     
     public AsynchronousQueue(Handler<T> handler, int dequeueTime, int accelDequeueThresh, int accelDequeueTime, int pendinglimit, boolean normalprio) {
         this.handler = handler;
@@ -55,7 +55,7 @@ public class AsynchronousQueue<T> {
         synchronized (lock) {
             if (set.remove(t)) {
                 queue.remove(t);
-            	return true;
+                return true;
             }
         }
         return false;
@@ -68,7 +68,7 @@ public class AsynchronousQueue<T> {
     public List<T> popAll() {
         List<T> s;
         synchronized(lock) {
-            s = new ArrayList<T>(queue);
+            s = new ArrayList<>(queue);
             queue.clear();
             set.clear();
         }
@@ -77,12 +77,7 @@ public class AsynchronousQueue<T> {
     
     public void start() {
         synchronized (lock) {
-            thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    running();
-                }
-            });
+            thread = new Thread(() -> running());
             thread.setDaemon(true);
             thread.start();
             try {
@@ -115,22 +110,22 @@ public class AsynchronousQueue<T> {
     private void running() {
         try {
             while (Thread.currentThread() == thread) {
-            	synchronized(lock) {
-            		while(pendingcnt >= pendinglimit) {
-            			try {
-            				lock.wait(accelDequeueTime);
-            			} catch (InterruptedException ix) {
-            				if(Thread.currentThread() != thread)
-            					return;
-            				throw ix;
-            			}
-            		}
-            	}
+                synchronized(lock) {
+                    while(pendingcnt >= pendinglimit) {
+                        try {
+                            lock.wait(accelDequeueTime);
+                        } catch (InterruptedException ix) {
+                            if(Thread.currentThread() != thread)
+                                return;
+                            throw ix;
+                        }
+                    }
+                }
                 T t = pop();
                 if (t != null) {
-                	synchronized(lock) {
-                		pendingcnt++;
-                	}
+                    synchronized(lock) {
+                        pendingcnt++;
+                    }
                     handler.handle(t);
                 }
                 if(set.size() >= accelDequeueThresh)
@@ -155,8 +150,8 @@ public class AsynchronousQueue<T> {
     
     public void done(T t) {
         synchronized (lock) {
-        	if(pendingcnt > 0) pendingcnt--;
-        	lock.notifyAll();
+            if(pendingcnt > 0) pendingcnt--;
+            lock.notifyAll();
         }
     }
 }

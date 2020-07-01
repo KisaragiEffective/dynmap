@@ -1,8 +1,8 @@
 package org.dynmap;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.dynmap.common.DynmapListenerManager.EventType;
@@ -10,6 +10,7 @@ import org.dynmap.common.DynmapListenerManager.WorldEventListener;
 import org.dynmap.common.DynmapListenerManager.PlayerEventListener;
 import org.dynmap.common.DynmapPlayer;
 import org.dynmap.markers.AreaMarker;
+import org.dynmap.markers.GenericMarker;
 import org.dynmap.markers.Marker;
 import org.dynmap.markers.MarkerAPI;
 import org.dynmap.markers.MarkerIcon;
@@ -21,7 +22,7 @@ import org.dynmap.utils.Polygon;
  * Markers component - ties in the component system, both on the server and client
  */
 public class MarkersComponent extends ClientComponent {
-    private MarkerAPI api;
+    private final MarkerAPI api;
     private MarkerSignManager signmgr;
     private MarkerIcon spawnicon;
     private String spawnlbl;
@@ -32,9 +33,9 @@ public class MarkersComponent extends ClientComponent {
     private MarkerIcon spawnbedicon;
     private String spawnbedformat;
     private long maxofflineage;
-    private boolean showSpawn;
-    private boolean showBorder;
-    private HashMap<String, Long> offline_times = new HashMap<String, Long>();
+    private final boolean showSpawn;
+    private final boolean showBorder;
+    private final HashMap<String, Long> offline_times = new HashMap<>();
     private static final String OFFLINE_PLAYERS_SETID = "offline_players";
     private static final String PLAYER_SPAWN_BED_SETID = "spawn_beds";
     
@@ -63,13 +64,10 @@ public class MarkersComponent extends ClientComponent {
         }
         if (showSpawn || showBorder) {
             /* Add listener for world loads */
-            WorldEventListener wel = new WorldEventListener() {
-                @Override
-                public void worldEvent(DynmapWorld w) {
-                    DynmapLocation loc = w.getSpawnLocation();    /* Get location of spawn */
-                    if(loc != null)
-                        addUpdateWorld(w, loc);
-                }
+            WorldEventListener wel = w -> {
+                DynmapLocation loc = w.getSpawnLocation();    /* Get location of spawn */
+                if(loc != null)
+                    addUpdateWorld(w, loc);
             };
             core.listenerManager.addListener(EventType.WORLD_LOAD, wel);
             /* Add listener for spawn changes */
@@ -116,48 +114,38 @@ public class MarkersComponent extends ClientComponent {
                 core.getServer().scheduleServerTask(new Runnable() {
                     public void run() {
                         long ts = System.currentTimeMillis();
-                        ArrayList<String> deleted = new ArrayList<String>();
-                        for(Map.Entry<String,Long> me : offline_times.entrySet()) {
-                            if(ts > me.getValue()) {
-                                deleted.add(me.getKey());
-                            }
-                        }
-                        for(String id : deleted) {
-                            Marker m = offlineset.findMarker(id);
-                            if(m != null)
-                                m.deleteMarker();
-                        }
+                        offline_times.entrySet()
+                                .stream()
+                                .filter(me -> ts > me.getValue())
+                                .map(Map.Entry::getKey)
+                                .map(id -> offlineset.findMarker(id))
+                                .filter(Objects::nonNull)
+                                .forEachOrdered(GenericMarker::deleteMarker);
                         core.getServer().scheduleServerTask(this, 30 * 20);
                     }
                 }, 30 * 20);    /* Check every 30 seconds */
             }
             /* Add listener for players coming and going */
-            core.listenerManager.addListener(EventType.PLAYER_JOIN, new PlayerEventListener() {
-                @Override
-                public void playerEvent(DynmapPlayer p) {
-                    Marker m = offlineset.findMarker(p.getName());
-                    if(m != null) {
-                        m.deleteMarker();
-                        offline_times.remove(p.getName());
-                    }
+            core.listenerManager.addListener(EventType.PLAYER_JOIN, (PlayerEventListener) p -> {
+                Marker m = offlineset.findMarker(p.getName());
+                if(m != null) {
+                    m.deleteMarker();
+                    offline_times.remove(p.getName());
                 }
             });
-            core.listenerManager.addListener(EventType.PLAYER_QUIT, new PlayerEventListener() {
-                @Override
-                public void playerEvent(DynmapPlayer p) {
-                    String pname = p.getName();
-                    Marker m = offlineset.findMarker(pname);
-                    if(m != null) {
-                        m.deleteMarker();
-                        offline_times.remove(p.getName());
-                    }
-                    if(core.playerList.isVisiblePlayer(pname)) {
-                        DynmapLocation loc = p.getLocation();
-                        m = offlineset.createMarker(p.getName(), core.getServer().stripChatColor(p.getDisplayName()), false,
-                                                loc.world, loc.x, loc.y, loc.z, offlineicon, true);
-                        if(maxofflineage > 0)
-                            offline_times.put(p.getName(), System.currentTimeMillis() + maxofflineage);
-                    }
+            core.listenerManager.addListener(EventType.PLAYER_QUIT, (PlayerEventListener) p -> {
+                String pname = p.getName();
+                Marker m = offlineset.findMarker(pname);
+                if(m != null) {
+                    m.deleteMarker();
+                    offline_times.remove(p.getName());
+                }
+                if(core.playerList.isVisiblePlayer(pname)) {
+                    DynmapLocation loc = p.getLocation();
+                    m = offlineset.createMarker(p.getName(), core.getServer().stripChatColor(p.getDisplayName()), false,
+                                            loc.world, loc.x, loc.y, loc.z, offlineicon, true);
+                    if(maxofflineage > 0)
+                        offline_times.put(p.getName(), System.currentTimeMillis() + maxofflineage);
                 }
             });
         }
@@ -182,31 +170,14 @@ public class MarkersComponent extends ClientComponent {
             spawnbedformat = configuration.getString("spawnbedformat", "%name%'s bed");
             
             /* Add listener for players coming and going */
-            core.listenerManager.addListener(EventType.PLAYER_JOIN, new PlayerEventListener() {
-                @Override
-                public void playerEvent(DynmapPlayer p) {                    
-                    updatePlayer(p);
+            core.listenerManager.addListener(EventType.PLAYER_JOIN, (PlayerEventListener) p -> updatePlayer(p));
+            core.listenerManager.addListener(EventType.PLAYER_QUIT, (PlayerEventListener) p -> {
+                Marker m = spawnbedset.findMarker(p.getName()+"_bed");
+                if(m != null) {
+                    m.deleteMarker();
                 }
             });
-            core.listenerManager.addListener(EventType.PLAYER_QUIT, new PlayerEventListener() {
-                @Override
-                public void playerEvent(DynmapPlayer p) {                    
-                    Marker m = spawnbedset.findMarker(p.getName()+"_bed");
-                    if(m != null) {
-                        m.deleteMarker();
-                    }
-                }
-            });
-            core.listenerManager.addListener(EventType.PLAYER_BED_LEAVE, new PlayerEventListener() {
-                @Override
-                public void playerEvent(final DynmapPlayer p) {                    
-                    core.getServer().scheduleServerTask(new Runnable() {
-                        public void run() {
-                            updatePlayer(p);
-                        }
-                    }, 0);
-                }
-            });
+            core.listenerManager.addListener(EventType.PLAYER_BED_LEAVE, (PlayerEventListener) p -> core.getServer().scheduleServerTask(() -> updatePlayer(p), 0));
         }
         else {
             /* Make set, if needed */

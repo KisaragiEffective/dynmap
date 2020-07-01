@@ -4,15 +4,17 @@ import org.dynmap.Color;
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;
+import org.dynmap.JSONUtils;
 import org.json.simple.JSONObject;
 
-import static org.dynmap.JSONUtils.s;
+import java.util.Arrays;
+
 
 public class DefaultHDLighting implements HDLighting {
-    private String name;
+    private final String name;
     protected boolean grayscale;
     protected boolean blackandwhite;
-    protected int blackthreshold;
+    protected final int blackthreshold;
     protected final Color graytone;
     protected final Color graytonedark;
 
@@ -26,23 +28,17 @@ public class DefaultHDLighting implements HDLighting {
         blackthreshold = configuration.getInteger("blackthreshold",  0x40);
     }
     
-    protected void checkGrayscale(Color[] outcolor) {
+    protected void checkGrayscale(Color[] colors) {
         if (grayscale) {
-        	for (int i = 0; i < outcolor.length; i++) {
-        		outcolor[i].setGrayscale();
-        		outcolor[i].scaleColor(graytonedark,graytone);
-        	}
-        }
-        else if (blackandwhite) {
-        	for (int i = 0; i < outcolor.length; i++) {
-        		outcolor[i].setGrayscale();
-        		if (outcolor[i].getRed() > blackthreshold) {
-        			outcolor[i].setColor(graytone);
-        		}
-        		else {
-        			outcolor[i].setColor(graytonedark);
-        		}
-        	}        	
+            Arrays.stream(colors).forEachOrdered(color -> {
+                color.setGrayscale();
+                color.scaleColor(graytonedark, graytone);
+            });
+        } else if (blackandwhite) {
+            Arrays.stream(colors).forEachOrdered(color -> {
+                color.setGrayscale();
+                color.setColor(color.getRed() > blackthreshold ? graytone : graytonedark);
+            });
         }
     }
 
@@ -51,8 +47,7 @@ public class DefaultHDLighting implements HDLighting {
     
     /* Apply lighting to given pixel colors (1 outcolor if normal, 2 if night/day) */
     public void    applyLighting(HDPerspectiveState ps, HDShaderState ss, Color incolor, Color[] outcolor) {
-        for(int i = 0; i < outcolor.length; i++)
-            outcolor[i].setColor(incolor);
+        Arrays.stream(outcolor).forEachOrdered(color -> color.setColor(incolor));
         checkGrayscale(outcolor);
     }
     
@@ -79,8 +74,8 @@ public class DefaultHDLighting implements HDLighting {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "lighting", name);
-        s(mapObject, "nightandday", isNightAndDayEnabled());
+        JSONUtils.setValue(mapObject, "lighting", name);
+        JSONUtils.setValue(mapObject, "nightandday", isNightAndDayEnabled());
     }
 
     @Override

@@ -21,12 +21,13 @@ import org.dynmap.utils.Polygon;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 public abstract class DynmapWorld {
-    public List<MapType> maps = new ArrayList<MapType>();
-    public List<MapTypeState> mapstate = new ArrayList<MapTypeState>();
+    public final List<MapType> maps = new ArrayList<>();
+    public final List<MapTypeState> mapstate = new ArrayList<>();
     
-    public UpdateQueue updates = new UpdateQueue();
+    public final UpdateQueue updates = new UpdateQueue();
     public DynmapLocation center;
     public List<DynmapLocation> seedloc;    /* All seed location - both direct and based on visibility limits */
     private List<DynmapLocation> seedloccfg;    /* Configured full render seeds only */
@@ -47,7 +48,7 @@ public abstract class DynmapWorld {
     public int tileupdatedelay;
     private boolean is_enabled;
     boolean is_protected;   /* If true, user needs 'dynmap.world.<worldid>' privilege to see world */
-    protected int[] brightnessTable = new int[16];  // 0-256 scaled brightness table
+    protected final int[] brightnessTable = new int[16];  // 0-256 scaled brightness table
     
     private MapStorage storage; // Storage handler for this world's maps
     
@@ -55,7 +56,7 @@ public abstract class DynmapWorld {
     public final int worldheight;
     public final int heightshift;
     public final int heightmask;
-    public int sealevel;
+    public final int sealevel;
     
     protected DynmapWorld(String wname, int worldheight, int sealevel) {
         this.raw_wname = wname;
@@ -105,7 +106,7 @@ public abstract class DynmapWorld {
         for (MapTypeState mts : mapstate) {
             if (cancelled) return;
             MapType mt = mts.type;
-            MapType.ImageVariant var[] = mt.getVariants();
+            MapType.ImageVariant[] var = mt.getVariants();
             mts.startZoomOutIter(); // Start iterator
             while (mts.nextZoomOutInv(c)) {
                 if(cancelled) return;
@@ -131,8 +132,8 @@ public abstract class DynmapWorld {
         int step = 1 << tile.zoom;
         MapStorageTile ztile = tile.getZoomOutTile();
         int width = 128, height = 128;
-        BufferedImage zIm = null;
-        DynmapBufferedImage kzIm = null;
+        BufferedImage zIm;
+        DynmapBufferedImage kzIm;
         boolean blank = true;
         int[] argb = new int[width*height];
         int tx = ztile.x;
@@ -171,7 +172,7 @@ public abstract class DynmapWorld {
                             im.getRGB(0, 0, width, height, argb, 0, width);    /* Read data */
                             im.flush();
                             /* Do binlinear scale to 64x64 */
-                            int off = 0;
+                            int off;
                             for(int y = 0; y < height; y += 2) {
                                 off = y*width;
                                 for(int x = 0; x < width; x += 2, off += 2) {
@@ -322,8 +323,8 @@ public abstract class DynmapWorld {
         else
             center = null;
         List<ConfigurationNode> loclist = worldconfig.getNodes("fullrenderlocations");
-        seedloc = new ArrayList<DynmapLocation>();
-        seedloccfg = new ArrayList<DynmapLocation>();
+        seedloc = new ArrayList<>();
+        seedloccfg = new ArrayList<>();
         servertime = (int)(getTime() % 24000);
         sendposition = worldconfig.getBoolean("sendposition", true);
         sendhealth = worldconfig.getBoolean("sendhealth", true);
@@ -358,7 +359,7 @@ public abstract class DynmapWorld {
         /* Load visibility limits, if any are defined */
         List<ConfigurationNode> vislimits = worldconfig.getNodes("visibilitylimits");
         if(vislimits != null) {
-            visibility_limits = new ArrayList<VisibilityLimit>();
+            visibility_limits = new ArrayList<>();
             for(ConfigurationNode vis : vislimits) {
                 VisibilityLimit lim;
                 if (vis.containsKey("r")) {  /* It is round visibility limit */
@@ -382,7 +383,7 @@ public abstract class DynmapWorld {
         /* Load hidden limits, if any are defined */
         List<ConfigurationNode> hidelimits = worldconfig.getNodes("hiddenlimits");
         if(hidelimits != null) {
-            hidden_limits = new ArrayList<VisibilityLimit>();
+            hidden_limits = new ArrayList<>();
             for(ConfigurationNode vis : hidelimits) {
                 VisibilityLimit lim;
                 if (vis.containsKey("r")) {  /* It is round visibility limit */
@@ -435,15 +436,14 @@ public abstract class DynmapWorld {
         }
         /* Add seed locations, if any */
         if(seedloccfg.size() > 0) {
-            ArrayList<Map<String,Object>> locs = new ArrayList<Map<String,Object>>();
-            for(int i = 0; i < seedloccfg.size(); i++) {
-                DynmapLocation dl = seedloccfg.get(i);
+            ArrayList<Map<String,Object>> locs = new ArrayList<>();
+            seedloccfg.forEach(dl -> {
                 ConfigurationNode ll = new ConfigurationNode();
                 ll.put("x", dl.x);
                 ll.put("y", dl.y);
                 ll.put("z", dl.z);
                 locs.add(ll.entries);
-            }
+            });
             node.put("fullrenderlocations", locs);
         }
         /* Add flags */
@@ -452,33 +452,31 @@ public abstract class DynmapWorld {
         node.put("extrazoomout", extrazoomoutlevels);
         /* Save visibility limits, if defined */
         if(visibility_limits != null) {
-            ArrayList<Map<String,Object>> lims = new ArrayList<Map<String,Object>>();
-            for(int i = 0; i < visibility_limits.size(); i++) {
-                VisibilityLimit lim = visibility_limits.get(i);
-                LinkedHashMap<String, Object> lv = new LinkedHashMap<String,Object>();
+            ArrayList<Map<String,Object>> lims = new ArrayList<>();
+            visibility_limits.forEach(lim -> {
+                LinkedHashMap<String, Object> lv = new LinkedHashMap<>();
                 if (lim instanceof RectangleVisibilityLimit) {
                     RectangleVisibilityLimit rect_lim = (RectangleVisibilityLimit) lim;
                     lv.put("x0", rect_lim.x_min);
                     lv.put("z0", rect_lim.z_min);
                     lv.put("x1", rect_lim.x_max);
                     lv.put("z1", rect_lim.z_max);
-                }
-                else {
+                } else {
                     RoundVisibilityLimit round_lim = (RoundVisibilityLimit) lim;
                     lv.put("x", round_lim.x_center);
                     lv.put("z", round_lim.z_center);
                     lv.put("r", round_lim.radius);
                 }
                 lims.add(lv);
-            }
+            });
             node.put("visibilitylimits", lims);
         }
         /* Save hidden limits, if defined */
         if(hidden_limits != null) {
-            ArrayList<Map<String,Object>> lims = new ArrayList<Map<String,Object>>();
+            ArrayList<Map<String,Object>> lims = new ArrayList<>();
             for(int i = 0; i < hidden_limits.size(); i++) {
                 VisibilityLimit lim = visibility_limits.get(i);
-                LinkedHashMap<String, Object> lv = new LinkedHashMap<String,Object>();
+                LinkedHashMap<String, Object> lv = new LinkedHashMap<>();
                 if (lim instanceof RectangleVisibilityLimit) {
                     RectangleVisibilityLimit rect_lim = (RectangleVisibilityLimit) lim;
                     lv.put("x0", rect_lim.x_min);
@@ -510,11 +508,9 @@ public abstract class DynmapWorld {
         }
         node.put("hidestyle", hide);
         /* Handle map settings */
-        ArrayList<Map<String,Object>> mapinfo = new ArrayList<Map<String,Object>>();
-        for(MapType mt : maps) {
-            ConfigurationNode mnode = mt.saveConfiguration();
-            mapinfo.add(mnode);
-        }
+        List<Map<String,Object>> mapinfo = maps.stream()
+                .map(MapType::saveConfiguration)
+                .collect(Collectors.toCollection(ArrayList::new));
         node.put("maps", mapinfo);
 
         return node;

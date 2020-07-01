@@ -2,6 +2,7 @@ package org.dynmap.hdmap.renderer;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.Map;
 
 import org.dynmap.renderer.MapDataContext;
@@ -31,10 +32,10 @@ public class RPSupportFrameRenderer extends RPMicroRenderer {
         int covermask = 0;
         Object v = ctx.getBlockTileEntityField("cvm");
         if(v instanceof Integer) {
-            covermask = ((Integer)v).intValue();
+            covermask = (Integer) v;
         }
         RenderPatchFactory rpf = ctx.getPatchFactory();
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         /* Use mask to add right sides first */
         /* Add top */
         list.add(rpf.getPatch(0, 1.001, 1, 1, 1.001, 1, 0, 1.001, 0, 0, 1, 0, 1, SideVisible.BOTH,
@@ -57,10 +58,8 @@ public class RPSupportFrameRenderer extends RPMicroRenderer {
         /* Get patches from any microblocks */
         if((covermask & 0x3FFFFFFF) != 0) {
             RenderPatch[] rp = super.getRenderPatchList(ctx);
-            for(int i = 0; i < rp.length; i++) {
-                list.add(rp[i]);
-            }
+            Collections.addAll(list, rp);
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
 }

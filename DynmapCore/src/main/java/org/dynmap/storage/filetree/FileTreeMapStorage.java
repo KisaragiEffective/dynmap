@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +33,7 @@ public class FileTreeMapStorage extends MapStorage {
     private File baseTileDir;
     private TileHashManager hashmap;
     private static final int MAX_WRITE_RETRIES = 6;
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
 
     public class StorageTile extends MapStorageTile {
         private final String baseFilename;
@@ -62,7 +64,7 @@ public class FileTreeMapStorage extends MapStorage {
         private File getTileFile() {
             ImageEncoding fmt = map.getImageFormat().getEncoding();
             File ff = getTileFile(fmt);
-            if (ff.exists() == false) {
+            if (!ff.exists()) {
                 if (fmt == ImageEncoding.PNG) {
                     fmt = ImageEncoding.JPG;
                 }
@@ -99,7 +101,7 @@ public class FileTreeMapStorage extends MapStorage {
         public TileRead read() {
             ImageEncoding fmt = map.getImageFormat().getEncoding();
             File ff = getTileFile(fmt);
-            if (ff.exists() == false) { // Fallback and try to read other format
+            if (!ff.exists()) { // Fallback and try to read other format
                 if (fmt == ImageEncoding.PNG) {
                     fmt = ImageEncoding.JPG;
                 }
@@ -111,18 +113,11 @@ public class FileTreeMapStorage extends MapStorage {
             if (ff.isFile()) {
                 TileRead tr = new TileRead();
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
-                } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
-                    }
                 }
                 tr.image = new BufferInputStream(buf);
                 tr.format = fmt;
@@ -151,10 +146,10 @@ public class FileTreeMapStorage extends MapStorage {
                 }
                 return true;
             }
-            if (ffpar.exists() == false) {
+            if (!ffpar.exists()) {
                 ffpar.mkdirs();
             }
-            if (replaceFile(ff, encImage.buf, encImage.len) == false) {
+            if (!replaceFile(ff, encImage.buf, encImage.len)) {
                 return false;
             }
             hashmap.updateHashCode(world.getName() + "." + map.getPrefix(), x, y, hash);
@@ -274,7 +269,7 @@ public class FileTreeMapStorage extends MapStorage {
         }
         // Now, take the last section and parse out coordinates and zoom
         String fname = suri[suri.length-1];
-        String[] coord = fname.split("[_\\.]");
+        String[] coord = fname.split("[_.]");
         if (coord.length < 3) { // 3 or 4
             return null;
         }
@@ -299,16 +294,16 @@ public class FileTreeMapStorage extends MapStorage {
 
     private void processEnumMapTiles(DynmapWorld world, MapType map, File base, ImageVariant var, MapStorageTileEnumCB cb, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
         File bdir = new File(base, map.getPrefix() + var.variantSuffix);
-        if (bdir.isDirectory() == false) {
+        if (!bdir.isDirectory()) {
             if(cbEnd != null)
                 cbEnd.searchEnded();
             return;
         }
 
-        LinkedList<File> dirs = new LinkedList<File>(); // List to traverse
+        LinkedList<File> dirs = new LinkedList<>(); // List to traverse
         dirs.add(bdir);   // Directory for map
         // While more paths to handle
-        while (dirs.isEmpty() == false) {
+        while (!dirs.isEmpty()) {
             File dir = dirs.pop();
             String[] dirlst = dir.list();
             if (dirlst == null) continue;
@@ -368,39 +363,25 @@ public class FileTreeMapStorage extends MapStorage {
     @Override
     public void enumMapTiles(DynmapWorld world, MapType map, MapStorageTileEnumCB cb) {
         File base = new File(baseTileDir, world.getName()); // Get base directory for world
-        List<MapType> mtlist;
+        List<MapType> mapTypes = map != null ? Collections.singletonList(map) : new ArrayList<>(world.maps);
 
-        if (map != null) {
-            mtlist = Collections.singletonList(map);
-        }
-        else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
-        }
-        for (MapType mt : mtlist) {
+        // Else, add all directories under world directory (for maps)
+        mapTypes.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, base, var, cb, null, null);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processEnumMapTiles(world, mt, base, var, cb, null, null));
+        });
     }
 
     @Override
     public void enumMapBaseTiles(DynmapWorld world, MapType map, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
         File base = new File(baseTileDir, world.getName()); // Get base directory for world
-        List<MapType> mtlist;
+        List<MapType> mapTypes = map != null ? Collections.singletonList(map) : new ArrayList<>(world.maps);
 
-        if (map != null) {
-            mtlist = Collections.singletonList(map);
-        }
-        else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
-        }
-        for (MapType mt : mtlist) {
+        // Else, add all directories under world directory (for maps)
+        mapTypes.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, base, var, null, cbBase, cbEnd);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processEnumMapTiles(world, mt, base, var, null, cbBase, cbEnd));
+        });
     }
 
     private void processPurgeMapTiles(DynmapWorld world, MapType map, File base, ImageVariant var) {
@@ -408,21 +389,20 @@ public class FileTreeMapStorage extends MapStorage {
         // Clean up hash files
         String[] hlist = base.list();
         if (hlist != null) {
-            for (String h : hlist) {
-                if (h.endsWith(".hash") == false) continue;
-                if (h.startsWith(mname + "_")) continue;
-                File f = new File(base, h);
-                f.delete();
-            }
+            Arrays.stream(hlist)
+                    .filter(h -> h.endsWith(".hash"))
+                    .filter(h -> !h.startsWith(mname + "_"))
+                    .map(h -> new File(base, h))
+                    .forEachOrdered(File::delete);
         }
         File bdir = new File(base, mname);
-        if (bdir.isDirectory() == false) return;
+        if (!bdir.isDirectory()) return;
 
-        LinkedList<File> dirs = new LinkedList<File>(); // List to traverse
-        LinkedList<File> dirsdone = new LinkedList<File>();
+        LinkedList<File> dirs = new LinkedList<>(); // List to traverse
+        LinkedList<File> dirsdone = new LinkedList<>();
         dirs.add(bdir);   // Directory for map
         // While more paths to handle
-        while (dirs.isEmpty() == false) {
+        while (!dirs.isEmpty()) {
             File dir = dirs.pop();
             dirsdone.add(dir);
             String[] dirlst = dir.list();
@@ -456,14 +436,12 @@ public class FileTreeMapStorage extends MapStorage {
             mtlist = Collections.singletonList(map);
         }
         else {  // Else, add all directories under world directory (for maps)
-            mtlist = new ArrayList<MapType>(world.maps);
+            mtlist = new ArrayList<>(world.maps);
         }
-        for (MapType mt : mtlist) {
+        mtlist.forEach(mt -> {
             ImageVariant[] vars = mt.getVariants();
-            for (ImageVariant var : vars) {
-                processPurgeMapTiles(world, mt, base, var);
-            }
-        }
+            Arrays.stream(vars).forEachOrdered(var -> processPurgeMapTiles(world, mt, base, var));
+        });
     }
 
     @Override
@@ -476,7 +454,7 @@ public class FileTreeMapStorage extends MapStorage {
             ff.delete();
             return true;
         }
-        if (ffpar.exists() == false) {
+        if (!ffpar.exists()) {
             ffpar.mkdirs();
         }
         getWriteLock(baseFilename);
@@ -493,18 +471,12 @@ public class FileTreeMapStorage extends MapStorage {
         if (ff.exists()) {
             if (getReadLock(baseFilename, 5000)) {
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
                 } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
-                    }
                     releaseReadLock(baseFilename);
                 }
                 return new BufferInputStream(buf);
@@ -530,7 +502,7 @@ public class FileTreeMapStorage extends MapStorage {
             ff.delete();
             return true;
         }
-        if (ffpar.exists() == false) {
+        if (!ffpar.exists()) {
             ffpar.mkdirs();
         }
         getWriteLock(baseFilename);
@@ -546,18 +518,12 @@ public class FileTreeMapStorage extends MapStorage {
         if (ff.exists()) {
             if (getReadLock(baseFilename, 5000)) {
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
                 } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
-                    }
                     releaseReadLock(baseFilename);
                 }
                 return new BufferInputStream(buf);
@@ -575,7 +541,7 @@ public class FileTreeMapStorage extends MapStorage {
             ff.delete();
             return true;
         }
-        if (ffpar.exists() == false) {
+        if (!ffpar.exists()) {
             ffpar.mkdirs();
         }
         getWriteLock(baseFilename);
@@ -592,18 +558,12 @@ public class FileTreeMapStorage extends MapStorage {
         if (ff.exists()) {
             if (getReadLock(baseFilename, 5000)) {
                 byte[] buf = new byte[(int) ff.length()];
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(ff);
+                try (FileInputStream fis = new FileInputStream(ff)) {
                     fis.read(buf, 0, buf.length);   // Read whole thing
                 } catch (IOException iox) {
                     Log.info("read (" + ff.getPath() + ") failed = " + iox.getMessage());
                     return null;
                 } finally {
-                    if (fis != null) {
-                        try { fis.close(); } catch (IOException iox) {}
-                        fis = null;
-                    }
                     releaseReadLock(baseFilename);
                 }
                 return new String(buf, UTF8);
@@ -665,12 +625,12 @@ public class FileTreeMapStorage extends MapStorage {
         String p = core.getTilesFolder().getAbsolutePath();
         if(!p.endsWith("/"))
             p += "/";
-        sb.append("$tilespath = \'");
+        sb.append("$tilespath = '");
         sb.append(WebAuthManager.esc(p));
-        sb.append("\';\n");
-        sb.append("$markerspath = \'");
+        sb.append("';\n");
+        sb.append("$markerspath = '");
         sb.append(WebAuthManager.esc(p));
-        sb.append("\';\n");
+        sb.append("';\n");
         
         // Need to call base to add webpath
         super.addPaths(sb, core);

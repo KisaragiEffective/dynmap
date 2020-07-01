@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.common.DynmapPlayer;
@@ -84,13 +85,13 @@ public class DynmapMapCommands {
             return true;
         Set<String> wnames = null;
         if(args.length > 1) {
-            wnames = new HashSet<String>();
+            wnames = new HashSet<>();
             for(int i = 1; i < args.length; i++)
                 wnames.add(DynmapWorld.normalizeWorldName(args[i]));
         }
         /* Get active worlds */
         for(DynmapWorld w : core.getMapManager().getWorlds()) {
-            if((wnames != null) && (wnames.contains(w.getName()) == false)) {
+            if((wnames != null) && (!wnames.contains(w.getName()))) {
                 continue;
             }
             StringBuilder sb = new StringBuilder();
@@ -112,7 +113,7 @@ public class DynmapMapCommands {
         }
         /* Get disabled worlds */
         for(String wn : core.getMapManager().getDisabledWorlds()) {
-            if((wnames != null) && (wnames.contains(wn) == false)) {
+            if((wnames != null) && (!wnames.contains(wn))) {
                 continue;
             }
             sender.sendMessage("world " + wn + ": isenabled=false");
@@ -138,86 +139,86 @@ public class DynmapMapCommands {
         
         boolean did_update = false;
         for(int i = 2; i < args.length; i++) {
-            String[] tok = args[i].split(":");  /* Split at colon */
-            if(tok.length != 2) {
+            String[] token = args[i].split(":");  /* Split at colon */
+            if(token.length != 2) {
                 sender.sendMessage("Syntax error: " + args[i]);
                 return false;
             }
-            if(tok[0].equalsIgnoreCase("enabled")) {
-                did_update |= core.setWorldEnable(wname, !tok[1].equalsIgnoreCase("false"));
+            if(token[0].equalsIgnoreCase("enabled")) {
+                did_update |= core.setWorldEnable(wname, !token[1].equalsIgnoreCase("false"));
             }
-            else if(tok[0].equalsIgnoreCase("title")) {
+            else if(token[0].equalsIgnoreCase("title")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set extrazoomout on disabled or undefined world");
                     return true;
                 }
-                w.setTitle(tok[1]);
+                w.setTitle(token[1]);
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("sendposition")) {
+            else if(token[0].equalsIgnoreCase("sendposition")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set sendposition on disabled or undefined world");
                     return true;
                 }
-                w.sendposition = tok[1].equals("true");
+                w.sendposition = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("sendhealth")) {
+            else if(token[0].equalsIgnoreCase("sendhealth")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set sendhealth on disabled or undefined world");
                     return true;
                 }
-                w.sendhealth = tok[1].equals("true");
+                w.sendhealth = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("showborder")) {
+            else if(token[0].equalsIgnoreCase("showborder")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set sendworldborder on disabled or undefined world");
                     return true;
                 }
-                w.showborder = tok[1].equals("true");
+                w.showborder = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("protected")) {
+            else if(token[0].equalsIgnoreCase("protected")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set protected on disabled or undefined world");
                     return true;
                 }
-                w.is_protected = tok[1].equals("true");
+                w.is_protected = token[1].equals("true");
                 core.updateWorldConfig(w);
                 did_update = true;
             }
-            else if(tok[0].equalsIgnoreCase("extrazoomout")) {  /* Extrazoomout setting */
+            else if(token[0].equalsIgnoreCase("extrazoomout")) {  /* Extrazoomout setting */
                 if(w == null) {
                     sender.sendMessage("Cannot set extrazoomout on disabled or undefined world");
                     return true;
                 }
                 int exo = -1;
                 try {
-                    exo = Integer.valueOf(tok[1]);
+                    exo = Integer.parseInt(token[1]);
                 } catch (NumberFormatException nfx) {}
                 if((exo < 0) || (exo > 32)) {
-                    sender.sendMessage("Invalid value for extrazoomout: " + tok[1]);
+                    sender.sendMessage("Invalid value for extrazoomout: " + token[1]);
                     return true;
                 }
                 did_update |= core.setWorldZoomOut(wname, exo);
             }
-            else if(tok[0].equalsIgnoreCase("tileupdatedelay")) {  /* tileupdatedelay setting */
+            else if(token[0].equalsIgnoreCase("tileupdatedelay")) {  /* tileupdatedelay setting */
                 if(w == null) {
                     sender.sendMessage("Cannot set tileupdatedelay on disabled or undefined world");
                     return true;
                 }
                 int tud = -1;
                 try {
-                    tud = Integer.valueOf(tok[1]);
+                    tud = Integer.parseInt(token[1]);
                 } catch (NumberFormatException nfx) {}
                 did_update |= core.setWorldTileUpdateDelay(wname, tud);
             }
-            else if(tok[0].equalsIgnoreCase("center")) {    /* Center */
+            else if(token[0].equalsIgnoreCase("center")) {    /* Center */
                 if(w == null) {
                     sender.sendMessage("Cannot set center on disabled or undefined world");
                     return true;
@@ -225,19 +226,18 @@ public class DynmapMapCommands {
                 boolean good = false;
                 DynmapLocation loc = null;
                 try {
-                    String[] toks = tok[1].split("/");
+                    String[] toks = token[1].split("/");
                     if(toks.length == 3) {
-                        double x = 0, y = 0, z = 0;
-                        x = Double.valueOf(toks[0]);
-                        y = Double.valueOf(toks[1]);
-                        z = Double.valueOf(toks[2]);
+                        double x = Double.parseDouble(toks[0]);
+                        double y = Double.parseDouble(toks[1]);
+                        double z = Double.parseDouble(toks[2]);
                         loc = new DynmapLocation(wname, x, y, z);
                        good = true;
                     }
-                    else if(tok[1].equalsIgnoreCase("default")) {
+                    else if(token[1].equalsIgnoreCase("default")) {
                         good = true;
                     }
-                    else if(tok[1].equalsIgnoreCase("here")) {
+                    else if(token[1].equalsIgnoreCase("here")) {
                         if(sender instanceof DynmapPlayer) {
                             loc = ((DynmapPlayer)sender).getLocation();
                             good = true;
@@ -254,14 +254,14 @@ public class DynmapMapCommands {
                 }
                 did_update |= core.setWorldCenter(wname, loc);
             }
-            else if(tok[0].equalsIgnoreCase("order")) {
+            else if(token[0].equalsIgnoreCase("order")) {
                 if(w == null) {
                     sender.sendMessage("Cannot set order on disabled or undefined world");
                     return true;
                 }
                 int order = -1;
                 try {
-                    order = Integer.valueOf(tok[1]);
+                    order = Integer.parseInt(token[1]);
                 } catch (NumberFormatException nfx) {}
                 if(order < 1) {
                     sender.sendMessage("Order value must be number from 1 to number of worlds");
@@ -294,22 +294,22 @@ public class DynmapMapCommands {
             return true;
         }
         List<MapType> maps = w.maps;
-        for(MapType mt : maps) {
-            if(mt instanceof HDMap) {
-                HDMap hdmt = (HDMap)mt;
-                StringBuilder sb = new StringBuilder();
-                sb.append("map ").append(mt.getName()).append(": prefix=").append(hdmt.getPrefix()).append(", title=").append(hdmt.getTitle());
-                sb.append(", perspective=").append(hdmt.getPerspective().getName()).append(", shader=").append(hdmt.getShader().getName());
-                sb.append(", lighting=").append(hdmt.getLighting().getName()).append(", mapzoomin=").append(hdmt.getMapZoomIn()).append(", mapzoomout=").append(hdmt.getMapZoomOutLevels());
-                sb.append(", img-format=").append(hdmt.getImageFormatSetting()).append(", icon=").append(hdmt.getIcon());
-                sb.append(", append-to-world=").append(hdmt.getAppendToWorld()).append(", boostzoom=").append(hdmt.getBoostZoom());
-                sb.append(", protected=").append(hdmt.isProtected());
-                if(hdmt.tileupdatedelay > 0) {
-                    sb.append(", tileupdatedelay=").append(hdmt.tileupdatedelay);
-                }
-                sender.sendMessage(sb.toString());
-            }
-        }
+        maps.stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .forEachOrdered(mt -> {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("map ").append(mt.getName()).append(": prefix=").append(mt.getPrefix()).append(", title=").append(mt.getTitle());
+                    sb.append(", perspective=").append(mt.getPerspective().getName()).append(", shader=").append(mt.getShader().getName());
+                    sb.append(", lighting=").append(mt.getLighting().getName()).append(", mapzoomin=").append(mt.getMapZoomIn()).append(", mapzoomout=").append(mt.getMapZoomOutLevels());
+                    sb.append(", img-format=").append(mt.getImageFormatSetting()).append(", icon=").append(mt.getIcon());
+                    sb.append(", append-to-world=").append(mt.getAppendToWorld()).append(", boostzoom=").append(mt.getBoostZoom());
+                    sb.append(", protected=").append(mt.isProtected());
+                    if (mt.tileupdatedelay > 0) {
+                        sb.append(", tileupdatedelay=").append(mt.tileupdatedelay);
+                    }
+                    sender.sendMessage(sb.toString());
+                });
         
         return true;
     }
@@ -335,7 +335,7 @@ public class DynmapMapCommands {
                 sender.sendMessage("Cannot delete maps from disabled or unloaded world: " + wname);
                 return true;
             }
-            List<MapType> maps = new ArrayList<MapType>(w.maps);
+            List<MapType> maps = new ArrayList<>(w.maps);
             boolean done = false;
             for(int idx = 0; (!done) && (idx < maps.size()); idx++) {
                 MapType mt = maps.get(idx);
@@ -371,7 +371,7 @@ public class DynmapMapCommands {
             sender.sendMessage("Cannot reset world that is not loaded or enabled");
             return true;
         }
-        ConfigurationNode cn = null;
+        ConfigurationNode cn;
         if(args.length > 2) {
             cn = core.getTemplateConfigurationNode(args[2]);
         }
@@ -415,16 +415,14 @@ public class DynmapMapCommands {
             sender.sendMessage("Cannot update maps from disabled or unloaded world: " + wname);
             return true;
         }
-        HDMap mt = null;
         /* Find the map */
-        for(MapType map : w.maps) {
-            if(map instanceof HDMap) {
-                if(map.getName().equals(mname)) {
-                    mt = (HDMap)map;
-                    break;
-                }
-            }
-        }
+        HDMap mt = w.maps
+                .stream()
+                .filter(HDMap.class::isInstance)
+                .map(HDMap.class::cast)
+                .filter(map -> map.getName().equals(mname))
+                .findFirst()
+                .orElse(null);
         /* If new, make default map instance */
         if(isnew) {
             if(mt != null) {
@@ -462,7 +460,7 @@ public class DynmapMapCommands {
                 for(MapType map : w.maps){
                     if(map == mt) continue;
                     if(map instanceof HDMap) {
-                        if(((HDMap)map).getPrefix().equals(tok[1])) {
+                        if(map.getPrefix().equals(tok[1])) {
                             sender.sendMessage("Prefix " + tok[1] + " already in use");
                             return true;
                         }
@@ -479,7 +477,7 @@ public class DynmapMapCommands {
             else if(tok[0].equalsIgnoreCase("mapzoomin")) {
                 int mzi = -1;
                 try {
-                    mzi = Integer.valueOf(tok[1]);
+                    mzi = Integer.parseInt(tok[1]);
                 } catch (NumberFormatException nfx) {
                 }
                 if((mzi < 0) || (mzi > 32)) {
@@ -491,7 +489,7 @@ public class DynmapMapCommands {
             else if(tok[0].equalsIgnoreCase("mapzoomout")) {
                 int mzi = -1;
                 try {
-                    mzi = Integer.valueOf(tok[1]);
+                    mzi = Integer.parseInt(tok[1]);
                 } catch (NumberFormatException nfx) {
                 }
                 if((mzi < 0) || (mzi > 32)) {
@@ -503,7 +501,7 @@ public class DynmapMapCommands {
             else if(tok[0].equalsIgnoreCase("boostzoom")) {
                 int mzi = -1;
                 try {
-                    mzi = Integer.valueOf(tok[1]);
+                    mzi = Integer.parseInt(tok[1]);
                 } catch (NumberFormatException nfx) {
                 }
                 if((mzi < 0) || (mzi > 3)) {
@@ -515,7 +513,7 @@ public class DynmapMapCommands {
             else if(tok[0].equalsIgnoreCase("tileupdatedelay")) {
                 int tud = -1;
                 try {
-                    tud = Integer.valueOf(tok[1]);
+                    tud = Integer.parseInt(tok[1]);
                 } catch (NumberFormatException nfx) {
                 }
                 did_update |= mt.setTileUpdateDelay(tud);
@@ -560,7 +558,7 @@ public class DynmapMapCommands {
             else if(tok[0].equalsIgnoreCase("order")) {
                 int idx = -1;
                 try {
-                    idx = Integer.valueOf(tok[1]);
+                    idx = Integer.parseInt(tok[1]);
                 } catch (NumberFormatException nfx) {
                 }
                 if(idx < 1) {
@@ -597,11 +595,15 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.perspectivelist"))
             return true;
         if(MapManager.mapman != null) {
-            StringBuilder sb = new StringBuilder();
-            for(HDPerspective p : MapManager.mapman.hdmapman.perspectives.values()) {
-                sb.append(p.getName()).append(' ');
-            }
-            sender.sendMessage(sb.toString());
+            String sb = MapManager.mapman
+                    .hdmapman
+                    .perspectives
+                    .values()
+                    .stream()
+                    .map(HDPerspective::getName)
+                    .map(s -> s + ' ')
+                    .collect(Collectors.joining());
+            sender.sendMessage(sb);
         }
         return true;
     }
@@ -610,11 +612,15 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.shaderlist"))
             return true;
         if(MapManager.mapman != null) {
-            StringBuilder sb = new StringBuilder();
-            for(HDShader p : MapManager.mapman.hdmapman.shaders.values()) {
-                sb.append(p.getName()).append(' ');
-            }
-            sender.sendMessage(sb.toString());
+            String sb = MapManager.mapman
+                    .hdmapman
+                    .shaders
+                    .values()
+                    .stream()
+                    .map(HDShader::getName)
+                    .map(s -> s + ' ')
+                    .collect(Collectors.joining());
+            sender.sendMessage(sb);
         }
         return true;
     }
@@ -623,11 +629,15 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.lightinglist"))
             return true;
         if(MapManager.mapman != null) {
-            StringBuilder sb = new StringBuilder();
-            for(HDLighting p : MapManager.mapman.hdmapman.lightings.values()) {
-                sb.append(p.getName()).append(' ');
-            }
-            sender.sendMessage(sb.toString());
+            String sb = MapManager.mapman
+                    .hdmapman
+                    .lightings
+                    .values()
+                    .stream()
+                    .map(HDLighting::getName)
+                    .map(s -> s + ' ')
+                    .collect(Collectors.joining());
+            sender.sendMessage(sb);
         }
         return true;
     }
@@ -636,10 +646,9 @@ public class DynmapMapCommands {
         if(!core.checkPlayerPermission(sender, "dmap.blklist"))
             return true;
         Map<String, Integer> map = core.getServer().getBlockUniqueIDMap();
-        TreeSet<String> keys = new TreeSet<String>(map.keySet());
-        for (String k : keys) {
-            sender.sendMessage(k + ": " + map.get(k));
-        }
+        new TreeSet<>(map.keySet()).stream()
+                .map(k -> k + ": " + map.get(k))
+                .forEach(sender::sendMessage);
         return true;
     }
 }

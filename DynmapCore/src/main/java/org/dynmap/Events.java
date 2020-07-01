@@ -4,15 +4,15 @@ import java.util.Map;
 
 
 public class Events {
-    public Map<String, Event<?>> events = new HashMap<String, Event<?>>();
+    public final Map<String, Event<?>> events = new HashMap<>();
     @SuppressWarnings("unchecked")
     public <T> void addListener(String eventName, Event.Listener<T> listener) {
         Event<?> genericEvent = events.get(eventName);
-        Event<T> event = null;
+        Event<T> event;
         if (genericEvent != null) {
             event = (Event<T>)genericEvent;
         } else {
-            events.put(eventName, event = new Event<T>());
+            events.put(eventName, event = new Event<>());
         }
         event.addListener(listener);
     }
@@ -20,7 +20,7 @@ public class Events {
     @SuppressWarnings("unchecked")
     public <T> void removeListener(String eventName, Event.Listener<T> listener) {
         Event<?> genericEvent = events.get(eventName);
-        Event<T> event = null;
+        Event<T> event;
         if (genericEvent != null) {
             event = (Event<T>)genericEvent;
             event.removeListener(listener);

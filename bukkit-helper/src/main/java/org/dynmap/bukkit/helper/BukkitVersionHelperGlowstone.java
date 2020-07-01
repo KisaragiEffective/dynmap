@@ -75,7 +75,7 @@ public class BukkitVersionHelperGlowstone extends BukkitVersionHelper {
 
     @Override
     public Object[] getBiomeBaseFromSnapshot(ChunkSnapshot css) {
-        Integer b[] = new Integer[256];
+        Integer[] b = new Integer[256];
         byte[] rb = null;
         try {
             rb = (byte[]) rawbiome.invoke(css, new Object[0]);
@@ -85,7 +85,7 @@ public class BukkitVersionHelperGlowstone extends BukkitVersionHelper {
         }
         if (rb != null) {
             for (int i = 0; i < 256; i++) {
-                b[i] = Integer.valueOf(255 & (int)rb[i]);
+                b[i] = 255 & (int) rb[i];
             }
         }
         return b;
@@ -443,8 +443,8 @@ public class BukkitVersionHelperGlowstone extends BukkitVersionHelper {
     }
 
     @Override
-	public String getStateStringByCombinedId(int blkid, int meta) {
-		return "meta=" + meta;
-	}
+    public String getStateStringByCombinedId(int blkid, int meta) {
+        return "meta=" + meta;
+    }
 
 }

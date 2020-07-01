@@ -3,7 +3,6 @@ package org.dynmap;
 import org.dynmap.MapType.ImageFormat;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.common.DynmapListenerManager.PlayerEventListener;
-import org.dynmap.common.DynmapPlayer;
 import org.dynmap.debug.Debug;
 import org.dynmap.storage.MapStorage;
 import org.dynmap.utils.BufferOutputStream;
@@ -17,16 +16,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
  * Listen for player logins, and process player faces by fetching skins *
  */
 public class PlayerFaces {
-    private boolean fetchskins;
-    private boolean refreshskins;
+    private final boolean fetchskins;
+    private final boolean refreshskins;
     private String skinurl;
-    public MapStorage storage;
+    public final MapStorage storage;
     
     public enum FaceType {
         FACE_8X8("8x8", 0),
@@ -42,59 +42,47 @@ public class PlayerFaces {
             this.typeID = typeid;
         }
         public static FaceType byID(String i_d) {
-            for (FaceType ft : values()) {
-                if (ft.id.equals(i_d)) {
-                    return ft;
-                }
-            }
-            return null;
+            return Arrays.stream(values()).filter(ft -> ft.id.equals(i_d)).findFirst().orElse(null);
         }
         public static FaceType byTypeID(int tid) {
-            for (FaceType ft : values()) {
-                if (ft.typeID == tid) {
-                    return ft;
-                }
-            }
-            return null;
+            return Arrays.stream(values()).filter(ft -> ft.typeID == tid).findFirst().orElse(null);
         }
     }
     
     private void copyLayersToTarget(BufferedImage srcimg, int layer1x, int layer1y, int layer2x, int layer2y, int w, int h, int[] dest, int destoff, int destscansize)
     {
-    	int[] l1 = new int[w * h];
-    	int[] l2 = new int[w * h];
-    	int imgh = srcimg.getHeight();
-    	// Read layer 1
-    	if (imgh >= (layer1y+h))
-    		srcimg.getRGB(layer1x, layer1y, w, h, l1, 0, w);
+        int[] l1 = new int[w * h];
+        int[] l2 = new int[w * h];
+        int imgh = srcimg.getHeight();
+        // Read layer 1
+        if (imgh >= (layer1y+h))
+            srcimg.getRGB(layer1x, layer1y, w, h, l1, 0, w);
         // Read layer 2
-    	if (imgh >= (layer2y+h))
-    		srcimg.getRGB(layer2x, layer2y, w, h, l2, 0, w);
+        if (imgh >= (layer2y+h))
+            srcimg.getRGB(layer2x, layer2y, w, h, l2, 0, w);
         // Apply layer1 to layer 1
         boolean transp = false;
         int v = l2[0];
         for (int i = 0; i < (w*h); i++) {
-        	if ((l2[i] & 0xFF000000) == 0) {
-        		transp = true;
-        		break;
-        	}
-        	/* If any different values, render face too */
-        	else if (l2[i] != v) {
-        	    transp = true;
-        	    break;
-        	}
+            if ((l2[i] & 0xFF000000) == 0) {
+                transp = true;
+                break;
+            }
+            /* If any different values, render face too */
+            else if (l2[i] != v) {
+                transp = true;
+                break;
+            }
         }
         if(transp) {
             for (int i = 0; i < (w*h); i++) {
-            	if ((l2[i] & 0xFF000000) != 0)
-            		l1[i] = l2[i];
+                if ((l2[i] & 0xFF000000) != 0)
+                    l1[i] = l2[i];
             }
         }
-    	// Write to dest
+        // Write to dest
         for (int y = 0; y < h; y++) {
-        	for (int x = 0; x < w; x++) {
-        		dest[destoff + (y*destscansize + x)] = l1[(y*w)+x];
-        	}
+            if (w >= 0) System.arraycopy(l1, (y * w) + 0, dest, destoff + (y * destscansize + x), w);
         }
     }
 
@@ -106,7 +94,7 @@ public class PlayerFaces {
     }
     
     private class LoadPlayerImages implements Runnable {
-        private SkinUrlProvider mSkinUrlProvider;
+        private final SkinUrlProvider mSkinUrlProvider;
         public final String playername;
         public final String playerskinurl;
 
@@ -130,7 +118,7 @@ public class PlayerFaces {
                     URL url = null;
 
                     if (mSkinUrlProvider == null) {
-                        if (!skinurl.equals("")) {
+                        if (!skinurl.isEmpty()) {
                             url = new URL(skinurl.replace("%player%", URLEncoder.encode(playername, "UTF-8")));
                         } else if (playerskinurl != null) {
                             url = new URL(playerskinurl);
@@ -225,8 +213,8 @@ public class PlayerFaces {
             /* Write body file */
             if(refreshskins || (!has_body)) {
 
-                Image skin_image = null;
-                BufferedImage skin_buff = null;
+                Image skin_image;
+                BufferedImage skin_buff;
 
                 if (is_64x32_skin){
 
@@ -294,18 +282,15 @@ public class PlayerFaces {
         skinurl = core.configuration.getString("skin-url", "");
         // These don't work anymore - Mojang retired them
         if (skinurl.equals("http://s3.amazonaws.com/MinecraftSkins/%player%.png") ||
-        		skinurl.equals("http://skins.minecraft.net/MinecraftSkins/%player%.png")) {
+                skinurl.equals("http://skins.minecraft.net/MinecraftSkins/%player%.png")) {
             skinurl = "";
         }
-        core.listenerManager.addListener(EventType.PLAYER_JOIN, new PlayerEventListener() {
-            @Override
-            public void playerEvent(DynmapPlayer p) {
-                Runnable job = new LoadPlayerImages(p.getName(), p.getSkinURL(), p.getUUID(), core.skinUrlProvider);
-                if(fetchskins)
-                    MapManager.scheduleDelayedJob(job, 0);
-                else
-                    job.run();
-            }
+        core.listenerManager.addListener(EventType.PLAYER_JOIN, (PlayerEventListener) p -> {
+            Runnable job = new LoadPlayerImages(p.getName(), p.getSkinURL(), p.getUUID(), core.skinUrlProvider);
+            if(fetchskins)
+                MapManager.scheduleDelayedJob(job, 0);
+            else
+                job.run();
         });
         storage = core.getDefaultMapStorage();
     }

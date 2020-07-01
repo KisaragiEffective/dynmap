@@ -1,7 +1,10 @@
 package org.dynmap.utils;
 
 public class RectangleVisibilityLimit implements VisibilityLimit {
-    public int x_min, x_max, z_min, z_max;
+    public final int x_min;
+    public final int x_max;
+    public final int z_min;
+    public final int z_max;
 
 
     public RectangleVisibilityLimit(int x0, int z0, int x1, int z1) {

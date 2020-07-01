@@ -12,7 +12,7 @@ import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 
 class MarkerImpl implements Marker {
-    private String markerid;
+    private final String markerid;
     private String label;
     private boolean markup;
     private String desc;
@@ -99,13 +99,13 @@ class MarkerImpl implements Marker {
     }
     
     @Override
-	public String getUniqueMarkerID() {
-    	if (markerset != null) {
-    		return markerset + ":marker:" + markerid;
-    	}
-    	else {
-    		return null;
-    	}
+    public String getUniqueMarkerID() {
+        if (markerset != null) {
+            return markerset + ":marker:" + markerid;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
@@ -138,7 +138,7 @@ class MarkerImpl implements Marker {
         }
         /* Check if icons restricted for this set */
         Set<MarkerIcon> icns = markerset.getAllowedMarkerIcons();
-        if((icns != null) && (icns.contains(icon) == false)) {
+        if((icns != null) && (!icns.contains(icon))) {
             return false;
         }
         this.icon = (MarkerIconImpl)icon;
@@ -181,12 +181,12 @@ class MarkerImpl implements Marker {
     Map<String, Object> getPersistentData() {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
         node.put("markup", markup);
-        node.put("x", Double.valueOf(x));
-        node.put("y", Double.valueOf(y));
-        node.put("z", Double.valueOf(z));
+        node.put("x", x);
+        node.put("y", y);
+        node.put("z", z);
         node.put("world", world);
         node.put("icon", icon.getMarkerIconID());
         if (this.minzoom >= 0) {
@@ -238,7 +238,7 @@ class MarkerImpl implements Marker {
     @Override
     public void setDescription(String desc) {
         if(markerset == null) return;
-        if((this.desc == null) || (this.desc.equals(desc) == false)) {
+        if((this.desc == null) || (!this.desc.equals(desc))) {
             this.desc = desc;
             MarkerAPIImpl.markerUpdated(this, MarkerUpdate.UPDATED);
             if(ispersistent)

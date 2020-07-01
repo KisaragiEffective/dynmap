@@ -9,16 +9,16 @@ import org.dynmap.utils.TileFlags;
 public class MapTypeState {
     public static final long DEF_INV_PERIOD = 30;
     public static final long NANOS_PER_SECOND = 1000000000L;
-    public MapType type;
-    private Object invTileLock = new Object();
+    public final MapType type;
+    private final Object invTileLock = new Object();
     private TileFlags pendingInvTiles = new TileFlags();
     private TileFlags pendingInvTilesAlt = new TileFlags();
-    private TileFlags invTiles = new TileFlags();
-    private TileFlags.Iterator invTilesIter = invTiles.getIterator();
+    private final TileFlags invTiles = new TileFlags();
+    private final TileFlags.Iterator invTilesIter = invTiles.getIterator();
     private long nextInvTS;
     private long invTSPeriod;
-    private ArrayList<TileFlags> zoomOutInvAccum = new ArrayList<TileFlags>();
-    private ArrayList<TileFlags> zoomOutInv = new ArrayList<TileFlags>();
+    private ArrayList<TileFlags> zoomOutInvAccum = new ArrayList<>();
+    private ArrayList<TileFlags> zoomOutInv = new ArrayList<>();
     private TileFlags.Iterator zoomOutInvIter = null;
     private int zoomOutInvIterLevel = -1;
     private final int zoomOutLevels;
@@ -46,13 +46,11 @@ public class MapTypeState {
     }
 
     public int invalidateTiles(List<TileFlags.TileCoord> coords) {
-        int cnt = 0;
+        int cnt;
         synchronized(invTileLock) {
-            for(TileFlags.TileCoord c : coords) {
-                if(!pendingInvTiles.setFlag(c.x, c.y, true)) {
-                    cnt++;
-                }
-            }
+            cnt = (int) coords.stream()
+                    .filter(c -> !pendingInvTiles.setFlag(c.x, c.y, true))
+                    .count();
         }
         return cnt;
     }
@@ -110,20 +108,18 @@ public class MapTypeState {
     }
     
     public List<List<String>> saveZoomOut() {
-        ArrayList<List<String>> rslt = new ArrayList<List<String>>();
+        ArrayList<List<String>> rslt = new ArrayList<>();
         synchronized(invTileLock) {
             boolean empty = true;
             for (TileFlags tf : zoomOutInv) {
                 List<String> val;
                 if (tf == null) {
                     val = Collections.emptyList();
-                }
-                else {
+                } else {
                     val = tf.save();
                     if (val == null) {
                         val = Collections.emptyList();
-                    }
-                    else {
+                    } else {
                         empty = false;
                     }
                 }
@@ -133,13 +129,11 @@ public class MapTypeState {
                 List<String> val;
                 if (tf == null) {
                     val = Collections.emptyList();
-                }
-                else {
+                } else {
                     val = tf.save();
                     if (val == null) {
                         val = Collections.emptyList();
-                    }
-                    else {
+                    } else {
                         empty = false;
                     }
                 }

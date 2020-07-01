@@ -13,7 +13,8 @@ public class PatchDefinition implements RenderPatch {
     public double vmin, vmax;   /* Limits of patch - minimum and maximum v value */
     public double vmaxatumax;   /* Limits of patch - max v value at max u (allows triangle or trapezoid) */
     public double vminatumax;   /* Limits of patch - min v value at max u (allows triangle or trapezoid) */
-    public Vector3D u, v;       /* U and V vector, relative to origin */
+    public final Vector3D u;
+    public final Vector3D v;       /* U and V vector, relative to origin */
     public SideVisible sidevis;  /* Which side is visible */
     public int textureindex;
     public BlockStep step; /* Best approximation of orientation of surface, from top (positive determinent) */
@@ -251,16 +252,14 @@ public class PatchDefinition implements RenderPatch {
             return true;
         if(o instanceof PatchDefinition) {
             PatchDefinition p = (PatchDefinition)o;
-            if((hc == p.hc) && (textureindex == p.textureindex) && 
+            return (hc == p.hc) && (textureindex == p.textureindex) &&
                     (x0 == p.x0) && (y0 == p.y0) && (z0 == p.z0) &&
                     (xu == p.xu) && (yu == p.yu) && (zu == p.zu) &&
-                    (xv == p.xv) && (yv == p.yv) && (zv == p.zv) && 
+                    (xv == p.xv) && (yv == p.yv) && (zv == p.zv) &&
                     (umin == p.umin) && (umax == p.umax) &&
                     (vmin == p.vmin) && (vmax == p.vmax) &&
-                    (vmaxatumax == p.vmaxatumax) && 
-                    (vminatumax == p.vminatumax) && (sidevis == p.sidevis)) {
-                return true;
-            }
+                    (vmaxatumax == p.vmaxatumax) &&
+                    (vminatumax == p.vminatumax) && (sidevis == p.sidevis);
         }
         return false;
     }
@@ -274,7 +273,7 @@ public class PatchDefinition implements RenderPatch {
     }
     @Override
     public String toString() {
-    	return String.format("xyz0=%f/%f/%f,xyzU=%f/%f/%f,xyzV=%f/%f/%f,minU=%f,maxU=%f,vMin=%f/%f,vmax=%f/%f,side=%s,txtidx=%d",
-    			x0, y0, z0, xu, yu, zu, xv, yv, zv, umin, umax, vmin, vminatumax, vmax, vmaxatumax, sidevis, textureindex);
+        return String.format("xyz0=%f/%f/%f,xyzU=%f/%f/%f,xyzV=%f/%f/%f,minU=%f,maxU=%f,vMin=%f/%f,vmax=%f/%f,side=%s,txtidx=%d",
+                x0, y0, z0, xu, yu, zu, xv, yv, zv, umin, umax, vmin, vminatumax, vmax, vmaxatumax, sidevis, textureindex);
     }
 }

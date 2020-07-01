@@ -28,11 +28,11 @@ public class Client {
 
     public static class ChatMessage extends Update {
         public String type = "chat";
-        public String source;
-        public String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
-        public String message;
-        public String account;
-        public String channel;
+        public final String source;
+        public final String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
+        public final String message;
+        public final String account;
+        public final String channel;
         public ChatMessage(String source, String channel, String playerName, String message, String playeraccount) {
             this.source = source;
             if (ClientUpdateComponent.hideNames)
@@ -61,8 +61,8 @@ public class Client {
 
     public static class PlayerJoinMessage extends Update {
         public String type = "playerjoin";
-        public String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
-        public String account;
+        public final String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
+        public final String account;
         public PlayerJoinMessage(String playerName, String playeraccount) {
             if (ClientUpdateComponent.hideNames)
                 this.playerName = "";
@@ -88,8 +88,8 @@ public class Client {
 
     public static class PlayerQuitMessage extends Update {
         public String type = "playerquit";
-        public String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
-        public String account;
+        public final String playerName;   // Note: this needs to be client-safe HTML text (can include tags, but only sanitized ones)
+        public final String account;
         public PlayerQuitMessage(String playerName, String playeraccount) {
             if (ClientUpdateComponent.hideNames)
                 this.playerName = "";
@@ -115,7 +115,7 @@ public class Client {
 
     public static class Tile extends Update {
         public String type = "tile";
-        public String name;
+        public final String name;
 
         public Tile(String name) {
             this.name = name;
@@ -136,17 +136,14 @@ public class Client {
 
     public static class DayNight extends Update {
         public String type = "daynight";
-        public boolean isday;
+        public final boolean isday;
 
         public DayNight(boolean isday) {
             this.isday = isday;
         }
         @Override
         public boolean equals(Object o) {
-            if(o instanceof DayNight) {
-                return true;
-            }
-            return false;
+            return o instanceof DayNight;
         }
         @Override
         public int hashCode() {
@@ -177,31 +174,31 @@ public class Client {
         // Apply sanitize policy before returning
         return sanitizeHTML(s);
     }
-    private static String[][] codes = {
-        { "0", "<span style=\'color:#000000\'>" },
-        { "1", "<span style=\'color:#0000AA\'>" },
-        { "2", "<span style=\'color:#00AA00\'>" },
-        { "3", "<span style=\'color:#00AAAA\'>" },
-        { "4", "<span style=\'color:#AA0000\'>" },
-        { "5", "<span style=\'color:#AA00AA\'>" },
-        { "6", "<span style=\'color:#FFAA00\'>" },
-        { "7", "<span style=\'color:#AAAAAA\'>" },
-        { "8", "<span style=\'color:#555555\'>" },
-        { "9", "<span style=\'color:#5555FF\'>" },
-        { "a", "<span style=\'color:#55FF55\'>" },
-        { "b", "<span style=\'color:#55FFFF\'>" },
-        { "c", "<span style=\'color:#FF5555\'>" },
-        { "d", "<span style=\'color:#FF55FF\'>" },
-        { "e", "<span style=\'color:#FFFF55\'>" },
-        { "f", "<span style=\'color:#FFFFFF\'>" },
-        { "l", "<span style=\'font-weight:bold\'>" },
-        { "m", "<span style=\'text-decoration:line-through\'>" },
-        { "n", "<span style=\'text-decoration:underline\'>" },
-        { "o", "<span style=\'font-style:italic\'>" },
-        { "r", "<span style=\'font-style:normal,text-decoration:none,font-weight:normal\'>" }
+    private static final String[][] codes = {
+        { "0", "<span style='color:#000000'>"},
+        { "1", "<span style='color:#0000AA'>"},
+        { "2", "<span style='color:#00AA00'>"},
+        { "3", "<span style='color:#00AAAA'>"},
+        { "4", "<span style='color:#AA0000'>"},
+        { "5", "<span style='color:#AA00AA'>"},
+        { "6", "<span style='color:#FFAA00'>"},
+        { "7", "<span style='color:#AAAAAA'>"},
+        { "8", "<span style='color:#555555'>"},
+        { "9", "<span style='color:#5555FF'>"},
+        { "a", "<span style='color:#55FF55'>"},
+        { "b", "<span style='color:#55FFFF'>"},
+        { "c", "<span style='color:#FF5555'>"},
+        { "d", "<span style='color:#FF55FF'>"},
+        { "e", "<span style='color:#FFFF55'>"},
+        { "f", "<span style='color:#FFFFFF'>"},
+        { "l", "<span style='font-weight:bold'>"},
+        { "m", "<span style='text-decoration:line-through'>"},
+        { "n", "<span style='text-decoration:underline'>"},
+        { "o", "<span style='font-style:italic'>"},
+        { "r", "<span style='font-style:normal,text-decoration:none,font-weight:normal'>"}
     };
-    private static Random rnd = new Random();
-    private static String rndchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final Random rnd = new Random();
+    private static final String rndchars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     // Replace color codes with corresponding <span - assume we're returning safe HTML text 
     public static String encodeColorInHTML(String s) {
         StringBuilder sb = new StringBuilder();
@@ -219,9 +216,9 @@ public class Client {
                 else if (c == 'r') { // reset
                     magic = false;
                 }
-                for (int j = 0; j < codes.length; j++) {
-                    if (codes[j][0].charAt(0) == c) {   // Matching code?
-                        sb.append(codes[j][1]); // Substitute
+                for (String[] code : codes) {
+                    if (code[0].charAt(0) == c) {   // Matching code?
+                        sb.append(code[1]); // Substitute
                         spancnt++;
                         break;
                     }
@@ -240,9 +237,9 @@ public class Client {
                     else if (c == 'r') { // reset
                         magic = false;
                     }
-                    for (int j = 0; j < codes.length; j++) {
-                        if (codes[j][0].charAt(0) == c) {   // Matching code?
-                            sb.append(codes[j][1]); // Substitute
+                    for (String[] code : codes) {
+                        if (code[0].charAt(0) == c) {   // Matching code?
+                            sb.append(code[1]); // Substitute
                             spancnt++;
                             break;
                         }

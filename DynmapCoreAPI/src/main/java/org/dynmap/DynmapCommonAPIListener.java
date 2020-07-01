@@ -40,7 +40,7 @@ public abstract class DynmapCommonAPIListener {
     
     private static DynmapCommonAPI dynmapapi = null;
     
-    private static CopyOnWriteArrayList<DynmapCommonAPIListener> listeners = new CopyOnWriteArrayList<DynmapCommonAPIListener>();
+    private static final CopyOnWriteArrayList<DynmapCommonAPIListener> listeners = new CopyOnWriteArrayList<>();
     /**
      * Register listener instance
      * 
@@ -52,9 +52,7 @@ public abstract class DynmapCommonAPIListener {
             listener.apiEnabled(dynmapapi);
         }
         else {
-            for (DynmapCommonAPIListener l : listeners) {
-                l.apiListenerAdded();
-            }
+            listeners.forEach(DynmapCommonAPIListener::apiListenerAdded);
         }
     }
     /**
@@ -72,17 +70,13 @@ public abstract class DynmapCommonAPIListener {
         }
         dynmapapi = api;
         if(dynmapapi != null) {
-            for (DynmapCommonAPIListener l : listeners) {
-                l.apiEnabled(api);
-            }
+            listeners.forEach(l -> l.apiEnabled(api));
         }
     }
     // Internal call - MODS/PLUGINS MUST NOT USE
     public static void apiTerminated() {
         if(dynmapapi != null) {
-            for (DynmapCommonAPIListener l : listeners) {
-                l.apiDisabled(dynmapapi);
-            }
+            listeners.forEach(l -> l.apiDisabled(dynmapapi));
             dynmapapi = null;
         }
     }

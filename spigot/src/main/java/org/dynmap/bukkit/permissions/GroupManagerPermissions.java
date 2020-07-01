@@ -2,6 +2,7 @@ package org.dynmap.bukkit.permissions;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
@@ -13,16 +14,16 @@ import org.anjocaido.groupmanager.dataholder.worlds.WorldsHolder;
 import org.anjocaido.groupmanager.permissions.AnjoPermissionsHandler;
 
 public class GroupManagerPermissions implements PermissionProvider {
-    String name;
-    GroupManager gm;
-    WorldsHolder wh;
+    final String name;
+    final GroupManager gm;
+    final WorldsHolder wh;
 
     public static GroupManagerPermissions create(Server server, String name) {
         Plugin permissionsPlugin = server.getPluginManager().getPlugin("GroupManager");
         if (permissionsPlugin == null)
             return null;
         server.getPluginManager().enablePlugin(permissionsPlugin);
-        if(permissionsPlugin.isEnabled() == false)
+        if(!permissionsPlugin.isEnabled())
             return null;
         Log.info("Using GroupManager " + permissionsPlugin.getDescription().getVersion() + " for access control");
         return new GroupManagerPermissions(name, permissionsPlugin);
@@ -37,20 +38,16 @@ public class GroupManagerPermissions implements PermissionProvider {
     @Override
     public boolean has(CommandSender sender, String permission) {        
         Player player = sender instanceof Player ? (Player) sender : null;
-        boolean rslt = (player != null) ? gm.getWorldsHolder().getDefaultWorld().getPermissionsHandler().permission(player, name + "." + permission) : true;
+        boolean rslt = (player == null) || gm.getWorldsHolder().getDefaultWorld().getPermissionsHandler().permission(player, name + "." + permission);
         return rslt;
     }
     
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> hasperms = new HashSet<String>();
+        HashSet<String> hasperms = new HashSet<>();
         AnjoPermissionsHandler apm = gm.getWorldsHolder().getDefaultWorld().getPermissionsHandler();
         if (apm != null) {
-            for (String pp : perms) {
-                if (apm.permission(player, name + "." + pp)) {
-                    hasperms.add(pp);
-                }
-            }
+            hasperms = perms.stream().filter(pp -> apm.permission(player, name + "." + pp)).collect(Collectors.toCollection(HashSet::new));
         }
         return hasperms;
     }

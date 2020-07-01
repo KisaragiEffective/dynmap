@@ -13,8 +13,8 @@ import org.dynmap.utils.LRULinkedHashMap;
  *
  */
 public class TileHashManager {
-    private File    tiledir;    /* Base tile directory */    
-    private boolean enabled;
+    private final File    tiledir;    /* Base tile directory */
+    private final boolean enabled;
     
     /**
      * Each tile hash file is a 32x32 tile grid, with each file having a CRC32 hash code generated from its pre-compression frame buffer
@@ -62,7 +62,7 @@ public class TileHashManager {
                     fd = new RandomAccessFile(f, "rw");
                 } catch (FileNotFoundException nfnx) {
                     File pf = f.getParentFile();
-                    if (pf.exists() == false) {
+                    if (!pf.exists()) {
                         pf.mkdirs();
                     }
                     fd = new RandomAccessFile(f, "rw");
@@ -74,7 +74,6 @@ public class TileHashManager {
             } finally {
                 if(fd != null) {
                     try { fd.close(); } catch (IOException iox) {}
-                    fd = null;
                 }
             }
         }
@@ -92,7 +91,6 @@ public class TileHashManager {
             } finally {
                 if(fd != null) {
                     try { fd.close(); } catch (IOException iox) {}
-                    fd = null;
                 }
             }
             if (!success) {
@@ -117,8 +115,8 @@ public class TileHashManager {
     }
     
     private static final int MAX_CACHED_TILEHASHFILES = 25;
-    private Object lock = new Object();
-    private LRULinkedHashMap<TileHashFile, byte[]> tilehash = new LRULinkedHashMap<TileHashFile, byte[]>(MAX_CACHED_TILEHASHFILES);
+    private final Object lock = new Object();
+    private final LRULinkedHashMap<TileHashFile, byte[]> tilehash = new LRULinkedHashMap<>(MAX_CACHED_TILEHASHFILES);
     
     public TileHashManager(File tileroot, boolean enabled) {
         tiledir = tileroot;

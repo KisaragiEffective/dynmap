@@ -7,7 +7,7 @@ import java.util.List;
 import org.dynmap.utils.MapChunkCache;
 
 public abstract class MapTile {
-    protected DynmapWorld world;
+    protected final DynmapWorld world;
 
     public abstract boolean render(MapChunkCache cache, String mapname);
     public abstract List<DynmapChunk> getRequiredChunks();

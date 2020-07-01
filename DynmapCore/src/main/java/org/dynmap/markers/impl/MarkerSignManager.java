@@ -30,12 +30,12 @@ public class MarkerSignManager {
         @Override
         public void signChangeEvent(String material, String wname, int x, int y, int z, String[] lines, DynmapPlayer p) {
             if(mgr == null)
-                return;			
-			
+                return;            
+            
             if(!lines[0].equalsIgnoreCase("[dynmap]")) {  /* If not dynmap sign, quit */
                 return;
             }
-			
+            
             /* If allowed to do marker signs */
             if((p == null) || ((plugin != null) && (plugin.checkPlayerPermission(p, "marker.sign")))) {
                 String id = getSignMarkerID(wname, x, y, z);  /* Get marker ID */
@@ -55,9 +55,9 @@ public class MarkerSignManager {
                     }
                     else if(v.length() > 0) {
                         if(label.length() > 0) {
-                            label = label + "<br/>";
+                            label += "<br/>";
                         }
-                        label = label + escapeMarkup(v);
+                        label += escapeMarkup(v);
                     }
                 }
                 /* Get the set and see if the marker is already defined */
@@ -105,7 +105,7 @@ public class MarkerSignManager {
             if(mgr == null)
                 return;
             if(sign_cache == null) {    /* Initialize sign cache */
-                sign_cache = new HashMap<String, SignRec>();
+                sign_cache = new HashMap<>();
                 Set<MarkerSet> sets = MarkerAPIImpl.api.getMarkerSets();
                 for(MarkerSet ms : sets) {
                     for(Marker m : ms.getMarkers()) {

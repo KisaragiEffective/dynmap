@@ -9,7 +9,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.dynmap.DynmapChunk;
-import org.dynmap.Log;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.Polygon;
@@ -26,7 +25,7 @@ public abstract class BukkitVersionHelper {
         return true;
     }
     protected boolean isBiomeBaseListNeeded() {
-    	return true;
+        return true;
     }
 
     protected BukkitVersionHelper() {
@@ -143,40 +142,40 @@ public abstract class BukkitVersionHelper {
         stateByID = new DynmapBlockState[16*blkname.length];
         Arrays.fill(stateByID, DynmapBlockState.AIR);
         for (int i = 0; i < blkname.length; i++) {
-        	if (blkname[i] == null) continue;
-        	String bn = blkname[i];
-        	if (bn.indexOf(':') < 0) {
-        		bn = "minecraft:" + bn;
-        	}
+            if (blkname[i] == null) continue;
+            String bn = blkname[i];
+            if (bn.indexOf(':') < 0) {
+                bn = "minecraft:" + bn;
+            }
             // Only do defined names, and not "air"
             if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                 BukkitMaterial mat = blkmat[i];
                 DynmapBlockState basebs = null;
                 for (int m = 0; m < 16; m++) {
-                	String sn = helper.getStateStringByCombinedId(i, m);
+                    String sn = helper.getStateStringByCombinedId(i, m);
                     DynmapBlockState bs = new DynmapBlockState(basebs, m, bn, sn, mat.name, i);
                     if (basebs == null) basebs = bs;
                     stateByID[(i << 4) + m] = bs;
                     if (mat != null) {
-                    	if (mat.name.equals("AIR")) {
-                        	bs.setAir();
-                    	}
-                    	if (mat.name.equals("LEAVES")) {
-                        	bs.setLeaves();
-                    	}
-                    	if (mat.name.equals("WOOD")) {
-                        	bs.setLog();
-                    	}
-                    	if (mat.isSolid) {
-                    		bs.setSolid();
-                    	}
+                        if (mat.name.equals("AIR")) {
+                            bs.setAir();
+                        }
+                        if (mat.name.equals("LEAVES")) {
+                            bs.setLeaves();
+                        }
+                        if (mat.name.equals("WOOD")) {
+                            bs.setLog();
+                        }
+                        if (mat.isSolid) {
+                            bs.setSolid();
+                        }
                     }                    
                 }
             }
         }
         //for (int gidx = 0; gidx < DynmapBlockState.getGlobalIndexMax(); gidx++) {
-        //	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
-        //	Log.verboseinfo(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
+        //    DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
+        //    Log.verboseinfo(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
         //}
     }
     /**
@@ -190,24 +189,24 @@ public abstract class BukkitVersionHelper {
         c.setChunks(dw, chunks);
         return c;
     }
-	public Object[] getBlockIDFieldFromSnapshot(ChunkSnapshot css) {
-		return null;
-	}
-	/**
-	 * Get biome base water multiplier
-	 */
-	public int getBiomeBaseWaterMult(Object bb) {
-		return -1;
-	}
+    public Object[] getBlockIDFieldFromSnapshot(ChunkSnapshot css) {
+        return null;
+    }
+    /**
+     * Get biome base water multiplier
+     */
+    public int getBiomeBaseWaterMult(Object bb) {
+        return -1;
+    }
 
-	public abstract String getStateStringByCombinedId(int blkid, int meta);
-	
-	// Send title/subtitle to user
+    public abstract String getStateStringByCombinedId(int blkid, int meta);
+    
+    // Send title/subtitle to user
     public void sendTitleText(Player p, String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTIcks) {
-    	// Do send message for old implementations
-    	if (p != null) {
-    		if (title != null) p.sendMessage(title);
-    		if (subtitle != null) p.sendMessage(subtitle);
-    	}
+        // Do send message for old implementations
+        if (p != null) {
+            if (title != null) p.sendMessage(title);
+            if (subtitle != null) p.sendMessage(subtitle);
+        }
     }
 }

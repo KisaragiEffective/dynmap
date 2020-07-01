@@ -130,8 +130,8 @@ public class DynmapMod
     @EventHandler
     public void serverStopping(FMLServerStoppingEvent event)
     {
-    	proxy.stopServer(plugin);
-    	plugin = null;
+        proxy.stopServer(plugin);
+        plugin = null;
     }
     @NetworkCheckHandler
     public boolean netCheckHandler(Map<String, String> mods, Side side) {

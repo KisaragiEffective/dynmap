@@ -6,8 +6,8 @@ import org.dynmap.DynmapCore;
 import org.dynmap.Log;
 
 public class RegionsComponent extends Component {
-    private static String deprecated_ids[] = { "Residence", "Factions", "Towny", "WorldGuard" };
-    private static String deprecated_new_plugins[] = { "dynmap-residence", "Dynmap-Factions", "Dynmap-Towny", "Dynmap-WorldGuard" };
+    private static final String[] deprecated_ids = { "Residence", "Factions", "Towny", "WorldGuard" };
+    private static final String[] deprecated_new_plugins = { "dynmap-residence", "Dynmap-Factions", "Dynmap-Towny", "Dynmap-WorldGuard" };
     
     public RegionsComponent(final DynmapCore plugin, final ConfigurationNode configuration) {
         super(plugin, configuration);

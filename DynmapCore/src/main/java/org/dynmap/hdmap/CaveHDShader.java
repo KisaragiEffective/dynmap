@@ -1,15 +1,10 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;
 
-import org.dynmap.Color;
-import org.dynmap.ConfigurationNode;
-import org.dynmap.DynmapCore;
-import org.dynmap.MapManager;
+import org.dynmap.*;
 import org.dynmap.common.DynmapCommandSender;
 import org.dynmap.exporter.OBJExport;
 import org.dynmap.renderer.DynmapBlockState;
@@ -20,9 +15,9 @@ import org.dynmap.utils.MapIterator;
 import org.json.simple.JSONObject;
 
 public class CaveHDShader implements HDShader {
-    private String name;
-    private boolean iflit;
-    private BitSet hiddenids = new BitSet();
+    private final String name;
+    private final boolean iflit;
+    private final BitSet hiddenids = new BitSet();
 
     private void setHidden(DynmapBlockState blk) {
         hiddenids.set(blk.globalStateIndex);
@@ -43,19 +38,18 @@ public class CaveHDShader implements HDShader {
         iflit = configuration.getBoolean("onlyiflit", false);
         
         for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); i++) {
-        	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-        	if (bs.isAir() || bs.isWater()) {
-        		setHidden(bs);
-        	}
+            DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+            if (bs.isAir() || bs.isWater()) {
+                setHidden(bs);
+            }
         }
 
         List<Object> hidden = configuration.getList("hiddennames");
         if(hidden != null) {
-            for(Object o : hidden) {
-                if(o instanceof String) {
-                    setHidden((String) o);
-                }
-            }
+            hidden.stream()
+                    .filter(o -> o instanceof String)
+                    .map(o -> (String) o)
+                    .forEach(this::setHidden);
         }
         else {
             setHidden(DynmapBlockState.LOG_BLOCK);
@@ -67,10 +61,10 @@ public class CaveHDShader implements HDShader {
             setHidden(DynmapBlockState.ICE_BLOCK);
             setHidden(DynmapBlockState.SNOW_LAYER_BLOCK);
             for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); i++) {
-            	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-            	if (bs.isLeaves() || bs.isSnow() || bs.isLog()) {
-            		setHidden(bs);
-            	}
+                DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+                if (bs.isLeaves() || bs.isSnow() || bs.isLog()) {
+                    setHidden(bs);
+                }
             }
         }
     }
@@ -111,9 +105,9 @@ public class CaveHDShader implements HDShader {
     }
     
     private class OurShaderState implements HDShaderState {
-        private Color color;
-        protected MapIterator mapiter;
-        protected HDMap map;
+        private final Color color;
+        protected final MapIterator mapiter;
+        protected final HDMap map;
         private boolean air;
         private int yshift;
         final int[] lightingTable;
@@ -183,11 +177,11 @@ public class CaveHDShader implements HDShader {
                 return false;
             }
             if (blocktype.isAir() && !air) {
-            	if(iflit && (ps.getMapIterator().getBlockEmittedLight() == 0)) {
-            		return false;
-            	}
+                if(iflit && (ps.getMapIterator().getBlockEmittedLight() == 0)) {
+                    return false;
+                }
                 int cr, cg, cb;
-                int mult = 256;
+                int mult;
 
                 int ys = mapiter.getY() >> yshift;
                 if (ys < 64) {
@@ -271,7 +265,7 @@ public class CaveHDShader implements HDShader {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "shader", name);
+        JSONUtils.setValue(mapObject, "shader", name);
     }
     @Override
     public void exportAsMaterialLibrary(DynmapCommandSender sender, OBJExport out) throws IOException {

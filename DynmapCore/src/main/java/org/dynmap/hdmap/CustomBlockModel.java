@@ -17,7 +17,7 @@ public class CustomBlockModel extends HDBlockModel {
         try {
             Class<?> cls = Class.forName(classname);   /* Get class */
             render = (CustomRenderer) cls.newInstance();
-            if(render.initializeRenderer(HDBlockModels.pdf, bstate.blockName, databits, classparm) == false) {
+            if(!render.initializeRenderer(HDBlockModels.pdf, bstate.blockName, databits, classparm)) {
                 Log.severe("Error loading custom renderer - " + classname);
                 render = null;
             }

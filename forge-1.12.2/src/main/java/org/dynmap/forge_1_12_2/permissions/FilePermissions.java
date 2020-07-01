@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,7 +15,7 @@ import org.dynmap.Log;
 import org.dynmap.forge_1_12_2.DynmapPlugin;
 
 public class FilePermissions implements PermissionProvider {
-    private HashMap<String, Set<String>> perms;
+    private final HashMap<String, Set<String>> perms;
     private Set<String> defperms;
     
     public static FilePermissions create() {
@@ -30,21 +31,20 @@ public class FilePermissions implements PermissionProvider {
     }
     
     private FilePermissions(ConfigurationNode cfg) {
-        perms = new HashMap<String,Set<String>>();
-        for(String k : cfg.keySet()) {
-            List<String> p = cfg.getStrings(k, null);
-            if(p != null) {
-                k = k.toLowerCase();
-                HashSet<String> pset = new HashSet<String>();
-                for(String perm : p) {
-                    pset.add(perm.toLowerCase());
-                }
-                perms.put(k,  pset);
-                if(k.equals("defaultuser")) {
-                    defperms = pset;
+        perms = new HashMap<>();
+        cfg.keySet().forEach(k2 -> {
+            List<String> strings = cfg.getStrings(k2, null);
+            if (strings != null) {
+                final String k = k2.toLowerCase();
+                Set<String> lowercase = strings.stream()
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toCollection(HashSet::new));
+                perms.put(k, lowercase);
+                if (k.equals("defaultuser")) {
+                    defperms = lowercase;
                 }
             }
-        }
+        });
     }
 
     private boolean hasPerm(String player, String perm) {
@@ -52,24 +52,20 @@ public class FilePermissions implements PermissionProvider {
         if((ps != null) && (ps.contains(perm))) {
             return true;
         }
-        if(defperms.contains(perm)) {
-            return true;
-        }
-        return false;
+        return defperms.contains(perm);
     }
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
         player = player.toLowerCase();
-        HashSet<String> rslt = new HashSet<String>();
+        HashSet<String> rslt;
         if(DynmapPlugin.plugin.isOp(player)) {
-            rslt.addAll(perms);
+            rslt = new HashSet<>(perms);
         }
         else {
-            for(String p : perms) {
-                if(hasPerm(player, p)) {
-                    rslt.add(p);
-                }
-            }
+            final String fp = player;
+            rslt = perms.stream()
+                    .filter(p -> hasPerm(fp, p))
+                    .collect(Collectors.toCollection(HashSet::new));
         }
         return rslt;
     }

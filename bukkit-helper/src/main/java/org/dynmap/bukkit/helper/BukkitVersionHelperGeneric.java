@@ -3,7 +3,6 @@ package org.dynmap.bukkit.helper;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -29,22 +28,22 @@ import com.google.gson.JsonParseException;
  * Helper for isolation of bukkit version specific issues
  */
 public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
-    private String obc_package; // Package used for org.bukkit.craftbukkit
-    protected String nms_package; // Package used for net.minecraft.server
+    private final String obc_package; // Package used for org.bukkit.craftbukkit
+    protected final String nms_package; // Package used for net.minecraft.server
     private boolean failed;
     protected static final Object[] nullargs = new Object[0];
     protected static final Class<?>[] nulltypes = new Class[0];
     private static final Map<?, ?> nullmap = Collections.emptyMap();
     
     /** CraftChunkSnapshot */
-    protected Class<?> craftchunksnapshot;
+    protected final Class<?> craftchunksnapshot;
     private Field ccss_biome;
     /** CraftChunk */
-    private Class<?> craftchunk;
-    private Method cc_gethandle;
+    private final Class<?> craftchunk;
+    private final Method cc_gethandle;
     /** CraftWorld */
-    private Class<?> craftworld;
-    private Method cw_gethandle;
+    private final Class<?> craftworld;
+    private final Method cw_gethandle;
 
     /** BiomeBase related helpers */
     protected Class<?> biomestorage;
@@ -105,18 +104,18 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
     protected Method nmsbp_getz;
     
     /** Server */
-    protected Method server_getonlineplayers;
+    protected final Method server_getonlineplayers;
     /** Player */
-    protected Method player_gethealth;
+    protected final Method player_gethealth;
     // CraftPlayer
-    private Class<?> obc_craftplayer;
-    private Method obcplayer_getprofile;
+    private final Class<?> obc_craftplayer;
+    private final Method obcplayer_getprofile;
     // GameProfile
-    private Class<?> cma_gameprofile;
-    private Method cmaprofile_getproperties;
+    private final Class<?> cma_gameprofile;
+    private final Method cmaprofile_getproperties;
     // Property
-    private Class<?> cma_property;
-    private Method cmaproperty_getvalue;
+    private final Class<?> cma_property;
+    private final Method cmaproperty_getvalue;
 
     protected BukkitVersionHelperGeneric() {
         failed = false;
@@ -156,8 +155,8 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
         cmaprofile_getproperties = getMethod(cma_gameprofile, new String[] { "getProperties" }, new Class[0]);
         // Property
         cma_property = getOBCClass("com.mojang.authlib.properties.Property");
-	    cmaproperty_getvalue = getMethod(cma_property, new String[] { "getValue" }, new Class[0]);
-        		
+        cmaproperty_getvalue = getMethod(cma_property, new String[] { "getValue" }, new Class[0]);
+
         /* Get NMS classes and fields */
         if(!failed)
             loadNMS();
@@ -379,7 +378,7 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
     public boolean isInUnloadQueue(Object unloadqueue, int x, int z) {
         if(unloadqueue != null) {
             if (cps_unloadqueue_isSet)
-                return ((Set) unloadqueue).contains(Long.valueOf((long)x & 0xFFFFFFFF | ((long)z & 0xFFFFFFFF) << 32));
+                return ((Set<Long>) unloadqueue).contains((long) x | ((long) z) << 32);
             return (Boolean)callMethod(unloadqueue, lhs_containskey, new Object[] { x, z }, true);
         }
         return true;
@@ -398,7 +397,7 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
     /**
      * Get inhabited ticks count from chunk
      */
-    private static final Long zero = new Long(0);
+    private static final Long zero = 0L;
     public long getInhabitedTicks(Chunk c) {
         if (nmsc_inhabitedticks == null) {
             return 0;
@@ -553,32 +552,32 @@ public abstract class BukkitVersionHelperGeneric extends BukkitVersionHelper {
      * @param player
      */
     public String getSkinURL(Player player) {
-    	String url = null;
+        String url = null;
         Object profile = callMethod(player, obcplayer_getprofile, nullargs, null);
-    	if (profile != null) {
-    		Object propmap = callMethod(profile, cmaprofile_getproperties, nullargs, null);
-    		if ((propmap != null) && (propmap instanceof ForwardingMultimap)) {
-    			ForwardingMultimap<String, Object> fmm = (ForwardingMultimap<String, Object>) propmap;
-    			Collection<Object> txt = fmm.get("textures");
-    	        Object textureProperty = Iterables.getFirst(fmm.get("textures"), null);
-    	        if (textureProperty != null) {
-    				String val = (String) callMethod(textureProperty, cmaproperty_getvalue, nullargs, null);
-    				if (val != null) {
-    					TexturesPayload result = null;
-    					try {
-    						String json = new String(Base64Coder.decode(val), Charsets.UTF_8);
-    						result = gson.fromJson(json, TexturesPayload.class);
-    					} catch (JsonParseException e) {
-    					}
-    					if ((result != null) && (result.textures != null) && (result.textures.containsKey("SKIN"))) {
-    						url = result.textures.get("SKIN").url;
-    					}
-    				}
-    			}
-    		}
-    	}
-    	
-    	return url;
+        if (profile != null) {
+            Object propmap = callMethod(profile, cmaprofile_getproperties, nullargs, null);
+            if ((propmap != null) && (propmap instanceof ForwardingMultimap)) {
+                ForwardingMultimap<String, Object> fmm = (ForwardingMultimap<String, Object>) propmap;
+                Collection<Object> txt = fmm.get("textures");
+                Object textureProperty = Iterables.getFirst(fmm.get("textures"), null);
+                if (textureProperty != null) {
+                    String val = (String) callMethod(textureProperty, cmaproperty_getvalue, nullargs, null);
+                    if (val != null) {
+                        TexturesPayload result = null;
+                        try {
+                            String json = new String(Base64Coder.decode(val), Charsets.UTF_8);
+                            result = gson.fromJson(json, TexturesPayload.class);
+                        } catch (JsonParseException e) {
+                        }
+                        if ((result != null) && (result.textures != null) && (result.textures.containsKey("SKIN"))) {
+                            url = result.textures.get("SKIN").url;
+                        }
+                    }
+                }
+            }
+        }
+
+        return url;
     }
 
 }

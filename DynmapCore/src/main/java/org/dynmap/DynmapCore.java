@@ -17,19 +17,10 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -56,6 +47,7 @@ import org.dynmap.storage.mariadb.MariaDBMapStorage;
 import org.dynmap.storage.sqllte.SQLiteMapStorage;
 import org.dynmap.storage.postgresql.PostgreSQLMapStorage;
 import org.dynmap.utils.BlockStep;
+import org.dynmap.utils.EnumerationIntoIterator;
 import org.dynmap.utils.ImageIOManager;
 import org.dynmap.web.BanIPFilter;
 import org.dynmap.web.CustomHeaderFilter;
@@ -74,7 +66,7 @@ import org.eclipse.jetty.util.resource.FileResource;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
 import javax.servlet.http.HttpServlet;
 
 public class DynmapCore implements DynmapCommonAPI {
@@ -100,35 +92,47 @@ public class DynmapCore implements DynmapCommonAPI {
     public PlayerList playerList;
     public ConfigurationNode configuration;
     public ConfigurationNode world_config;
-    public ComponentManager componentManager = new ComponentManager();
-    public DynmapListenerManager listenerManager = new DynmapListenerManager(this);
+    public final ComponentManager componentManager = new ComponentManager();
+    public final DynmapListenerManager listenerManager = new DynmapListenerManager(this);
     public PlayerFaces playerfacemgr;
     public SkinUrlProvider skinUrlProvider;
     public Events events = new Events();
     public String deftemplatesuffix = "";
-    private DynmapMapCommands dmapcmds = new DynmapMapCommands();
-    private DynmapExpCommands dynmapexpcmds = new DynmapExpCommands();
+    private final DynmapMapCommands dmapcmds = new DynmapMapCommands();
+    private final DynmapExpCommands dynmapexpcmds = new DynmapExpCommands();
     boolean bettergrass = false;
     boolean smoothlighting = false;
     private boolean ctmsupport = false;
     private boolean customcolorssupport = false;
     private String def_image_format = "png";
-    private HashSet<String> enabledTriggers = new HashSet<String>();
+    private final Set<String> enabledTriggers = new HashSet<>();
     public boolean disable_chat_to_web = false;
     private WebAuthManager authmgr;
     public boolean player_info_protected;
     private boolean transparentLeaves = true;
     private List<String> sortPermissionNodes;
-    private int perTickLimit = 50;   // 50 ms
+    /**
+     * Specify tick limit in milliseconds.
+     */
+    private int perTickLimit = 50;
     private boolean dumpMissing = false;
     private static boolean migrate_chunks = false;
-        
-    private int     config_hashcode;    /* Used to signal need to reload web configuration (world changes, config update, etc) */
-    private int fullrenderplayerlimit;  /* Number of online players that will cause fullrender processing to pause */
-    private int updateplayerlimit;  /* Number of online players that will cause update processing to pause */
+
+    /**
+     *  Used to signal need to reload web configuration (world changes, config update, etc)
+     */
+    private int config_hashcode;
+    /**
+     * Number of online players that will cause fullrender processing to pause
+     */
+    private int fullrenderplayerlimit;
+    /**
+     * Number of online players that will cause update processing to pause
+     */
+    private int updateplayerlimit;
     private boolean didfullpause;
     private boolean didupdatepause;
-    private Map<String, LinkedList<String>> ids_by_ip = new HashMap<String, LinkedList<String>>();
+    private final Map<String, Deque<String>> ids_by_ip = new HashMap<>();
     private boolean persist_ids_by_ip = false;
     private int snapshotcachesize;
     private boolean snapshotsoftref;
@@ -142,7 +146,7 @@ public class DynmapCore implements DynmapCommonAPI {
     public boolean is_reload = false;
     public static boolean ignore_chunk_loads = false; /* Flag keep us from processing our own chunk loads */
 
-    private MarkerAPIImpl   markerapi;
+    private MarkerAPIImpl markerapi;
     
     private File dataDirectory;
     private File tilesDirectory;
@@ -210,7 +214,7 @@ public class DynmapCore implements DynmapCommonAPI {
         biomenames = names;
     }
     
-    public static final boolean migrateChunks() {
+    public static boolean migrateChunks() {
         return migrate_chunks;
     }
 
@@ -319,35 +323,39 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         /* Now process files */
         String[] templates = templatedir.list();
+        // if `templates` is null, NPE occurs
+        if (templates == null) return;
         /* Go through list - process all ones not starting with 'custom' first */
-        for(String tname: templates) {
-            /* If matches naming convention */
-            if(tname.endsWith(".txt") && (!tname.startsWith(CUSTOM_PREFIX))) {
-                File tf = new File(templatedir, tname);
-                ConfigurationNode cn = new ConfigurationNode(tf);
-                cn.load();
-                /* Supplement existing values (don't replace), since configuration.txt is more custom than these */
-                mergeConfigurationBranch(cn, "templates", false, false);
-            }
-        }
+        /* If matches naming convention */
+        /* Supplement existing values (don't replace), since configuration.txt is more custom than these */
+        Arrays.stream(templates)
+                .filter(tname -> tname.endsWith(".txt"))
+                .filter(tname -> (!tname.startsWith(CUSTOM_PREFIX)))
+                .map(tname -> new File(templatedir, tname))
+                .map(ConfigurationNode::new)
+                .forEachOrdered(cn -> {
+                    cn.load();
+                    mergeConfigurationBranch(cn, "templates", false, false);
+                });
         /* Go through list again - this time do custom- ones */
-        for(String tname: templates) {
-            /* If matches naming convention */
-            if(tname.endsWith(".txt") && tname.startsWith(CUSTOM_PREFIX)) {
-                File tf = new File(templatedir, tname);
-                ConfigurationNode cn = new ConfigurationNode(tf);
-                cn.load();
-                /* This are overrides - replace even configuration.txt content */
-                mergeConfigurationBranch(cn, "templates", true, false);
-            }
-        }
+        /* If matches naming convention */
+        /* This are overrides - replace even configuration.txt content */
+        Arrays.stream(templates)
+                .filter(tname -> tname.endsWith(".txt"))
+                .filter(tname -> tname.startsWith(CUSTOM_PREFIX))
+                .map(tname -> new File(templatedir, tname))
+                .map(ConfigurationNode::new)
+                .forEachOrdered(cn -> {
+                    cn.load();
+                    mergeConfigurationBranch(cn, "templates", true, false);
+                });
     }
 
     public boolean enableCore() {
-        boolean rslt = initConfiguration(null);
-        if (rslt)
-            rslt = enableCore(null);
-        return rslt;
+        boolean result = initConfiguration(null);
+        if (result)
+            result = enableCore(null);
+        return result;
     }
 
     public boolean initConfiguration(EnableCoreCallbacks cb) {
@@ -381,24 +389,26 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         // Create default storage handler
         String storetype = configuration.getString("storage/type", "filetree");
-        if (storetype.equals("filetree")) {
-            defaultStorage = new FileTreeMapStorage();
-        }
-        else if (storetype.equals("sqlite")) {
-            defaultStorage = new SQLiteMapStorage();
-        }
-        else if (storetype.equals("mysql")) {
-            defaultStorage = new MySQLMapStorage();
-        }
-        else if (storetype.equals("mariadb")) {
-            defaultStorage = new MariaDBMapStorage();
-        }
-        else if (storetype.equals("postgres") || storetype.equals("postgresql")) {
-            defaultStorage = new PostgreSQLMapStorage();
-        }
-        else {
-            Log.severe("Invalid storage type for map data: " + storetype);
-            return false;
+        switch (storetype) {
+            case "filetree":
+                defaultStorage = new FileTreeMapStorage();
+                break;
+            case "sqlite":
+                defaultStorage = new SQLiteMapStorage();
+                break;
+            case "mysql":
+                defaultStorage = new MySQLMapStorage();
+                break;
+            case "mariadb":
+                defaultStorage = new MariaDBMapStorage();
+                break;
+            case "postgres":
+            case "postgresql":
+                defaultStorage = new PostgreSQLMapStorage();
+                break;
+            default:
+                Log.severe("Invalid storage type for map data: " + storetype);
+                return false;
         }
         if (!defaultStorage.init(this)) {
             Log.severe("Map storage initialization failure");
@@ -442,22 +452,18 @@ public class DynmapCore implements DynmapCommonAPI {
         customcolorssupport = configuration.getBoolean("custom-colors-support", true);
         Log.verbose = configuration.getBoolean("verbose", true);
         deftemplatesuffix = configuration.getString("deftemplatesuffix", "");
-        /* Get snapshot cache size */
         snapshotcachesize = configuration.getInteger("snapshotcachesize", 500);
         /* Get soft ref flag for cache (weak=false, soft=true) */
         snapshotsoftref = configuration.getBoolean("soft-ref-cache", true);
-        /* Default better-grass */
         bettergrass = configuration.getBoolean("better-grass", false);
         /* Load full render processing player limit */
         fullrenderplayerlimit = configuration.getInteger("fullrenderplayerlimit", 0);
         /* Load update render processing player limit */
         updateplayerlimit = configuration.getInteger("updateplayerlimit", 0);
-        /* Load sort permission nodes */
         sortPermissionNodes = configuration.getStrings("player-sort-permission-nodes", null);
         
-        perTickLimit = configuration.getInteger("per-tick-time-limit", 50);
-        if (perTickLimit < 5) perTickLimit = 5;
-        
+        perTickLimit = Math.min(configuration.getInteger("per-tick-time-limit", 50), 5);
+
         dumpMissing = configuration.getBoolean("dump-missing-blocks", false);
         
         migrate_chunks = configuration.getBoolean("migrate-chunks",  false);
@@ -509,7 +515,7 @@ public class DynmapCore implements DynmapCommonAPI {
         mapManager.startRendering();
 
         if (markerapi != null) {
-        	MarkerAPIImpl.completeInitializeMarkerAPI(markerapi);
+            MarkerAPIImpl.completeInitializeMarkerAPI(markerapi);
         }
         
         playerfacemgr = new PlayerFaces(this);
@@ -521,17 +527,12 @@ public class DynmapCore implements DynmapCommonAPI {
         loadWebserver();
 
         enabledTriggers.clear();
-        List<String> triggers = configuration.getStrings("render-triggers", new ArrayList<String>());
-        if ((triggers != null) && (triggers.size() > 0)) 
-        {
-            for (Object trigger : triggers) {
-                enabledTriggers.add((String) trigger);
-            }
+        List<String> triggers = configuration.getStrings("render-triggers", Collections.emptyList());
+        if ((triggers != null) && (triggers.size() > 0)) {
+            enabledTriggers.addAll(triggers);
         }
         else {
-            for (String def : deftriggers) {
-                enabledTriggers.add(def);
-            }
+            Collections.addAll(enabledTriggers, deftriggers);
         }
         
         // Load components.
@@ -545,18 +546,8 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         
         /* Add login/logoff listeners */
-        listenerManager.addListener(EventType.PLAYER_JOIN, new DynmapListenerManager.PlayerEventListener() {
-            @Override
-            public void playerEvent(DynmapPlayer p) {
-                playerJoined(p);
-            }
-        });
-        listenerManager.addListener(EventType.PLAYER_QUIT, new DynmapListenerManager.PlayerEventListener() {
-            @Override
-            public void playerEvent(DynmapPlayer p) {
-                playerQuit(p);
-            }
-        });
+        listenerManager.addListener(EventType.PLAYER_JOIN, (DynmapListenerManager.PlayerEventListener) this::playerJoined);
+        listenerManager.addListener(EventType.PLAYER_QUIT, (DynmapListenerManager.PlayerEventListener) this::playerQuit);
         
         /* Print version info */
         Log.info("version " + plugin_ver + " is enabled - core version " + version );
@@ -564,7 +555,7 @@ public class DynmapCore implements DynmapCommonAPI {
         Log.info("To report or track bugs, visit https://github.com/webbukkit/dynmap/issues");
         Log.info("If you'd like to donate, please visit https://www.patreon.com/dynmap or https://ko-fi.com/michaelprimm");
 
-        events.<Object>trigger("initialized", null);
+        events.trigger("initialized", null);
                 
         //dumpColorMap("standard.txt", "standard");
         //dumpColorMap("dokudark.txt", "dokudark.zip");
@@ -576,14 +567,14 @@ public class DynmapCore implements DynmapCommonAPI {
 //        Log.info("Block Name dump");
 //        Log.info("---------------");
 //        for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); ) {
-//        	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-//        	if (bs != null) {
-//        		Log.info(String.format("%d,%s,%d", i, bs.blockName, bs.getStateCount()));
-//        		i += bs.getStateCount();
-//        	}
-//        	else {
-//        		i++;
-//        	}
+//            DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+//            if (bs != null) {
+//                Log.info(String.format("%d,%s,%d", i, bs.blockName, bs.getStateCount()));
+//                i += bs.getStateCount();
+//            }
+//            else {
+//                i++;
+//            }
 //        }
 //        Log.info("---------------");
         return true;
@@ -592,9 +583,7 @@ public class DynmapCore implements DynmapCommonAPI {
     void dumpColorMap(String id, String name) {
         int[] sides = new int[] { BlockStep.Y_MINUS.ordinal(), BlockStep.X_PLUS.ordinal(), BlockStep.Z_PLUS.ordinal(), 
                 BlockStep.Y_PLUS.ordinal(), BlockStep.X_MINUS.ordinal(), BlockStep.Z_MINUS.ordinal() };
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(id);
+        try (FileWriter fw = new FileWriter(id)) {
             TexturePack tp = TexturePack.getTexturePack(this, name);
             if (tp == null) return;
             tp = tp.resampleTexturePack(1);
@@ -609,12 +598,12 @@ public class DynmapCore implements DynmapCommonAPI {
                 for (int i = 0; (!done) && (i < sides.length); i++) {
                     int idx = map.getIndexForFace(sides[i]);
                     if (idx < 0) continue;
-                    int rgb[] = tp.getTileARGB(idx % 1000000);
+                    int[] rgb = tp.getTileARGB(idx % 1000000);
                     if (rgb == null) continue;
                     if (rgb[0] == 0) continue;
                     c.setARGB(rgb[0]);
                     idx = (idx / 1000000);
-                    switch(idx) {
+                    switch (idx) {
                         case 1: // grass
                         case 18: // grass
                             System.out.println("Used grass for " + blk);
@@ -655,37 +644,34 @@ public class DynmapCore implements DynmapCommonAPI {
                         }
                         c.blendColor(custmult);
                     }
-                    String ln = "";
+                    String ln;
                     if (blk.stateIndex == 0) {
                         meta0color = c.getARGB();
                         ln = blk.blockName + " ";
-                    }
-                    else {
+                    } else {
                         ln = blk + " ";
                     }
                     if ((blk.stateIndex == 0) || (meta0color != c.getARGB())) {
                         ln += c.getRed() + " " + c.getGreen() + " " + c.getBlue() + " " + c.getAlpha();
-                        ln += " " + (c.getRed()*4/5) + " " + (c.getGreen()*4/5) + " " + (c.getBlue()*4/5) + " " + c.getAlpha();
-                        ln += " " + (c.getRed()/2) + " " + (c.getGreen()/2) + " " + (c.getBlue()/2) + " " + c.getAlpha();
-                        ln += " " + (c.getRed()*2/5) + " " + (c.getGreen()*2/5) + " " + (c.getBlue()*2/5) + " " + c.getAlpha() + "\n";
+                        ln += " " + (c.getRed() * 4 / 5) + " " + (c.getGreen() * 4 / 5) + " " + (c.getBlue() * 4 / 5) + " " + c.getAlpha();
+                        ln += " " + (c.getRed() / 2) + " " + (c.getGreen() / 2) + " " + (c.getBlue() / 2) + " " + c.getAlpha();
+                        ln += " " + (c.getRed() * 2 / 5) + " " + (c.getGreen() * 2 / 5) + " " + (c.getBlue() * 2 / 5) + " " + c.getAlpha() + "\n";
                         fw.write(ln);
                     }
                     done = true;
                 }
             }
         } catch (IOException iox) {
-        } finally {
-            if (fw != null) { try { fw.close(); } catch (IOException x) {} }
         }
     }
 
     private void playerJoined(DynmapPlayer p) {
         playerList.updateOnlinePlayers(null);
         if((fullrenderplayerlimit > 0) || (updateplayerlimit > 0)) {
-            int pcnt = getServer().getOnlinePlayers().length;
+            int playersCount = getServer().getOnlinePlayers().length;
             
-            if ((fullrenderplayerlimit > 0) && (pcnt == fullrenderplayerlimit)) {
-                if(getPauseFullRadiusRenders() == false) {  /* If not paused, pause it */
+            if ((fullrenderplayerlimit > 0) && (playersCount == fullrenderplayerlimit)) {
+                if(!getPauseFullRadiusRenders()) {  /* If not paused, pause it */
                     setPauseFullRadiusRenders(true);
                     Log.info("Pause full/radius renders - player limit reached");
                     didfullpause = true;
@@ -694,8 +680,8 @@ public class DynmapCore implements DynmapCommonAPI {
                     didfullpause = false;
                 }
             }
-            if ((updateplayerlimit > 0) && (pcnt == updateplayerlimit)) {
-                if(getPauseUpdateRenders() == false) {  /* If not paused, pause it */
+            if ((updateplayerlimit > 0) && (playersCount == updateplayerlimit)) {
+                if(!getPauseUpdateRenders()) {  /* If not paused, pause it */
                     setPauseUpdateRenders(true);
                     Log.info("Pause tile update renders - player limit reached");
                     didupdatepause = true;
@@ -709,13 +695,14 @@ public class DynmapCore implements DynmapCommonAPI {
         InetSocketAddress addr = p.getAddress();
         if(addr != null) {
             String ip = addr.getAddress().getHostAddress();
-            LinkedList<String> ids = ids_by_ip.get(ip);
+            Deque<String> ids = ids_by_ip.get(ip);
             if(ids == null) {
-                ids = new LinkedList<String>();
+                ids = new ArrayDeque<>();
                 ids_by_ip.put(ip, ids);
             }
             String pid = p.getName();
-            if(ids.indexOf(pid) != 0) {
+
+            if(!ids.isEmpty() && !ids.peek().equals(pid)) {
                 ids.remove(pid);    /* Remove from list */
                 ids.addFirst(pid);  /* Put us first on list */
             }
@@ -743,15 +730,15 @@ public class DynmapCore implements DynmapCommonAPI {
         playerList.updateOnlinePlayers(p.getName());
         if ((fullrenderplayerlimit > 0) || (updateplayerlimit > 0)) {
             /* Quitting player is still online at this moment, so discount count by 1 */
-            int pcnt = getServer().getOnlinePlayers().length - 1;
-            if ((fullrenderplayerlimit > 0) && (pcnt == (fullrenderplayerlimit - 1))) {
+            int people = getServer().getOnlinePlayers().length - 1;
+            if ((fullrenderplayerlimit > 0) && (people == (fullrenderplayerlimit - 1))) {
                 if(didfullpause && getPauseFullRadiusRenders()) {  /* Only unpause if we did the pause */
                     setPauseFullRadiusRenders(false);
                     Log.info("Resume full/radius renders - below player limit");
                 }
                 didfullpause = false;
             }
-            if ((updateplayerlimit > 0) && (pcnt == (updateplayerlimit - 1))) {
+            if ((updateplayerlimit > 0) && (people == (updateplayerlimit - 1))) {
                 if(didupdatepause && getPauseUpdateRenders()) {  /* Only unpause if we did the pause */
                     setPauseUpdateRenders(false);
                     Log.info("Resume tile update renders - below player limit");
@@ -771,9 +758,9 @@ public class DynmapCore implements DynmapCommonAPI {
 
     private FileResource createFileResource(String path) {
         try {
-        	File f = new File(path);
-        	URI uri = f.toURI();
-        	URL url = uri.toURL();
+            File f = new File(path);
+            URI uri = f.toURI();
+            URL url = uri.toURL();
             return new FileResource(url);
         } catch(Exception e) {
             Log.info("Could not create file resource");
@@ -790,10 +777,10 @@ public class DynmapCore implements DynmapCommonAPI {
         webhostname = configuration.getString("webserver-bindaddress", ip);
         webport = configuration.getInteger("webserver-port", 8123);
 
-        int maxconnections = configuration.getInteger("max-sessions", 30);
-        if(maxconnections < 2) maxconnections = 2;
-        LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<Runnable>(maxconnections);
-        ExecutorThreadPool pool = new ExecutorThreadPool(maxconnections, 2, queue);
+        int maxSessions = configuration.getInteger("max-sessions", 30);
+        if(maxSessions < 2) maxSessions = 2;
+        BlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(maxSessions);
+        ExecutorThreadPool pool = new ExecutorThreadPool(maxSessions, 2, queue);
 
         webServer = new Server(pool);
         webServer.setSessionIdManager(new DefaultSessionIdManager(webServer));
@@ -801,7 +788,7 @@ public class DynmapCore implements DynmapCommonAPI {
         NetworkTrafficServerConnector connector = new NetworkTrafficServerConnector(webServer);
         connector.setIdleTimeout(5000);
         connector.setAcceptQueueSize(50);
-        if(webhostname.equals("0.0.0.0") == false)
+        if(!webhostname.equals("0.0.0.0"))
             connector.setHost(webhostname);
         connector.setPort(webport);
         webServer.setConnectors(new Connector[]{connector});
@@ -849,7 +836,7 @@ public class DynmapCore implements DynmapCommonAPI {
         else
             Log.verboseinfo("Web server is not permitting symbolic links");
 
-        List<Filter> filters = new LinkedList<Filter>();
+        List<Filter> filters = new LinkedList<>();
         
         /* Check for banned IPs */
         boolean checkbannedips = configuration.getBoolean("check-banned-ips", true);
@@ -922,12 +909,12 @@ public class DynmapCore implements DynmapCommonAPI {
         if (webServer != null) {
             try {
                 webServer.stop();
-                for(int i = 0; i < 100; i++) {	/* Limit wait to 10 seconds */
-                	if(webServer.isStopping())
-                		Thread.sleep(100);
+                for(int i = 0; i < 100; i++) {    /* Limit wait to 10 seconds */
+                    if(webServer.isStopping())
+                        Thread.sleep(100);
                 }
                 if(webServer.isStopping()) {
-                	Log.warning("Graceful shutdown timed out - continuing to terminate");
+                    Log.warning("Graceful shutdown timed out - continuing to terminate");
                 }
             } catch (Exception e) {
                 Log.severe("Failed to stop WebServer!", e);
@@ -937,9 +924,7 @@ public class DynmapCore implements DynmapCommonAPI {
 
         if (componentManager != null) {
             int componentCount = componentManager.components.size();
-            for(Component component : componentManager.components) {
-                component.dispose();
-            }
+            componentManager.components.forEach(Component::dispose);
             componentManager.clear();
             Log.info("Unloaded " + componentCount + " components.");
         }
@@ -977,83 +962,76 @@ public class DynmapCore implements DynmapCommonAPI {
     protected void loadDebuggers() {
         List<ConfigurationNode> debuggersConfiguration = configuration.getNodes("debuggers");
         Debug.clearDebuggers();
-        for (ConfigurationNode debuggerConfiguration : debuggersConfiguration) {
+        debuggersConfiguration.forEach(debuggerConfiguration -> {
             try {
-                Class<?> debuggerClass = Class.forName((String) debuggerConfiguration.getString("class"));
+                Class<?> debuggerClass = Class.forName(debuggerConfiguration.getString("class"));
                 Constructor<?> constructor = debuggerClass.getConstructor(DynmapCore.class, ConfigurationNode.class);
                 Debugger debugger = (Debugger) constructor.newInstance(this, debuggerConfiguration);
                 Debug.addDebugger(debugger);
             } catch (Exception e) {
                 Log.severe("Error loading debugger: " + e);
                 e.printStackTrace();
-                continue;
             }
-        }
+        });
     }
 
     /* Parse argument strings : handle quoted strings */
     public static String[] parseArgs(String[] args, DynmapCommandSender snd) {
-        ArrayList<String> rslt = new ArrayList<String>();
+        List<String> rslt = new ArrayList<>();
         /* Build command line, so we can parse our way - make sure there is trailing space */
-        String cmdline = "";
-        for(int i = 0; i < args.length; i++) {
-            cmdline += args[i] + " ";
-        }
-        boolean inquote = false;
+        String cmdline = String.join(" ", args);
+        boolean inDoubleQuote = false;
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < cmdline.length(); i++) {
             char c = cmdline.charAt(i);
-            if(inquote) {   /* If in quote, accumulate until end or another quote */
+            if(inDoubleQuote) {   /* If in quote, accumulate until end or another quote */
                 if(c == '\"') { /* End quote */
-                    inquote = false;
-                }
-                else {
+                    inDoubleQuote = false;
+                } else {
                     sb.append(c);
                 }
-            }
-            else if(c == '\"') {    /* Start of quote? */
-                inquote = true;
-            }
-            else if(c == ' ') { /* Ending space? */
+            } else if(c == '\"') {    /* Start of quote? */
+                inDoubleQuote = true;
+            } else if(c == ' ') { /* Ending space? */
                 rslt.add(sb.toString());
                 sb.setLength(0);
-            }
-            else {
+            } else {
                 sb.append(c);
             }
         }
-        if(inquote) {   /* If still in quote, syntax error */
+        if(inDoubleQuote) {   /* If still in quote, syntax error */
             snd.sendMessage("Error: unclosed doublequote");
             return null;
         }
-        return rslt.toArray(new String[rslt.size()]);
+        return rslt.toArray(new String[0]);
     }
 
-    private static final Set<String> commands = new HashSet<String>(Arrays.asList(new String[] {
-        "render",
-        "hide",
-        "show",
-        "version",
-        "fullrender",
-        "cancelrender",
-        "radiusrender",
-        "updaterender",
-        "reload",
-        "stats",
-        "triggerstats",
-        "resetstats",
-        "sendtoweb",
-        "pause",
-        "purgequeue",
-        "purgemap",
-        "purgeworld",
-        "quiet",
-        "ids-for-ip",
-        "ips-for-id",
-        "add-id-for-ip",
-        "del-id-for-ip",
-        "webregister",
-        "help"}));
+    private static final Set<String> commands = new HashSet<>(Arrays.asList(
+            "render",
+            "hide",
+            "show",
+            "version",
+            "fullrender",
+            "cancelrender",
+            "radiusrender",
+            "updaterender",
+            "reload",
+            "stats",
+            "triggerstats",
+            "resetstats",
+            "sendtoweb",
+            "pause",
+            "purgequeue",
+            "purgemap",
+            "purgeworld",
+            "quiet",
+            "ids-for-ip",
+            "ips-for-id",
+            "add-id-for-ip",
+            "del-id-for-ip",
+            "webregister",
+            "help"
+    ));
 
     private static class CommandInfo {
         final String cmd;
@@ -1078,8 +1056,8 @@ public class DynmapCore implements DynmapCommonAPI {
         public boolean matches(String c) {
             return cmd.equals(c);
         }
-    };
-    
+    }
+
     private static final CommandInfo[] commandinfo = {
         new CommandInfo("dynmap", "", "Control execution of dynmap."),
         new CommandInfo("dynmap", "hide", "Hides the current player from the map."),
@@ -1189,7 +1167,7 @@ public class DynmapCore implements DynmapCommonAPI {
     
     public void printCommandHelp(DynmapCommandSender sender, String cmd, String subcmd) {
         boolean matched = false;
-        if((subcmd != null) && (!subcmd.equals(""))) {
+        if((subcmd != null) && (!subcmd.isEmpty())) {
             for(CommandInfo ci : commandinfo) {
                 if(ci.matches(cmd, subcmd)) {
                     sender.sendMessage(String.format("/%s %s %s - %s", ci.cmd, ci.subcmd, ci.args, ci.helptext));
@@ -1203,21 +1181,20 @@ public class DynmapCore implements DynmapCommonAPI {
                 return;
             }
         }
-        for(CommandInfo ci : commandinfo) {
-            if(ci.matches(cmd, "")) {
-                sender.sendMessage(String.format("/%s - %s", ci.cmd, ci.helptext));
-            }
-        }
+        Arrays.stream(commandinfo)
+                .filter(ci -> ci.matches(cmd, ""))
+                .map(ci -> String.format("/%s - %s", ci.cmd, ci.helptext))
+                .forEachOrdered(sender::sendMessage);
         String subcmdlist = " Valid subcommands:";
-        TreeSet<String> ts = new TreeSet<String>();
-        for(CommandInfo ci : commandinfo) {
-            if(ci.matches(cmd)) {
-                ts.add(ci.subcmd);
-            }
+        TreeSet<String> treeSet = Arrays.stream(commandinfo)
+                .filter(ci -> ci.matches(cmd))
+                .map(ci -> ci.subcmd)
+                .collect(Collectors.toCollection(TreeSet::new));
+        if (!treeSet.isEmpty()) {
+            subcmdlist += " ";
         }
-        for(String sc : ts) {
-            subcmdlist += " " + sc;
-        }
+
+        subcmdlist += String.join(" ", treeSet);
         sender.sendMessage(subcmdlist);
     }
     
@@ -1264,330 +1241,374 @@ public class DynmapCore implements DynmapCommonAPI {
                 return true;
             }
 
-            if (c.equals("render") && checkPlayerPermission(sender,"render")) {
-                if (player != null) {
-                    DynmapLocation loc = player.getLocation();
-                    if (loc != null) {
-                        mapManager.touch(loc.world, (int)loc.x, (int)loc.y, (int)loc.z, "render");
-                        sender.sendMessage("Tile render queued.");
-                    }
-                }
-                else {
-                    sender.sendMessage("Command can only be issued by player.");
-                }
-            }
-            else if(c.equals("radiusrender") && checkPlayerPermission(sender,"radiusrender")) {
-                int radius = 0;
-                String mapname = null;
-                DynmapLocation loc = null;
-                if((args.length == 2) || (args.length == 3)) {  /* Just radius, or <radius> <map> */
-                    try {
-                        radius = Integer.parseInt(args[1]); /* Parse radius */
-                    } catch (NumberFormatException nfe) {
-                        sender.sendMessage("Invalid radius: " + args[1]);
-                        return true;
-                    }
-                    if(radius < 0)
-                        radius = 0;
-                    if(args.length > 2)
-                        mapname = args[2];
-                    if (player != null)
-                        loc = player.getLocation();
-                    else
-                        sender.sendMessage("Command require <world> <x> <z> <radius> if issued from console.");
-                }
-                else if(args.length > 3) {  /* <world> <x> <z> */
-                    DynmapWorld w = mapManager.worldsLookup.get(args[1]);   /* Look up world */
-                    if(w == null) {
-                        sender.sendMessage("World '" + args[1] + "' not defined/loaded");
-                    }
-                    int x = 0, z = 0;
-                    try {
-                        x = Integer.parseInt(args[2]);
-                    } catch (NumberFormatException nfe) {
-                        sender.sendMessage("Invalid x coord: " + args[2]);
-                        return true;
-                    }
-                    try {
-                        z = Integer.parseInt(args[3]);
-                    } catch (NumberFormatException nfe) {
-                        sender.sendMessage("Invalid z coord: " + args[3]);
-                        return true;
-                    }
-                    if(args.length > 4) {
-                        try {
-                            radius = Integer.parseInt(args[4]);
-                        } catch (NumberFormatException nfe) {
-                            sender.sendMessage("Invalid radius: " + args[4]);
-                            return true;
+            switch (c) {
+                case "render":
+                    if (checkPlayerPermission(sender, "render")) {
+                        if (player != null) {
+                            DynmapLocation loc = player.getLocation();
+                            if (loc != null) {
+                                mapManager.touch(loc.world, (int) loc.x, (int) loc.y, (int) loc.z, "render");
+                                sender.sendMessage("Tile render queued.");
+                            }
+                        } else {
+                            sender.sendMessage("Command can only be issued by player.");
                         }
                     }
-                    if(args.length > 5)
-                        mapname = args[5];
-                    if(w != null)
-                        loc = new DynmapLocation(w.getName(), x, 64, z);
-                }
-                if(loc != null)
-                    mapManager.renderWorldRadius(loc, sender, mapname, radius);
-            } else if(c.equals("updaterender") && checkPlayerPermission(sender,"updaterender")) {
-                String mapname = null;
-                DynmapLocation loc = null;
-                if(args.length <= 3) {  /* Just command, or command plus map */
-                    if(args.length > 1)
-                        mapname = args[1];
-                    if (player != null)
-                        loc = player.getLocation();
-                    else
-                        sender.sendMessage("Command require <world> <x> <z> <mapname> if issued from console.");
-                }
-                else {  /* <world> <x> <z> */
-                    DynmapWorld w = mapManager.worldsLookup.get(args[1]);   /* Look up world */
-                    if(w == null) {
-                        sender.sendMessage("World '" + args[1] + "' not defined/loaded");
-                    }
-                    int x = 0, z = 0;
-                    try {
-                        x = Integer.parseInt(args[2]);
-                    } catch (NumberFormatException nfe) {
-                        sender.sendMessage("Invalid x coord: " + args[2]);
-                        return true;
-                    }
-                    try {
-                        z = Integer.parseInt(args[3]);
-                    } catch (NumberFormatException nfe) {
-                        sender.sendMessage("Invalid z coord: " + args[3]);
-                        return true;
-                    }
-                    if(args.length > 4)
-                        mapname = args[4];
-                    if(w != null)
-                        loc = new DynmapLocation(w.getName(), x, 64, z);
-                }
-                if(loc != null)
-                    mapManager.renderFullWorld(loc, sender, mapname, true, false);
-            } else if (c.equals("hide")) {
-                if (args.length == 1) {
-                    if(player != null && checkPlayerPermission(sender,"hide.self")) {
-                        playerList.setVisible(player.getName(),false);
-                        sender.sendMessage("You are now hidden on Dynmap.");
-                    }
-                } else if (checkPlayerPermission(sender,"hide.others")) {
-                    for (int i = 1; i < args.length; i++) {
-                        playerList.setVisible(args[i],false);
-                        sender.sendMessage(args[i] + " is now hidden on Dynmap.");
-                    }
-                }
-            } else if (c.equals("show")) {
-                if (args.length == 1) {
-                    if(player != null && checkPlayerPermission(sender,"show.self")) {
-                        playerList.setVisible(player.getName(),true);
-                        sender.sendMessage("You are now visible on Dynmap.");
-                    }
-                } else if (checkPlayerPermission(sender,"show.others")) {
-                    for (int i = 1; i < args.length; i++) {
-                        playerList.setVisible(args[i],true);
-                        sender.sendMessage(args[i] + " is now visible on Dynmap.");
-                    }
-                }
-            } else if (c.equals("fullrender") && checkPlayerPermission(sender,"fullrender")) {
-                String map = null;
-                if (args.length > 1) {
-                    boolean resume = false;
-                    for (int i = 1; i < args.length; i++) {
-                        if (args[i].equalsIgnoreCase("resume")) {
-                             resume = true;
-                             continue;
-                        }
-                        int dot = args[i].indexOf(":");
-                        DynmapWorld w;
-                        String wname = args[i];
-                        if(dot >= 0) {
-                            wname = args[i].substring(0, dot);
-                            map = args[i].substring(dot+1);
-                        }
-                        w = mapManager.getWorld(wname);
-                        if(w != null) {
-                            DynmapLocation loc;
-                            if(w.center != null)
-                                loc = w.center;
+                    break;
+                case "radiusrender":
+                    if (checkPlayerPermission(sender, "radiusrender")) {
+                        int radius = 0;
+                        String mapname = null;
+                        DynmapLocation loc = null;
+                        if ((args.length == 2) || (args.length == 3)) {  /* Just radius, or <radius> <map> */
+                            try {
+                                radius = Integer.parseInt(args[1]); /* Parse radius */
+                            } catch (NumberFormatException nfe) {
+                                sender.sendMessage("Invalid radius: " + args[1]);
+                                return true;
+                            }
+                            if (radius < 0)
+                                radius = 0;
+                            if (args.length > 2)
+                                mapname = args[2];
+                            if (player != null)
+                                loc = player.getLocation();
                             else
-                                loc = w.getSpawnLocation();
-                            mapManager.renderFullWorld(loc,sender, map, false, resume);
+                                sender.sendMessage("Command require <world> <x> <z> <radius> if issued from console.");
+                        } else if (args.length > 3) {  /* <world> <x> <z> */
+                            DynmapWorld w = mapManager.worldsLookup.get(args[1]);   /* Look up world */
+                            if (w == null) {
+                                sender.sendMessage("World '" + args[1] + "' not defined/loaded");
+                            }
+                            int x, z;
+                            try {
+                                x = Integer.parseInt(args[2]);
+                            } catch (NumberFormatException nfe) {
+                                sender.sendMessage("Invalid x coord: " + args[2]);
+                                return true;
+                            }
+                            try {
+                                z = Integer.parseInt(args[3]);
+                            } catch (NumberFormatException nfe) {
+                                sender.sendMessage("Invalid z coord: " + args[3]);
+                                return true;
+                            }
+                            if (args.length > 4) {
+                                try {
+                                    radius = Integer.parseInt(args[4]);
+                                } catch (NumberFormatException nfe) {
+                                    sender.sendMessage("Invalid radius: " + args[4]);
+                                    return true;
+                                }
+                            }
+                            if (args.length > 5)
+                                mapname = args[5];
+                            if (w != null)
+                                loc = new DynmapLocation(w.getName(), x, 64, z);
                         }
-                        else
-                            sender.sendMessage("World '" + wname + "' not defined/loaded");
+                        if (loc != null)
+                            mapManager.renderWorldRadius(loc, sender, mapname, radius);
                     }
-                } else if (player != null) {
-                    DynmapLocation loc = player.getLocation();
-                    if(args.length > 1)
-                        map = args[1];
-                    if(loc != null)
-                        mapManager.renderFullWorld(loc, sender, map, false, false);
-                } else {
-                    sender.sendMessage("World name is required");
-                }
-            } else if (c.equals("cancelrender") && checkPlayerPermission(sender,"cancelrender")) {
-                if (args.length > 1) {
-                    for (int i = 1; i < args.length; i++) {
-                        DynmapWorld w = mapManager.getWorld(args[i]);
-                        if(w != null)
-                            mapManager.cancelRender(w.getName(), sender);
-                        else
-                            sender.sendMessage("World '" + args[i] + "' not defined/loaded");
+                    break;
+                case "updaterender":
+                    if (checkPlayerPermission(sender, "updaterender")) {
+                        String mapname = null;
+                        DynmapLocation loc = null;
+                        if (args.length <= 3) {  /* Just command, or command plus map */
+                            if (args.length > 1)
+                                mapname = args[1];
+                            if (player != null)
+                                loc = player.getLocation();
+                            else
+                                sender.sendMessage("Command require <world> <x> <z> <mapname> if issued from console.");
+                        } else {  /* <world> <x> <z> */
+                            DynmapWorld w = mapManager.worldsLookup.get(args[1]);   /* Look up world */
+                            if (w == null) {
+                                sender.sendMessage("World '" + args[1] + "' not defined/loaded");
+                            }
+                            int x, z;
+                            try {
+                                x = Integer.parseInt(args[2]);
+                            } catch (NumberFormatException nfe) {
+                                sender.sendMessage("Invalid x coord: " + args[2]);
+                                return true;
+                            }
+                            try {
+                                z = Integer.parseInt(args[3]);
+                            } catch (NumberFormatException nfe) {
+                                sender.sendMessage("Invalid z coord: " + args[3]);
+                                return true;
+                            }
+                            if (args.length > 4)
+                                mapname = args[4];
+                            if (w != null)
+                                loc = new DynmapLocation(w.getName(), x, 64, z);
+                        }
+                        if (loc != null)
+                            mapManager.renderFullWorld(loc, sender, mapname, true, false);
                     }
-                } else if (player != null) {
-                    DynmapLocation loc = player.getLocation();
-                    if(loc != null)
-                        mapManager.cancelRender(loc.world, sender);
-                } else {
-                    sender.sendMessage("World name is required");
-                }
-            } else if (c.equals("purgequeue") && checkPlayerPermission(sender, "purgequeue")) {
-                if (args.length > 1) {
-                    for (int i = 1; i < args.length; i++) {
-                        mapManager.purgeQueue(sender, args[i]);
-                    }
-                }
-                else {
-                    mapManager.purgeQueue(sender, null);
-                }
-            } else if (c.equals("purgemap") && checkPlayerPermission(sender,"purgemap")) {
-                if (args.length > 2) {
-                    mapManager.purgeMap(sender, args[1], args[2]);
-                } else {
-                    sender.sendMessage("World name and map name values are required");
-                }
-            } else if (c.equals("purgeworld") && checkPlayerPermission(sender,"purgeworld")) {
-                if (args.length > 1) {
-                    mapManager.purgeWorld(sender, args[1]);
-                } else {
-                    sender.sendMessage("World name is required");
-                }
-            } else if (c.equals("reload") && checkPlayerPermission(sender, "reload")) {
-                sender.sendMessage("Reloading Dynmap...");
-                getServer().reload();
-                sender.sendMessage("Dynmap reloaded");
-            } else if (c.equals("stats") && checkPlayerPermission(sender, "stats")) {
-                if(args.length == 1)
-                    mapManager.printStats(sender, null);
-                else
-                    mapManager.printStats(sender, args[1]);
-            } else if (c.equals("triggerstats") && checkPlayerPermission(sender, "stats")) {
-                mapManager.printTriggerStats(sender);
-            } else if (c.equals("pause") && checkPlayerPermission(sender, "pause")) {
-                if(args.length == 1) {
-                }
-                else if(args[1].equals("full")) {
-                    setPauseFullRadiusRenders(true);
-                    setPauseUpdateRenders(false);
-                }
-                else if(args[1].equals("update")) {
-                    setPauseFullRadiusRenders(false);
-                    setPauseUpdateRenders(true);
-                }
-                else if(args[1].equals("all")) {
-                    setPauseFullRadiusRenders(true);
-                    setPauseUpdateRenders(true);
-                }
-                else {
-                    setPauseFullRadiusRenders(false);
-                    setPauseUpdateRenders(false);
-                }
-                if(getPauseFullRadiusRenders())
-                    sender.sendMessage("Full/Radius renders are PAUSED");
-                else if (mapManager.getTPSFullRenderPause())
-                    sender.sendMessage("Full/Radius renders are TPS PAUSED");
-                else
-                    sender.sendMessage("Full/Radius renders are ACTIVE");
-                if(getPauseUpdateRenders())
-                    sender.sendMessage("Update renders are PAUSED");
-                else if (mapManager.getTPSUpdateRenderPause())
-                    sender.sendMessage("Update renders are TPS PAUSED");
-                else
-                    sender.sendMessage("Update renders are ACTIVE");
-                if (mapManager.getTPSZoomOutPause())
-                    sender.sendMessage("Zoom out processing is TPS PAUSED");
-                else
-                    sender.sendMessage("Zoom out processing is ACTIVE");
-            } else if (c.equals("resetstats") && checkPlayerPermission(sender, "resetstats")) {
-                if(args.length == 1)
-                    mapManager.resetStats(sender, null);
-                else
-                    mapManager.resetStats(sender, args[1]);
-            } else if (c.equals("sendtoweb") && checkPlayerPermission(sender, "sendtoweb")) {
-                String msg = "";
-                for(int i = 1; i < args.length; i++) {
-                    msg += args[i] + " ";
-                }
-                this.sendBroadcastToWeb("dynmap", msg);
-            } else if(c.equals("ids-for-ip") && checkPlayerPermission(sender, "ids-for-ip")) {
-                if(args.length > 1) {
-                    List<String> ids = getIDsForIP(args[1]);
-                    sender.sendMessage("IDs logged in from address " + args[1] + " (most recent to least):");
-                    if(ids != null) {
-                        for(String id : ids)
-                            sender.sendMessage("  " + id);
-                    }
-                }
-                else {
-                    sender.sendMessage("IP address required as parameter");
-                }
-            } else if(c.equals("ips-for-id") && checkPlayerPermission(sender, "ips-for-id")) {
-                if(args.length > 1) {
-                    sender.sendMessage("IP addresses logged for player " + args[1] + ":");
-                    for(String ip: ids_by_ip.keySet()) {
-                        LinkedList<String> ids = ids_by_ip.get(ip);
-                        if((ids != null) && ids.contains(args[1])) {
-                            sender.sendMessage("  " + ip);
+                    break;
+                case "hide":
+                    if (args.length == 1) {
+                        if (player != null && checkPlayerPermission(sender, "hide.self")) {
+                            playerList.setVisible(player.getName(), false);
+                            sender.sendMessage("You are now hidden on Dynmap.");
+                        }
+                    } else if (checkPlayerPermission(sender, "hide.others")) {
+                        for (int i = 1; i < args.length; i++) {
+                            playerList.setVisible(args[i], false);
+                            sender.sendMessage(args[i] + " is now hidden on Dynmap.");
                         }
                     }
-                }
-                else {
-                    sender.sendMessage("Player ID required as parameter");
-                }
-            } else if((c.equals("add-id-for-ip") && checkPlayerPermission(sender, "add-id-for-ip")) ||
-                    (c.equals("del-id-for-ip") && checkPlayerPermission(sender, "del-id-for-ip"))) {
-                if(args.length > 2) {
-                    String ipaddr = "";
-                    try {
-                        InetAddress ip = InetAddress.getByName(args[2]);
-                        ipaddr = ip.getHostAddress();
-                    } catch (UnknownHostException uhx) {
-                        sender.sendMessage("Invalid address : " + args[2]);
-                        return true;
+                    break;
+                case "show":
+                    if (args.length == 1) {
+                        if (player != null && checkPlayerPermission(sender, "show.self")) {
+                            playerList.setVisible(player.getName(), true);
+                            sender.sendMessage("You are now visible on Dynmap.");
+                        }
+                    } else if (checkPlayerPermission(sender, "show.others")) {
+                        for (int i = 1; i < args.length; i++) {
+                            playerList.setVisible(args[i], true);
+                            sender.sendMessage(args[i] + " is now visible on Dynmap.");
+                        }
                     }
-                    LinkedList<String> ids = ids_by_ip.get(ipaddr);
-                    if(ids == null) {
-                        ids = new LinkedList<String>();
-                        ids_by_ip.put(ipaddr, ids);
+                    break;
+                case "fullrender":
+                    if (checkPlayerPermission(sender, "fullrender")) {
+                        String map = null;
+                        if (args.length > 1) {
+                            boolean resume = false;
+                            for (int i = 1; i < args.length; i++) {
+                                if (args[i].equalsIgnoreCase("resume")) {
+                                    resume = true;
+                                    continue;
+                                }
+                                int dot = args[i].indexOf(":");
+                                DynmapWorld w;
+                                String wname = args[i];
+                                if (dot >= 0) {
+                                    wname = args[i].substring(0, dot);
+                                    map = args[i].substring(dot + 1);
+                                }
+                                w = mapManager.getWorld(wname);
+                                if (w != null) {
+                                    DynmapLocation loc;
+                                    if (w.center != null)
+                                        loc = w.center;
+                                    else
+                                        loc = w.getSpawnLocation();
+                                    mapManager.renderFullWorld(loc, sender, map, false, resume);
+                                } else
+                                    sender.sendMessage("World '" + wname + "' not defined/loaded");
+                            }
+                        } else if (player != null) {
+                            DynmapLocation loc = player.getLocation();
+                            if (args.length > 1)
+                                map = args[1];
+                            if (loc != null)
+                                mapManager.renderFullWorld(loc, sender, map, false, false);
+                        } else {
+                            sender.sendMessage("World name is required");
+                        }
                     }
-                    ids.remove(args[1]); /* Remove existing, if any */
-                    if(c.equals("add-id-for-ip")) {
-                        ids.addFirst(args[1]);  /* And add us first */
-                        sender.sendMessage("Added player ID '" + args[1] + "' to address '" + ipaddr + "'");
+                    break;
+                case "cancelrender":
+                    if (checkPlayerPermission(sender, "cancelrender")) {
+                        if (args.length > 1) {
+                            for (int i = 1; i < args.length; i++) {
+                                DynmapWorld w = mapManager.getWorld(args[i]);
+                                if (w != null)
+                                    mapManager.cancelRender(w.getName(), sender);
+                                else
+                                    sender.sendMessage("World '" + args[i] + "' not defined/loaded");
+                            }
+                        } else if (player != null) {
+                            DynmapLocation loc = player.getLocation();
+                            if (loc != null)
+                                mapManager.cancelRender(loc.world, sender);
+                        } else {
+                            sender.sendMessage("World name is required");
+                        }
                     }
-                    else {
-                        sender.sendMessage("Removed player ID '" + args[1] + "' from address '" + ipaddr + "'");
+                    break;
+                case "purgequeue":
+                    if (checkPlayerPermission(sender, "purgequeue")) {
+                        if (args.length > 1) {
+                            for (int i = 1; i < args.length; i++) {
+                                mapManager.purgeQueue(sender, args[i]);
+                            }
+                        } else {
+                            mapManager.purgeQueue(sender, null);
+                        }
                     }
-                    saveIDsByIP();
-                }
-                else {
-                    sender.sendMessage("Needs player ID and IP address");
-                }
-            } else if(c.equals("webregister") && checkPlayerPermission(sender, "webregister")) {
-                if(authmgr != null)
-                    return authmgr.processWebRegisterCommand(this, sender, player, args);
-                else
-                    sender.sendMessage("Login support is not enabled");
-            }
-            else if (c.equals("quiet") && checkPlayerPermission(sender, "quiet")) {
-                mapManager.setJobsQuiet(sender);
-            }
-            else if(c.equals("help")) {
-                printCommandHelp(sender, cmd, (args.length > 1)?args[1]:"");
-            }
-            else if(c.equals("version")) {
-                sender.sendMessage("Dynmap version: core=" + this.getDynmapCoreVersion() + ", plugin=" + this.getDynmapPluginVersion());
+                    break;
+                case "purgemap":
+                    if (checkPlayerPermission(sender, "purgemap")) {
+                        if (args.length > 2) {
+                            mapManager.purgeMap(sender, args[1], args[2]);
+                        } else {
+                            sender.sendMessage("World name and map name values are required");
+                        }
+                    }
+                    break;
+                case "purgeworld":
+                    if (checkPlayerPermission(sender, "purgeworld")) {
+                        if (args.length > 1) {
+                            mapManager.purgeWorld(sender, args[1]);
+                        } else {
+                            sender.sendMessage("World name is required");
+                        }
+                    }
+                    break;
+                case "reload":
+                    if (checkPlayerPermission(sender, "reload")) {
+                        sender.sendMessage("Reloading Dynmap...");
+                        getServer().reload();
+                        sender.sendMessage("Dynmap reloaded");
+                    }
+                    break;
+                case "stats":
+                    if (checkPlayerPermission(sender, "stats")) {
+                        if (args.length == 1)
+                            mapManager.printStats(sender, null);
+                        else
+                            mapManager.printStats(sender, args[1]);
+                    }
+                    break;
+                case "triggerstats":
+                    if (checkPlayerPermission(sender, "triggerstats")) {
+                        mapManager.printTriggerStats(sender);
+                    }
+                    break;
+                case "pause":
+                    if (checkPlayerPermission(sender, "pause")) {
+                        if (args.length == 1) {
+                        } else if (args[1].equals("full")) {
+                            setPauseFullRadiusRenders(true);
+                            setPauseUpdateRenders(false);
+                        } else if (args[1].equals("update")) {
+                            setPauseFullRadiusRenders(false);
+                            setPauseUpdateRenders(true);
+                        } else if (args[1].equals("all")) {
+                            setPauseFullRadiusRenders(true);
+                            setPauseUpdateRenders(true);
+                        } else {
+                            setPauseFullRadiusRenders(false);
+                            setPauseUpdateRenders(false);
+                        }
+                        if (getPauseFullRadiusRenders())
+                            sender.sendMessage("Full/Radius renders are PAUSED");
+                        else if (mapManager.getTPSFullRenderPause())
+                            sender.sendMessage("Full/Radius renders are TPS PAUSED");
+                        else
+                            sender.sendMessage("Full/Radius renders are ACTIVE");
+                        if (getPauseUpdateRenders())
+                            sender.sendMessage("Update renders are PAUSED");
+                        else if (mapManager.getTPSUpdateRenderPause())
+                            sender.sendMessage("Update renders are TPS PAUSED");
+                        else
+                            sender.sendMessage("Update renders are ACTIVE");
+                        if (mapManager.getTPSZoomOutPause())
+                            sender.sendMessage("Zoom out processing is TPS PAUSED");
+                        else
+                            sender.sendMessage("Zoom out processing is ACTIVE");
+                    }
+                    break;
+                case "resetstats":
+                    if (checkPlayerPermission(sender, "resetstats")) {
+                        if (args.length == 1)
+                            mapManager.resetStats(sender, null);
+                        else
+                            mapManager.resetStats(sender, args[1]);
+                    }
+                    break;
+                case "sendtoweb":
+                    if (checkPlayerPermission(sender, "sendtoweb")) {
+                        StringBuilder msg = new StringBuilder();
+                        for (int i = 1; i < args.length; i++) {
+                            msg.append(args[i]).append(" ");
+                        }
+                        this.sendBroadcastToWeb("dynmap", msg.toString());
+                    }
+                    break;
+                case "ids-for-ip":
+                    if (checkPlayerPermission(sender, "ids-for-ip")) {
+                        if (args.length > 1) {
+                            List<String> ids = getIDsForIP(args[1]);
+                            sender.sendMessage("IDs logged in from address " + args[1] + " (most recent to least):");
+                            if (ids != null) {
+                                ids.stream().map(id -> "  " + id).forEach(sender::sendMessage);
+                            }
+                        } else {
+                            sender.sendMessage("IP address required as parameter");
+                        }
+                    }
+                    break;
+                case "ips-for-id":
+                    if (checkPlayerPermission(sender, "ips-for-id")) {
+                        if (args.length > 1) {
+                            sender.sendMessage("IP addresses logged for player " + args[1] + ":");
+                            for (String ip : ids_by_ip.keySet()) {
+                                Deque<String> ids = ids_by_ip.get(ip);
+                                if ((ids != null) && ids.contains(args[1])) {
+                                    sender.sendMessage("  " + ip);
+                                }
+                            }
+                        } else {
+                            sender.sendMessage("Player ID required as parameter");
+                        }
+                    }
+                    break;
+                case "add-id-for-ip":
+                case "del-id-for-ip":
+                    if (checkPlayerPermission(sender, c)) {
+                        if (args.length > 2) {
+                            String ipaddr;
+                            try {
+                                InetAddress ip = InetAddress.getByName(args[2]);
+                                ipaddr = ip.getHostAddress();
+                            } catch (UnknownHostException uhx) {
+                                sender.sendMessage("Invalid address : " + args[2]);
+                                return true;
+                            }
+                            Deque<String> ids = ids_by_ip.get(ipaddr);
+                            if (ids == null) {
+                                ids = new ArrayDeque<>();
+                                ids_by_ip.put(ipaddr, ids);
+                            }
+                            ids.remove(args[1]); /* Remove existing, if any */
+                            if (c.equals("add-id-for-ip")) {
+                                ids.addFirst(args[1]);  /* And add us first */
+                                sender.sendMessage("Added player ID '" + args[1] + "' to address '" + ipaddr + "'");
+                            } else {
+                                sender.sendMessage("Removed player ID '" + args[1] + "' from address '" + ipaddr + "'");
+                            }
+                            saveIDsByIP();
+                        } else {
+                            sender.sendMessage("Needs player ID and IP address");
+                        }
+                    }
+                    break;
+                case "webregister":
+                    if (checkPlayerPermission(sender, "webregister")) {
+                        if (authmgr != null)
+                            return authmgr.processWebRegisterCommand(this, sender, player, args);
+                        else
+                            sender.sendMessage("Login support is not enabled");
+                    }
+                    break;
+                case "quiet":
+                    if (checkPlayerPermission(sender, "quiet")) {
+                        mapManager.setJobsQuiet(sender);
+                    }
+                    break;
+                case "help":
+                    printCommandHelp(sender, cmd, (args.length > 1) ? args[1] : "");
+                    break;
+                case "version":
+                    sender.sendMessage("Dynmap version: core=" + this.getDynmapCoreVersion() + ", plugin=" + this.getDynmapPluginVersion());
+                    break;
             }
             return true;
         }
@@ -1642,7 +1663,7 @@ public class DynmapCore implements DynmapCommonAPI {
         /* Update world_config with final */
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         if(worlds == null) {
-            worlds = new ArrayList<Map<String,Object>>();
+            worlds = new ArrayList<>();
             world_config.put("worlds", worlds);
         }
         boolean did_upd = false;
@@ -1669,8 +1690,8 @@ public class DynmapCore implements DynmapCommonAPI {
         return getTemplateConfigurationNode(environmentName);
     }
     
-    private ConfigurationNode getWorldConfigurationNode(String worldName) {
-        worldName = DynmapWorld.normalizeWorldName(worldName);
+    private ConfigurationNode getWorldConfigurationNode(String worldName2) {
+        String worldName = DynmapWorld.normalizeWorldName(worldName2);
         for(ConfigurationNode worldNode : world_config.getNodes("worlds")) {
             if (worldName.equals(worldNode.getString("name"))) {
                 return worldNode;
@@ -1736,7 +1757,7 @@ public class DynmapCore implements DynmapCommonAPI {
             Log.severe("Unable to find resource - " + resourcename);
             return false;
         }
-        if(deffile.canRead() == false) {    /* Doesn't exist? */
+        if(!deffile.canRead()) {    /* Doesn't exist? */
             return createDefaultFileFromResource(resourcename, deffile);
         }
         /* Load default from resource */
@@ -1759,7 +1780,7 @@ public class DynmapCore implements DynmapCommonAPI {
             Log.severe("Unable to find resource - " + resourcename);
             return false;
         }
-        if(deffile.canRead() == false) {    /* Doesn't exist? */
+        if(!deffile.canRead()) {    /* Doesn't exist? */
             return createDefaultFileFromResource(resourcename, deffile);
         }
         /* Load default from resource */
@@ -1769,14 +1790,14 @@ public class DynmapCore implements DynmapCommonAPI {
         fc.load();
         /* Now, get the list associated with the base node default */
         List<Map<String,Object>> existing = fc.getMapList(basenode);
-        Set<String> existing_names = new HashSet<String>();
+        Set<String> existing_names = new HashSet<>();
         /* Make map, indexed by 'name' in map */
         if(existing != null) {
-            for(Map<String,Object> m : existing) {
-                Object name = m.get("name");
-                if(name instanceof String)
-                    existing_names.add((String)name);
-            }
+            existing_names = existing.stream()
+                    .map(m -> m.get("name"))
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .collect(Collectors.toSet());
         }
         boolean did_update = false;
         /* Now, loop through defaults, and see if any are missing */
@@ -1786,7 +1807,7 @@ public class DynmapCore implements DynmapCommonAPI {
                 Object name = m.get("name");
                 if(name instanceof String) {
                     /* If not an existing one, need to add it */
-                    if(existing_names.contains((String)name) == false) {
+                    if(!existing_names.contains(name)) {
                         existing.add(m);
                         did_update = true;
                     }
@@ -1881,15 +1902,15 @@ public class DynmapCore implements DynmapCommonAPI {
      * @return list of IDs
      */
     public List<String> getIDsForIP(String ip) {
-        LinkedList<String> ids = ids_by_ip.get(ip);
+        Deque<String> ids = ids_by_ip.get(ip);
         if(ids != null)
-            return new ArrayList<String>(ids);
+            return new ArrayList<>(ids);
         return null;
     }
 
     private void loadIDsByIP() {
         File f = new File(getDataFolder(), "ids-by-ip.txt");
-        if(f.exists() == false)
+        if(!f.exists())
             return;
         ConfigurationNode fc = new ConfigurationNode(new File(getDataFolder(), "ids-by-ip.txt"));
         try {
@@ -1899,7 +1920,7 @@ public class DynmapCore implements DynmapCommonAPI {
                 List<String> ids = fc.getList(k);
                 if(ids != null) {
                     k = k.replace("_", ".");
-                    ids_by_ip.put(k, new LinkedList<String>(ids));
+                    ids_by_ip.put(k, new LinkedList<>(ids));
                 }
             }
         } catch (Exception iox) {
@@ -1908,14 +1929,14 @@ public class DynmapCore implements DynmapCommonAPI {
     }
     private void saveIDsByIP() {
         File f = new File(getDataFolder(), "ids-by-ip.txt");
-        ConfigurationNode fc = new ConfigurationNode();
-        for(String k : ids_by_ip.keySet()) {
-            List<String> v = ids_by_ip.get(k);
-            if(v != null) {
-                k = k.replace(".", "_");
+        @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") ConfigurationNode fc = new ConfigurationNode();
+        ids_by_ip.keySet().forEach(k2 -> {
+            Deque<String> v;
+            if ((v = ids_by_ip.get(k2)) != null) {
+                final String k = k2.replace(".", "_");
                 fc.put(k, v);
             }
-        }
+        });
         try {
             fc.save(f);
         } catch (Exception x) {
@@ -1945,10 +1966,10 @@ public class DynmapCore implements DynmapCommonAPI {
             mapManager.pushUpdate(new Client.ChatMessage("player", "", playerdisplay, message, playerid));
     }
 
-    public void postPlayerJoinQuitToWeb(String playerid, String playerdisplay, boolean isjoin) {
+    public void postPlayerJoinQuitToWeb(String playerid, String playerdisplay, boolean isJoin) {
         if(playerdisplay == null) playerdisplay = playerid;
         if((mapManager != null) && (playerList != null) && (playerList.isVisiblePlayer(playerid))) {
-            if(isjoin)
+            if(isJoin)
                 mapManager.pushUpdate(new Client.PlayerJoinMessage(playerdisplay, playerid));
             else
                 mapManager.pushUpdate(new Client.PlayerQuitMessage(playerdisplay, playerid));
@@ -2013,26 +2034,26 @@ public class DynmapCore implements DynmapCommonAPI {
     }
     
     /* Enable/disable world */
-    public boolean setWorldEnable(String wname, boolean isenab) {
+    public boolean setWorldEnable(String wname, boolean enable) {
         wname = DynmapWorld.normalizeWorldName(wname);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         for(Map<String,Object> m : worlds) {
             String wn = (String)m.get("name");
             if((wn != null) && (wn.equals(wname))) {
-                m.put("enabled", isenab);
+                m.put("enabled", enable);
                 return true;
             }
         }
         /* If not found, and disable, add disable node */
-        if(isenab == false) {
-            Map<String,Object> newworld = new LinkedHashMap<String,Object>();
+        if(!enable) {
+            @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") Map<String,Object> newworld = new LinkedHashMap<>();
             newworld.put("name", wname);
-            newworld.put("enabled", isenab);
+            newworld.put("enabled", false);
         }
         return true;
     }
-    public boolean setWorldZoomOut(String wname, int xzoomout) {
-        wname = DynmapWorld.normalizeWorldName(wname);
+    public boolean setWorldZoomOut(String wname2, int xzoomout) {
+        final String wname = DynmapWorld.normalizeWorldName(wname2);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         for(Map<String,Object> m : worlds) {
             String wn = (String)m.get("name");
@@ -2043,8 +2064,8 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         return false;
     }
-    public boolean setWorldTileUpdateDelay(String wname, int tud) {
-        wname = DynmapWorld.normalizeWorldName(wname);
+    public boolean setWorldTileUpdateDelay(String wname2, int tud) {
+        final String wname = DynmapWorld.normalizeWorldName(wname2);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         for(Map<String,Object> m : worlds) {
             String wn = (String)m.get("name");
@@ -2058,14 +2079,14 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         return false;
     }
-    public boolean setWorldCenter(String wname, DynmapLocation loc) {
-        wname = DynmapWorld.normalizeWorldName(wname);
+    public boolean setWorldCenter(String wname2, DynmapLocation loc) {
+        final String wname = DynmapWorld.normalizeWorldName(wname2);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         for(Map<String,Object> m : worlds) {
             String wn = (String)m.get("name");
             if((wn != null) && (wn.equals(wname))) {
                 if(loc != null) {
-                    Map<String,Object> c = new LinkedHashMap<String,Object>();
+                    Map<String,Object> c = new LinkedHashMap<>();
                     c.put("x", loc.x);
                     c.put("y", loc.y);
                     c.put("z", loc.z);
@@ -2079,15 +2100,15 @@ public class DynmapCore implements DynmapCommonAPI {
         }
         return false;
     }
-    public boolean setWorldOrder(String wname, int order) {
-        wname = DynmapWorld.normalizeWorldName(wname);
+    public boolean setWorldOrder(String wname2, int order) {
+        final String wname = DynmapWorld.normalizeWorldName(wname2);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
-        ArrayList<Map<String,Object>> newworlds = new ArrayList<Map<String,Object>>(worlds);
+        List<Map<String,Object>> newworlds = new ArrayList<>(worlds);
 
         Map<String,Object> w = null;
         for(Map<String,Object> m : worlds) {
-            String wn = (String)m.get("name");
-            if((wn != null) && (wn.equals(wname))) {
+            String worldName = (String)m.get("name");
+            if((worldName != null) && (worldName.equals(wname))) {
                 w = m;
                 newworlds.remove(m);   /* Remove from list */
                 break;
@@ -2111,11 +2132,11 @@ public class DynmapCore implements DynmapCommonAPI {
         return replaceWorldConfig(w.getName(), cn);
     }
 
-    public boolean replaceWorldConfig(String wname, ConfigurationNode cn) {
-        wname = DynmapWorld.normalizeWorldName(wname);
+    public boolean replaceWorldConfig(String wname2, ConfigurationNode cn) {
+        final String wname = DynmapWorld.normalizeWorldName(wname2);
         List<Map<String,Object>> worlds = world_config.getMapList("worlds");
         if(worlds == null) {
-            worlds = new ArrayList<Map<String,Object>>();
+            worlds = new ArrayList<>();
             world_config.put("worlds", worlds);
         }
         for(int i = 0; i < worlds.size(); i++) {
@@ -2130,14 +2151,14 @@ public class DynmapCore implements DynmapCommonAPI {
     }
     
     public boolean saveWorldConfig() {
-        boolean rslt = world_config.save();    /* Save world config */
+        boolean result = world_config.save();    /* Save world config */
         updateConfigHashcode(); /* Update config hashcode */
-        return rslt;
+        return result;
     }
     
     /* Refresh world config */
-    public boolean refreshWorld(String wname) {
-        wname = DynmapWorld.normalizeWorldName(wname);
+    public boolean refreshWorld(String wname2) {
+        final String wname = DynmapWorld.normalizeWorldName(wname2);
         saveWorldConfig();
         if(mapManager != null) {
             mapManager.deactivateWorld(wname);  /* Clean it up */
@@ -2154,8 +2175,7 @@ public class DynmapCore implements DynmapCommonAPI {
         if(in == null)
             return;
         Yaml yaml = new Yaml();
-        @SuppressWarnings("unchecked")
-        Map<String,Object> val = (Map<String,Object>)yaml.load(in);
+        Map<String,Object> val = yaml.load(in);
         if(val != null)
             version = (String)val.get("version");
     }
@@ -2169,12 +2189,9 @@ public class DynmapCore implements DynmapCommonAPI {
     public void webChat(final String name, final String message) {
         if(mapManager == null)
             return;
-        Runnable c = new Runnable() {
-            @Override
-            public void run() {
-                ChatEvent event = new ChatEvent("web", name, message);
-                events.trigger("webchat", event);
-            }
+        Runnable c = () -> {
+            ChatEvent event = new ChatEvent("web", name, message);
+            events.trigger("webchat", event);
         };
         getServer().scheduleServerTask(c, 1);
     }
@@ -2228,17 +2245,17 @@ public class DynmapCore implements DynmapCommonAPI {
             return authmgr.processCompletedRegister(uid, pc, hash);
         return false;
     }
-    public boolean testIfPlayerVisibleToPlayer(String player, String player_to_see) {
-        player = player.toLowerCase();
-        player_to_see = player_to_see.toLowerCase();
+    public boolean testIfPlayerVisibleToPlayer(String player, String playerToSee) {
+        String lowercasePlayerName = player.toLowerCase();
+        String lowercaseToSee = playerToSee.toLowerCase();
         /* Can always see self */
-        if(player.equals(player_to_see)) return true;
+        if(lowercasePlayerName.equals(lowercaseToSee)) return true;
         /* If player is hidden, that is dominant */
-        if(getPlayerVisbility(player_to_see) == false) return false;
+        if(!getPlayerVisbility(lowercaseToSee)) return false;
         /* Check if player has see-all permission */
-        if(checkPermission(player, "playermarkers.seeall")) return true;
+        if(checkPermission(lowercasePlayerName, "playermarkers.seeall")) return true;
         if(markerapi != null) {
-            return markerapi.testIfPlayerVisible(player, player_to_see);
+            return markerapi.testIfPlayerVisible(lowercasePlayerName, lowercaseToSee);
         }
         return false;
     }
@@ -2273,53 +2290,47 @@ public class DynmapCore implements DynmapCommonAPI {
     private static boolean deleteDirectory(File dir) {
         File[] files = dir.listFiles();
         if (files != null) {
-            for (File f : files) {
-                if (f.getName().equals(".") || f.getName().equals("..")) continue;
-                if (f.isDirectory()) {
-                    deleteDirectory(f);
-                }
-                else if(f.isFile()) {
-                    f.delete();
-                }
-            }
+            Arrays.stream(files)
+                    .filter(f -> !f.getName().equals("."))
+                    .filter(f -> !f.getName().equals(".."))
+                    .forEachOrdered(f -> {
+                        if (f.isDirectory()) {
+                            deleteDirectory(f);
+                        } else if (f.isFile()) {
+                            f.delete();
+                        }
+                    });
         }
         return dir.delete();
     }
     private void updateExtractedFiles() {
         if(jarfile == null) return;
         File df = this.getDataFolder();
-        if(df.exists() == false) df.mkdirs();
+        if(!df.exists()) df.mkdirs();
         File ver = new File(df, "version.txt");
-        String prevver = "1.6";
+        StringBuilder prevVer = new StringBuilder("1.6");
         if(ver.exists()) {
-            Reader ir = null;
-            try {
-                ir = new FileReader(ver);
-                prevver = "";
+            try (Reader ir = new FileReader(ver)) {
+                prevVer = new StringBuilder();
                 int c;
-                while((c = ir.read()) >= 0) {
-                    prevver += (char)c;
+                while ((c = ir.read()) >= 0) {
+                    prevVer.append((char) c);
                 }
             } catch (IOException iox) {
-            } finally {
-                if(ir != null) {
-                    try { ir.close(); } catch (IOException iox) {}
-                }
             }
         }
         else {  // First time, delete old external texture pack
             deleteDirectory(new File(df, "texturepacks/standard"));
         }
-        String curver = this.getDynmapCoreVersion();
+        String coreVer = this.getDynmapCoreVersion();
         /* If matched, we're good */
-        if (prevver.equals(curver) && (!curver.endsWith(("-Dev")))) {
+        if (prevVer.toString().equals(coreVer) && (!coreVer.endsWith(("-Dev")))) {
             return;
         }
         /* Get deleted file list */
         InputStream in = getClass().getResourceAsStream("/deleted.txt");
         if(in != null) {
-            try {
-                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            try(BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
                 String line;
                 while ((line = br.readLine()) != null) {
                     if (line.length() == 0) continue;
@@ -2329,71 +2340,41 @@ public class DynmapCore implements DynmapCommonAPI {
                 }
             } catch (IOException iox) {
                 Log.warning("Exception while processing deleted files - " + iox.getMessage());
-            } finally {
-                try { in.close(); } catch (IOException x) {}
             }
         }
 
         /* Open JAR as ZIP */
-        ZipFile zf = null;
-        FileOutputStream fos = null;
-        InputStream ins = null;
-        byte[] buf = new byte[2048];
         String n = null;
-        try {
-            File f;
-            zf = new ZipFile(jarfile);
-            Enumeration<? extends ZipEntry> e = zf.entries();
-            while (e.hasMoreElements()) {
-                ZipEntry ze = e.nextElement();
-                n = ze.getName();
+        try (ZipFile zf = new ZipFile(jarfile)){
+            Iterator<? extends ZipEntry> e = new EnumerationIntoIterator<>(zf.entries());
+            byte[] buf = new byte[2048];
+            while (e.hasNext()) {
+                ZipEntry entry = e.next();
+                n = entry.getName();
                 if(!n.startsWith("extracted/")) continue;
                 n = n.substring("extracted/".length());
-                f = new File(df, n);
-                if(ze.isDirectory()) {
+                File f = new File(df, n);
+                if(entry.isDirectory()) {
                     f.mkdirs();
-                }
-                else {
+                } else {
                     f.getParentFile().mkdirs();
-                    fos = new FileOutputStream(f);
-                    ins = zf.getInputStream(ze);
-                    int len;
-                    while ((len = ins.read(buf)) >= 0) {
-                        fos.write(buf,  0,  len);
+                    try (FileOutputStream fos = new FileOutputStream(f);
+                         InputStream ins = zf.getInputStream(entry)) {
+                        int byteLength;
+                        while ((byteLength = ins.read(buf)) >= 0) {
+                            fos.write(buf, 0, byteLength);
+                        }
                     }
-                    ins.close();
-                    ins = null;
-                    fos.close();
-                    fos = null;
                 }
             }
         } catch (IOException iox) {
             Log.severe("Error extracting file - " + n);
-        } finally {
-            if (ins != null) {
-                try { ins.close(); } catch (IOException iox) {}
-                ins = null;
-            }
-            if (fos != null) {
-                try { fos.close(); } catch (IOException iox) {}
-                fos = null;
-            }
-            if (zf != null) {
-                try { zf.close(); } catch (IOException iox) {}
-                zf = null;
-            }
         }
         
         /* Finally, write new version cookie */
-        Writer out = null;
-        try {
-            out = new FileWriter(ver);
+        try (Writer out = new FileWriter(ver)) {
             out.write(this.getDynmapCoreVersion());
         } catch (IOException iox) {
-        } finally {
-            if(out != null) {
-                try { out.close(); } catch (IOException iox) {}
-            }
         }
         Log.info("Extracted files upgraded");
     }
@@ -2412,7 +2393,7 @@ public class DynmapCore implements DynmapCommonAPI {
     }
     // Notice that server has finished starting (needed for forge, which starts dynmap before full server is running)
     public void serverStarted() {
-        events.<Object>trigger("server-started", null);
+        events.trigger("server-started", null);
     }
     // Normalize ID (strip out submods)
     public String getNormalizedModID(String mod) {
@@ -2421,26 +2402,26 @@ public class DynmapCore implements DynmapCommonAPI {
         return mod;
     }
     // Add mod block IDs to value map
-    public void addModBlockItemIDs(String mod, Map<String, Integer> modvals) {
-        mod = getNormalizedModID(mod);
-        for (String k : blockmap.keySet()) {
+    public void addModBlockItemIDs(String mod2, Map<String, Integer> modvals) {
+        final String mod = getNormalizedModID(mod2);
+        blockmap.keySet().forEach(k -> {
             String[] ks = k.split(":", 2);
-            if (ks.length != 2) continue;
+            if (ks.length != 2) return;
             int id = blockmap.get(k);
-            ks[0] = getNormalizedModID(ks[0]);
-            if (mod.equals(ks[0])) {
+            final String key = getNormalizedModID(ks[0]);
+            if (mod.equals(key)) {
                 modvals.put("%" + ks[1], id);
             }
-        }
-        for (String k : itemmap.keySet()) {
-            String[] ks = k.split(":", 2);
-            if (ks.length != 2) continue;
+        });
+        itemmap.keySet().forEach(k -> {
+            String[] keyValue = k.split(":", 2);
+            if (keyValue.length != 2) return;
             int id = itemmap.get(k);
-            ks[0] = getNormalizedModID(ks[0]);
-            if (mod.equals(ks[0])) {
-                modvals.put("&" + ks[1], id);
+            final String key = getNormalizedModID(keyValue[0]);
+            if (mod.equals(key)) {
+                modvals.put("&" + keyValue[1], id);
             }
-        }
+        });
     }
 
     @Override

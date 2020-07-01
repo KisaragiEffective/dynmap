@@ -14,8 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class SkinsRestorerSkinUrlProvider implements SkinUrlProvider {
-    private JSONParser mJsonParser;
-    private SkinsRestorerBukkitAPI mSkinsRestorerApi;
+    private final JSONParser mJsonParser;
+    private final SkinsRestorerBukkitAPI mSkinsRestorerApi;
 
     SkinsRestorerSkinUrlProvider(SkinsRestorer skinsRestorer) {
         mJsonParser = new JSONParser();

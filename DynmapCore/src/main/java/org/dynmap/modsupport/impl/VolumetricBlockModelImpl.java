@@ -3,7 +3,7 @@ package org.dynmap.modsupport.impl;
 import org.dynmap.modsupport.VolumetricBlockModel;
 
 public class VolumetricBlockModelImpl extends BlockModelImpl implements VolumetricBlockModel {
-    private boolean[][][] grid;
+    private final boolean[][][] grid;
     
     public VolumetricBlockModelImpl(int blkid, ModModelDefinitionImpl mdf, int scale) {
         super(blkid, mdf);
@@ -48,12 +48,11 @@ public class VolumetricBlockModelImpl extends BlockModelImpl implements Volumetr
             String l = "layer: " + y + "\n";
             boolean empty = true;
             for (int z = 0; z < grid.length; z++) {
-                for (int x = 0; x < grid.length; x++) {
-                    if (grid[x][y][z]) {
+                for (boolean[][] booleans : grid) {
+                    if (booleans[y][z]) {
                         empty = false;
                         l += '*';
-                    }
-                    else {
+                    } else {
                         l += '-';
                     }
                 }

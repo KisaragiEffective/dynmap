@@ -27,7 +27,7 @@ public class DynmapMod
     public static DynmapMod instance;
 
     // Says where the client and server 'proxy' code is loaded.
-    public static Proxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> Proxy::new);
+    public static final Proxy proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> Proxy::new);
     
     public static DynmapPlugin plugin;
     public static File jarfile;
@@ -60,7 +60,7 @@ public class DynmapMod
     //}
 
     public DynmapMod() {
-    	instance = this;
+        instance = this;
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
 
@@ -72,7 +72,7 @@ public class DynmapMod
     
     public void setup(final FMLCommonSetupEvent event)
     {
-    	//TOOO
+        //TOOO
         jarfile = ModList.get().getModFileById("dynmap").getFile().getFilePath().toFile();
 
         ver = ModList.get().getModContainerById("dynmap").get().getModInfo().getVersion().toString();
@@ -93,7 +93,7 @@ public class DynmapMod
     public void init(FMLLoadCompleteEvent event)
     {
         /* Set up for chunk loading notice from chunk manager */
-    	//TODO
+        //TODO
         //if(useforcedchunks) {
         //    ForgeChunkManager.setForcedChunkLoadingCallback(DynmapMod.instance, new LoadingCallback());
         //}
@@ -109,8 +109,8 @@ public class DynmapMod
         server = event.getServer();
         if(plugin == null)
             plugin = proxy.startServer(server);
-		plugin.onStarting(event.getCommandDispatcher());
-	}
+        plugin.onStarting(event.getCommandDispatcher());
+    }
     
     @SubscribeEvent
     public void onServerStarted(FMLServerStartedEvent event) {
@@ -121,7 +121,7 @@ public class DynmapMod
     @SubscribeEvent
     public void serverStopping(FMLServerStoppingEvent event)
     {
-    	proxy.stopServer(plugin);
-    	plugin = null;
+        proxy.stopServer(plugin);
+        plugin = null;
     }
 }

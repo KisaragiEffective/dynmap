@@ -9,9 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import java.lang.Class;
 
@@ -57,20 +55,20 @@ public class FileResourceHandler extends ResourceHandler {
         if (file == null) {
             return;
         }
-    	if(!target.equals(normalizedTarget)){
-    		baseRequest.setURIPathQuery(normalizedTarget);
-    		baseRequest.setPathInfo(normalizedTarget);
-    		try{
-    			Class<?> requestClass = request.getClass();
-    			Field field = requestClass.getDeclaredField("_pathInfo");
-    			field.setAccessible(true);
-    			field.set(request, normalizedTarget);
-    		} catch (Exception ignore) {
-    			//It's unsafe to continue since these lines will be triggered by only malicious requests.
-    			ignore.printStackTrace();
-    			return;
-    		}
-    	}
-    	super.handle(normalizedTarget, baseRequest, request, response);
+        if(!target.equals(normalizedTarget)){
+            baseRequest.setURIPathQuery(normalizedTarget);
+            baseRequest.setPathInfo(normalizedTarget);
+            try{
+                Class<?> requestClass = request.getClass();
+                Field field = requestClass.getDeclaredField("_pathInfo");
+                field.setAccessible(true);
+                field.set(request, normalizedTarget);
+            } catch (Exception ignore) {
+                //It's unsafe to continue since these lines will be triggered by only malicious requests.
+                ignore.printStackTrace();
+                return;
+            }
+        }
+        super.handle(normalizedTarget, baseRequest, request, response);
     }
 }

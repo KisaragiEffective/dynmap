@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -27,26 +28,27 @@ import org.json.simple.parser.ParseException;
 import static org.dynmap.JSONUtils.*;
 
 import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
 public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
-    protected long jsonInterval;
+    protected final long jsonInterval;
     protected long currentTimestamp = 0;
     protected long lastTimestamp = 0;
     protected long lastChatTimestamp = 0;
-    protected JSONParser parser = new JSONParser();
-    private boolean hidewebchatip;
-    private boolean useplayerloginip;
-    private boolean requireplayerloginip;
-    private boolean trust_client_name;
-    private boolean checkuserban;
-    private boolean req_login;
-    private boolean chat_perms;
-    private int lengthlimit;
-    private HashMap<String,String> useralias = new HashMap<String,String>();
+    protected final JSONParser parser = new JSONParser();
+    private final boolean hidewebchatip;
+    private final boolean useplayerloginip;
+    private final boolean requireplayerloginip;
+    private final boolean trust_client_name;
+    private final boolean checkuserban;
+    private final boolean req_login;
+    private final boolean chat_perms;
+    private final int lengthlimit;
+    private final HashMap<String,String> useralias = new HashMap<>();
     private int aliasindex = 1;
     private long last_confighash;
     private MessageDigest md;
-    private MapStorage storage;
+    private final MapStorage storage;
     private File baseStandaloneDir;
 
     private static class FileToWrite {
@@ -64,9 +66,9 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     private class FileProcessor implements Runnable {
         public void run() {
             while(true) {
-                FileToWrite f = null;
+                FileToWrite f;
                 synchronized(lock) {
-                    if(files_to_write.isEmpty() == false) {
+                    if(!files_to_write.isEmpty()) {
                         f = files_to_write.removeFirst();
                     }
                     else {
@@ -91,9 +93,9 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
             }
         }
     }
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private FileProcessor pending;
-    private LinkedList<FileToWrite> files_to_write = new LinkedList<FileToWrite>();
+    private final LinkedList<FileToWrite> files_to_write = new LinkedList<>();
 
     private void enqueueFileWrite(String filename, byte[] content, boolean phpwrap) {
         FileToWrite ftw = new FileToWrite();
@@ -114,7 +116,7 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         }
     }
     
-    private static Charset cs_utf8 = Charset.forName("UTF-8");
+    private static final Charset cs_utf8 = StandardCharsets.UTF_8;
     public JsonFileClientUpdateComponent(final DynmapCore core, final ConfigurationNode configuration) {
         super(core, configuration);
         final boolean allowwebchat = configuration.getBoolean("allowwebchat", false);
@@ -157,57 +159,37 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
                 core.getServer().scheduleServerTask(this, jsonInterval/50);
             }}, jsonInterval/50);
         
-        core.events.addListener("buildclientconfiguration", new Event.Listener<JSONObject>() {
-            @Override
-            public void triggered(JSONObject t) {
-                s(t, "jsonfile", true);
-                s(t, "allowwebchat", allowwebchat);
-                s(t, "webchat-requires-login", req_login);
-                s(t, "loginrequired", core.isLoginRequired());
-                // For 'sendmessage.php'
-                s(t, "webchat-interval", configuration.getFloat("webchat-interval", 5.0f));
-                s(t, "chatlengthlimit", lengthlimit);
-            }
+        core.events.addListener("buildclientconfiguration", (Event.Listener<JSONObject>) t -> {
+            setValue(t, "jsonfile", true);
+            setValue(t, "allowwebchat", allowwebchat);
+            setValue(t, "webchat-requires-login", req_login);
+            setValue(t, "loginrequired", core.isLoginRequired());
+            // For 'sendmessage.php'
+            setValue(t, "webchat-interval", configuration.getFloat("webchat-interval", 5.0f));
+            setValue(t, "chatlengthlimit", lengthlimit);
         });
-        core.events.addListener("initialized", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-                writeLogins();
-                writeAccess();
-            }
+        core.events.addListener("initialized", t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
+            writeLogins();
+            writeAccess();
         });
-        core.events.addListener("server-started", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-                writeLogins();
-                writeAccess();
-            }
+        core.events.addListener("server-started", t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
+            writeLogins();
+            writeAccess();
         });
-        core.events.addListener("worldactivated", new Event.Listener<DynmapWorld>() {
-            @Override
-            public void triggered(DynmapWorld t) {
-                writeConfiguration();
-                writeUpdates(); /* Make sure we stay in sync */
-                writeAccess();
-            }
+        core.events.addListener("worldactivated", (Event.Listener<DynmapWorld>) t -> {
+            writeConfiguration();
+            writeUpdates(); /* Make sure we stay in sync */
+            writeAccess();
         });
-        core.events.addListener("loginupdated", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeLogins();
-                writeAccess();
-            }
+        core.events.addListener("loginupdated", t -> {
+            writeLogins();
+            writeAccess();
         });
-        core.events.addListener("playersetupdated", new Event.Listener<Object>() {
-            @Override
-            public void triggered(Object t) {
-                writeAccess();
-            }
-        });
+        core.events.addListener("playersetupdated", t -> writeAccess());
     }
         
     private void generateConfigJS(DynmapCore core) {
@@ -265,24 +247,13 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         sb.append("'\n }\n};\n");
         
         byte[] outputBytes = sb.toString().getBytes(cs_utf8);
-        MapManager.scheduleDelayedJob(new Runnable() {
-        	public void run() {
-                File f = new File(baseStandaloneDir, "config.js");
-                FileOutputStream fos = null;
-                try {
-                    fos = new FileOutputStream(f);
-                    fos.write(outputBytes);
-                } catch (IOException iox) {
-                    Log.severe("Exception while writing " + f.getPath(), iox);
-                } finally {
-                    if(fos != null) {
-                        try {
-                            fos.close();
-                        } catch (IOException x) {}
-                        fos = null;
-                    }
-                }        		
-        	}
+        MapManager.scheduleDelayedJob(() -> {
+File f = new File(baseStandaloneDir, "config.js");
+            try (FileOutputStream fos = new FileOutputStream(f)) {
+                fos.write(outputBytes);
+            } catch (IOException iox) {
+                Log.severe("Exception while writing " + f.getPath(), iox);
+            }
         }, 0);
     }
     
@@ -309,9 +280,8 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     protected void writeUpdates() {
         if(core.mapManager == null) return;
         //Handles Updates
-        ArrayList<DynmapWorld> wlist = new ArrayList<DynmapWorld>(core.mapManager.getWorlds());	// Grab copy of world list
-        for (int windx = 0; windx < wlist.size(); windx++) {
-        	DynmapWorld dynmapWorld = wlist.get(windx);
+        List<DynmapWorld> copyOfWorlds = new ArrayList<>(core.mapManager.getWorlds());    // Grab copy of world list
+        for (DynmapWorld dynmapWorld : copyOfWorlds) {
             JSONObject update = new JSONObject();
             update.put("timestamp", currentTimestamp);
             ClientUpdateEvent clientUpdate = new ClientUpdateEvent(currentTimestamp - 30000, dynmapWorld, update);
@@ -320,10 +290,9 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
 
             String outputFile;
             boolean dowrap = storage.wrapStandaloneJSON(core.isLoginSupportEnabled());
-            if(dowrap) {
+            if (dowrap) {
                 outputFile = "updates_" + dynmapWorld.getName() + ".php";
-            }
-            else {
+            } else {
                 outputFile = "dynmap_" + dynmapWorld.getName() + ".json";
             }
             byte[] content = Json.stringifyJson(update).getBytes(cs_utf8);
@@ -374,163 +343,136 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
     }
 
     private void processWebChat(JSONArray jsonMsgs) {
-    	Iterator<?> iter = jsonMsgs.iterator();
-		boolean init_skip = (lastChatTimestamp == 0);
-		while (iter.hasNext()) {
-			boolean ok = true;
-			JSONObject o = (JSONObject) iter.next();
-			String ts = String.valueOf(o.get("timestamp"));
-			if(ts.equals("null")) ts = "0";
-			long cts;
-			try {
-				cts = Long.parseLong(ts);
-			} catch (NumberFormatException nfx) {
-				try {
-					cts = (long) Double.parseDouble(ts);
-				} catch (NumberFormatException nfx2) {
-					cts = 0;
-				}
-			}
-			if (cts > lastChatTimestamp) {
-				String name = String.valueOf(o.get("name"));
-				String ip = String.valueOf(o.get("ip"));
-				String uid = null;
-				Object usr = o.get("userid");
-				if(usr != null) {
-					uid = String.valueOf(usr);
-				}
-				boolean isip = true;
-				lastChatTimestamp = cts;
-				if(init_skip)
-					continue;
-				if(uid == null) {
-					if((!trust_client_name) || (name == null) || (name.equals(""))) {
-						if(ip != null)
-							name = ip;
-					}
-					if(useplayerloginip) {  /* Try to match using IPs of player logins */
-						List<String> ids = core.getIDsForIP(name);
-						if(ids != null && !ids.isEmpty()) {
-							name = ids.get(0);
-							isip = false;
-							if(checkuserban) {
-								if(core.getServer().isPlayerBanned(name)) {
-									Log.info("Ignore message from '" + ip + "' - banned player (" + name + ")");
-									ok = false;
-								}
-							}
-							if(chat_perms && !core.getServer().checkPlayerPermission(name, "webchat")) {
-								Log.info("Rejected web chat from " + ip + ": not permitted (" + name + ")");
-								ok = false;
-							}
-						}
-						else if(requireplayerloginip) {
-							Log.info("Ignore message from '" + name + "' - no matching player login recorded");
-							ok = false;
-						}
-					}
-					if(hidewebchatip && isip) {
-						String n = useralias.get(name);
-						if(n == null) { /* Make ID */
-							n = String.format("web-%03d", aliasindex);
-							aliasindex++;
-							useralias.put(name, n);
-						}
-						name = n;
-					}
-				}
-				else {
-					if(core.getServer().isPlayerBanned(uid)) {
-						Log.info("Ignore message from '" + uid + "' - banned user");
-						ok = false;
-					}
-					if(chat_perms && !core.getServer().checkPlayerPermission(uid, "webchat")) {
-						Log.info("Rejected web chat from " + uid + ": not permitted");
-						ok = false;
-					}
-					name = uid;
-				}
-				if(ok) {
-					String message = String.valueOf(o.get("message"));
-					if((lengthlimit > 0) && (message.length() > lengthlimit))
-						message = message.substring(0, lengthlimit);
-					core.webChat(name, message);
-				}
-			}
-		}    	
+        Iterator<?> iter = jsonMsgs.iterator();
+        boolean init_skip = (lastChatTimestamp == 0);
+        while (iter.hasNext()) {
+            boolean ok = true;
+            JSONObject o = (JSONObject) iter.next();
+            String ts = String.valueOf(o.get("timestamp"));
+            if(ts.equals("null")) ts = "0";
+            long cts;
+            try {
+                cts = Long.parseLong(ts);
+            } catch (NumberFormatException nfx) {
+                try {
+                    cts = (long) Double.parseDouble(ts);
+                } catch (NumberFormatException nfx2) {
+                    cts = 0;
+                }
+            }
+            if (cts > lastChatTimestamp) {
+                String name = String.valueOf(o.get("name"));
+                String ip = String.valueOf(o.get("ip"));
+                String uid = null;
+                Object usr = o.get("userid");
+                if(usr != null) {
+                    uid = String.valueOf(usr);
+                }
+                boolean isip = true;
+                lastChatTimestamp = cts;
+                if(init_skip)
+                    continue;
+                if(uid == null) {
+                    if((!trust_client_name) || (name == null) || (name.isEmpty())) {
+                        if(ip != null)
+                            name = ip;
+                    }
+                    if(useplayerloginip) {  /* Try to match using IPs of player logins */
+                        List<String> ids = core.getIDsForIP(name);
+                        if(ids != null && !ids.isEmpty()) {
+                            name = ids.get(0);
+                            isip = false;
+                            if(checkuserban) {
+                                if(core.getServer().isPlayerBanned(name)) {
+                                    Log.info("Ignore message from '" + ip + "' - banned player (" + name + ")");
+                                    ok = false;
+                                }
+                            }
+                            if(chat_perms && !core.getServer().checkPlayerPermission(name, "webchat")) {
+                                Log.info("Rejected web chat from " + ip + ": not permitted (" + name + ")");
+                                ok = false;
+                            }
+                        }
+                        else if(requireplayerloginip) {
+                            Log.info("Ignore message from '" + name + "' - no matching player login recorded");
+                            ok = false;
+                        }
+                    }
+                    if(hidewebchatip && isip) {
+                        String n = useralias.get(name);
+                        if(n == null) { /* Make ID */
+                            n = String.format("web-%03d", aliasindex);
+                            aliasindex++;
+                            useralias.put(name, n);
+                        }
+                        name = n;
+                    }
+                }
+                else {
+                    if(core.getServer().isPlayerBanned(uid)) {
+                        Log.info("Ignore message from '" + uid + "' - banned user");
+                        ok = false;
+                    }
+                    if(chat_perms && !core.getServer().checkPlayerPermission(uid, "webchat")) {
+                        Log.info("Rejected web chat from " + uid + ": not permitted");
+                        ok = false;
+                    }
+                    name = uid;
+                }
+                if(ok) {
+                    String message = String.valueOf(o.get("message"));
+                    if((lengthlimit > 0) && (message.length() > lengthlimit))
+                        message = message.substring(0, lengthlimit);
+                    core.webChat(name, message);
+                }
+            }
+        }        
     }
     
     protected void handleWebChat() {
-    	MapManager.scheduleDelayedJob(new Runnable() {
-    		public void run() {
-    			BufferInputStream bis = storage.getStandaloneFile("dynmap_webchat.json");
-    			if (bis != null && lastTimestamp != 0) {
-    				JSONArray jsonMsgs = null;
-    				Reader inputFileReader = null;
-    				try {
-    					inputFileReader = new InputStreamReader(bis, cs_utf8);
-    					jsonMsgs = (JSONArray) parser.parse(inputFileReader);
-    				} catch (IOException ex) {
-    					Log.severe("Exception while reading JSON-file.", ex);
-    				} catch (ParseException ex) {
-    					Log.severe("Exception while parsing JSON-file.", ex);
-    				} finally {
-    					if(inputFileReader != null) {
-    						try {
-    							inputFileReader.close();
-    						} catch (IOException iox) {
-
-    						}
-    						inputFileReader = null;
-    					}
-    				}
-    				if (jsonMsgs != null) {
-        				final JSONArray json = jsonMsgs;
-    					// Process content on server thread
-    					core.getServer().scheduleServerTask(new Runnable() {
-    						@Override
-    						public void run() {
-    							processWebChat(json);
-    						}
-    					}, 0);
-    				}
-    			}
-    		}
-		}, 0);
+        MapManager.scheduleDelayedJob(() -> {
+            BufferInputStream bis = storage.getStandaloneFile("dynmap_webchat.json");
+            if (bis != null && lastTimestamp != 0) {
+                JSONArray jsonMsgs = null;
+                try (Reader inputFileReader = new InputStreamReader(bis, cs_utf8)) {
+                    jsonMsgs = (JSONArray) parser.parse(inputFileReader);
+                } catch (IOException ex) {
+                    Log.severe("Exception while reading JSON-file.", ex);
+                } catch (ParseException ex) {
+                    Log.severe("Exception while parsing JSON-file.", ex);
+                }
+                if (jsonMsgs != null) {
+                    final JSONArray json = jsonMsgs;
+                    // Process content on server thread
+                    core.getServer().scheduleServerTask(() -> processWebChat(json), 0);
+                }
+            }
+        }, 0);
     }
     protected void handleRegister() {
-        if(core.pendingRegisters() == false)
+        if(!core.pendingRegisters())
             return;
         BufferInputStream bis = storage.getStandaloneFile("dynmap_reg.php");
         if (bis != null) {
             BufferedReader br = null;
-            ArrayList<String> lines = new ArrayList<String>();
+            List<String> lines;
             try {
                 br = new BufferedReader(new InputStreamReader(bis));
-                String line;
-                while ((line = br.readLine()) != null)   {
-                    if(line.startsWith("<?") || line.startsWith("*/")) {
-                        continue;
-                    }
-                    lines.add(line);
-                }
-            } catch (IOException iox) {
-                Log.severe("Exception while reading dynmap_reg.php", iox);
+                lines = br.lines()
+                        .filter(line -> !line.startsWith("<?") && !line.startsWith("*/"))
+                        .collect(Collectors.toCollection(ArrayList::new));
             } finally {
                 if (br != null) {
                     try {
                         br.close();
                     } catch (IOException x) {
                     }
-                    br = null;
                 }
             }
-            for(int i = 0; i < lines.size(); i++) {
-                String[] vals = lines.get(i).split("=");
-                if(vals.length == 3) {
-                    core.processCompletedRegister(vals[0].trim(), vals[1].trim(), vals[2].trim());
-                }
-            }
+            lines.stream()
+                    .map(line -> line.split("="))
+                    .filter(vals -> vals.length == 3)
+                    .forEachOrdered(vals -> core.processCompletedRegister(vals[0].trim(), vals[1].trim(), vals[2].trim()));
         }
     }
     

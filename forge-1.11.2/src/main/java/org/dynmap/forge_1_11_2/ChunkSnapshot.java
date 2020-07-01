@@ -14,11 +14,11 @@ import net.minecraft.nbt.NBTTagList;
  */
 public class ChunkSnapshot
 {
-    private static interface Section {
-        public DynmapBlockState getBlockType(int x, int y, int z);
-        public int getBlockSkyLight(int x, int y, int z);
-        public int getBlockEmittedLight(int x, int y, int z);
-        public boolean isEmpty();
+    private interface Section {
+        DynmapBlockState getBlockType(int x, int y, int z);
+        int getBlockSkyLight(int x, int y, int z);
+        int getBlockEmittedLight(int x, int y, int z);
+        boolean isEmpty();
     }
 
     private final int x, z;
@@ -61,7 +61,7 @@ public class ChunkSnapshot
     private static final EmptySection empty_section = new EmptySection();
     
     private static class StdSection implements Section {
-        DynmapBlockState[] states;
+        final DynmapBlockState[] states;
         byte[] skylight;
         byte[] emitlight;
 
@@ -140,45 +140,44 @@ public class ChunkSnapshot
         NBTTagList sect = nbt.getTagList("Sections", 10);
         for (int i = 0; i < sect.tagCount(); i++) {
             NBTTagCompound sec = sect.getCompoundTagAt(i);
-            byte secnum = sec.getByte("Y");
-            if (secnum >= this.sectionCnt) {
-                Log.info("Section " + (int) secnum + " above world height " + worldheight);
+            byte thatY = sec.getByte("Y");
+            if (thatY >= this.sectionCnt) {
+                Log.info("Section " + (int) thatY + " above world height " + worldheight);
                 continue;
             }
             // Create normal section to initialize
             StdSection cursect = new StdSection();
-            this.section[secnum] = cursect;
+            this.section[thatY] = cursect;
             DynmapBlockState[] states = cursect.states;
             // JEI format
             if (sec.hasKey("Palette", 11)) {
-            	int[] p = sec.getIntArray("Palette");
+                int[] p = sec.getIntArray("Palette");
                 // Palette is list of state values, where Blocks=bit 11-4 of index, Data=bit 3-0
-            	byte[] msb_bytes = sec.getByteArray("Blocks");
-            	int mlen = msb_bytes.length / 2;
-            	byte[] lsb_bytes = sec.getByteArray("Data");
-            	int llen = BLOCKS_PER_SECTION / 2;
-            	if (llen > lsb_bytes.length) llen = lsb_bytes.length;
+                byte[] msb_bytes = sec.getByteArray("Blocks");
+                int mlen = msb_bytes.length / 2;
+                byte[] lsb_bytes = sec.getByteArray("Data");
+                int llen = BLOCKS_PER_SECTION / 2;
+                if (llen > lsb_bytes.length) llen = lsb_bytes.length;
                 for(int j = 0; j < llen; j++) {
-                	int idx = lsb_bytes[j] & 0xF;
-                	int idx2 = (lsb_bytes[j] & 0xF0) >>> 4;
-        			if (j < mlen) {
-        				idx += (255 & msb_bytes[2*j]) << 4;
-        				idx2 += (255 & msb_bytes[2*j+1]) << 4;
-        			}
-        			// Get even block id
-        			states[2*j] = DynmapPlugin.stateByID[(idx < p.length) ? p[idx] : 0];
-        			// Get odd block id
-        			states[2*j+1] = DynmapPlugin.stateByID[(idx2 < p.length) ? p[idx2] : 0];
+                    int idx = lsb_bytes[j] & 0xF;
+                    int idx2 = (lsb_bytes[j] & 0xF0) >>> 4;
+                    if (j < mlen) {
+                        idx += (255 & msb_bytes[2*j]) << 4;
+                        idx2 += (255 & msb_bytes[2*j+1]) << 4;
+                    }
+                    // Get even block id
+                    states[2*j] = DynmapPlugin.stateByID[(idx < p.length) ? p[idx] : 0];
+                    // Get odd block id
+                    states[2*j+1] = DynmapPlugin.stateByID[(idx2 < p.length) ? p[idx2] : 0];
                 }
-            }
-            else {
+            } else {
                 // Get block IDs
-            	byte[] lsb_bytes = sec.getByteArray("Blocks");
-            	if (lsb_bytes.length < BLOCKS_PER_SECTION) {
-            	    lsb_bytes = Arrays.copyOf(lsb_bytes, BLOCKS_PER_SECTION);
-            	}
-            	// Get any additional ID data
-            	byte[] addid = null;
+                byte[] lsb_bytes = sec.getByteArray("Blocks");
+                if (lsb_bytes.length < BLOCKS_PER_SECTION) {
+                    lsb_bytes = Arrays.copyOf(lsb_bytes, BLOCKS_PER_SECTION);
+                }
+                // Get any additional ID data
+                byte[] addid = null;
                 if (sec.hasKey("Add", 7)) {    /* If additional data, add it */
                     addid = sec.getByteArray("Add");
                     if (addid.length < (BLOCKS_PER_SECTION / 2)) {
@@ -195,18 +194,19 @@ public class ChunkSnapshot
                 }
                 // Get meta nibble data
                 byte[] bd = null;
-                if (sec.hasKey("Data", 7)) {
+                if (!sec.hasKey("Data", 7)) {
+                } else {
                     bd = sec.getByteArray("Data");
                     if (bd.length < (BLOCKS_PER_SECTION / 2)) {
                         bd = Arrays.copyOf(bd, (BLOCKS_PER_SECTION / 2));
                     }
                 }
                 // Traverse section
-            	for(int j = 0; j < BLOCKS_PER_SECTION; j += 2) {
-            	    // Start with block ID
-            	    int id = (0xFF & lsb_bytes[j]) << 4;
+                for(int j = 0; j < BLOCKS_PER_SECTION; j += 2) {
+                    // Start with block ID
+                    int id = (0xFF & lsb_bytes[j]) << 4;
                     int id2 = (0xFF & lsb_bytes[j+1]) << 4;
-            	    // Add in additional parts
+                    // Add in additional parts
                     if (addid != null) {
                         byte b = addid[j >> 1];
                         id += (0xF & b) << 12;
@@ -227,7 +227,7 @@ public class ChunkSnapshot
                     // Compute states
                     states[j] = DynmapPlugin.stateByID[id];
                     states[j+1] = DynmapPlugin.stateByID[id2];
-            	}
+                }
             }
             cursect.emitlight = sec.getByteArray("BlockLight");
             if (sec.hasKey("SkyLight")) {
@@ -238,20 +238,11 @@ public class ChunkSnapshot
         this.biome = new int[COLUMNS_PER_CHUNK];
         if (nbt.hasKey("Biomes")) {
             byte[] b = nbt.getByteArray("Biomes");
-            if (b != null) {
-            	for (int i = 0; i < b.length; i++) {
-            		int bv = 255 & b[i];
-            		this.biome[i] = (bv == 255) ? 0 : bv;
-            	}
-            }
-            else {	// Check JEI biomes
-            	int[] bb = nbt.getIntArray("Biomes");
-            	if (bb != null) {
-                	for (int i = 0; i < bb.length; i++) {
-                		int bv = bb[i];
-                		this.biome[i] = (bv < 0) ? 0 : bv;
-                	}
-            	}
+            // b always isn't null
+            assert b != null;
+            for (int i = 0; i < b.length; i++) {
+                int bv = 255 & b[i];
+                this.biome[i] = (bv == 255) ? 0 : bv;
             }
         }
     }

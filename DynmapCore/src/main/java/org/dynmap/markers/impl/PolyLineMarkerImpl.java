@@ -12,7 +12,7 @@ import org.dynmap.markers.MarkerSet;
 import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 
 class PolyLineMarkerImpl implements PolyLineMarker {
-    private String markerid;
+    private final String markerid;
     private String label;
     private boolean markup;
     private String desc;
@@ -20,7 +20,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
     private String world;
     private String normalized_world;
     private boolean ispersistent;
-    private ArrayList<Coord> corners;
+    private final ArrayList<Coord> corners;
     private int lineweight = 3;
     private double lineopacity = 0.8;
     private int linecolor = 0xFF0000;
@@ -46,14 +46,14 @@ class PolyLineMarkerImpl implements PolyLineMarker {
      * @param persistent - true if persistent
      * @param set - marker set
      */
-    PolyLineMarkerImpl(String id, String lbl, boolean markup, String world, double x[], double[] y, double z[], boolean persistent, MarkerSetImpl set) {
+    PolyLineMarkerImpl(String id, String lbl, boolean markup, String world, double[] x, double[] y, double[] z, boolean persistent, MarkerSetImpl set) {
         markerid = id;
         if(lbl != null)
             label = lbl;
         else
             label = id;
         this.markup = markup;
-        this.corners = new ArrayList<Coord>();
+        this.corners = new ArrayList<>();
         for(int i = 0; i < x.length; i++) {
             this.corners.add(new Coord(x[i], y[i], z[i]));
         }
@@ -76,7 +76,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
         label = id;
         markup = false;
         desc = null;
-        corners = new ArrayList<Coord>();
+        corners = new ArrayList<>();
         this.minzoom = -1;
         this.maxzoom = -1;
         world = normalized_world = "world";
@@ -101,8 +101,8 @@ class PolyLineMarkerImpl implements PolyLineMarker {
         normalized_world = DynmapWorld.normalizeWorldName(world);
         desc = node.getString("desc", null);
         lineweight = node.getInteger("strokeWeight", -1);
-        if(lineweight == -1) {	/* Handle typo-saved value */
-        	 lineweight = node.getInteger("stokeWeight", 3);
+        if(lineweight == -1) {    /* Handle typo-saved value */
+             lineweight = node.getInteger("stokeWeight", 3);
         }
         lineopacity = node.getDouble("strokeOpacity", 0.8);
         linecolor = node.getInteger("strokeColor", 0xFF0000);
@@ -119,13 +119,13 @@ class PolyLineMarkerImpl implements PolyLineMarker {
     }
     
     @Override
-	public String getUniqueMarkerID() {
-    	if (markerset != null) {
-    		return markerset + ":poly:" + markerid;
-    	}
-    	else {
-    		return null;
-    	}
+    public String getUniqueMarkerID() {
+        if (markerset != null) {
+            return markerset + ":poly:" + markerid;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
@@ -177,18 +177,17 @@ class PolyLineMarkerImpl implements PolyLineMarker {
     Map<String, Object> getPersistentData() {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
         node.put("markup", markup);
-        List<Double> xx = new ArrayList<Double>();
-        List<Double> yy = new ArrayList<Double>();
-        List<Double> zz = new ArrayList<Double>();
-        for(int i = 0; i < corners.size(); i++) {
-            Coord c = corners.get(i);
+        List<Double> xx = new ArrayList<>();
+        List<Double> yy = new ArrayList<>();
+        List<Double> zz = new ArrayList<>();
+        corners.forEach(c -> {
             xx.add(c.x);
             yy.add(c.y);
             zz.add(c.z);
-        }
+        });
         node.put("x", xx);
         node.put("y", yy);
         node.put("z", zz);
@@ -222,7 +221,7 @@ class PolyLineMarkerImpl implements PolyLineMarker {
     @Override
     public void setDescription(String desc) {
         if(markerset == null) return;
-        if((this.desc == null) || (this.desc.equals(desc) == false)) {
+        if((this.desc == null) || (!this.desc.equals(desc))) {
             this.desc = desc;
             MarkerAPIImpl.polyLineMarkerUpdated(this, MarkerUpdate.UPDATED);
             if(ispersistent)

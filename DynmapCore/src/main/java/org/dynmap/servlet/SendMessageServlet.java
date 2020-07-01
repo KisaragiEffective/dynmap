@@ -1,9 +1,8 @@
 package org.dynmap.servlet;
 
-import static org.dynmap.JSONUtils.s;
-
 import org.dynmap.DynmapCore;
 import org.dynmap.Event;
+import org.dynmap.JSONUtils;
 import org.dynmap.Log;
 import org.dynmap.web.HttpField;
 import org.json.simple.JSONObject;
@@ -19,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,17 +31,17 @@ public class SendMessageServlet extends HttpServlet {
     protected static final Logger log = Logger.getLogger("Minecraft");
 
     private static final JSONParser parser = new JSONParser();
-    public Event<Message> onMessageReceived = new Event<Message>();
-    private Charset cs_utf8 = Charset.forName("UTF-8");
+    public final Event<Message> onMessageReceived = new Event<>();
+    private final Charset cs_utf8 = StandardCharsets.UTF_8;
     public int maximumMessageInterval = 1000;
     public boolean hideip = false;
     public boolean trustclientname = false;
     
     public String spamMessage = "\"You may only chat once every %interval% seconds.\"";
-    private HashMap<String, WebUser> disallowedUsers = new HashMap<String, WebUser>();
-    private LinkedList<WebUser> disallowedUserQueue = new LinkedList<WebUser>();
-    private Object disallowedUsersLock = new Object();
-    private HashMap<String,String> useralias = new HashMap<String,String>();
+    private final HashMap<String, WebUser> disallowedUsers = new HashMap<>();
+    private final LinkedList<WebUser> disallowedUserQueue = new LinkedList<>();
+    private final Object disallowedUsersLock = new Object();
+    private final HashMap<String,String> useralias = new HashMap<>();
     private int aliasindex = 1;
     public boolean use_player_login_ip = false;
     public boolean require_player_login_ip = false;
@@ -50,7 +50,7 @@ public class SendMessageServlet extends HttpServlet {
     public boolean chat_perms = false;
     public int lengthlimit = 256;
     public DynmapCore core;
-    public HashSet<String> proxyaddress = new HashSet<String>();
+    public final HashSet<String> proxyaddress = new HashSet<>();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -89,7 +89,7 @@ public class SendMessageServlet extends HttpServlet {
                     message.name = String.valueOf(o.get("name"));
                 }
                 boolean isip = true;
-                if ((message.name == null) || message.name.equals("")) {
+                if ((message.name == null) || message.name.isEmpty()) {
                     /* If from trusted proxy, check for client */
                     String rmtaddr = request.getRemoteAddr(); 
                     if (this.proxyaddress.contains(rmtaddr)) {
@@ -189,7 +189,7 @@ public class SendMessageServlet extends HttpServlet {
                 onMessageReceived.trigger(message);
         }
         JSONObject json = new JSONObject();
-        s(json, "error", error);
+        JSONUtils.setValue(json, "error", error);
         bytes = json.toJSONString().getBytes(cs_utf8);
         
         String dateStr = new Date().toString();

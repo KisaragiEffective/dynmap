@@ -8,9 +8,9 @@ import org.dynmap.ConfigurationNode;
 import org.dynmap.markers.MarkerIcon;
 
 class MarkerIconImpl implements MarkerIcon {
-    private String iconid;
+    private final String iconid;
     private String label;
-    private boolean is_builtin;
+    private final boolean is_builtin;
     private MarkerSize size = MarkerSize.MARKER_16x16;
     
     MarkerIconImpl(String id) {
@@ -45,7 +45,7 @@ class MarkerIconImpl implements MarkerIcon {
     @Override
     public void setMarkerIconLabel(String lbl) {
         if(lbl == null) lbl = iconid;
-        if(label.equals(lbl) == false) {
+        if(!label.equals(lbl)) {
             label = lbl;
             MarkerAPIImpl.saveMarkers();
         }
@@ -75,7 +75,7 @@ class MarkerIconImpl implements MarkerIcon {
         if(is_builtin)
             return null;
         
-        HashMap<String, Object> node = new HashMap<String, Object>();
+        HashMap<String, Object> node = new HashMap<>();
         node.put("label", label);
 
         return node;

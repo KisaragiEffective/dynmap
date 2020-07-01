@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import org.dynmap.DynmapCore;
 import org.dynmap.Log;
@@ -26,15 +28,15 @@ import org.dynmap.utils.MapIterator;
  * Connected Texture Mod (CTM) handler
  */
 public class CTMTexturePack {
-    private String[] ctpfiles;
-    private TexturePackLoader tpl;
+    private final String[] ctpfiles;
+    private final TexturePackLoader tpl;
     private CTMProps[][] bytilelist;
     private CTMProps[][] bybaseblockstatelist;
     private BitSet mappedtiles;
     private BitSet mappedblocks;
     private String[] biomenames;
     
-    private String vanillatextures;
+    private final String vanillatextures;
     
     static final int BOTTOM_FACE = 0; // 0, -1, 0
     static final int TOP_FACE = 1; // 0, 1, 0
@@ -146,7 +148,7 @@ public class CTMTexturePack {
     public enum CTMConnect {
         NONE, BLOCK, TILE, MATERIAL, UNKNOWN
     }
-    public static final int FACE_BOTTOM = (1 << 0);
+    public static final int FACE_BOTTOM = (1    );
     public static final int FACE_TOP = (1 << 1);
     public static final int FACE_NORTH = (1 << 2);
     public static final int FACE_SOUTH = (1 << 3);
@@ -170,23 +172,23 @@ public class CTMTexturePack {
     }
 
     public static class CTMProps {
-        public String name = null;
-        public String basePath = null;
-        public int[] matchBlocks = null;
+        public String name;
+        public String basePath;
+        public int[] matchBlocks;
         public String[] matchTiles = null;
         public CTMMethod method = CTMMethod.NONE;
-        public String[] tiles = null;
+        public String[] tiles;
         public CTMConnect connect = CTMConnect.NONE;
         public int faces = FACE_ALL;
         public int metadata = -1;
         public int[] biomes = null;
-        public int minY = 0;
-        public int maxY = 1024;
-        public int renderPass = 0;
+        public final int minY;
+        public final int maxY;
+        public final int renderPass;
         public boolean innerSeams = false;
-        public int width = 0;
-        public int height = 0;
-        public int[] weights = null;
+        public final int width;
+        public final int height;
+        public int[] weights;
         public CTMSymmetry symmetry = CTMSymmetry.NONE;
         public int[] sumWeights = null;
         public int sumAllWeights = 0;
@@ -196,12 +198,12 @@ public class CTMTexturePack {
         private String[] tokenize(String v, String split)
         {
             StringTokenizer tok = new StringTokenizer(v, split);
-            ArrayList<String> rslt = new ArrayList<String>();
+            ArrayList<String> rslt = new ArrayList<>();
 
             while (tok.hasMoreTokens()) {
                 rslt.add(tok.nextToken());
             }
-            return rslt.toArray(new String[rslt.size()]);
+            return rslt.toArray(new String[0]);
         }
 
         private void getFaces(Properties p) {
@@ -209,33 +211,36 @@ public class CTMTexturePack {
             this.faces = 0;
             String[] tok = v.split("\\s+");
             for(String t : tok) {
-                if (t.equals("bottom")) {
-                    this.faces |= FACE_BOTTOM;
-                }
-                else if (t.equals("top")) {
-                    this.faces |= FACE_TOP;
-                }
-                else if (t.equals("north")) {
-                    this.faces |= FACE_NORTH;
-                }
-                else if (t.equals("south")) {
-                    this.faces |= FACE_SOUTH;
-                }
-                else if (t.equals("east")) {
-                    this.faces |= FACE_EAST;
-                }
-                else if (t.equals("west")) {
-                    this.faces |= FACE_WEST;
-                }
-                else if (t.equals("sides") || t.equals("side")) {
-                    this.faces |= FACE_SIDES;
-                }
-                else if (t.equals("all")) {
-                    this.faces |= FACE_ALL;
-                }
-                else {
-                    Log.info("Unknown face in CTM file: " + t);
-                    this.faces |= FACE_UNKNOWN;
+                switch (t) {
+                    case "bottom":
+                        this.faces |= FACE_BOTTOM;
+                        break;
+                    case "top":
+                        this.faces |= FACE_TOP;
+                        break;
+                    case "north":
+                        this.faces |= FACE_NORTH;
+                        break;
+                    case "south":
+                        this.faces |= FACE_SOUTH;
+                        break;
+                    case "east":
+                        this.faces |= FACE_EAST;
+                        break;
+                    case "west":
+                        this.faces |= FACE_WEST;
+                        break;
+                    case "sides":
+                    case "side":
+                        this.faces |= FACE_SIDES;
+                        break;
+                    case "all":
+                        this.faces |= FACE_ALL;
+                        break;
+                    default:
+                        Log.info("Unknown face in CTM file: " + t);
+                        this.faces |= FACE_UNKNOWN;
+                        break;
                 }
             }
         }
@@ -253,7 +258,7 @@ public class CTMTexturePack {
             String v = p.getProperty(fld);
             if(v == null) return null;
             String[] tok = tokenize(v, ", ");
-            ArrayList<Integer> rslt = new ArrayList<Integer>();
+            ArrayList<Integer> rslt = new ArrayList<>();
             for(String t : tok) {
                 t = t.trim();
                 String[] vtok = tokenize(t, "-");
@@ -276,11 +281,9 @@ public class CTMTexturePack {
                     }
                 }
             }
-            int[] out = new int[rslt.size()];
-            for(int i = 0; i < out.length; i++) {
-                out[i] = rslt.get(i);
-            }
-            return out;
+            return rslt.stream()
+                    .mapToInt(integer -> integer)
+                    .toArray();
         }
         private int parseRenderPass(Properties p, String fld, int def) {
             String v = p.getProperty(fld);
@@ -302,28 +305,28 @@ public class CTMTexturePack {
         }
         
         private void addBlockStateToIDSet(Set<Integer> list, DynmapBlockState bs) {
-    		list.add(bs.globalStateIndex);
+            list.add(bs.globalStateIndex);
         }
         private void addBaseBlockStateToIDSet(Set<Integer> list, DynmapBlockState bs) {
-        	bs = bs.baseState;
-        	for (int i = 0; i < bs.getStateCount(); i++) {
-        		list.add(bs.getStateByIndex(i).globalStateIndex);
-        	}
+            bs = bs.baseState;
+            for (int i = 0; i < bs.getStateCount(); i++) {
+                list.add(bs.getStateByIndex(i).globalStateIndex);
+            }
         }
         private int[] getIDList(Properties properties, String key, String type) {
-            Set<Integer> list = new HashSet<Integer>();
+            Set<Integer> list = new HashSet<>();
             String property = properties.getProperty(key, "");
             for (String token : property.split("\\s+")) {
-                if (token.equals("")) {
+                if (token.isEmpty()) {
                 } else if (token.matches("\\d+")) {
                     try {
                         int id = Integer.parseInt(token);
                         DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
                         if (bs == null) {
-                        	Log.info("Unknown Legacy block ID in CTM: " + token);
+                            Log.info("Unknown Legacy block ID in CTM: " + token);
                         }
                         else {
-                        	addBaseBlockStateToIDSet(list, bs);
+                            addBaseBlockStateToIDSet(list, bs);
                         }
                     } catch (NumberFormatException e) {
                         Log.info("Bad ID token: " + token);
@@ -337,20 +340,20 @@ public class CTMTexturePack {
                     boolean addbase = false;
                     // If blockname:statename
                     if (toks.length > 2) {
-                    	bs = DynmapBlockState.getStateByNameAndState(toks[0] + ":" + toks[1], toks[2]);
+                        bs = DynmapBlockState.getStateByNameAndState(toks[0] + ":" + toks[1], toks[2]);
                     }
                     else {
                         bs = DynmapBlockState.getBaseStateByName(token);
                         addbase = true;
                     }
-                	if (bs == DynmapBlockState.AIR) {
-                		Log.info("Unknown block ID in CTM: " + token);
+                    if (bs == DynmapBlockState.AIR) {
+                        Log.info("Unknown block ID in CTM: " + token);
                     }
                     else if (addbase) {
-                		addBaseBlockStateToIDSet(list, bs);
+                        addBaseBlockStateToIDSet(list, bs);
                     }
                     else {
-                		addBlockStateToIDSet(list, bs);
+                        addBlockStateToIDSet(list, bs);
                     }
                 }
             }
@@ -361,10 +364,10 @@ public class CTMTexturePack {
                         int id = Integer.parseInt(m.group(1));
                         DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
                         if (bs == null) {
-                        	Log.info("Unknown Legacy block ID from filename in CTM: " + name);
+                            Log.info("Unknown Legacy block ID from filename in CTM: " + name);
                         }
                         else {
-                        	addBlockStateToIDSet(list, bs);
+                            addBlockStateToIDSet(list, bs);
                         }
                     } catch (NumberFormatException e) {
                         Log.info("Bad block number: " + name);
@@ -440,8 +443,8 @@ public class CTMTexturePack {
         }
         private void getBiomes(Properties p, CTMTexturePack tp) {
             String v = p.getProperty("biomes", "").trim().toLowerCase();
-            if (!v.equals("")) {
-                ArrayList<Integer> ids = new ArrayList<Integer>();
+            if (!v.isEmpty()) {
+                ArrayList<Integer> ids = new ArrayList<>();
                 String[] biomenames = tp.biomenames;
                 for(String s : v.split("\\s+")) {
                     for(int i = 0; i < biomenames.length; i++) {
@@ -509,7 +512,7 @@ public class CTMTexturePack {
                 if (v.length() == 0) {
                     return null;
                 }
-                ArrayList<String> lst = new ArrayList<String>();
+                List<String> lst = new ArrayList<>();
                 String[] tok = tokenize(v, " ,");
                 for (String t : tok) {
                     if (t.indexOf('-') >= 0) {
@@ -534,7 +537,7 @@ public class CTMTexturePack {
                 for (int i = 0; i < out.length; i++) {
                     String vv = lst.get(i);
                     // If not absolute path
-                    if ((vv.startsWith("/") == false) && (vv.startsWith("assets/") == false)) {
+                    if ((!vv.startsWith("/")) && (!vv.startsWith("assets/"))) {
                         vv = this.basePath + "/" + vv;    // Build path
                     }
                     if (vv.endsWith(".png")) {   // If needed, strip of png
@@ -564,10 +567,10 @@ public class CTMTexturePack {
                     }
                 }
                 if (id >= 0) {
-                	DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
-                	if (bs != null) {
-                		this.matchBlocks = new int[] { bs.globalStateIndex };
-                	}
+                    DynmapBlockState bs = DynmapBlockState.getStateByLegacyBlockID(id);
+                    if (bs != null) {
+                        this.matchBlocks = new int[] { bs.globalStateIndex };
+                    }
                 }
             }
         }
@@ -597,9 +600,8 @@ public class CTMTexturePack {
             int[] md = parseInts(p, "metadata");
             if (md != null) {
                 this.metadata = 0;
-                for(int m : md) {
-                    this.metadata |= (1 << m);
-                }
+                Arrays.stream(md)
+                        .forEachOrdered(m -> this.metadata |= (1 << m));
             }
             this.minY = parseInt(p, "minHeight", -1);
             this.maxY = parseInt(p, "maxHeight", Integer.MAX_VALUE);
@@ -704,9 +706,7 @@ public class CTMTexturePack {
                 return true;
             } else if (this.metadata != -1 && block.stateIndex >= 0 && block.stateIndex < 32) {
                 int altMetadata = getOrientationFromMetadata(block) & META_MASK;
-                if ((this.metadata & ((1 << block.stateIndex) | (1 << altMetadata))) == 0) {
-                    return true;
-                }
+                return (this.metadata & ((1 << block.stateIndex) | (1 << altMetadata))) == 0;
             }
             return false;
         }
@@ -830,9 +830,9 @@ public class CTMTexturePack {
                 String ftn = tn;
                 String modname = "minecraft";
                 int colonindex = ftn.indexOf(':');
-                if (colonindex > 0) {	// Modname:resource?
-                	modname = ftn.substring(0, colonindex);
-                	ftn = ftn.substring(colonindex+1);
+                if (colonindex > 0) {    // Modname:resource?
+                    modname = ftn.substring(0, colonindex);
+                    ftn = ftn.substring(colonindex+1);
                 }
                 if (ftn.startsWith("./")) {
                     ftn = proppath + "/" + ftn.substring(2);
@@ -849,7 +849,7 @@ public class CTMTexturePack {
                     ftn = ftn + ".png"; // Add .png if needed
                 }
                 if (modname.equals("minecraft")) {
-                	modname = null;
+                    modname = null;
                 }
                 //Log.info(tn + ":registerTiles(" + modname + ":" + ftn + ")");
                 // Find file ID, add if needed
@@ -901,7 +901,6 @@ public class CTMTexturePack {
      * @param is_rp - if true, resource pack; if false, texture pack
      */
     public CTMTexturePack(TexturePackLoader tpl, TexturePack tp, DynmapCore core, boolean is_rp) {
-        ArrayList<String> files = new ArrayList<String>();
         this.tpl = tpl;
         biomenames = core.getBiomeNames();
         Set<String> ent = tpl.getEntries();
@@ -916,12 +915,7 @@ public class CTMTexturePack {
             ctmpath = ctmpath2 = "ctm/";
             vanillatextures = "textures/blocks/%2$s";
         }
-        for (String name : ent) {
-            if((name.startsWith(ctmpath) || name.startsWith(ctmpath2)) && name.endsWith(".properties")) {
-                files.add(name);
-            }
-        }
-        ctpfiles = files.toArray(new String[files.size()]);
+        ctpfiles = ent.stream().filter(name -> (name.startsWith(ctmpath) || name.startsWith(ctmpath2)) && name.endsWith(".properties")).toArray(String[]::new);
         Arrays.sort(ctpfiles);
         processFiles(core);
     }
@@ -973,15 +967,13 @@ public class CTMTexturePack {
         biomenames = newbiomes;
         
         for(String f : ctpfiles) {
-            InputStream is = null;
-            try {
-                is = tpl.openTPResource(f);
+            try (InputStream is = tpl.openTPResource(f)) {
                 Properties p = new Properties();
-                if(is != null) {
+                if (is != null) {
                     p.load(is);
-                    
+
                     CTMProps ctmp = new CTMProps(p, f, this);
-                    if(ctmp.isValid(f)) {
+                    if (ctmp.isValid(f)) {
                         ctmp.registerTiles(this.vanillatextures, f);
                         bytilelist = addToList(bytilelist, mappedtiles, ctmp.matchTileIcons, ctmp);
                         bybaseblockstatelist = addToList(bybaseblockstatelist, mappedblocks, ctmp.matchBlocks, ctmp);
@@ -989,27 +981,23 @@ public class CTMTexturePack {
                 }
             } catch (IOException iox) {
                 Log.severe("Cannot process CTM file - " + f, iox);
-            } finally {
-                if(is != null) {
-                    try { is.close(); } catch (IOException iox) {}
-                }
             }
         }
 //        for (int i = 0; i < bybaseblockstatelist.length; i++) {
-//        	CTMProps[] p = bybaseblockstatelist[i];
-//        	if (p != null) {
-//        		DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-//        		Log.info(bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
-//        		for (CTMProps pp : p) {
-//        			Log.info("  " + pp.name + ", faces=" + pp.faces + ",connect=" + pp.connect + ", meta=" + pp.metadata + ", method=" + pp.method);
-//        		}
-//        	}
+//            CTMProps[] p = bybaseblockstatelist[i];
+//            if (p != null) {
+//                DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+//                Log.info(bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
+//                for (CTMProps pp : p) {
+//                    Log.info("  " + pp.name + ", faces=" + pp.faces + ",connect=" + pp.connect + ", meta=" + pp.metadata + ", method=" + pp.method);
+//                }
+//            }
 //        }
 //        for (int i = 0; i < mappedblocks.length(); i++) {
-//        	if (mappedblocks.get(i)) {
-//        		DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
-//        		Log.info("mapped:" + bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
-//        	}
+//            if (mappedblocks.get(i)) {
+//                DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+//                Log.info("mapped:" + bs.blockName + ":" + bs.stateName + "(" + i + "): legacyID=" + bs.legacyBlockID);
+//            }
 //        }
     }
 
@@ -1098,7 +1086,7 @@ public class CTMTexturePack {
             if (blk == neighbor)
                 return true;
             else 
-            	return blk.material.equals(neighbor.material);
+                return blk.material.equals(neighbor.material);
         }
     }
     
@@ -1116,7 +1104,7 @@ public class CTMTexturePack {
             idx = (mapiter.getBlockKey() << 8) | laststep.ordinal();
             Integer val = (Integer) cache.get(idx);
             if (val != null) {
-                return val.intValue();
+                return val;
             }
         }
             
@@ -1276,12 +1264,7 @@ public class CTMTexturePack {
     private int mapTextureCtm(CTMProps p, Context ctx) {
         int face = ctx.face;
         int[][] offsets = NEIGHBOR_OFFSET[face];
-        int neighborBits = 0;
-        for (int bit = 0; bit < 8; bit++) {
-            if (p.shouldConnect(ctx, offsets[bit])) {
-                neighborBits |= (1 << bit);
-            }
-        }
+        int neighborBits = IntStream.range(0, 8).filter(bit -> p.shouldConnect(ctx, offsets[bit])).map(bit -> (1 << bit)).reduce(0, (a, b) -> a | b);
         return p.tileIcons[neighborMapCtm[neighborBits]];
     }
     // Map texture using horizontal method
@@ -1328,7 +1311,7 @@ public class CTMTexturePack {
             face = 0;
         }
         face = ctx.reorient(face) / p.symmetry.shift;
-        int index = 0;
+        int index;
         // If no weights, consistent weight
         if (p.weights == null) {
             index = getRandom(ctx.x, ctx.y, ctx.z, face, p.tileIcons.length);
@@ -1337,12 +1320,7 @@ public class CTMTexturePack {
             int rnd = getRandom(ctx.x, ctx.y, ctx.z, face, p.sumAllWeights);
             int[] w = p.sumWeights;
             // Find which range matches
-            for (int i = 0; i < w.length; ++i) {
-                if (rnd < w[i]) {
-                    index = i;
-                    break;
-                }
-            }
+            index = IntStream.range(0, w.length).filter(i -> rnd < w[i]).findFirst().orElse(0);
         }
         return p.tileIcons[index];
     }
@@ -1534,7 +1512,7 @@ public class CTMTexturePack {
     private static final long MULTIPLIER = 0x5deece66dL;
     private static final long ADDEND = 0xbL;
 
-    private static final int getRandom(int x, int y, int z, int face, int modulus)
+    private static int getRandom(int x, int y, int z, int face, int modulus)
     {
         long n = P1 * x * (x + ADDEND) + P2 * y * (y + ADDEND) + P3 * z * (z + ADDEND) + P4 * face * (face + ADDEND);
         n = MULTIPLIER * (n + x + y + z + face) + ADDEND;
@@ -1545,10 +1523,7 @@ public class CTMTexturePack {
         if (a.length != b.length) {
             throw new RuntimeException("arrays to add are not same length");
         }
-        int[] c = new int[a.length];
-        for (int i = 0; i < c.length; i++) {
-            c[i] = a[i] + b[i];
-        }
+        int[] c = IntStream.range(0, a.length).map(i -> a[i] + b[i]).toArray();
         return c;
     }
 

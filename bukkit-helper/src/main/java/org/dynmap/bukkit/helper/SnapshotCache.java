@@ -12,20 +12,20 @@ import org.dynmap.utils.DynIntHashMap;
 import org.dynmap.bukkit.helper.AbstractMapChunkCache.Snapshot;
 
 public class SnapshotCache {
-	
-	public static SnapshotCache sscache;
-	
+    
+    public static SnapshotCache sscache;
+    
     public static class SnapshotRec {
         public Snapshot ss;
         public long inhabitedTicks;
         public DynIntHashMap tileData;
-    };
+    }
 
     private CacheHashMap snapcache;
-    private ReferenceQueue<SnapshotRec> refqueue;
+    private final ReferenceQueue<SnapshotRec> refqueue;
     private long cache_attempts;
     private long cache_success;
-    private boolean softref;
+    private final boolean softref;
     
     private static class CacheRec {
         Reference<SnapshotRec> ref;
@@ -37,13 +37,13 @@ public class SnapshotCache {
     
     @SuppressWarnings("serial")
     public class CacheHashMap extends LinkedHashMap<String, CacheRec> {
-        private int limit;
+        private final int limit;
         private IdentityHashMap<Reference<SnapshotRec>, String> reverselookup;
 
         public CacheHashMap(int lim) {
             super(16, (float)0.75, true);
             limit = lim;
-            reverselookup = new IdentityHashMap<Reference<SnapshotRec>, String>();
+            reverselookup = new IdentityHashMap<>();
         }
         protected boolean removeEldestEntry(Map.Entry<String, CacheRec> last) {
             boolean remove = (size() >= limit);
@@ -59,7 +59,7 @@ public class SnapshotCache {
      */
     public SnapshotCache(int max_size, boolean softref) {
         snapcache = new CacheHashMap(max_size);
-        refqueue = new ReferenceQueue<SnapshotRec>();
+        refqueue = new ReferenceQueue<>();
         this.softref = softref;
     }
     private String getKey(String w, int cx, int cz) {
@@ -135,9 +135,9 @@ public class SnapshotCache {
         rec.hasrawbiome = biomeraw;
         rec.hashighesty = highesty;
         if (softref)
-            rec.ref = new SoftReference<SnapshotRec>(ss, refqueue);
+            rec.ref = new SoftReference<>(ss, refqueue);
         else
-            rec.ref = new WeakReference<SnapshotRec>(ss, refqueue);
+            rec.ref = new WeakReference<>(ss, refqueue);
         CacheRec prevrec = snapcache.put(key, rec);
         if(prevrec != null) {
             snapcache.reverselookup.remove(prevrec.ref);

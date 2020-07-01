@@ -15,7 +15,7 @@ public interface CustomTextureFile extends TextureFile {
      * @param ydest - vertical position within the destination oatch of the top-left corner
      * @return true if good patch, false if error
      */
-    public boolean setCustomPatch(int patchID, int xpos, int ypos, int xdim, int ydim, int xdest, int ydest);
+    boolean setCustomPatch(int patchID, int xpos, int ypos, int xdim, int ydim, int xdest, int ydest);
     /**
      * Set custom patch within texture file.  Coordinates assume that nominal dimensions of the texture file are 16*xcount wide and 16*ycount high.
      * Resulting patch is square with top-left corner of source in top-left corner of patch.
@@ -26,6 +26,6 @@ public interface CustomTextureFile extends TextureFile {
      * @param ydim - height of the patch, in scaled pixels
      * @return true if good patch, false if error
      */
-    public boolean setCustomPatch(int patchID, int xpos, int ypos, int xdim, int ydim);
+    boolean setCustomPatch(int patchID, int xpos, int ypos, int xdim, int ydim);
     
 }

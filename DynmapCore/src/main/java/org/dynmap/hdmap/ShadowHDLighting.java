@@ -4,15 +4,14 @@ import org.dynmap.Color;
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;
-import org.dynmap.Log;
 import org.dynmap.MapManager;
 import org.dynmap.utils.LightLevels;
 import org.dynmap.utils.BlockStep;
 
 public class ShadowHDLighting extends DefaultHDLighting {
 
-    protected final int   defLightingTable[];  /* index=skylight level, value = 256 * scaling value */
-    protected final int   lightscale[];   /* scale skylight level (light = lightscale[skylight] */
+    protected final int[] defLightingTable;  /* index=skylight level, value = 256 * scaling value */
+    protected final int[] lightscale;   /* scale skylight level (light = lightscale[skylight] */
     protected final boolean night_and_day;    /* If true, render both day (prefix+'-day') and night (prefix) tiles */
     protected final boolean smooth;
     protected final boolean useWorldBrightnessTable;
@@ -133,7 +132,7 @@ public class ShadowHDLighting extends DefaultHDLighting {
         else if(ll2 > ll0)
             weight += w2;
         outcolor[0].setColor(incolor);
-        int cscale = 256;
+        int cscale;
         if(weight == 0) {
             cscale = shadowscale[ll0];
         }
@@ -173,7 +172,6 @@ public class ShadowHDLighting extends DefaultHDLighting {
             else if(ll2 > ll0)
                 weight += w2;
             outcolor[1].setColor(incolor);
-            cscale = 256;
             if(weight == 0) {
                 cscale = shadowscale[ll0];
             }
@@ -202,7 +200,7 @@ public class ShadowHDLighting extends DefaultHDLighting {
         }
     }
     
-    private final int getLightLevel(final LightLevels ll, boolean useambient) {
+    private int getLightLevel(final LightLevels ll, boolean useambient) {
         int lightlevel;
         /* If ambient light, adjust base lighting for it */
         if(useambient)
@@ -267,7 +265,7 @@ public class ShadowHDLighting extends DefaultHDLighting {
         checkGrayscale(outcolor);
     }
 
-    private final void shadowColor(Color c, int lightlevel, int[] shadowscale) {
+    private void shadowColor(Color c, int lightlevel, int[] shadowscale) {
         int scale = shadowscale[lightlevel];
         if(scale < 256)
             c.setRGBA((c.getRed() * scale) >> 8, (c.getGreen() * scale) >> 8, 

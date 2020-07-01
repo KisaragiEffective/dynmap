@@ -27,9 +27,9 @@ public class ModTextureDefinitionImpl implements ModTextureDefinition {
     private final String modver;
     private ModModelDefinitionImpl modDef = null;
     private String texturePath;
-    private HashMap<String, TextureFileImpl> txtFileByID = new HashMap<String, TextureFileImpl>();
-    private ArrayList<BlockTextureRecordImpl> blkTextureRec = new ArrayList<BlockTextureRecordImpl>();
-    private ArrayList<CopyBlockTextureRecordImpl> blkCopyTextureRec = new ArrayList<CopyBlockTextureRecordImpl>();
+    private final HashMap<String, TextureFileImpl> txtFileByID = new HashMap<>();
+    private final ArrayList<BlockTextureRecordImpl> blkTextureRec = new ArrayList<>();
+    private final ArrayList<CopyBlockTextureRecordImpl> blkCopyTextureRec = new ArrayList<>();
     private boolean published = false;
     
     public ModTextureDefinitionImpl(String modid, String modver) {
@@ -84,7 +84,7 @@ public class ModTextureDefinitionImpl implements ModTextureDefinition {
     @Override
     public void setTexturePath(String txtpath) {
         this.texturePath = txtpath;
-        if (this.texturePath.endsWith("/") == false) {
+        if (!this.texturePath.endsWith("/")) {
             this.texturePath += "/";
         }
         if (this.texturePath.startsWith("/")) {
@@ -265,9 +265,7 @@ public class ModTextureDefinitionImpl implements ModTextureDefinition {
     
     public void writeToFile(File destdir) throws IOException {
         File f = new File(destdir, this.modid + "-texture.txt");
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(f);
+        try (FileWriter fw = new FileWriter(f)) {
             // Write modname line
             String s = "modname:" + this.modid;
             fw.write(s + "\n\n");
@@ -291,10 +289,6 @@ public class ModTextureDefinitionImpl implements ModTextureDefinition {
                 if (line != null) {
                     fw.write(line + "\n");
                 }
-            }
-        } finally {
-            if (fw != null) {
-                fw.close(); 
             }
         }
     }

@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class MainServlet extends HttpServlet {
     public static class Header {
-        public String name;
-        public String value;
+        public final String name;
+        public final String value;
         public Header(String name, String value) {
             this.name = name;
             this.value = value;
@@ -24,8 +24,8 @@ public class MainServlet extends HttpServlet {
     }
     
     private static class Registration {
-        public String pattern;
-        public HttpServlet servlet;
+        public final String pattern;
+        public final HttpServlet servlet;
         
         public Registration(String pattern, HttpServlet servlet) {
             this.pattern = pattern;
@@ -33,8 +33,8 @@ public class MainServlet extends HttpServlet {
         }
     }
     
-    List<Registration> registrations = new LinkedList<Registration>();
-    public List<Header> customHeaders = new LinkedList<Header>();
+    final List<Registration> registrations = new LinkedList<>();
+    public final List<Header> customHeaders = new LinkedList<>();
     
     public void addServlet(String pattern, HttpServlet servlet) {
         registrations.add(new Registration(pattern, servlet));
@@ -42,7 +42,7 @@ public class MainServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HashMap<String, Object> properties = new HashMap<String, Object>();
+        HashMap<String, Object> properties = new HashMap<>();
         String path = req.getPathInfo();
         
         for(Header header : customHeaders) {
@@ -60,7 +60,7 @@ public class MainServlet extends HttpServlet {
                     bestMatch = r;
                     bestMatchPart = matchingPart;
                     bestProperties = properties;
-                    properties = new HashMap<String, Object>();
+                    properties = new HashMap<>();
                 }
             }
         }
@@ -122,8 +122,8 @@ public class MainServlet extends HttpServlet {
     private int indexOfAny(String s, char[] cs, int startIndex) {
         for(int i = startIndex; i < s.length(); i++) {
             char c = s.charAt(i);
-            for(int j = 0; j < cs.length; j++) {
-                if (c == cs[j]) {
+            for (char value : cs) {
+                if (c == value) {
                     return i;
                 }
             }
@@ -132,7 +132,7 @@ public class MainServlet extends HttpServlet {
     }
     
     class RequestWrapper extends HttpServletRequestWrapper {
-        String pathInfo;
+        final String pathInfo;
         public RequestWrapper(HttpServletRequest request, String pathInfo) {
             super(request);
             this.pathInfo = pathInfo;

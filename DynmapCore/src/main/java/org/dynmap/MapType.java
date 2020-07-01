@@ -2,6 +2,7 @@ package org.dynmap;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -46,12 +47,7 @@ public abstract class MapType {
         }
         public static ImageEncoding fromExt(String x) {
             ImageEncoding[] v = values();
-            for (int i = 0; i < v.length; i++) {
-                if (v[i].ext.equalsIgnoreCase(x)) {
-                    return v[i];
-                }
-            }
-            return null;
+            return Arrays.stream(v).filter(imageEncoding -> imageEncoding.ext.equalsIgnoreCase(x)).findFirst().orElse(null);
         }
     }
     
@@ -64,9 +60,9 @@ public abstract class MapType {
         FORMAT_JPG90("jpg-q90", 0.90f, ImageEncoding.JPG),
         FORMAT_JPG95("jpg-q95", 0.95f, ImageEncoding.JPG),
         FORMAT_JPG100("jpg-q100", 1.00f, ImageEncoding.JPG);
-        String id;
-        float qual;
-        ImageEncoding enc;
+        final String id;
+        final float qual;
+        final ImageEncoding enc;
         
         ImageFormat(String id, float quality, ImageEncoding enc) {
             this.id = id;
@@ -79,18 +75,13 @@ public abstract class MapType {
         public ImageEncoding getEncoding() { return enc; }
 
         public static ImageFormat fromID(String imgfmt) {
-            for(ImageFormat i_f : MapType.ImageFormat.values()) {
-                if(i_f.getID().equals(imgfmt)) {
-                    return i_f;
-                }
-            }
-            return null;
+            return Arrays.stream(ImageFormat.values()).filter(i_f -> i_f.getID().equals(imgfmt)).findFirst().orElse(null);
         }
-    };
-    
+    }
+
     public static class ZoomInfo {
-        public String prefix;
-        public int  background_argb;
+        public final String prefix;
+        public final int  background_argb;
         public ZoomInfo(String pre, int bg) { prefix = pre; background_argb = bg; }
     }
 
@@ -109,7 +100,7 @@ public abstract class MapType {
 
     public List<MapTile> getTiles(DynmapWorld w, int x, int y, int z) {
         List<TileFlags.TileCoord> coords = this.getTileCoords(w, x, y, z);
-        ArrayList<MapTile> tiles = new ArrayList<MapTile>();
+        ArrayList<MapTile> tiles = new ArrayList<>();
         for(TileFlags.TileCoord c : coords) {
             this.addMapTiles(tiles, w, c.x, c.y);
         }
@@ -142,14 +133,14 @@ public abstract class MapType {
     public void purgeOldTiles(DynmapWorld world, TileFlags rendered) { }
  
     public interface FileCallback {
-        public void fileFound(File f, File parent, boolean day);
+        void fileFound(File f, File parent, boolean day);
     }
     
     protected void walkMapTree(File root, FileCallback cb, boolean day) {
-        LinkedList<File> dirs = new LinkedList<File>();
+        LinkedList<File> dirs = new LinkedList<>();
         String ext = "." + getImageFormat().getFileExt();
         dirs.add(root);
-        while(dirs.isEmpty() == false) {
+        while(!dirs.isEmpty()) {
             File dir = dirs.pop();
             String[] lst = dir.list();
             if(lst == null) continue;

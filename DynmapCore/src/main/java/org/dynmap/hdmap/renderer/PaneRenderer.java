@@ -25,7 +25,7 @@ public class PaneRenderer extends CustomRenderer {
     protected static final int SIDE_ZN = 0x2;
     
     // Meshes, indexed by connection combination (bit 0=X-, bit 1=Z-, bit 2=X+, bit 3=Z+)
-    protected RenderPatch[][] meshes = new RenderPatch[16][];
+    protected final RenderPatch[][] meshes = new RenderPatch[16][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {

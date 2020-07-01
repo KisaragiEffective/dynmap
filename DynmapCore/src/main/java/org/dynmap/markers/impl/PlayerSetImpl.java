@@ -12,21 +12,21 @@ import org.dynmap.markers.PlayerSet;
 import org.dynmap.markers.impl.MarkerAPIImpl.MarkerUpdate;
 
 class PlayerSetImpl implements PlayerSet {
-    private String setid;
-    private HashSet<String> players;
+    private final String setid;
+    private final HashSet<String> players;
     private boolean symmetric;
     private boolean ispersistent;
     
     PlayerSetImpl(String id) {
         setid = id;
-        players = new HashSet<String>();
+        players = new HashSet<>();
         symmetric = true;
     }
     
     PlayerSetImpl(String id, boolean symmetric, Set<String> players, boolean persistent) {
         setid = id;
         this.symmetric = symmetric;
-        this.players = new HashSet<String>(players);
+        this.players = new HashSet<>(players);
         ispersistent = persistent;
     }
     
@@ -60,8 +60,8 @@ class PlayerSetImpl implements PlayerSet {
         if(!ispersistent)   /* Nothing if not persistent */
             return null;
         /* Make top level node */
-        HashMap<String, Object> setnode = new HashMap<String, Object>();
-        ArrayList<String> playlist = new ArrayList<String>(players);
+        HashMap<String, Object> setnode = new HashMap<>();
+        ArrayList<String> playlist = new ArrayList<>(players);
         setnode.put("players", playlist);
         setnode.put("symmetric", symmetric);
         return setnode;
@@ -75,9 +75,9 @@ class PlayerSetImpl implements PlayerSet {
         List<String> plist = node.getList("players");
         if(plist != null) {
             players.clear();
-            for(String id : plist) {
-                players.add(id.toLowerCase());
-            }
+            plist.stream()
+                    .map(String::toLowerCase)
+                    .forEach(players::add);
         }
         symmetric = node.getBoolean("symmetric", true);
         
@@ -107,20 +107,16 @@ class PlayerSetImpl implements PlayerSet {
     @Override
     public void setPlayers(Set<String> players) {
         if(players.size() == this.players.size()) {
-            boolean match = true;
-            for(String s : players) {
-                if(this.players.contains(s.toLowerCase()) == false) {
-                    match = false;
-                    break;
-                }
-            }
+            boolean match = players.stream()
+                    .map(String::toLowerCase)
+                    .allMatch(this.players::contains);
             if(match)
                 return;
         }
         this.players.clear();
-        for(String id : players) {
-            this.players.add(id.toLowerCase());
-        }
+        players.stream()
+                .map(String::toLowerCase)
+                .forEach(this.players::add);
         MarkerAPIImpl.playerSetUpdated(this, MarkerUpdate.UPDATED);
         if(ispersistent)
             MarkerAPIImpl.saveMarkers();

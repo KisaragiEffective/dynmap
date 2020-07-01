@@ -1,14 +1,14 @@
 package org.dynmap.hdmap;
 
-import static org.dynmap.JSONUtils.s;
-
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
 import org.dynmap.Color;
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
+import org.dynmap.JSONUtils;
 import org.dynmap.Log;
 import org.dynmap.MapManager;
 import org.dynmap.common.DynmapCommandSender;
@@ -53,7 +53,7 @@ public class TexturePackHDShader implements HDShader {
         }
     }
     
-    private final TexturePack getTexturePack() {
+    private TexturePack getTexturePack() {
         if (!did_tp_load) {
             tp = TexturePack.getTexturePack(this.core, this.tpname);
             if(tp == null) {
@@ -100,8 +100,8 @@ public class TexturePackHDShader implements HDShader {
     }
     
     class ShaderState implements HDShaderState {
-        final private Color color[];
-        final private Color tmpcolor[];
+        final private Color[] color;
+        final private Color[] tmpcolor;
         final private Color c;
         final protected MapIterator mapiter;
         final protected HDMap map;
@@ -171,8 +171,7 @@ public class TexturePackHDShader implements HDShader {
          */
         @Override
         public void reset(HDPerspectiveState ps) {
-            for(int i = 0; i < color.length; i++)
-                color[i].setTransparent();
+            Arrays.stream(color).forEachOrdered(Color::setTransparent);
             setLastBlockState(DynmapBlockState.AIR);
             lastblkhit = DynmapBlockState.AIR;
         }
@@ -188,7 +187,7 @@ public class TexturePackHDShader implements HDShader {
             }
             
             if (blocktype.isAir()) {
-            	lastblkhit = blocktype;
+                lastblkhit = blocktype;
                 return false;
             }
             
@@ -198,7 +197,7 @@ public class TexturePackHDShader implements HDShader {
             if (scaledtp != null) {
                 scaledtp.readColor(ps, mapiter, c, blocktype, lastblocktype, ShaderState.this);
             }
-        	lastblkhit = blocktype;
+            lastblkhit = blocktype;
 
             if (c.getAlpha() > 0) {
                 /* Scale brightness depending upon face */
@@ -253,10 +252,10 @@ public class TexturePackHDShader implements HDShader {
                     int xx = mapiter.getX() % gridscale;
                     int zz = mapiter.getZ() % gridscale;
                     if(((xx == 0) && ((zz & 2) == 0)) || ((zz == 0) && ((xx & 2) == 0))) {
-                        for(int i = 0; i < tmpcolor.length; i++) {
-                            int v = tmpcolor[i].getARGB();
-                            tmpcolor[i].setARGB((v & 0xFF000000) | ((v & 0xFEFEFE) >> 1) | 0x808080);
-                        }
+                        Arrays.stream(tmpcolor).forEachOrdered(value -> {
+                            int v = value.getARGB();
+                            value.setARGB((v & 0xFF000000) | ((v & 0xFEFEFE) >> 1) | 0x808080);
+                        });
                     }
                 }
                 /* If no previous color contribution, use new color */
@@ -271,14 +270,13 @@ public class TexturePackHDShader implements HDShader {
                     int alpha2 = tmpcolor[0].getAlpha() * (255-alpha) / 255;
                     int talpha = alpha + alpha2;
                     if(talpha > 0)
-                    	for(int i = 0; i < color.length; i++)
-                    		color[i].setRGBA((tmpcolor[i].getRed()*alpha2 + color[i].getRed()*alpha) / talpha,
+                        for(int i = 0; i < color.length; i++)
+                            color[i].setRGBA((tmpcolor[i].getRed()*alpha2 + color[i].getRed()*alpha) / talpha,
                                   (tmpcolor[i].getGreen()*alpha2 + color[i].getGreen()*alpha) / talpha,
                                   (tmpcolor[i].getBlue()*alpha2 + color[i].getBlue()*alpha) / talpha, talpha);
                     else
-                    	for(int i = 0; i < color.length; i++)
-                    		color[i].setTransparent();
-                    	
+                        Arrays.stream(color).forEachOrdered(Color::setTransparent);
+                        
                     return (talpha >= 254);   /* If only one short, no meaningful contribution left */
                 }
             }
@@ -324,7 +322,7 @@ public class TexturePackHDShader implements HDShader {
         }
         // Return last blockc with surface hit
         public DynmapBlockState getLastBlockHit() {
-        	return lastblkhit;
+            return lastblkhit;
         }
     }
 
@@ -342,7 +340,7 @@ public class TexturePackHDShader implements HDShader {
     
     /* Add shader's contributions to JSON for map object */
     public void addClientConfiguration(JSONObject mapObject) {
-        s(mapObject, "shader", name);
+        JSONUtils.setValue(mapObject, "shader", name);
     }
 
     @Override

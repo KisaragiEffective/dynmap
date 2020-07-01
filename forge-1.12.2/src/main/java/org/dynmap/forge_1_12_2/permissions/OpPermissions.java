@@ -1,5 +1,6 @@
 package org.dynmap.forge_1_12_2.permissions;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -10,18 +11,16 @@ import org.dynmap.Log;
 import org.dynmap.forge_1_12_2.DynmapPlugin;
 
 public class OpPermissions implements PermissionProvider {
-    public HashSet<String> usrCommands = new HashSet<String>();
+    public final HashSet<String> usrCommands = new HashSet<>();
 
     public OpPermissions(String[] usrCommands) {
-        for (String usrCommand : usrCommands) {
-            this.usrCommands.add(usrCommand);
-        }
+        Collections.addAll(this.usrCommands, usrCommands);
         Log.info("Using ops.txt for access control");
     }
 
     @Override
     public Set<String> hasOfflinePermissions(String player, Set<String> perms) {
-        HashSet<String> rslt = new HashSet<String>();
+        HashSet<String> rslt = new HashSet<>();
         if(DynmapPlugin.plugin.isOp(player)) {
             rslt.addAll(perms);
         }

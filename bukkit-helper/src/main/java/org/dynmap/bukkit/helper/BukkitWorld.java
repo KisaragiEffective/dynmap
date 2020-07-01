@@ -24,7 +24,7 @@ public class BukkitWorld extends DynmapWorld {
     private World world;
     private World.Environment env;
     private boolean skylight;
-    private DynmapLocation spawnloc = new DynmapLocation();
+    private final DynmapLocation spawnloc = new DynmapLocation();
     
     public BukkitWorld(World w) {
         this(w.getName(), w.getMaxHeight(), w.getSeaLevel(), w.getEnvironment());
@@ -177,7 +177,7 @@ public class BukkitWorld extends DynmapWorld {
     @Override
     public MapChunkCache getChunkCache(List<DynmapChunk> chunks) {
         if(isLoaded()) {
-        	return BukkitVersionHelper.helper.getChunkCache(this, chunks);
+            return BukkitVersionHelper.helper.getChunkCache(this, chunks);
         }
         else {
             return null;
@@ -243,9 +243,9 @@ public class BukkitWorld extends DynmapWorld {
     private Polygon lastBorder;
     @Override
     public Polygon getWorldBorder() {
-    	if (world != null) {
-    		lastBorder = BukkitVersionHelper.helper.getWorldBorder(world);
-    	}
-    	return lastBorder;
+        if (world != null) {
+            lastBorder = BukkitVersionHelper.helper.getWorldBorder(world);
+        }
+        return lastBorder;
     }
 }

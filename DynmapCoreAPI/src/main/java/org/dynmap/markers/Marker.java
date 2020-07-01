@@ -8,17 +8,17 @@ public interface Marker extends MarkerDescription {
      * Get marker's X coordinate
      * @return x coordinate
      */
-    public double getX();
+    double getX();
     /**
      * Get marker's Y coordinate
      * @return y coordinate
      */
-    public double getY();
+    double getY();
     /**
      * Get marker's Z coordinate
      * @return z coordinate
      */
-    public double getZ();
+    double getZ();
     /**
      * Update the marker's location
      * @param worldid - world ID
@@ -26,16 +26,16 @@ public interface Marker extends MarkerDescription {
      * @param y - y coord
      * @param z - z coord
      */
-    public void setLocation(String worldid, double x, double y, double z);
+    void setLocation(String worldid, double x, double y, double z);
     /**
      * Get the marker's icon
      * @return marker icon
      */
-    public MarkerIcon getMarkerIcon();
+    MarkerIcon getMarkerIcon();
     /**
      * Set the marker's icon
      * @param icon - new marker icon
      * @return true if new marker icon set, false if not allowed
      */
-    public boolean setMarkerIcon(MarkerIcon icon);
+    boolean setMarkerIcon(MarkerIcon icon);
 }

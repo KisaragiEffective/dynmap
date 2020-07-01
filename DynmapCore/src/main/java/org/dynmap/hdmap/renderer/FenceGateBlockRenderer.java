@@ -16,7 +16,7 @@ public class FenceGateBlockRenderer extends CustomRenderer {
     private static final int TEXTURE_BOTTOM = 2;
 
     // Meshes, indexed by connection combination (bit 2=open(1)/close(0), bit 0-1=0(south),1(west),2(north),3(east))
-    protected RenderPatch[][] meshes = new RenderPatch[8][];
+    protected final RenderPatch[][] meshes = new RenderPatch[8][];
     
     @Override
     public boolean initializeRenderer(RenderPatchFactory rpf, String blkname, BitSet blockdatamask, Map<String,String> custparm) {
@@ -38,7 +38,7 @@ public class FenceGateBlockRenderer extends CustomRenderer {
     }
     
     private void buildMeshes(RenderPatchFactory rpf) {
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for(int dat = 0; dat < 8; dat++) {
             // Add posts
             if ((dat & 1) == 0) {
@@ -96,7 +96,7 @@ public class FenceGateBlockRenderer extends CustomRenderer {
                 }
             }
             
-            meshes[dat] = list.toArray(new RenderPatch[list.size()]);
+            meshes[dat] = list.toArray(new RenderPatch[0]);
             
             list.clear();
         }

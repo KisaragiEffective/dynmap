@@ -32,12 +32,10 @@ public class HDScaledBlockModels {
                         blockmodels[gidx] = null;
                     }
                 }
-            }
-            else if(m instanceof HDBlockPatchModel) {
+            } else if(m instanceof HDBlockPatchModel) {
                 HDBlockPatchModel pm = (HDBlockPatchModel)m;
                 patches[gidx] = pm.getPatches();
-            }
-            else if(m instanceof CustomBlockModel) {
+            } else if(m instanceof CustomBlockModel) {
                 CustomBlockModel cbm = (CustomBlockModel)m;
                 custom[gidx] = cbm;
             }

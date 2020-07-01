@@ -87,7 +87,7 @@ public class RPMicroRenderer extends CustomRenderer {
     private static final int NUM_TEXTURES = 70;
 
     /* Texture index = material index in RP */
-    private static final int materialTextureMap[][] = {
+    private static final int[][] materialTextureMap = {
         { 0 }, // 0 = Cobblestone (cobblestone:0)
         { 1 }, // 1 = Stone (stone:0)
         { 2 }, // 2 = Wood planks (Oak) (planks:0)
@@ -184,7 +184,7 @@ public class RPMicroRenderer extends CustomRenderer {
         byte[] covervals = new byte[2*29];
         Object v = ctx.getBlockTileEntityField("cvm");
         if(v instanceof Integer) {
-            covermask = ((Integer)v).intValue();
+            covermask = (Integer) v;
         }
         v = ctx.getBlockTileEntityField("cvs");
         if(v instanceof byte[]) {
@@ -196,14 +196,14 @@ public class RPMicroRenderer extends CustomRenderer {
 //        }
 //        Log.info(s);
         /* Build patch list */
-        ArrayList<RenderPatch> list = new ArrayList<RenderPatch>();
+        ArrayList<RenderPatch> list = new ArrayList<>();
         for(int i = 0, off = 0; i < 29; i++) {
             if ((covermask & (1 << i)) != 0) {
                 addPatchesFor(ctx.getPatchFactory(), list, i, covervals[off], covervals[off+1]);
                 off += 2;
             }
         }
-        return list.toArray(new RenderPatch[list.size()]);
+        return list.toArray(new RenderPatch[0]);
     }
     
     private static final double[] thick_0_5 = { 0.125, 0.25, 0.5, 0.125, 0.25, 0.5, 0.375, 0.625, 0.75, 0.875, 0.375, 0.625, 0.75, 0.875 };

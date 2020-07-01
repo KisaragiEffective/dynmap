@@ -7,8 +7,8 @@ import org.dynmap.renderer.DynmapBlockState;
 
 public class HDBlockVolumetricModel extends HDBlockModel {
     /* Volumetric model specific attributes */
-    private long blockflags[];
-    private int nativeres;
+    private final long[] blockflags;
+    private final int nativeres;
     private HashMap<Integer, short[]> scaledblocks;
     /**
      * Block definition - positions correspond to Bukkit coordinates (+X is south, +Y is up, +Z is west)
@@ -59,8 +59,8 @@ public class HDBlockVolumetricModel extends HDBlockModel {
      * @return array of alpha values (0-255), corresponding to resXresXres subcubes of block
      */
     public short[] getScaledMap(int res) {
-        if(scaledblocks == null) { scaledblocks = new HashMap<Integer, short[]>(); }
-        short[] map = scaledblocks.get(Integer.valueOf(res));
+        if(scaledblocks == null) { scaledblocks = new HashMap<>(); }
+        short[] map = scaledblocks.get(res);
         if(map == null) {
             map = new short[res*res*res];
             if(res == nativeres) {
@@ -76,8 +76,8 @@ public class HDBlockVolumetricModel extends HDBlockModel {
              * blocks to accumulate contributions
              */
             else if(res > nativeres) {
-                int weights[] = new int[res];
-                int offsets[] = new int[res];
+                int[] weights = new int[res];
+                int[] offsets = new int[res];
                 /* LCM of resolutions is used as length of line (res * nativeres)
                  * Each native block is (res) long, each scaled block is (nativeres) long
                  * Each scaled block overlaps 1 or 2 native blocks: starting with native block 'offsets[]' with
@@ -127,8 +127,8 @@ public class HDBlockVolumetricModel extends HDBlockModel {
                 }
             }
             else {  /* nativeres > res */
-                int weights[] = new int[nativeres];
-                int offsets[] = new int[nativeres];
+                int[] weights = new int[nativeres];
+                int[] offsets = new int[nativeres];
                 /* LCM of resolutions is used as length of line (res * nativeres)
                  * Each native block is (res) long, each scaled block is (nativeres) long
                  * Each native block overlaps 1 or 2 scaled blocks: starting with scaled block 'offsets[]' with
@@ -144,7 +144,7 @@ public class HDBlockVolumetricModel extends HDBlockModel {
                     }
                 }
                 /* Now, use weights and indices to fill in scaled map */
-                long accum[] = new long[map.length];
+                long[] accum = new long[map.length];
                 for(int y = 0; y < nativeres; y++) {
                     int ind_y = offsets[y];
                     int wgt_y = weights[y];
@@ -179,7 +179,7 @@ public class HDBlockVolumetricModel extends HDBlockModel {
                     if(map[i] < 0) map[i] = 0;
                 }
             }
-            scaledblocks.put(Integer.valueOf(res), map);
+            scaledblocks.put(res, map);
         }
         return map;
     }
