@@ -82,7 +82,7 @@ public class ColorScheme {
             Debug.debug("Loading colors from '" + colorSchemeFile + "'...");
             try (
             InputStream stream = new FileInputStream(colorSchemeFile);
-            Scanner scanner = new Scanner(stream);
+            Scanner scanner = new Scanner(stream)
             ) {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();

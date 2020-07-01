@@ -1785,7 +1785,7 @@ public class TexturePack {
      */
     private static void loadTileSetsFile(InputStream txtfile, String txtname, ConfigurationNode config, DynmapCore core, String blockset) {
         try (
-        LineNumberReader rdr = new LineNumberReader(new InputStreamReader(txtfile));
+        LineNumberReader rdr = new LineNumberReader(new InputStreamReader(txtfile))
         ) {
             try {
                 String line;

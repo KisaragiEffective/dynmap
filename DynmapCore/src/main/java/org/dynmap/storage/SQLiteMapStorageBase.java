@@ -63,11 +63,9 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = executeQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = executeQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     result = rs.next();
-                    rs.close();
-                    stmt.close();
                 }
             } catch (SQLException x) {
                 Log.severe("Tile exists error - " + x.getMessage());
@@ -88,7 +86,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = executeQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = executeQuery(stmt, "SELECT HashCode FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     if (rs.next()) {
                         long actual = rs.getLong("HashCode");
@@ -116,7 +114,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = executeQuery(stmt, "SELECT HashCode,LastUpdate,Format,Image,ImageLen FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = executeQuery(stmt, "SELECT HashCode,LastUpdate,Format,Image,ImageLen FROM Tiles WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     if (rs.next()) {
                         rslt = new TileRead();
@@ -294,7 +292,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             c = getConnection();    // Get connection (create DB if needed)
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = executeQuery(stmt, "SELECT level FROM SchemaVersion;");
+            ResultSet rs = executeQuery(stmt, "SELECT level FROM SchemaVersion;")
             ) {
                 if (rs.next()) {
                     ver = rs.getInt("level");
@@ -328,7 +326,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             c = getConnection();
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = executeQuery(stmt, "SELECT * from Maps;");
+            ResultSet rs = executeQuery(stmt, "SELECT * from Maps;")
             ) {
                 while (rs.next()) {
                     int key = rs.getInt("ID");
@@ -576,7 +574,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             // Query tiles for given mapkey
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = executeQuery(stmt, "SELECT x,y,zoom,Format FROM Tiles WHERE MapID=" + mapkey + ";");
+            ResultSet rs = executeQuery(stmt, "SELECT x,y,zoom,Format FROM Tiles WHERE MapID=" + mapkey + ";")
             ) {
                 while (rs.next()) {
                     SQLiteMapStorageBase.StorageTile st = new SQLiteMapStorageBase.StorageTile(world, map, rs.getInt("x"), rs.getInt("y"), rs.getInt("zoom"), var);
@@ -679,7 +677,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT Image,ImageLen FROM Faces WHERE PlayerName=? AND TypeID=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT Image,ImageLen FROM Faces WHERE PlayerName=? AND TypeID=?;")
             ) {
                 stmt.setString(1, playername);
                 stmt.setInt(2, facetype.typeID);
@@ -714,7 +712,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT TypeID FROM Faces WHERE PlayerName=? AND TypeID=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT TypeID FROM Faces WHERE PlayerName=? AND TypeID=?;")
             ) {
                 stmt.setString(1, playername);
                 stmt.setInt(2, facetype.typeID);
@@ -739,7 +737,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             c = getConnection();
             boolean exists = false;
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT IconName FROM MarkerIcons WHERE IconName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT IconName FROM MarkerIcons WHERE IconName=?;")
             ) {
                 stmt.setString(1, markerid);
                 try (ResultSet rs = executeQuery(stmt)) {
@@ -750,7 +748,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
                 try (
-                PreparedStatement stmt = c.prepareStatement("DELETE FROM MarkerIcons WHERE IconName=?;");
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM MarkerIcons WHERE IconName=?;")
                 ) {
                     stmt.setString(1, markerid);
                     executeUpdate(stmt);
@@ -758,7 +756,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             }
             else if (exists) {
                 try (
-                PreparedStatement stmt = c.prepareStatement("UPDATE MarkerIcons SET Image=?,ImageLen=? WHERE IconName=?;");
+                PreparedStatement stmt = c.prepareStatement("UPDATE MarkerIcons SET Image=?,ImageLen=? WHERE IconName=?;")
                 ) {
                     stmt.setBytes(1, encImage.buf);
                     stmt.setInt(2, encImage.len);
@@ -768,7 +766,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             }
             else {
                 try (
-                PreparedStatement stmt = c.prepareStatement("INSERT INTO MarkerIcons (IconName,Image,ImageLen) VALUES (?,?,?);");
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO MarkerIcons (IconName,Image,ImageLen) VALUES (?,?,?);")
                 ) {
                     stmt.setString(1, markerid);
                     stmt.setBytes(2, encImage.buf);
@@ -793,7 +791,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT Image,ImageLen FROM MarkerIcons WHERE IconName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT Image,ImageLen FROM MarkerIcons WHERE IconName=?;")
             ) {
                 stmt.setString(1, markerid);
                 try (ResultSet rs = executeQuery(stmt)) {
@@ -826,10 +824,10 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
             c = getConnection();
             boolean exists;
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM MarkerFiles WHERE FileName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM MarkerFiles WHERE FileName=?;")
             ) {
                 stmt.setString(1, world);
-                try (ResultSet rs = executeQuery(stmt);) {
+                try (ResultSet rs = executeQuery(stmt)) {
                     exists = rs.next();
                 }
             }
@@ -837,14 +835,14 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
                 try (
-                PreparedStatement stmt = c.prepareStatement("DELETE FROM MarkerFiles WHERE FileName=?;");
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM MarkerFiles WHERE FileName=?;")
                 ) {
                     stmt.setString(1, world);
                     executeUpdate(stmt);
                 }
             } else if (exists) {
                 try (
-                PreparedStatement stmt = c.prepareStatement("UPDATE MarkerFiles SET Content=? WHERE FileName=?;");
+                PreparedStatement stmt = c.prepareStatement("UPDATE MarkerFiles SET Content=? WHERE FileName=?;")
                 ) {
                     stmt.setBytes(1, content.getBytes(CHARSET));
                     stmt.setString(2, world);
@@ -852,7 +850,7 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
                 }
             } else {
                 try (
-                PreparedStatement stmt = c.prepareStatement("INSERT INTO MarkerFiles (FileName,Content) VALUES (?,?);");
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO MarkerFiles (FileName,Content) VALUES (?,?);")
                 ) {
                     stmt.setString(1, world);
                     stmt.setBytes(2, content.getBytes(CHARSET));
@@ -876,11 +874,11 @@ public class SQLiteMapStorageBase extends AbstractDataBaseMapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM MarkerFiles WHERE FileName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM MarkerFiles WHERE FileName=?;")
             ) {
                 stmt.setString(1, world);
 
-                try (ResultSet rs = executeQuery(stmt);) {
+                try (ResultSet rs = executeQuery(stmt)) {
                     if (rs.next()) {
                         byte[] img = rs.getBytes("Content");
                         content = new String(img, CHARSET);

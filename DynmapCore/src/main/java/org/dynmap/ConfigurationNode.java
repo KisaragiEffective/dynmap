@@ -100,7 +100,6 @@ public class ConfigurationNode implements Map<String, Object> {
     public boolean save(File file) {
         initparse();
 
-        FileOutputStream stream = null;
 
         File parent = file.getParentFile();
 
@@ -108,18 +107,11 @@ public class ConfigurationNode implements Map<String, Object> {
             parent.mkdirs();
         }
 
-        try {
-            stream = new FileOutputStream(file);
+        try (FileOutputStream stream = new FileOutputStream(file)){
             OutputStreamWriter writer = new OutputStreamWriter(stream, StandardCharsets.UTF_8);
             yaml.dump(entries, writer);
             return true;
         } catch (IOException e) {
-        } finally {
-            try {
-                if (stream != null) {
-                    stream.close();
-                }
-            } catch (IOException e) {}
         }
         return false;
     }
@@ -252,7 +244,6 @@ public class ConfigurationNode implements Map<String, Object> {
         return new ConfigurationNode(v);
     }
     
-    @SuppressWarnings("unchecked")
     public List<ConfigurationNode> getNodes(String path) {
         List<Object> o = getList(path);
 
@@ -285,30 +276,22 @@ public class ConfigurationNode implements Map<String, Object> {
         if(v instanceof Map) {
             @SuppressWarnings("unchecked")
             Map<String, Object> mv = (Map<String, Object>)v;
-            LinkedHashMap<String, Object> newv = new LinkedHashMap<>();
-            for(Map.Entry<String, Object> me : mv.entrySet()) {
-                newv.put(me.getKey(), copyValue(me.getValue()));
-            }
-            return newv;
-        }
-        else if(v instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<Object> lv = (List<Object>)v;
-            ArrayList<Object> newv = lv.stream().map(ConfigurationNode::copyValue).collect(Collectors.toCollection(ArrayList::new));
-            return newv;
-        }
-        else {
+            return mv.entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(Entry::getKey, me -> copyValue(me.getValue()), (a, b) -> b, LinkedHashMap::new));
+        } else if(v instanceof List) {
+            List<?> lv = (List<?>)v;
+            return lv.stream()
+                    .map(ConfigurationNode::copyValue)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } else {
             return v;
         }
     }
 
     private static void extendMap(Map<String, Object> left, Map<String, Object> right) {
         ConfigurationNode original = new ConfigurationNode(left);
-        for(Map.Entry<String, Object> entry : right.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            original.put(key, copyValue(value));
-        }
+        right.forEach((key, value) -> original.put(key, copyValue(value)));
     }
     
     public <T> T createInstance(Class<?>[] constructorParameters, Object[] constructorArguments) {

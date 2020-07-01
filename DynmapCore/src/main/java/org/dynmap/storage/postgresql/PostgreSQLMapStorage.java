@@ -82,7 +82,7 @@ public class PostgreSQLMapStorage extends MapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     rslt = rs.next();
                 }
@@ -105,7 +105,7 @@ public class PostgreSQLMapStorage extends MapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     if (rs.next()) {
                         long v = rs.getLong("HashCode");
@@ -131,7 +131,7 @@ public class PostgreSQLMapStorage extends MapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT HashCode,LastUpdate,Format,Image FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = stmt.executeQuery("SELECT HashCode,LastUpdate,Format,Image FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     if (rs.next()) {
                         tile = new TileRead();
@@ -164,7 +164,7 @@ public class PostgreSQLMapStorage extends MapStorage {
                 c = getConnection();
                 if (encImage == null) { // If delete
                     try (
-                            PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableTiles + " WHERE MapID=? AND x=? and y=? AND zoom=?;");
+                            PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableTiles + " WHERE MapID=? AND x=? and y=? AND zoom=?;")
                     ) {
                         stmt.setInt(1, mapkey);
                         stmt.setInt(2, x);
@@ -174,7 +174,7 @@ public class PostgreSQLMapStorage extends MapStorage {
                     }
                 } else if (exists) {
                     try (
-                    PreparedStatement stmt = c.prepareStatement("UPDATE " + tableTiles + " SET HashCode=?, LastUpdate=?, Format=?, Image=? WHERE MapID=? AND x=? and y=? AND zoom=?;");
+                    PreparedStatement stmt = c.prepareStatement("UPDATE " + tableTiles + " SET HashCode=?, LastUpdate=?, Format=?, Image=? WHERE MapID=? AND x=? and y=? AND zoom=?;")
                     ) {
                         stmt.setLong(1, hash);
                         stmt.setLong(2, System.currentTimeMillis());
@@ -188,7 +188,7 @@ public class PostgreSQLMapStorage extends MapStorage {
                     }
                 } else {
                     try (
-                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableTiles + " (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image) VALUES (?,?,?,?,?,?,?,?);");
+                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableTiles + " (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image) VALUES (?,?,?,?,?,?,?,?);")
                     ) {
                         stmt.setInt(1, mapkey);
                         stmt.setInt(2, x);
@@ -355,7 +355,7 @@ public class PostgreSQLMapStorage extends MapStorage {
             c = getConnection();    // Get connection (create DB if needed)
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery( "SELECT level FROM " + tableSchemaVersion + ";");
+            ResultSet rs = stmt.executeQuery( "SELECT level FROM " + tableSchemaVersion + ";")
             ) {
                 if (rs.next()) {
                     ver = rs.getInt("level");
@@ -386,7 +386,7 @@ public class PostgreSQLMapStorage extends MapStorage {
             c = getConnection();
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * from " + tableMaps + ";");
+            ResultSet rs = stmt.executeQuery("SELECT * from " + tableMaps + ";")
             ) {
                 while (rs.next()) {
                     int key = rs.getInt("ID");

@@ -82,7 +82,7 @@ public class MySQLMapStorage extends MapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     exists = rs.next();
                 }
@@ -105,7 +105,7 @@ public class MySQLMapStorage extends MapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = stmt.executeQuery("SELECT HashCode FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     if (rs.next()) {
                         long v = rs.getLong("HashCode");
@@ -131,7 +131,7 @@ public class MySQLMapStorage extends MapStorage {
                 c = getConnection();
                 try (
                 Statement stmt = c.createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT HashCode,LastUpdate,Format,Image FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";");
+                ResultSet rs = stmt.executeQuery("SELECT HashCode,LastUpdate,Format,Image FROM " + tableTiles + " WHERE MapID=" + mapkey + " AND x=" + x + " AND y=" + y + " AND zoom=" + zoom + ";")
                 ) {
                     if (rs.next()) {
                         rslt = new TileRead();
@@ -164,7 +164,7 @@ public class MySQLMapStorage extends MapStorage {
                 c = getConnection();
                 if (encImage == null) { // If delete
                     try (
-                    PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableTiles + " WHERE MapID=? AND x=? and y=? AND zoom=?;");
+                    PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableTiles + " WHERE MapID=? AND x=? and y=? AND zoom=?;")
                     ) {
                         stmt.setInt(1, mapkey);
                         stmt.setInt(2, x);
@@ -174,7 +174,7 @@ public class MySQLMapStorage extends MapStorage {
                     }
                 } else if (exists) {
                     try (
-                    PreparedStatement stmt = c.prepareStatement("UPDATE " + tableTiles + " SET HashCode=?, LastUpdate=?, Format=?, Image=? WHERE MapID=? AND x=? and y=? AND zoom=?;");
+                    PreparedStatement stmt = c.prepareStatement("UPDATE " + tableTiles + " SET HashCode=?, LastUpdate=?, Format=?, Image=? WHERE MapID=? AND x=? and y=? AND zoom=?;")
                     ) {
                         stmt.setLong(1, hash);
                         stmt.setLong(2, System.currentTimeMillis());
@@ -188,7 +188,7 @@ public class MySQLMapStorage extends MapStorage {
                     }
                 } else {
                     try (
-                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableTiles + " (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image) VALUES (?,?,?,?,?,?,?,?);");
+                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableTiles + " (MapID,x,y,zoom,HashCode,LastUpdate,Format,Image) VALUES (?,?,?,?,?,?,?,?);")
                     ) {
                         stmt.setInt(1, mapkey);
                         stmt.setInt(2, x);
@@ -355,7 +355,7 @@ public class MySQLMapStorage extends MapStorage {
             c = getConnection();    // Get connection (create DB if needed)
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery( "SELECT level FROM " + tableSchemaVersion + ";");
+            ResultSet rs = stmt.executeQuery( "SELECT level FROM " + tableSchemaVersion + ";")
             ) {
                 if (rs.next()) {
                     ver = rs.getInt("level");
@@ -387,7 +387,7 @@ public class MySQLMapStorage extends MapStorage {
             c = getConnection();
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * from " + tableMaps + ";");
+            ResultSet rs = stmt.executeQuery("SELECT * from " + tableMaps + ";")
             ) {
                 while (rs.next()) {
                     int key = rs.getInt("ID");
@@ -419,7 +419,7 @@ public class MySQLMapStorage extends MapStorage {
                     c = getConnection();
                     // Insert row
                     try (
-                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMaps + " (WorldID,MapID,Variant,ServerID) VALUES (?, ?, ?, ?);");
+                    PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMaps + " (WorldID,MapID,Variant,ServerID) VALUES (?, ?, ?, ?);")
                     ) {
                         stmt.setString(1, w.getName());
                         stmt.setString(2, mt.getPrefix());
@@ -429,7 +429,7 @@ public class MySQLMapStorage extends MapStorage {
                     }
                     //  Query key assigned
                     try (
-                    PreparedStatement stmt = c.prepareStatement("SELECT ID FROM " + tableMaps + " WHERE WorldID = ? AND MapID = ? AND Variant = ? AND ServerID = ?;");
+                    PreparedStatement stmt = c.prepareStatement("SELECT ID FROM " + tableMaps + " WHERE WorldID = ? AND MapID = ? AND Variant = ? AND ServerID = ?;")
                     ) {
                         stmt.setString(1, w.getName());
                         stmt.setString(2, mt.getPrefix());
@@ -657,7 +657,7 @@ public class MySQLMapStorage extends MapStorage {
             // Query tiles for given mapkey
             try (
             Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT x,y,zoom,Format FROM " + tableTiles + " WHERE MapID=" + mapkey + ";");
+            ResultSet rs = stmt.executeQuery("SELECT x,y,zoom,Format FROM " + tableTiles + " WHERE MapID=" + mapkey + ";")
             ) {
                 while (rs.next()) {
                     StorageTile st = new StorageTile(world, map, rs.getInt("x"), rs.getInt("y"), rs.getInt("zoom"), var);
@@ -721,7 +721,7 @@ public class MySQLMapStorage extends MapStorage {
             c = getConnection();
             if (encImage == null) { // If delete
                 try (
-                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableFaces + " WHERE PlayerName=? AND TypeIDx=?;");
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableFaces + " WHERE PlayerName=? AND TypeIDx=?;")
                 ) {
                     stmt.setString(1, playername);
                     stmt.setInt(2, facetype.typeID);
@@ -729,7 +729,7 @@ public class MySQLMapStorage extends MapStorage {
                 }
             } else if (exists) {
                 try (
-                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableFaces + " SET Image=? WHERE PlayerName=? AND TypeID=?;");
+                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableFaces + " SET Image=? WHERE PlayerName=? AND TypeID=?;")
                 ) {
                     stmt.setBinaryStream(1, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
                     stmt.setString(2, playername);
@@ -738,7 +738,7 @@ public class MySQLMapStorage extends MapStorage {
                 }
             } else {
                 try (
-                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableFaces + " (PlayerName,TypeID,Image) VALUES (?,?,?);");
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableFaces + " (PlayerName,TypeID,Image) VALUES (?,?,?);")
                 ) {
                     stmt.setString(1, playername);
                     stmt.setInt(2, facetype.typeID);
@@ -764,7 +764,7 @@ public class MySQLMapStorage extends MapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;")
             ) {
                 stmt.setString(1, playername);
                 stmt.setInt(2, facetype.typeID);
@@ -792,7 +792,7 @@ public class MySQLMapStorage extends MapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT TypeID FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT TypeID FROM " + tableFaces + " WHERE PlayerName=? AND TypeID=?;")
             ) {
                 stmt.setString(1, playername);
                 stmt.setInt(2, facetype.typeID);
@@ -820,7 +820,7 @@ public class MySQLMapStorage extends MapStorage {
             c = getConnection();
             boolean exists = false;
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT IconName FROM " + tableMarkerIcons + " WHERE IconName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT IconName FROM " + tableMarkerIcons + " WHERE IconName=?;")
             ) {
                 stmt.setString(1, markerid);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -834,14 +834,14 @@ public class MySQLMapStorage extends MapStorage {
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
                 try (
-                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableMarkerIcons + " WHERE IconName=?;");
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableMarkerIcons + " WHERE IconName=?;")
                 ) {
                     stmt.setString(1, markerid);
                     stmt.executeUpdate();
                 }
             } else if (exists) {
                 try (
-                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableMarkerIcons + " SET Image=? WHERE IconName=?;");
+                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableMarkerIcons + " SET Image=? WHERE IconName=?;")
                 ) {
                     stmt.setBinaryStream(1, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
                     stmt.setString(2, markerid);
@@ -849,7 +849,7 @@ public class MySQLMapStorage extends MapStorage {
                 }
             } else {
                 try (
-                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMarkerIcons + " (IconName,Image) VALUES (?,?);");
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMarkerIcons + " (IconName,Image) VALUES (?,?);")
                 ) {
                     stmt.setString(1, markerid);
                     stmt.setBinaryStream(2, new BufferInputStream(encImage.buf, encImage.len), encImage.len);
@@ -873,7 +873,7 @@ public class MySQLMapStorage extends MapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableMarkerIcons + " WHERE IconName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT Image FROM " + tableMarkerIcons + " WHERE IconName=?;")
             ) {
                 stmt.setString(1, markerid);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -901,7 +901,7 @@ public class MySQLMapStorage extends MapStorage {
             c = getConnection();
             boolean exists = false;
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM " + tableMarkerFiles + " WHERE FileName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM " + tableMarkerFiles + " WHERE FileName=?;")
             ) {
                 stmt.setString(1, world);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -914,14 +914,14 @@ public class MySQLMapStorage extends MapStorage {
                 // If delete, and doesn't exist, quit
                 if (!exists) return false;
                 try (
-                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableMarkerFiles + " WHERE FileName=?;");
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableMarkerFiles + " WHERE FileName=?;")
                 ) {
                     stmt.setString(1, world);
                     stmt.executeUpdate();
                 }
             } else if (exists) {
                 try (
-                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableMarkerFiles + " SET Content=? WHERE FileName=?;");
+                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableMarkerFiles + " SET Content=? WHERE FileName=?;")
                 ) {
                     stmt.setBytes(1, content.getBytes(UTF8));
                     stmt.setString(2, world);
@@ -929,7 +929,7 @@ public class MySQLMapStorage extends MapStorage {
                 }
             } else {
                 try (
-                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMarkerFiles + " (FileName,Content) VALUES (?,?);");
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableMarkerFiles + " (FileName,Content) VALUES (?,?);")
                 ) {
                     stmt.setString(1, world);
                     stmt.setBytes(2, content.getBytes(UTF8));
@@ -953,7 +953,7 @@ public class MySQLMapStorage extends MapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableMarkerFiles + " WHERE FileName=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableMarkerFiles + " WHERE FileName=?;")
             ) {
                 stmt.setString(1, world);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -1005,7 +1005,7 @@ public class MySQLMapStorage extends MapStorage {
         try {
             c = getConnection();
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT Content FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;")
             ) {
                 stmt.setString(1, fileid);
                 stmt.setLong(2, serverID);
@@ -1034,7 +1034,7 @@ public class MySQLMapStorage extends MapStorage {
             c = getConnection();
             boolean exists = false;
             try (
-            PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;");
+            PreparedStatement stmt = c.prepareStatement("SELECT FileName FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;")
             ) {
                 stmt.setString(1, fileid);
                 stmt.setLong(2, serverID);
@@ -1049,7 +1049,7 @@ public class MySQLMapStorage extends MapStorage {
                 //quit if doesn't exist
                 if (!exists) return true;
                 try (
-                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;");
+                PreparedStatement stmt = c.prepareStatement("DELETE FROM " + tableStandaloneFiles + " WHERE FileName=? AND ServerID=?;")
                 ) {
                     stmt.setString(1, fileid);
                     stmt.setLong(2, serverID);
@@ -1057,7 +1057,7 @@ public class MySQLMapStorage extends MapStorage {
                 }
             } else if (exists) {
                 try (
-                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableStandaloneFiles + " SET Content=? WHERE FileName=? AND ServerID=?;");
+                PreparedStatement stmt = c.prepareStatement("UPDATE " + tableStandaloneFiles + " SET Content=? WHERE FileName=? AND ServerID=?;")
                 ) {
                     stmt.setBinaryStream(1, new BufferInputStream(content.buf, content.len), content.len);
                     stmt.setString(2, fileid);
@@ -1066,7 +1066,7 @@ public class MySQLMapStorage extends MapStorage {
                 }
             } else {
                 try (
-                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableStandaloneFiles + " (FileName,ServerID,Content) VALUES (?,?,?);");
+                PreparedStatement stmt = c.prepareStatement("INSERT INTO " + tableStandaloneFiles + " (FileName,ServerID,Content) VALUES (?,?,?);")
                 ) {
                     stmt.setString(1, fileid);
                     stmt.setLong(2, serverID);

@@ -27,7 +27,7 @@ public class ForgeConfigFile {
         try {
             try (
             FileInputStream fis = new FileInputStream(cfg);
-            BufferedReader rdr = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
+            BufferedReader rdr = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8))
             ) {
                 String line;
                 List<String> section = new ArrayList<>();
